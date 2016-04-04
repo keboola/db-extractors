@@ -1,0 +1,19 @@
+app:
+  build: .
+  volumes:
+    - .:/code
+  working_dir: /code
+  entrypoint: "./phpunit.sh"
+  tty: true
+  stdin_open: true
+  environment:
+    ORACLE_DB_HOST: oracle
+    ORACLE_DB_PORT: 1521
+    ORACLE_DB_USER: system
+    ORACLE_DB_PASSWORD: oracle
+    ORACLE_DB_DATABASE: test
+  links:
+    - oracle
+
+oracle:
+  image: alexeiled/docker-oracle-xe-11g
