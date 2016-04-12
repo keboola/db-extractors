@@ -22,15 +22,17 @@ try {
 
 	$config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
 	$config['data_dir'] = $arguments['data'];
-	$config['extractor_class'] = 'MSSQL';
+	$config['extractor_class'] = 'MySQL';
 
 	$app = new Application($config);
 	$app->setConfigDefinition(new MySQLConfigDefinition());
 	$app->run();
 
 } catch(UserException $e) {
+	if (isset($app)) {
+		$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
+	}
 
-	$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
 	exit(1);
 
 } catch(ApplicationException $e) {
