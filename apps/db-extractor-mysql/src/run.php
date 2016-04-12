@@ -1,15 +1,15 @@
 <?php
 /**
- * @package ex-db-mssql
+ * @package ex-db-mysql
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 use Keboola\DbExtractor\Application;
-use Keboola\DbExtractor\Configuration\MSSSQLConfigDefinition;
+use Keboola\DbExtractor\Configuration\MySSQLConfigDefinition;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
 
-define('APP_NAME', 'ex-db-mssql');
+define('APP_NAME', 'ex-db-mysql');
 
 require_once(__DIR__ . "/../bootstrap.php");
 
@@ -25,7 +25,7 @@ try {
 	$config['extractor_class'] = 'MSSQL';
 
 	$app = new Application($config);
-	$app->setConfigDefinition(new MSSSQLConfigDefinition());
+	$app->setConfigDefinition(new MySSQLConfigDefinition());
 	$app->run();
 
 } catch(UserException $e) {
