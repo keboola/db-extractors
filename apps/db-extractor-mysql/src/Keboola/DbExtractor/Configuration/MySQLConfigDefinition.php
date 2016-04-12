@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class MySSQLConfigDefinition extends ConfigDefinition
+class MySQLConfigDefinition extends ConfigDefinition
 {
 	/**
 	 * Generates the configuration tree builder.

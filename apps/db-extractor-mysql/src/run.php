@@ -4,7 +4,7 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 use Keboola\DbExtractor\Application;
-use Keboola\DbExtractor\Configuration\MySSQLConfigDefinition;
+use Keboola\DbExtractor\Configuration\MySQLConfigDefinition;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
@@ -25,7 +25,7 @@ try {
 	$config['extractor_class'] = 'MSSQL';
 
 	$app = new Application($config);
-	$app->setConfigDefinition(new MySSQLConfigDefinition());
+	$app->setConfigDefinition(new MySQLConfigDefinition());
 	$app->run();
 
 } catch(UserException $e) {
