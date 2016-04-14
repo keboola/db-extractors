@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
 
-class MySQLTest extends AbstractMySQLTest
+class MySQLSSLTest extends AbstractMySQLTest
 {
 	public function setUp()
 	{
@@ -20,6 +20,10 @@ class MySQLTest extends AbstractMySQLTest
 			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
+		$options[\PDO::MYSQL_ATTR_SSL_KEY] = realpath($this->dataDir . '/mysql/ssl/client-key.pem');
+		$options[\PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
+		$options[\PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
+
 		$config = $this->getConfig('mysql');
 		$dbConfig = $config['parameters']['db'];
 
@@ -31,54 +35,29 @@ class MySQLTest extends AbstractMySQLTest
 		);
 
 		$this->pdo = new \PDO($dsn, $dbConfig['user'], $dbConfig['password'], $options);
+
 		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_LOCAL_INFILE, true);
 		$this->pdo->exec("SET NAMES utf8;");
+	}
+
+	public function testSSLEnabled()
+	{
+		$status = $this->pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
+
+		$this->assertArrayHasKey('Value', $status);
+		$this->assertNotEmpty($status['Value']);
 	}
 
 	public function testRun()
 	{
 		$config = $this->getConfig('mysql');
-		$app = $this->createApplication($config);
 
-
-		$csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
-		$this->createTextTable($csv1);
-
-		$csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
-		$this->createTextTable($csv2);
-
-		$result = $app->run();
-
-
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
-
-		$this->assertEquals('ok', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv1, $outputCsvFile);
-
-
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
-
-		$this->assertEquals('ok', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv2, $outputCsvFile);
-	}
-
-	public function testRunWithSSH()
-	{
-		$config = $this->getConfig('mysql');
-		$config['parameters']['db']['ssh'] = [
+		$config['parameters']['db']['ssl'] = [
 			'enabled' => true,
-			'keys' => [
-				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
-				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
-			],
-			'user' => 'root',
-			'sshHost' => 'sshproxy',
-			'remoteHost' => 'mysql',
-			'remotePort' => '3306',
+			'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
+			'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
+			'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+//			'cipher' => '',
 		];
 
 		$app = $this->createApplication($config);
@@ -89,7 +68,6 @@ class MySQLTest extends AbstractMySQLTest
 
 		$csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
 		$this->createTextTable($csv2);
-
 
 		$result = $app->run();
 
