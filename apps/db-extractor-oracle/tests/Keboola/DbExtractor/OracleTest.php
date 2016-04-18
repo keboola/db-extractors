@@ -12,17 +12,13 @@ use Keboola\DbExtractor\Test\ExtractorTest;
 
 class OracleTest extends ExtractorTest
 {
-	/** @var Application */
-	protected $app;
-
 	protected $connection;
 
 	public function setUp()
 	{
-		define('APP_NAME', 'ex-db-oracle');
-		$app = new Application($this->getConfig('oracle'));
-		$app->setConfigDefinition(new OracleConfigDefinition());
-		$this->app = $app;
+		if (!defined('APP_NAME')) {
+			define('APP_NAME', 'ex-db-oracle');
+		}
 
 		$config = $this->getConfig('oracle');
 		$dbConfig = $config['parameters']['db'];
@@ -138,13 +134,16 @@ class OracleTest extends ExtractorTest
 
 	public function testRun()
 	{
+		$config = $this->getConfig('oracle');
+		$app = $this->createApplication($config);
+
 		$csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
 		$this->createTextTable($csv1);
 
 		$csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
 		$this->createTextTable($csv2);
 
-		$result = $this->app->run();
+		$result = $app->run();
 
 		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
@@ -162,4 +161,60 @@ class OracleTest extends ExtractorTest
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
 	}
 
+	public function testRunWithSSH()
+	{
+		$config = $this->getConfig('oracle');
+		$config['parameters']['db']['ssh'] = [
+			'enabled' => true,
+			'keys' => [
+				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+			],
+			'user' => 'root',
+			'sshHost' => 'sshproxy',
+			'remoteHost' => 'oracle',
+			'remotePort' => $config['parameters']['db']['port'],
+			'localPort' => '15211',
+		];
+
+		$app = $this->createApplication($config);
+
+
+		$csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+		$this->createTextTable($csv1);
+
+		$csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+		$this->createTextTable($csv2);
+
+
+		$result = $app->run();
+
+
+		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+
+		$this->assertEquals('ok', $result['status']);
+		$this->assertFileExists($outputCsvFile);
+		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+		$this->assertFileEquals((string) $csv1, $outputCsvFile);
+
+
+		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+
+		$this->assertEquals('ok', $result['status']);
+		$this->assertFileExists($outputCsvFile);
+		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+		$this->assertFileEquals((string) $csv2, $outputCsvFile);
+	}
+
+	/**
+	 * @param array $config
+	 * @return Application
+	 */
+	public function createApplication(array $config)
+	{
+		$app = new Application($config);
+		$app->setConfigDefinition(new OracleConfigDefinition());
+
+		return $app;
+	}
 }

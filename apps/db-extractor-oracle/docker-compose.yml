@@ -14,9 +14,20 @@ app:
     ORACLE_DB_DATABASE: xe
   links:
     - oracle
+    - sshproxy
 
 oracle:
   image: alexeiled/docker-oracle-xe-11g
   ports:
     - 8080:8080
     - 1521:1521
+
+sshproxy:
+  build: ./tests/env/sshproxy
+  volumes:
+      - ./tests/env/sshproxy:/code
+  working_dir: /code
+  ports:
+    - "2222:22"
+  links:
+    - oracle
