@@ -5,37 +5,37 @@
  */
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Exception\ApplicationException;
 
 class Oracle extends Extractor
 {
 	public function createConnection($params)
 	{
-		// convert errors to PDOExceptions
-		$options = [
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
-		];
+		$dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
+		return oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
+	}
 
-		// check params
-		foreach (['host', 'database', 'user', 'password'] as $r) {
-			if (!array_key_exists($r, $params)) {
-				throw new UserException(sprintf("Parameter %s is missing.", $r));
+	protected function executeQuery($query, CsvFile $csv)
+	{
+		$stmt = oci_parse($this->db, $query);
+		oci_execute($stmt);
+
+		$resultRow = oci_fetch_assoc($stmt);
+
+		if (is_array($resultRow) && !empty($resultRow)) {
+			// write header and first line
+			$csv->writeRow(array_keys($resultRow));
+			$csv->writeRow($resultRow);
+
+			// write the rest
+			while ($resultRow = oci_fetch_assoc($stmt)) {
+				$csv->writeRow($resultRow);
 			}
+		} else {
+			$this->logger->warn("Query returned empty result. Nothing was imported.");
 		}
-
-		$port = isset($params['port']) ? $params['port'] : '1433';
-		$dsn = sprintf(
-			"dblib:host=%s;port=%d;dbname=%s;charset=UTF-8",
-			$params['host'],
-			$port,
-			$params['database']//,
-		);
-
-		$pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
-		$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-		return $pdo;
 	}
 
 	public function getConnection()

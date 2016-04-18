@@ -107,9 +107,9 @@ class OracleTest extends ExtractorTest
 			}
 		}
 
-		$query = oci_parse($this->connection, sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName));
-		oci_execute($query);
-		$row = oci_fetch_assoc($query);
+		$stmt = oci_parse($this->connection, sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName));
+		oci_execute($stmt);
+		$row = oci_fetch_assoc($stmt);
 
 		$this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
 	}
