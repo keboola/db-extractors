@@ -1,4 +1,4 @@
-"usergender","usercity","usersentiment","zipcode","sku","createdat","category","price","county","countycode","userstate","categorygroup"
+"USERGENDER","USERCITY","USERSENTIMENT","ZIPCODE","SKU","CREATEDAT","CATEGORY","PRICE","COUNTY","COUNTYCODE","USERSTATE","CATEGORYGROUP"
 "usergender","usercity","","zipcode","sku","createdat","category","","county","countycode","userstate","group"
 "Female","Mize","-1","39153","ZD111318","2013-09-23 22:38:29","Cameras","708","Smith","28129","Mississippi","Electronics"
 "Male","The Lakes","1","89124","ZD111402","2013-09-23 22:38:30","Televisions","1546","Clark","32003","Nevada","Electronics"
