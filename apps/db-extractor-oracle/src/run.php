@@ -4,7 +4,7 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 use Keboola\DbExtractor\Application;
-use Keboola\DbExtractor\Configuration\MSSSQLConfigDefinition;
+use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
@@ -25,7 +25,7 @@ try {
 	$config['extractor_class'] = 'Oracle';
 
 	$app = new Application($config);
-	$app->setConfigDefinition(new MSSSQLConfigDefinition());
+	$app->setConfigDefinition(new OracleConfigDefinition());
 	$app->run();
 
 } catch(UserException $e) {
