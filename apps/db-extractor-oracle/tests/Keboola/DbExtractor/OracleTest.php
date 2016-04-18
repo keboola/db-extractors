@@ -15,10 +15,7 @@ class OracleTest extends ExtractorTest
 	/** @var Application */
 	protected $app;
 
-	/**
-	 * @var \PDO
-	 */
-	protected $pdo;
+	protected $connection;
 
 	public function setUp()
 	{
@@ -29,16 +26,9 @@ class OracleTest extends ExtractorTest
 
 		$config = $this->getConfig('oracle');
 		$dbConfig = $config['parameters']['db'];
+		$dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
 
-		$dsn = sprintf(
-			"dblib:host=%s;port=%d;dbname=%s;charset=UTF-8",
-			$dbConfig['host'],
-			$dbConfig['port'],
-			$dbConfig['database']
-		);
-
-		$this->pdo = new \PDO($dsn, $dbConfig['user'], $dbConfig['password']);
-		$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		$this->connection = oci_connect($dbConfig['user'], $dbConfig['password'], $dbString, 'AL32UTF8');
 	}
 
 	/**
@@ -63,7 +53,7 @@ class OracleTest extends ExtractorTest
 			$file->getBasename('.' . $file->getExtension())
 		);
 
-		return 'dbo.' . $tableName;
+		return $tableName;
 	}
 
 	/**
@@ -75,88 +65,53 @@ class OracleTest extends ExtractorTest
 	{
 		$tableName = $this->generateTableName($file);
 
-		$this->pdo->exec(sprintf(
-			'IF OBJECT_ID(\'%s\', \'U\') IS NOT NULL DROP TABLE %s',
-			$tableName,
-			$tableName
-		));
+		try {
+			oci_execute(oci_parse($this->connection, sprintf("DROP TABLE %s", $tableName)));
+		} catch (\Exception $e) {
+			// table dont exists
+		}
 
-		$this->pdo->exec(sprintf(
+		$header = $file->getHeader();
+
+		oci_execute(oci_parse($this->connection, sprintf(
 			'CREATE TABLE %s (%s)',
 			$tableName,
 			implode(
 				', ',
 				array_map(function ($column) {
-					return $column . ' text NULL';
-				}, $file->getHeader())
+					return $column . ' NVARCHAR2 (400)';
+				}, $header)
 			),
 			$tableName
-		));
+		)));
 
 		$file->next();
-
-		$this->pdo->beginTransaction();
 
 		$columnsCount = count($file->current());
 		$rowsPerInsert = intval((1000 / $columnsCount) - 1);
 
-
-		while ($file->current() !== false) {
-			$sqlInserts = "";
-
+		while ($file->current() != false) {
 			for ($i=0; $i<$rowsPerInsert && $file->current() !== false; $i++) {
-				$sqlInserts = "";
+				$cols = [];
+				foreach ($file->current() as $col) {
+					$cols[] = "'" . $col . "'";
+				}
+				$sql = sprintf(
+					"INSERT INTO {$tableName} (%s) VALUES (%s)",
+					implode(',', $header),
+					implode(',', $cols));
 
-				$sqlInserts .= sprintf(
-					"(%s),",
-					implode(
-						',',
-						array_map(function ($data) {
-							if ($data == "") return 'null';
-							if (is_numeric($data)) return "'" . $data . "'";
+				oci_execute(oci_parse($this->connection, $sql));
 
-							$nonDisplayables = array(
-								'/%0[0-8bcef]/',            // url encoded 00-08, 11, 12, 14, 15
-								'/%1[0-9a-f]/',             // url encoded 16-31
-								'/[\x00-\x08]/',            // 00-08
-								'/\x0b/',                   // 11
-								'/\x0c/',                   // 12
-								'/[\x0e-\x1f]/'             // 14-31
-							);
-							foreach ($nonDisplayables as $regex) {
-								$data = preg_replace($regex, '', $data);
-							}
-
-							$data = str_replace("'", "''", $data );
-
-							return "'" . $data . "'";
-						}, $file->current())
-					)
-				);
 				$file->next();
-
-				$sql = sprintf('INSERT INTO %s VALUES %s',
-					$tableName,
-					substr($sqlInserts, 0, -1)
-				);
-
-				$this->pdo->exec($sql);
 			}
-
-//			if ($sqlInserts) {
-//				$sql = sprintf('INSERT INTO %s VALUES %s',
-//					$tableName,
-//					substr($sqlInserts, 0, -1)
-//				);
-//
-//				$this->pdo->exec($sql);
-//			}
 		}
 
-		$this->pdo->commit();
+		$query = oci_parse($this->connection, sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName));
+		oci_execute($query);
+		$row = oci_fetch_assoc($query);
 
-		$count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s', $tableName))->fetchColumn();
-		$this->assertEquals($this->countTable($file), (int) $count);
+		$this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
 	}
 
 	/**
@@ -183,10 +138,10 @@ class OracleTest extends ExtractorTest
 
 	public function testRun()
 	{
-		$csv1 = new CsvFile($this->dataDir . '/mssql/sales.csv');
+		$csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
 		$this->createTextTable($csv1);
 
-		$csv2 = new CsvFile($this->dataDir . '/mssql/escaping.csv');
+		$csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
 		$this->createTextTable($csv2);
 
 		$result = $this->app->run();
