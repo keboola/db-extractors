@@ -1,2 +1,2 @@
-# MS SQL DB Extractor
+# Oracle DB Extractor
 
