@@ -34,7 +34,7 @@ class OracleTest extends ExtractorTest
 	public function getConfig($driver = 'oracle')
 	{
 		$config = parent::getConfig($driver);
-		$config['extractor_class'] = 'Oracle';
+		$config['parameters']['extractor_class'] = 'Oracle';
 		return $config;
 	}
 
