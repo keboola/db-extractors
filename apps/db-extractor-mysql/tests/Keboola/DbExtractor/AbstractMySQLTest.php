@@ -6,7 +6,6 @@
 namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Configuration\MySQLConfigDefinition;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
 abstract class AbstractMySQLTest extends ExtractorTest
@@ -27,7 +26,6 @@ abstract class AbstractMySQLTest extends ExtractorTest
 			$config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
 		}
 		$config['parameters']['extractor_class'] = 'MySQL';
-		$config['data_dir'] = $this->dataDir;
 		return $config;
 	}
 
@@ -111,12 +109,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
 	/**
 	 * @param array $config
-	 * @return Application
+	 * @return MySQLApplication
 	 */
 	public function createApplication(array $config)
 	{
-		$app = new Application($config);
-		$app->setConfigDefinition(new MySQLConfigDefinition());
+		$app = new MySQLApplication($config, $this->dataDir);
 
 		return $app;
 	}
