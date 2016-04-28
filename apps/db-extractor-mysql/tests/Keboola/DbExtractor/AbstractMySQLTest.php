@@ -23,6 +23,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
 	public function getConfig($driver = 'mysql')
 	{
 		$config = parent::getConfig($driver);
+		if (!empty($config['parameters']['db']['#password'])) {
+			$config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+		}
 		$config['parameters']['extractor_class'] = 'MySQL';
 		$config['data_dir'] = $this->dataDir;
 		return $config;
