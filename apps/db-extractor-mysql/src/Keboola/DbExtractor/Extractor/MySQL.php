@@ -55,6 +55,10 @@ class MySQL extends Extractor
 		}
 
 		// check params
+		if (isset($params['#password'])) {
+	            $params['password'] = $params['#password'];
+	        }
+		
 		foreach (['host', 'database', 'user', 'password'] as $r) {
 			if (!array_key_exists($r, $params)) {
 				throw new UserException(sprintf("Parameter %s is missing.", $r));
