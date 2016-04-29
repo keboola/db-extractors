@@ -3,8 +3,7 @@
  * @package ex-db-oracle
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
-use Keboola\DbExtractor\Application;
-use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
+use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
@@ -20,12 +19,13 @@ try {
 		throw new UserException('Data folder not set.');
 	}
 
-	$config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
-	$config['data_dir'] = $arguments['data'];
-	$config['extractor_class'] = 'Oracle';
+	$app = new OracleApplication(
+		Yaml::parse(
+			file_get_contents($arguments["data"] . "/config.yml")
+		),
+		$arguments["data"]
+	);
 
-	$app = new Application($config);
-	$app->setConfigDefinition(new OracleConfigDefinition());
 	$app->run();
 
 } catch(UserException $e) {

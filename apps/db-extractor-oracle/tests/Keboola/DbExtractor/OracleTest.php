@@ -28,17 +28,6 @@ class OracleTest extends ExtractorTest
 	}
 
 	/**
-	 * @param string $driver
-	 * @return mixed
-	 */
-	public function getConfig($driver = 'oracle')
-	{
-		$config = parent::getConfig($driver);
-		$config['parameters']['extractor_class'] = 'Oracle';
-		return $config;
-	}
-
-	/**
 	 * @param CsvFile $file
 	 * @return string
 	 */
@@ -208,12 +197,11 @@ class OracleTest extends ExtractorTest
 
 	/**
 	 * @param array $config
-	 * @return Application
+	 * @return OracleApplication
 	 */
 	public function createApplication(array $config)
 	{
-		$app = new Application($config);
-		$app->setConfigDefinition(new OracleConfigDefinition());
+		$app = new OracleApplication($config, $this->dataDir);
 
 		return $app;
 	}
