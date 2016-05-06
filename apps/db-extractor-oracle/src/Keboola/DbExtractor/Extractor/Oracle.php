@@ -42,4 +42,10 @@ class Oracle extends Extractor
 	{
 		return $this->db;
 	}
+
+	public function testConnection()
+	{
+		$stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
+		oci_execute($stmt);
+	}
 }

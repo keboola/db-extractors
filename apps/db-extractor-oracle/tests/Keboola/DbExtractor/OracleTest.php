@@ -24,7 +24,7 @@ class OracleTest extends ExtractorTest
 		$dbConfig = $config['parameters']['db'];
 		$dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
 
-		$this->connection = oci_connect($dbConfig['user'], $dbConfig['password'], $dbString, 'AL32UTF8');
+		$this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
 	}
 
 	/**
@@ -121,6 +121,19 @@ class OracleTest extends ExtractorTest
 		return $linesCount;
 	}
 
+	public function testCredentials()
+	{
+		$config = $this->getConfig('oracle');
+		$config['action'] = 'testConnection';
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRun()
 	{
 		$config = $this->getConfig('oracle');
@@ -148,6 +161,33 @@ class OracleTest extends ExtractorTest
 		$this->assertFileExists($outputCsvFile);
 		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
+	}
+
+	public function testCredentialsWithSSH()
+	{
+		$config = $this->getConfig('oracle');
+
+		$config['parameters']['db']['ssh'] = [
+			'enabled' => true,
+			'keys' => [
+				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+			],
+			'user' => 'root',
+			'sshHost' => 'sshproxy',
+			'remoteHost' => 'oracle',
+			'remotePort' => $config['parameters']['db']['port'],
+			'localPort' => '15212',
+		];
+
+		$config['action'] = 'testConnection';
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
 	}
 
 	public function testRunWithSSH()
