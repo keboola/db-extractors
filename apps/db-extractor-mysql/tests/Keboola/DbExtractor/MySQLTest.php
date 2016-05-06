@@ -35,6 +35,19 @@ class MySQLTest extends AbstractMySQLTest
 		$this->pdo->exec("SET NAMES utf8;");
 	}
 
+	public function testCredentials()
+	{
+		$config = $this->getConfig('mysql');
+		$config['action'] = 'testConnection';
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRun()
 	{
 		$config = $this->getConfig('mysql');

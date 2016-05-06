@@ -93,4 +93,9 @@ class MySQL extends Extractor
 	{
 		return $this->db;
 	}
+
+	public function testConnection()
+	{
+		$this->db->query('SELECT NOW();')->execute();
+	}
 }
