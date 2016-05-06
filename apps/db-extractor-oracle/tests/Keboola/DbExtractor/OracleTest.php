@@ -134,6 +134,19 @@ class OracleTest extends ExtractorTest
 		$this->assertEquals('ok', $result['status']);
 	}
 
+	public function testRunWithoutTables()
+	{
+		$config = $this->getConfig('oracle');
+
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRun()
 	{
 		$config = $this->getConfig('oracle');
