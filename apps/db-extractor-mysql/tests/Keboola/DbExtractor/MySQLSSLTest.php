@@ -48,6 +48,28 @@ class MySQLSSLTest extends AbstractMySQLTest
 		$this->assertNotEmpty($status['Value']);
 	}
 
+	public function testCredentials()
+	{
+		$config = $this->getConfig('mysql');
+		$config['action'] = 'testConnection';
+
+		$config['parameters']['db']['ssl'] = [
+			'enabled' => true,
+			'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
+			'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
+			'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+//			'cipher' => '',
+		];
+
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRun()
 	{
 		$config = $this->getConfig('mysql');

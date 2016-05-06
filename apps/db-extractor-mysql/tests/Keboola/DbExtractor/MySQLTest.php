@@ -79,6 +79,33 @@ class MySQLTest extends AbstractMySQLTest
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
 	}
 
+	public function testCredentialsWithSSH()
+	{
+		$config = $this->getConfig('mysql');
+		$config['action'] = 'testConnection';
+
+		$config['parameters']['db']['ssh'] = [
+			'enabled' => true,
+			'keys' => [
+				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+			],
+			'user' => 'root',
+			'sshHost' => 'sshproxy',
+			'remoteHost' => 'mysql',
+			'remotePort' => '3306',
+			'localPort' => '13306',
+		];
+
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRunWithSSH()
 	{
 		$config = $this->getConfig('mysql');
@@ -92,6 +119,7 @@ class MySQLTest extends AbstractMySQLTest
 			'sshHost' => 'sshproxy',
 			'remoteHost' => 'mysql',
 			'remotePort' => '3306',
+			'localPort' => '23306',
 		];
 
 		$app = $this->createApplication($config);
