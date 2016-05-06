@@ -48,6 +48,19 @@ class MySQLTest extends AbstractMySQLTest
 		$this->assertEquals('ok', $result['status']);
 	}
 
+	public function testRunWithoutTables()
+	{
+		$config = $this->getConfig('mysql');
+
+		unset($config['parameters']['tables']);
+
+		$app = $this->createApplication($config);
+		$result = $app->run();
+
+		$this->assertArrayHasKey('status', $result);
+		$this->assertEquals('ok', $result['status']);
+	}
+
 	public function testRun()
 	{
 		$config = $this->getConfig('mysql');
