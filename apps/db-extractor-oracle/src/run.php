@@ -7,12 +7,15 @@ use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
+use Monolog\Handler\NullHandler;
+use Monolog\Logger;
 
 define('APP_NAME', 'ex-db-oracle');
 
 require_once(__DIR__ . "/../bootstrap.php");
 
 try {
+	$runAction = true;
 
 	$arguments = getopt("d::", ["data::"]);
 	if (!isset($arguments["data"])) {
@@ -26,10 +29,29 @@ try {
 		$arguments["data"]
 	);
 
-	echo json_encode($app->run());
+	if ($app['action'] !== 'run') {
+		$app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));
+		$runAction = false;
+	}
+
+	$result = $app->run();
+
+	if (!$runAction) {
+		echo json_encode($result);
+	}
+
+	$app['logger']->log('info', "Extractor finished successfully.");
+	exit(0);
 } catch(UserException $e) {
 
-	$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
+	if (isset($app)) {
+		$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
+
+		if (!$runAction) {
+			echo $e->getMessage();
+		}
+	}
+
 	exit(1);
 
 } catch(ApplicationException $e) {
@@ -45,7 +67,5 @@ try {
 		'trace' => $e->getTrace()
 	]);
 	exit(2);
-}
 
-$app['logger']->log('info', "Extractor finished successfully.");
-exit(0);
+}
