@@ -67,7 +67,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 		$result = $app->run();
 
 		$this->assertArrayHasKey('status', $result);
-		$this->assertEquals('ok', $result['status']);
+		$this->assertEquals('success', $result['status']);
 	}
 
 	public function testRun()
@@ -96,7 +96,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 
 		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
-		$this->assertEquals('ok', $result['status']);
+		$this->assertEquals('success', $result['status']);
 		$this->assertFileExists($outputCsvFile);
 		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
 		$this->assertFileEquals((string) $csv1, $outputCsvFile);
@@ -104,7 +104,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 
 		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
 
-		$this->assertEquals('ok', $result['status']);
+		$this->assertEquals('success', $result['status']);
 		$this->assertFileExists($outputCsvFile);
 		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
