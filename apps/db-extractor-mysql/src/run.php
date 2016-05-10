@@ -27,6 +27,7 @@ try {
 	);
 
 	echo json_encode($app->run());
+	exit(0);
 } catch(UserException $e) {
 	if (isset($app)) {
 		$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
