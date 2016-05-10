@@ -15,7 +15,7 @@ define('APP_NAME', 'ex-db-mysql');
 require_once(__DIR__ . "/../bootstrap.php");
 
 try {
-	$jsonOutput = false;
+	$runAction = true;
 
 	$arguments = getopt("d::", ["data::"]);
 	if (!isset($arguments["data"])) {
@@ -31,12 +31,12 @@ try {
 
 	if ($app['action'] !== 'run') {
 		$app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));
-		$jsonOutput = true;
+		$runAction = false;
 	}
 
 	$result = $app->run();
 
-	if ($jsonOutput) {
+	if (!$runAction) {
 		echo json_encode($result);
 	}
 
@@ -46,11 +46,8 @@ try {
 	if (isset($app)) {
 		$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
 
-		if ($jsonOutput) {
-			echo json_encode([
-				'status' => 'error',
-				'error' => $e->getMessage(),
-			]);
+		if (!$runAction) {
+			echo $e->getMessage();
 		}
 	}
 

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2e06d7d555a42358d88cda84cf97343e",
-    "content-hash": "41447966629c92d88713cff1c00f640c",
+    "hash": "3144f5870d557b98d2b2871ae31f3839",
+    "content-hash": "f1e41a01912871a8e91b33d60262a7eb",
     "packages": [
         {
             "name": "keboola/csv",
@@ -40,16 +40,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "4baeb458e40aa6d998f4721629929e06085e07d2"
+                "reference": "0a7aa6ad415d213f6bd21802bb22235e9fd89754"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/4baeb458e40aa6d998f4721629929e06085e07d2",
-                "reference": "4baeb458e40aa6d998f4721629929e06085e07d2",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/0a7aa6ad415d213f6bd21802bb22235e9fd89754",
+                "reference": "0a7aa6ad415d213f6bd21802bb22235e9fd89754",
                 "shasum": ""
             },
             "require": {
@@ -77,7 +77,7 @@
                     "email": "miro@keboola.com"
                 }
             ],
-            "time": "2016-05-05 14:30:22"
+            "time": "2016-05-10 13:52:03"
         },
         {
             "name": "keboola/php-temp",
