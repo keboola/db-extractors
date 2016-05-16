@@ -14,6 +14,8 @@ define('APP_NAME', 'ex-db-mysql');
 
 require_once(__DIR__ . "/../bootstrap.php");
 
+$logger = new \Keboola\DbExtractor\Logger(APP_NAME);
+
 try {
 	$runAction = true;
 
@@ -43,23 +45,22 @@ try {
 	$app['logger']->log('info', "Extractor finished successfully.");
 	exit(0);
 } catch(UserException $e) {
-	if (isset($app)) {
-		$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
+	
+	$logger->log('error', $e->getMessage(), (array) $e->getData());
 
-		if (!$runAction) {
-			echo $e->getMessage();
-		}
+	if (!$runAction) {
+		echo $e->getMessage();
 	}
 
 	exit(1);
 } catch(ApplicationException $e) {
 
-	$app['logger']->log('error', $e->getMessage(), (array) $e->getData());
+	$logger->log('error', $e->getMessage(), (array) $e->getData());
 	exit($e->getCode() > 1 ? $e->getCode(): 2);
 
 } catch(\Exception $e) {
 
-	$app['logger']->log('error', $e->getMessage(), [
+	$logger->log('error', $e->getMessage(), [
 		'errFile' => $e->getFile(),
 		'errLine' => $e->getLine(),
 		'trace' => $e->getTrace()
