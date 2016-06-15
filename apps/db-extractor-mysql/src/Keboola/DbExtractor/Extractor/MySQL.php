@@ -68,9 +68,7 @@ class MySQL extends Extractor
 			$params['database']
 		);
 
-		$this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : '')/*  , [
-			'options' => $options
-		]*/);
+		$this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
 		$pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
 		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);

@@ -60,10 +60,14 @@ try {
 
 } catch(\Exception $e) {
 
-	$logger->log('error', $e->getMessage(), [
-		'errFile' => $e->getFile(),
-		'errLine' => $e->getLine(),
-		'trace' => $e->getTrace()
-	]);
+//	$logger->log('error', $e->getMessage(), [
+//		'errFile' => $e->getFile(),
+//		'errLine' => $e->getLine(),
+//		'trace' => $e->getTrace()
+//	]);
+
+	print $e->getMessage();
+	print $e->getTraceAsString();
+
 	exit(2);
 }
