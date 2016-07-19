@@ -1,0 +1,21 @@
+{
+    "name": "keboola/db-extractor-redshift",
+    "require": {
+        "keboola/db-extractor-common": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.6.*",
+        "ext-pdo_pgsql": "*"
+    },
+    "authors": [
+        {
+            "name": "Marc Raiser",
+            "email": "marc@keboola.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Keboola\\": "src/Keboola/"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+app:
+  build: .
+  volumes:
+      - .:/code
+  working_dir: /code
+  entrypoint: "./phpunit.sh"
+  tty: true
+  stdin_open: true
+
