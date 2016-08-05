@@ -21,11 +21,6 @@ class Redshift extends Extractor
     {
         $this->dbConfig = $dbParams;
 
-        // convert errors to PDOExceptions
-        $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-        ];
-
         // check params
         foreach (['host', 'database', 'user', 'password'] as $r) {
             if (!isset($dbParams[$r])) {
@@ -54,7 +49,56 @@ class Redshift extends Extractor
 
     public function export(array $table)
     {
-        // TODO: make this thing
+        $outputTable = $table['outputTable'];
+        $csv = $this->createOutputCsv($outputTable);
+        $this->logger->info("Exporting to " . $outputTable);
+        $query = $table['query'];
+        $tries = 0;
+        $exception = null;
+        $csvCreated = false;
+        while ($tries < 5) {
+            $exception = null;
+            try {
+                if ($tries > 0) {
+                    $this->restartConnection();
+                }
+                $csvCreated = $this->executeQuery($query, $csv);
+                break;
+            } catch (\PDOException $e) {
+                $exception = new UserException("DB query failed: " . $e->getMessage(), 0, $e);
+            }
+            sleep(pow($tries, 2));
+            $tries++;
+        }
+        if ($exception) {
+            throw $exception;
+        }
+        if ($csvCreated) {
+            if ($this->createManifest($table) === false) {
+                throw new ApplicationException("Unable to create manifest", 0, null, [
+                    'table' => $table
+                ]);
+            }
+        }
+        return $outputTable;
+
+    }
+
+    protected function executeQuery($query, CsvFile $csv)
+    {
+        $statement = $this->db->query($query);
+
+        ob_implicit_flush(true);
+        while (@ob_end_flush());
+
+        $i = 0;
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if ($i === 0) {
+                $csv->writeRow(array_keys($row));
+            }
+            $csv->writeRow($row);
+            $i++;
+        }
     }
 
     public function testConnection()
