@@ -33,3 +33,11 @@
         }
       ]
     }
+
+## Running Tests
+
+To run tests, copy set-env.template.sh to set-env.sh and fill in your values for the environment variables. Then:
+
+```
+source set-env.sh && docker-compose run --rm app
+```
