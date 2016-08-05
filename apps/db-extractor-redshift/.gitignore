@@ -5,3 +5,4 @@ composer.phar
 runtests.sh
 test.php
 set-env.sh
+tests/data/out
