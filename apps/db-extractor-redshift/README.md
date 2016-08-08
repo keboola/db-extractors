@@ -1,8 +1,8 @@
+[![Docker Repository on Quay](https://quay.io/repository/keboola/db-extractor-redshift/status "Docker Repository on Quay")](https://quay.io/repository/keboola/db-extractor-redshift)
+
 # Redshift DB Extractor
 
-
 ## Example configuration
-
 
     {
       "db": {
