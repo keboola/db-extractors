@@ -88,6 +88,10 @@ class Redshift extends Extractor
     {
         $statement = $this->db->query($query);
 
+        if ($statement === FALSE) {
+            throw new UserException("Failed to execute the provided query.");
+        }
+        
         ob_implicit_flush(true);
         while (@ob_end_flush());
 
