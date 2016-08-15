@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # install dependencies
+composer selfupdate;
 composer install -n;
 
 php ./tests/Keboola/loadS3.php
