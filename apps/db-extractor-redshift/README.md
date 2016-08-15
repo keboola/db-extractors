@@ -1,4 +1,5 @@
 [![Docker Repository on Quay](https://quay.io/repository/keboola/db-extractor-redshift/status "Docker Repository on Quay")](https://quay.io/repository/keboola/db-extractor-redshift)
+[![Build Status](https://travis-ci.org/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.org/keboola/db-extractor-redshift)
 
 # Redshift DB Extractor
 
@@ -36,7 +37,9 @@
 
 ## Running Tests
 
-To run tests, copy set-env.template.sh to set-env.sh and fill in your values for the environment variables. Then:
+1. Create Redshift cluster and S3 bucket from CloudFormation template `aws-services.json`
+2. Copy set-env.template.sh to set-env.sh and fill in you Redshift and S3 credentials
+3. Run the tests:
 
 ```
 source set-env.sh && docker-compose run --rm app
