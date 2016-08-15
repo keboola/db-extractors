@@ -103,6 +103,8 @@ class Redshift extends Extractor
             $csv->writeRow($row);
             $i++;
         }
+
+        return ($i > 0);
     }
 
     public function testConnection()

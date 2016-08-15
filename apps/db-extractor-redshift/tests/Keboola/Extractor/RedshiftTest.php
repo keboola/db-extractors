@@ -10,6 +10,7 @@
 namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Test\ExtractorTest;
+use Symfony\Component\Filesystem\Filesystem;
 
 class RedshiftTest extends ExtractorTest
 {
@@ -18,6 +19,10 @@ class RedshiftTest extends ExtractorTest
 
     public function setUp()
     {
+        $fs = new Filesystem();
+        $fs->remove($this->dataDir . '/out/tables');
+        $fs->mkdir($this->dataDir . '/out/tables');
+
         if (!defined('APP_NAME')) {
             define('APP_NAME', 'ex-db-redshift');
         }
@@ -26,7 +31,7 @@ class RedshiftTest extends ExtractorTest
         $pdo = new \PDO(
             "pgsql:dbname={$config['parameters']['db']['database']};port=5439;host=" . $config['parameters']['db']['host'],
             $config['parameters']['db']['user'],
-            $config['parameters']['db']['password']
+            $config['parameters']['db']['#password']
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
