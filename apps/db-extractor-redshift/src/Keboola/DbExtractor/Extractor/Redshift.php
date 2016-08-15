@@ -91,9 +91,6 @@ class Redshift extends Extractor
         if ($statement === FALSE) {
             throw new UserException("Failed to execute the provided query.");
         }
-        
-        ob_implicit_flush(true);
-        while (@ob_end_flush());
 
         $i = 0;
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
