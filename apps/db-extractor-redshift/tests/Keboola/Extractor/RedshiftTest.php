@@ -11,6 +11,7 @@ namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends ExtractorTest
 {
@@ -77,11 +78,15 @@ class RedshiftTest extends ExtractorTest
         $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest';
+        $manifest = Yaml::parse(file_get_contents($outputManifestFile));
+
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($outputManifestFile);;
         $this->assertEquals(file_get_contents($expectedCsvFile), file_get_contents($outputCsvFile));
-
+        $this->assertEquals('in.c-main.escaping', $manifest['destination']);
+        $this->assertEquals(true, $manifest['incremental']);
+        $this->assertEquals('col3', $manifest['primary_key'][0]);
     }
 
     public function testTestConnection()
