@@ -15,9 +15,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends ExtractorTest
 {
-    /** @var Application */
-    protected $app;
-
     public function setUp()
     {
         $fs = new Filesystem();
@@ -45,8 +42,6 @@ class RedshiftTest extends ExtractorTest
         $qry = "COPY \"{$config['test']['schema']}\".escaping ";
         $qry .= "FROM 's3://{$config["aws"]["bucket"]}/escaping.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
         $pdo->query($qry);
-
-        $this->app = new Application($this->getConfig());
     }
 
     public function getConfig($driver = 'redshift')
@@ -72,9 +67,9 @@ class RedshiftTest extends ExtractorTest
         return $config;
     }
 
-    public function testRun()
+    private function runApp(Application $app)
     {
-        $result = $this->app->run();
+        $result = $app->run();
         $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest';
@@ -87,6 +82,29 @@ class RedshiftTest extends ExtractorTest
         $this->assertEquals('in.c-main.escaping', $manifest['destination']);
         $this->assertEquals(true, $manifest['incremental']);
         $this->assertEquals('col3', $manifest['primary_key'][0]);
+    }
+
+    public function testRun()
+    {
+        $this->runApp(new Application($this->getConfig()));
+    }
+
+    public function testRunWithSSH()
+    {
+        $config = $this->getConfig();
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE'),
+                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC')
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'localPort' => '33306',
+            'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
+            'remotePort' => $this->getEnv('redshift', 'DB_PORT')
+        ];
+        $this->runApp(new Application($config));
     }
 
     public function testTestConnection()
