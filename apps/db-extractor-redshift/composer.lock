@@ -40,16 +40,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "4.0.1",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "7860b32d5b136c37f99fa2774843a913457caec3"
+                "reference": "6c247036897bc0cea04984fb4c4af26ea3c5a513"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/7860b32d5b136c37f99fa2774843a913457caec3",
-                "reference": "7860b32d5b136c37f99fa2774843a913457caec3",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/6c247036897bc0cea04984fb4c4af26ea3c5a513",
+                "reference": "6c247036897bc0cea04984fb4c4af26ea3c5a513",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                     "email": "miro@keboola.com"
                 }
             ],
-            "time": "2016-09-24 11:35:55"
+            "time": "2016-09-28 09:45:45"
         },
         {
             "name": "keboola/ssh-tunnel",
@@ -494,16 +494,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.19.10",
+            "version": "3.19.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "eb9488f671175e708cf68c74cc04bd9115c96761"
+                "reference": "19bac3bdd7988cbf7f89d5ce8e2748d774e2cde8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/eb9488f671175e708cf68c74cc04bd9115c96761",
-                "reference": "eb9488f671175e708cf68c74cc04bd9115c96761",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/19bac3bdd7988cbf7f89d5ce8e2748d774e2cde8",
+                "reference": "19bac3bdd7988cbf7f89d5ce8e2748d774e2cde8",
                 "shasum": ""
             },
             "require": {
@@ -570,7 +570,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2016-09-22 19:32:03"
+            "time": "2016-09-27 19:38:36"
         },
         {
             "name": "doctrine/instantiator",
