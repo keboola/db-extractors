@@ -24,10 +24,12 @@ try {
 		throw new UserException('Data folder not set.');
 	}
 
+	$config = Yaml::parse(
+		file_get_contents($arguments["data"] . "/config.yml")
+	);
+
 	$app = new MySQLApplication(
-		Yaml::parse(
-			file_get_contents($arguments["data"] . "/config.yml")
-		),
+		$config,
 		$arguments["data"]
 	);
 
