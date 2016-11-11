@@ -36,4 +36,4 @@ composer install -n
 
 waitforservices
 
-./vendor/bin/phpunit --debug --verbose --filter testRunAction
+./vendor/bin/phpunit "$@"
