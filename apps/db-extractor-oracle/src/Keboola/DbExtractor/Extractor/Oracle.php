@@ -11,9 +11,12 @@ use Keboola\DbExtractor\Exception\ApplicationException;
 
 class Oracle extends Extractor
 {
+	protected $db;
+
 	public function createConnection($params)
 	{
 		$dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
+
 		return oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
 	}
 

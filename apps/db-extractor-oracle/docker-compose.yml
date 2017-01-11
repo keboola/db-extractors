@@ -17,10 +17,10 @@ app:
     - sshproxy
 
 oracle:
-  image: alexeiled/docker-oracle-xe-11g
+  image: sath89/oracle-xe-11g
   ports:
-    - 8080:8080
-    - 1521:1521
+    - "8080:8080"
+    - "1521:1521"
 
 sshproxy:
   build: ./tests/env/sshproxy
