@@ -43,7 +43,7 @@ class Oracle extends Extractor
 
 		} else {
 			$error = oci_error($stmt);
-			throw new UserException("Error executing query: " . $error);
+			throw new UserException("Error executing query: " . $error['message']);
 		}
 	}
 
