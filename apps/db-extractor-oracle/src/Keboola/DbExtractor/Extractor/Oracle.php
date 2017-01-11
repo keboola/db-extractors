@@ -23,21 +23,27 @@ class Oracle extends Extractor
 	protected function executeQuery($query, CsvFile $csv)
 	{
 		$stmt = oci_parse($this->db, $query);
-		oci_execute($stmt);
+		$success = @oci_execute($stmt);
 
-		$resultRow = oci_fetch_assoc($stmt);
+		if ($success) {
+			$resultRow = oci_fetch_assoc($stmt);
 
-		if (is_array($resultRow) && !empty($resultRow)) {
-			// write header and first line
-			$csv->writeRow(array_keys($resultRow));
-			$csv->writeRow($resultRow);
-
-			// write the rest
-			while ($resultRow = oci_fetch_assoc($stmt)) {
+			if (is_array($resultRow) && !empty($resultRow)) {
+				// write header and first line
+				$csv->writeRow(array_keys($resultRow));
 				$csv->writeRow($resultRow);
+
+				// write the rest
+				while ($resultRow = oci_fetch_assoc($stmt)) {
+					$csv->writeRow($resultRow);
+				}
+			} else {
+				$this->logger->warn("Query returned empty result. Nothing was imported.");
 			}
+
 		} else {
-			$this->logger->warn("Query returned empty result. Nothing was imported.");
+			$error = oci_error($stmt);
+			throw new UserException("Error executing query: " . $error);
 		}
 	}
 
