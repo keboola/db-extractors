@@ -37,6 +37,10 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->setTimeout(300);
         $process->run();
 
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
+//        die;
+
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');

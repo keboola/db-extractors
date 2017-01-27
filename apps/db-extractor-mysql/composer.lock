@@ -39,16 +39,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "4.0.5",
+            "version": "4.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "b7ec0dc48b2e1acdee040169c8386d7aa4414811"
+                "reference": "16c3be5100d71bb1c131764977ea7dda7dff5fe1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/b7ec0dc48b2e1acdee040169c8386d7aa4414811",
-                "reference": "b7ec0dc48b2e1acdee040169c8386d7aa4414811",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/16c3be5100d71bb1c131764977ea7dda7dff5fe1",
+                "reference": "16c3be5100d71bb1c131764977ea7dda7dff5fe1",
                 "shasum": ""
             },
             "require": {
@@ -77,7 +77,7 @@
                     "email": "miro@keboola.com"
                 }
             ],
-            "time": "2017-01-26T14:56:58+00:00"
+            "time": "2017-01-27T11:19:43+00:00"
         },
         {
             "name": "keboola/php-temp",

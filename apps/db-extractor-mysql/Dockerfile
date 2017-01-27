@@ -1,18 +1,33 @@
-FROM quay.io/keboola/docker-base-php56:0.0.2
+FROM centos:7
 MAINTAINER Erik Zigo <erik.zigo@keboola.com>
 
-# Install required tools
-RUN yum install -y wget
-RUN yum install -y tar
-RUN yum install -y openssl
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-devel
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-pear
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-mysql
+WORKDIR /code
 
-WORKDIR /home
+# Install required tools
+RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+	rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
+	yum -y --enablerepo=epel,remi,remi-php56 upgrade && \
+	yum -y --enablerepo=epel,remi,remi-php56 install \
+		git \
+		php \
+		openssl \
+		php-cli \
+		php-common \
+		php-mbstring \
+		php-pdo \
+		php-xml \
+		php-devel \
+		php-pear \
+		php-mysql \
+		&& \
+	yum clean all && \
+	echo "date.timezone=UTC" >> /etc/php.ini && \
+	echo "memory_limit = -1" >> /etc/php.ini && \
+	curl -sS https://getcomposer.org/installer | php && \
+	mv composer.phar /usr/local/bin/composer
 
 # Initialize
-COPY . /home/
+COPY . /code/
 RUN composer install --no-interaction
 
 RUN curl --location --silent --show-error --fail \
