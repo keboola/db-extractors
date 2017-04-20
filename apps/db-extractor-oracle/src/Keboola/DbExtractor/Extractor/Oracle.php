@@ -15,8 +15,14 @@ class Oracle extends Extractor
 	public function createConnection($params)
 	{
 		$dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
+        $connection = @oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
 
-		return oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
+        if (!$connection) {
+            $error = oci_error();
+            throw new UserException("Error connection to DB: " . $error['message']);
+        }
+
+		return $connection;
 	}
 
 	protected function executeQuery($query, CsvFile $csv)

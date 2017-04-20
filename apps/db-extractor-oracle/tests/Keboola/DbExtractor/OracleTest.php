@@ -24,7 +24,12 @@ class OracleTest extends ExtractorTest
 		$dbConfig = $config['parameters']['db'];
 		$dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
 
-		$this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+		$this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+
+        if (!$this->connection) {
+            $error = oci_error();
+            echo $error;
+        }
 	}
 
 	/**

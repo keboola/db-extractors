@@ -23,11 +23,6 @@ WORKDIR /home
 
 # Initialize
 COPY . /home/
-RUN composer install --no-interaction
-
-RUN curl --location --silent --show-error --fail \
-        https://github.com/Barzahlen/waitforservices/releases/download/v0.3/waitforservices \
-        > /usr/local/bin/waitforservices && \
-    chmod +x /usr/local/bin/waitforservices
+RUN composer selfupdate && composer install --no-interaction
 
 CMD php ./src/run.php --data=/data

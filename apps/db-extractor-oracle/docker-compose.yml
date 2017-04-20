@@ -20,9 +20,9 @@ services:
       - sshproxy
 
   oracle:
-    image: sath89/oracle-xe-11g
+    image: alexeiled/docker-oracle-xe-11g
     ports:
-      - "8080:8585"
+      - "8080:8080"
       - "1521:1521"
 
   sshproxy:
