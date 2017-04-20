@@ -3,6 +3,9 @@ services:
   app:
     build: .
     image: keboola/db-extractor-oracle
+    volumes:
+      - .:/code
+    working_dir: /code
     tty: true
     stdin_open: true
     command: ./phpunit.sh
