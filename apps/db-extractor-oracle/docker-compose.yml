@@ -1,33 +1,33 @@
-app:
-  build: .
-  volumes:
-    - .:/code
-  working_dir: /code
-  entrypoint: "./phpunit.sh"
-  tty: true
-  stdin_open: true
-  environment:
-    ORACLE_DB_HOST: oracle
-    ORACLE_DB_PORT: 1521
-    ORACLE_DB_USER: system
-    ORACLE_DB_PASSWORD: oracle
-    ORACLE_DB_DATABASE: xe
-  links:
-    - oracle
-    - sshproxy
+version: "2"
+services:
+  app:
+    build: .
+    image: keboola/db-extractor-oracle
+    tty: true
+    stdin_open: true
+    command: ./phpunit.sh
+    environment:
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: system
+      ORACLE_DB_PASSWORD: oracle
+      ORACLE_DB_DATABASE: xe
+    links:
+      - oracle
+      - sshproxy
 
-oracle:
-  image: sath89/oracle-xe-11g
-  ports:
-    - "8080:8080"
-    - "1521:1521"
+  oracle:
+    image: sath89/oracle-xe-11g
+    ports:
+      - "8080:8080"
+      - "1521:1521"
 
-sshproxy:
-  build: ./tests/env/sshproxy
-  volumes:
-      - ./tests/env/sshproxy:/code
-  working_dir: /code
-  ports:
-    - "2222:22"
-  links:
-    - oracle
+  sshproxy:
+    build: ./tests/env/sshproxy
+    volumes:
+        - ./tests/env/sshproxy:/code
+    working_dir: /code
+    ports:
+      - "2222:22"
+    links:
+      - oracle
