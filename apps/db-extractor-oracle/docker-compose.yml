@@ -22,7 +22,7 @@ services:
   oracle:
     image: sath89/oracle-xe-11g
     ports:
-      - "8080:8080"
+      - "8080:8585"
       - "1521:1521"
 
   sshproxy:
