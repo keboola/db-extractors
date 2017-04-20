@@ -7,7 +7,6 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Exception\ApplicationException;
 
 class Oracle extends Extractor
 {
@@ -25,26 +24,29 @@ class Oracle extends Extractor
 		$stmt = oci_parse($this->db, $query);
 		$success = @oci_execute($stmt);
 
-		if ($success) {
-			$resultRow = oci_fetch_assoc($stmt);
-
-			if (is_array($resultRow) && !empty($resultRow)) {
-				// write header and first line
-				$csv->writeRow(array_keys($resultRow));
-				$csv->writeRow($resultRow);
-
-				// write the rest
-				while ($resultRow = oci_fetch_assoc($stmt)) {
-					$csv->writeRow($resultRow);
-				}
-			} else {
-				$this->logger->warn("Query returned empty result. Nothing was imported.");
-			}
-
-		} else {
+		if (!$success) {
 			$error = oci_error($stmt);
 			throw new UserException("Error executing query: " . $error['message']);
 		}
+
+        $resultRow = oci_fetch_assoc($stmt);
+        if (!is_array($resultRow) || empty($resultRow)) {
+            $this->logger->warn("Query returned empty result. Nothing was imported.");
+            return 0;
+        }
+
+        // write header and first line
+        $csv->writeRow(array_keys($resultRow));
+        $csv->writeRow($resultRow);
+
+        // write the rest
+        $cnt = 1;
+        while ($resultRow = oci_fetch_assoc($stmt)) {
+            $csv->writeRow($resultRow);
+            $cnt++;
+        }
+
+        return $cnt;
 	}
 
 	public function getConnection()
@@ -55,6 +57,6 @@ class Oracle extends Extractor
 	public function testConnection()
 	{
 		$stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-		oci_execute($stmt);
+		return oci_execute($stmt);
 	}
 }
