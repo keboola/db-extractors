@@ -16,15 +16,15 @@ class OracleTest extends ExtractorTest
 
 	public function setUp()
 	{
-		if (!defined('APP_NAME')) {
-			define('APP_NAME', 'ex-db-oracle');
-		}
+        if (!defined('APP_NAME')) {
+            define('APP_NAME', 'ex-db-oracle');
+        }
 
-		$config = $this->getConfig('oracle');
-		$dbConfig = $config['parameters']['db'];
-		$dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
+        $config = $this->getConfig('oracle');
+        $dbConfig = $config['parameters']['db'];
+        $dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
 
-		$this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+        $this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         if (!$this->connection) {
             $error = oci_error();
             echo $error['message'];
@@ -156,11 +156,11 @@ class OracleTest extends ExtractorTest
 		$config = $this->getConfig('oracle');
 		$app = $this->createApplication($config);
 
-		$csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-		$this->createTextTable($csv1);
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1);
 
-		$csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-		$this->createTextTable($csv2);
+        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $this->createTextTable($csv2);
 
 		$result = $app->run();
 
@@ -225,13 +225,11 @@ class OracleTest extends ExtractorTest
 
 		$app = $this->createApplication($config);
 
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1);
 
-		$csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-		$this->createTextTable($csv1);
-
-		$csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-		$this->createTextTable($csv2);
-
+        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $this->createTextTable($csv2);
 
 		$result = $app->run();
 
@@ -251,6 +249,34 @@ class OracleTest extends ExtractorTest
 		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
 	}
+
+    public function testGetTables()
+    {
+        $config = $this->getConfig('oracle');
+        $config['action'] = 'getTables';
+
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertArrayHasKey('tables', $result);
+        $this->assertEquals('success', $result['status']);
+        $this->assertCount(95, $result['tables']);
+        foreach ($result['tables'] as $i => $table) {
+            $this->assertArrayHasKey('name', $table);
+            $this->assertArrayHasKey('columns', $table);
+            if (count($table['columns']) > 0) { // in case a table exists with no columns
+                foreach ($table['columns'] as $j => $column) {
+                    $this->assertArrayHasKey('name', $column);
+                    $this->assertArrayHasKey('type', $column);
+                    $this->assertArrayHasKey('length', $column);
+                    $this->assertArrayHasKey('nullable', $column);
+                    $this->assertArrayHasKey('default', $column);
+                    $this->assertArrayHasKey('ordinalPosition', $column);
+                }
+            }
+        }
+    }
 
 	/**
 	 * @param array $config
