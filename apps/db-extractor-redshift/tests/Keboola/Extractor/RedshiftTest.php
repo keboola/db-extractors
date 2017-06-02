@@ -63,6 +63,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('success', $result['status']);
     }
 
+<<<<<<< HEAD
     public function testSSHConnection()
     {
         $config = $this->getConfig();
@@ -84,5 +85,32 @@ class RedshiftTest extends AbstractRedshiftTest
         $app = new Application($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
+=======
+    public function testGetTables()
+    {
+        $config = $this->getConfig();
+        $config['action'] = 'getTables';
+        $app = new Application($config);
+        $result = $app->run();
+        $this->assertArrayHasKey('status', $result);
+        $this->assertArrayHasKey('tables', $result);
+        $this->assertCount(1, $result['tables']);
+        $this->assertArrayHasKey('name', $result['tables'][0]);
+        $this->assertEquals("escaping", $result['tables'][0]['name']);
+        $this->assertArrayHasKey('columns', $result['tables'][0]);
+        $this->assertCount(3, $result['tables'][0]['columns']);
+        $this->assertArrayHasKey('name', $result['tables'][0]['columns'][0]);
+        $this->assertEquals("col1", $result['tables'][0]['columns'][0]['name']);
+        $this->assertArrayHasKey('type', $result['tables'][0]['columns'][0]);
+        $this->assertEquals("character varying", $result['tables'][0]['columns'][0]['type']);
+        $this->assertArrayHasKey('length', $result['tables'][0]['columns'][0]);
+        $this->assertEquals(256, $result['tables'][0]['columns'][0]['length']);
+        $this->assertArrayHasKey('nullable', $result['tables'][0]['columns'][0]);
+        $this->assertFalse($result['tables'][0]['columns'][0]['nullable']);
+        $this->assertArrayHasKey('default', $result['tables'][0]['columns'][0]);
+        $this->assertEquals("a", $result['tables'][0]['columns'][0]['default']);
+        $this->assertArrayHasKey('primaryKey', $result['tables'][0]['columns'][0]);
+        $this->asserttrue($result['tables'][0]['columns'][0]['primaryKey']);
+>>>>>>> feat: support for getTables
     }
 }

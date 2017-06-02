@@ -110,4 +110,84 @@ class Redshift extends Extractor
     {
         $this->db->query("SELECT 1");
     }
+
+    public function listTables()
+    {
+        $res = $this->db->query(
+            "SELECT schemaname, tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'"
+        );
+        $output = $res->fetchAll();
+        return array_column($output, 'tablename');
+    }
+
+    public function describeTable($tableName, $schemaName = false)
+    {
+
+        $sql = "
+            SELECT cols.column_name, cols.column_default, cols.is_nullable, cols.data_type, cols.ordinal_position,
+                        cols.character_maximum_length, cols.numeric_precision, cols.numeric_scale,
+                        def.contype, def.conkey
+            FROM information_schema.columns as cols 
+            JOIN (
+              SELECT
+                a.attnum,
+                n.nspname,
+                c.relname,
+                a.attname AS colname,
+                t.typname AS type,
+                a.atttypmod,
+                FORMAT_TYPE(a.atttypid, a.atttypmod) AS complete_type,
+                d.adsrc AS default_value,
+                a.attnotnull AS notnull,
+                a.attlen AS length,
+                co.contype,
+                ARRAY_TO_STRING(co.conkey, ',') AS conkey
+              FROM pg_attribute AS a
+                JOIN pg_class AS c ON a.attrelid = c.oid
+                JOIN pg_namespace AS n ON c.relnamespace = n.oid
+                JOIN pg_type AS t ON a.atttypid = t.oid
+                LEFT OUTER JOIN pg_constraint AS co ON (co.conrelid = c.oid
+                    AND a.attnum = ANY(co.conkey) AND (co.contype = 'p' OR co.contype = 'u'))
+                LEFT OUTER JOIN pg_attrdef AS d ON d.adrelid = c.oid AND d.adnum = a.attnum
+              WHERE a.attnum > 0 AND c.relname = " . $this->db->quote($tableName) . "
+            ) as def 
+            ON cols.column_name = def.colname
+            WHERE cols.table_name = " . $this->db->quote($tableName);
+        if ($schemaName) {
+            $sql .= " AND cols.schema_name = " . $this->db->quote($schemaName);
+        }
+        $sql .= ' ORDER BY cols.ordinal_position';
+
+        $res = $this->db->query($sql);
+
+        $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
+        
+        $columns = [];
+        foreach ($rows as $i => $column) {
+
+            $length = ($column['character_maximum_length']) ? $column['character_maximum_length'] : null;
+            if (is_null($length) && !is_null($column['numeric_precision'])) {
+                if ($column['numeric_scale'] > 0) {
+                    $length = $column['numeric_precision'] . "," . $column['numeric_scale'];
+                } else {
+                    $length = $column['numeric_precision'];
+                }
+            }
+            $default = null;
+            if (!is_null($column['column_default'])) {
+                $default = str_replace("'", "", explode('::', $column['column_default'])[0]);
+            }
+            $columns[$i] = [
+                "name" => $column['column_name'],
+                "type" => $column['data_type'],
+                "primaryKey" => ($column['contype'] === "p") ? true : false,
+                "uniqueKey" => ($column['contype'] === "u") ? true : false,
+                "length" => $length,
+                "nullable" => ($column['is_nullable'] === "NO") ? false : true,
+                "default" => $default,
+                "ordinalPosition" => $column['ordinal_position']
+            ];
+        }
+        return $columns;
+    }
 }
