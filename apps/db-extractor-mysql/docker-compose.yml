@@ -1,5 +1,6 @@
 app:
   build: .
+  image: keboola/ex-db-mysql
   volumes:
     - .:/code
   working_dir: /code
