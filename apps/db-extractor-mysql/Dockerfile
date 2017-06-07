@@ -30,9 +30,4 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
 COPY . /code/
 RUN composer install --no-interaction
 
-RUN curl --location --silent --show-error --fail \
-        https://github.com/Barzahlen/waitforservices/releases/download/v0.3/waitforservices \
-        > /usr/local/bin/waitforservices && \
-    chmod +x /usr/local/bin/waitforservices
-
 CMD php ./src/run.php --data=/data
