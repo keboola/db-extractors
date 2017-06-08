@@ -15,6 +15,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends ExtractorTest
 {
+    const TESTING_SCHEMA_NAME = 'testing';
+
     public function setUp()
     {
         $fs = new Filesystem();
@@ -33,13 +35,13 @@ class RedshiftTest extends ExtractorTest
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        $pdo->query("CREATE SCHEMA IF NOT EXISTS \"{$config['test']['schema']}\"");
-        $pdo->query("DROP TABLE IF EXISTS \"{$config['test']['schema']}\".escaping;");
-        $pdo->query("CREATE TABLE IF NOT EXISTS \"{$config['test']['schema']}\".escaping (col1 VARCHAR NOT NULL, col2 VARCHAR NOT NULL, col3 VARCHAR NOT NULL);");
+        $pdo->query("CREATE SCHEMA IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME. "\"");
+        $pdo->query("DROP TABLE IF EXISTS \"" . self::TESTING_SCHEMA_NAME. "\".escaping;");
+        $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME. "\".escaping (col1 VARCHAR NOT NULL, col2 VARCHAR NOT NULL, col3 VARCHAR NOT NULL);");
 
         $credStr = "aws_access_key_id={$config['aws']['s3key']};aws_secret_access_key={$config['aws']['s3secret']}";
 
-        $qry = "COPY \"{$config['test']['schema']}\".escaping ";
+        $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".escaping ";
         $qry .= "FROM 's3://{$config["aws"]["bucket"]}/escaping.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
         $pdo->query($qry);
     }
@@ -59,10 +61,7 @@ class RedshiftTest extends ExtractorTest
         if (getenv('AWS_S3_BUCKET')) {
             $config['aws']['bucket'] = getenv('AWS_S3_BUCKET');
         }
-        if (getenv('REDSHIFT_DB_SCHEMA')) {
-            $config['test']['schema'] = getenv('REDSHIFT_DB_SCHEMA');
-        }
-        
+
         $config['parameters']['extractor_class'] = 'Redshift';
         return $config;
     }
