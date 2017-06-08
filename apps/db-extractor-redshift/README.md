@@ -38,7 +38,18 @@
 ## Running Tests
 
 1. Create Redshift cluster and S3 bucket from CloudFormation template `aws-services.json`
-2. Copy set-env.template.sh to set-env.sh and fill in you Redshift and S3 credentials
+2. Create `.env` file and fill in you Redshift and S3 credentials:
+```
+REDSHIFT_DB_HOST=my.redshift.host.region.amazonaws.com
+REDSHIFT_DB_PORT=5439
+REDSHIFT_DB_DATABASE=testdb
+REDSHIFT_DB_USER=testuser
+REDSHIFT_DB_PASSWORD=testpassword
+AWS_ACCESS_KEY=aws_access_key
+AWS_SECRET_KEY=aws_secret_key
+AWS_REGION=eu-west-1
+AWS_S3_BUCKET=test-bucket
+```
 3. Run the tests:
 
 ```
