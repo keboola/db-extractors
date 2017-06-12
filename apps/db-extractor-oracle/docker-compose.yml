@@ -8,7 +8,7 @@ services:
     working_dir: /code
     tty: true
     stdin_open: true
-    command: ./phpunit.sh
+    command: "./phpunit.sh"
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
