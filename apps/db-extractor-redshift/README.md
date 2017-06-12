@@ -1,4 +1,3 @@
-[![Docker Repository on Quay](https://quay.io/repository/keboola/db-extractor-redshift/status "Docker Repository on Quay")](https://quay.io/repository/keboola/db-extractor-redshift)
 [![Build Status](https://travis-ci.org/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.org/keboola/db-extractor-redshift)
 
 # Redshift DB Extractor
