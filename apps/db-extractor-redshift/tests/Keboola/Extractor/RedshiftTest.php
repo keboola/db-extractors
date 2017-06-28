@@ -96,6 +96,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertCount(1, $result['tables']);
         $this->assertArrayHasKey('name', $result['tables'][0]);
         $this->assertEquals("escaping", $result['tables'][0]['name']);
+        $this->assertEquals(self::TESTING_SCHEMA_NAME, $result['tables'][0]['schema']);
+        $this->assertEquals(self::TESTING_SCHEMA_NAME, $result['tables'][0]['catalog']);
+        $this->assertEquals("BASE TABLE", $result['tables'][0]['type']);
         $this->assertArrayHasKey('columns', $result['tables'][0]);
         $this->assertCount(3, $result['tables'][0]['columns']);
         $this->assertArrayHasKey('name', $result['tables'][0]['columns'][0]);
@@ -110,5 +113,82 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals("a", $result['tables'][0]['columns'][0]['default']);
         $this->assertArrayHasKey('primaryKey', $result['tables'][0]['columns'][0]);
         $this->asserttrue($result['tables'][0]['columns'][0]['primaryKey']);
+    }
+
+    public function testManifestMetadata()
+    {
+        $config = $this->getConfig();
+
+        $config['parameters']['tables'][0]['columns'] = ["col1","col2","col3"];
+        $config['parameters']['tables'][0]['table'] = 'escaping';
+        $config['parameters']['tables'][0]['query'] = "SELECT col1, col2, col3 FROM escaping";
+        // use just 1 table
+        unset($config['parameters']['tables'][1]);
+
+        $app = new Application($config);
+
+        $result = $app->run();
+
+        $outputManifest = Yaml::parse(
+            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest')
+        );
+
+        $this->assertArrayHasKey('destination', $outputManifest);
+        $this->assertArrayHasKey('incremental', $outputManifest);
+        $this->assertArrayHasKey('metadata', $outputManifest);
+        foreach ($outputManifest['metadata'] as $i => $metadata) {
+            $this->assertArrayHasKey('key', $metadata);
+            $this->assertArrayHasKey('value', $metadata);
+            switch ($metadata['key']) {
+                case 'KBC.name':
+                    $this->assertEquals('escaping', $metadata['value']);
+                    break;
+                case 'KBC.schema':
+                    $this->assertEquals(self::TESTING_SCHEMA_NAME, $metadata['value']);
+                    break;
+                case 'KBC.catalog':
+                    $this->assertEquals(self::TESTING_SCHEMA_NAME, $metadata['value']);
+                    break;
+                case 'KBC.type':
+                    $this->assertEquals('BASE TABLE', $metadata['value']);
+                    break;
+                default:
+                    $this->fail('Unknown table metadata key: ' . $metadata['key']);
+            }
+        }
+        $this->assertArrayHasKey('column_metadata', $outputManifest);
+        $this->assertCount(3, $outputManifest['column_metadata']);
+        foreach ($outputManifest['column_metadata']['col1'] as $metadata) {
+            $this->assertArrayHasKey('key', $metadata);
+            $this->assertArrayHasKey('value', $metadata);
+            switch ($metadata['key']) {
+                case 'KBC.datatype.type':
+                    $this->assertEquals('character varying', $metadata['value']);
+                    break;
+                case 'KBC.datatype.basetype':
+                    $this->assertEquals('STRING', $metadata['value']);
+                    break;
+                case 'KBC.datatype.nullable':
+                    $this->assertFalse($metadata['value']);
+                    break;
+                case 'KBC.datatype.default':
+                    $this->assertEquals("a", $metadata['value']);
+                    break;
+                case 'KBC.datatype.length':
+                    $this->assertEquals('256', $metadata['value']);
+                    break;
+                case 'KBC.primaryKey':
+                    $this->assertTrue($metadata['value']);
+                    break;
+                case 'KBC.ordinalPosition':
+                    $this->assertEquals(1, $metadata['value']);
+                    break;
+                case 'KBC.uniqueKey':
+                    $this->assertFalse($metadata['value']);
+                    break;
+                default:
+                    $this->fail('Unknown table metadata key: ' . $metadata['key']);
+            }
+        }
     }
 }
