@@ -111,17 +111,39 @@ class Redshift extends Extractor
         $this->db->query("SELECT 1");
     }
 
-    public function listTables()
+
+    public function getTables(array $tables = null)
     {
-        $res = $this->db->query(
-            "SELECT schemaname, tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'"
-        );
-        $output = $res->fetchAll();
-        return array_column($output, 'tablename');
+        $sql = "SELECT * FROM information_schema.tables 
+                WHERE table_schema != 'pg_catalog' AND table_schema != 'information_schema'";
+
+        if (!is_null($tables) && count($tables) > 0) {
+            $sql .= sprintf(
+                " AND table_name IN (%s)",
+                implode(',', array_map(function ($table) {
+                    return $this->db->quote($table);
+                }, $tables))
+            );
+        }
+
+        $res = $this->db->query($sql);
+        $arr = $res->fetchAll();
+
+        $output = [];
+        foreach ($arr as $table) {
+            $output[] = $this->describeTable($table);
+        }
+        return $output;
     }
 
-    public function describeTable($tableName, $schemaName = false)
+    public function describeTable(array $table)
     {
+        $tabledef = [
+            'name' => $table['table_name'],
+            'schema' => (isset($table['table_schema'])) ? $table['table_schema'] : null,
+            'type' => (isset($table['table_type'])) ? $table['table_type'] : null,
+            'catalog' => (isset($table['table_catalog'])) ? $table['table_catalog'] : null
+        ];
 
         $sql = "
             SELECT cols.column_name, cols.column_default, cols.is_nullable, cols.data_type, cols.ordinal_position,
@@ -149,12 +171,12 @@ class Redshift extends Extractor
                 LEFT OUTER JOIN pg_constraint AS co ON (co.conrelid = c.oid
                     AND a.attnum = ANY(co.conkey) AND (co.contype = 'p' OR co.contype = 'u'))
                 LEFT OUTER JOIN pg_attrdef AS d ON d.adrelid = c.oid AND d.adnum = a.attnum
-              WHERE a.attnum > 0 AND c.relname = " . $this->db->quote($tableName) . "
+              WHERE a.attnum > 0 AND c.relname = " . $this->db->quote($tabledef['name']) . "
             ) as def 
             ON cols.column_name = def.colname
-            WHERE cols.table_name = " . $this->db->quote($tableName);
-        if ($schemaName) {
-            $sql .= " AND cols.schema_name = " . $this->db->quote($schemaName);
+            WHERE cols.table_name = " . $this->db->quote($tabledef['name']);
+        if ($tabledef['schema']) {
+            $sql .= " AND cols.table_schema = " . $this->db->quote($tabledef['schema']);
         }
         $sql .= ' ORDER BY cols.ordinal_position';
 
@@ -188,6 +210,8 @@ class Redshift extends Extractor
                 "ordinalPosition" => $column['ordinal_position']
             ];
         }
-        return $columns;
+
+        $tabledef['columns'] = $columns;
+        return $tabledef;
     }
 }

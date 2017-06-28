@@ -63,7 +63,6 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('success', $result['status']);
     }
 
-<<<<<<< HEAD
     public function testSSHConnection()
     {
         $config = $this->getConfig();
@@ -85,7 +84,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $app = new Application($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
-=======
+    }
     public function testGetTables()
     {
         $config = $this->getConfig();
@@ -111,6 +110,5 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals("a", $result['tables'][0]['columns'][0]['default']);
         $this->assertArrayHasKey('primaryKey', $result['tables'][0]['columns'][0]);
         $this->asserttrue($result['tables'][0]['columns'][0]['primaryKey']);
->>>>>>> feat: support for getTables
     }
 }
