@@ -9,7 +9,8 @@ docker push $REPOSITORY:latest
 export SYRUP_CLI=quay.io/keboola/syrup-cli
 
 docker pull $SYRUP_CLI:latest
-# run simple job
+
+echo 'Running simple configuration ... job[1/3]'
 docker run --rm -e KBC_STORAGE_TOKEN=$KBC_SYRUP_CLI_TOKEN \
    $SYRUP_CLI:latest run-job keboola.ex-db-mysql 287537333 $TRAVIS_TAG
 
@@ -18,7 +19,7 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-#run ssh job
+echo 'Running ssh configuration ... job[2/3]'
 docker run --rm -e KBC_STORAGE_TOKEN=$KBC_SYRUP_CLI_TOKEN \
    $SYRUP_CLI:latest run-job keboola.ex-db-mysql 287589303 $TRAVIS_TAG
 
@@ -27,17 +28,16 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-#run firewall test job
+echo 'Running firewall test configuration ... job[3/3]'
 docker run --rm -e KBC_STORAGE_TOKEN=$KBC_SYRUP_CLI_TOKEN \
    $SYRUP_CLI:latest run-job keboola.ex-db-mysql 288410371 $TRAVIS_TAG
 
 if [ $? -ne 0 ]; then
-  echo 'SSH test job run failed'
+  echo 'Firewall test job run failed'
   exit 1;
 fi
 
-
-# If those jobs pass then go ahead and update the DP tag
+echo 'All test jobs were successfull.  Updating repository tag in the developer portal...'
 docker run --rm \
   -e KBC_DEVELOPERPORTAL_USERNAME=$KBC_DEVELOPERPORTAL_USERNAME \
   -e KBC_DEVELOPERPORTAL_PASSWORD=$KBC_DEVELOPERPORTAL_PASSWORD \
