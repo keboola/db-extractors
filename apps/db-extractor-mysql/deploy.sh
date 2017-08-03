@@ -15,7 +15,7 @@ docker pull $SYRUP_CLI:latest
 function bell {
   while true; do
     echo "."
-    sleep 20
+    sleep 60
   done
 }
 
