@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 docker pull quay.io/keboola/developer-portal-cli-v2:latest
 export REPOSITORY=`docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME=$KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD=$KBC_DEVELOPERPORTAL_PASSWORD -e KBC_DEVELOPERPORTAL_URL=$KBC_DEVELOPERPORTAL_URL quay.io/keboola/developer-portal-cli-v2:latest ecr:get-repository keboola keboola.ex-db-mysql`
 docker tag keboola/ex-db-mysql:latest $REPOSITORY:$TRAVIS_TAG
@@ -11,10 +12,10 @@ export SYRUP_CLI=quay.io/keboola/syrup-cli
 docker pull $SYRUP_CLI:latest
 
 # helper to keep travis from timing out
-function bell() {
+function bell {
   while true; do
     echo "."
-    sleep 60
+    sleep 20
   done
 }
 
