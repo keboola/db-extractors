@@ -36,9 +36,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
 //        die;
 
         $this->assertEquals(0, $process->getExitCode());
@@ -48,5 +45,37 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest');
         $this->assertFileEquals((string) $csv2, $outputCsvFile2);
+    }
+
+    public function testTestConnectionAction()
+    {
+        $config = $this->getConfig();
+        @unlink($this->dataDir . '/config.yml');
+        $config['action'] = 'testConnection';
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+        $this->assertJson($process->getOutput());
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals("", $process->getErrorOutput());
+    }
+
+    public function testGetTablesAction()
+    {
+        $config = $this->getConfig();
+        $config['action'] = "getTables";
+        @unlink($this->dataDir . '/config.yml');
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        // run entrypoint
+        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertJson($process->getOutput());
+        $this->assertEquals("", $process->getErrorOutput());
     }
 }
