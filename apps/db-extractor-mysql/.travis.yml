@@ -9,7 +9,7 @@ before_install:
 
 script:
   - docker-compose run --rm app
-  - docker pull quay.io/keboola/developer-portal-cli-v2:0.0.1
+  - docker pull quay.io/keboola/developer-portal-cli-v2:latest
   - export REPOSITORY=`docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD -e KBC_DEVELOPERPORTAL_URL quay.io/keboola/developer-portal-cli-v2:latest ecr:get-repository keboola keboola.ex-db-mysql`
   - docker tag keboola/ex-db-mysql:latest $REPOSITORY:master
   - eval $(docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD -e KBC_DEVELOPERPORTAL_URL quay.io/keboola/developer-portal-cli-v2:latest ecr:get-login keboola keboola.ex-db-mysql)
@@ -18,7 +18,7 @@ script:
   # env requires: KBC_STORAGE_TOKEN and KBC_APP_TEST_CONFIG (a token to a test project where the app has a configuration)
   - docker pull quay.io/keboola/syrup-cli:latest
   - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287537333 master
-  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287589303 master
+  - travis_wait 30 docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287589303 master
   - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 288410371 master
 
 deploy:
