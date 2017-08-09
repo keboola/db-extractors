@@ -5,7 +5,7 @@ services:
 
 before_install:
   - docker-compose -v
-  - docker-compose build
+  - docker-compose build sshproxy mysql app
 
 script:
   - docker-compose run --rm app
@@ -16,10 +16,10 @@ script:
   - docker push $REPOSITORY:master
   # Run live test job on new master image
   # env requires: KBC_STORAGE_TOKEN and KBC_APP_TEST_CONFIG (a token to a test project where the app has a configuration)
-  - docker pull quay.io/keboola/syrup-cli:latest
-  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287537333 master
-  - travis_wait 30 docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287589303 master
-  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 288410371 master
+  #- docker pull quay.io/keboola/syrup-cli:latest
+  #- travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287537333 master
+  #- travis_wait 30 docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287589303 master
+  #- travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 288410371 master
 
 deploy:
   provider: script
