@@ -35,6 +35,6 @@ composer selfupdate
 composer install -n
 
 # wait for mysql start
-sleep 5
+sleep 90
 
 ./vendor/bin/phpunit "$@"
