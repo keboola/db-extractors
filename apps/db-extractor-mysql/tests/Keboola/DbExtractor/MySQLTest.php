@@ -6,6 +6,7 @@
 namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
+use Symfony\Component\Yaml\Yaml;
 
 class MySQLTest extends AbstractMySQLTest
 {
@@ -85,6 +86,7 @@ class MySQLTest extends AbstractMySQLTest
 		unset($config['parameters']['tables']);
 
 		$app = $this->createApplication($config);
+
 		$result = $app->run();
 
 		$this->assertArrayHasKey('status', $result);
@@ -143,4 +145,249 @@ class MySQLTest extends AbstractMySQLTest
 
 		$app->run();
 	}
+
+    public function testGetTables()
+    {
+        $config = $this->getConfig();
+        $config['action'] = 'getTables';
+        $app = new Application($config);
+
+        $result = $app->run();
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertArrayHasKey('tables', $result);
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertCount(2, $result['tables']);
+
+        //var_dump($result['tables']);
+        //unset($result['tables'][0]['rowCount']);
+        //unset($result['tables'][1]['rowCount']);
+
+        $expectedData = [
+            [
+                "name" => "escaping",
+                "schema" => "test",
+                "type" => "BASE TABLE",
+                "rowCount" => '7',
+                "columns" => [
+                    [
+                        "name" => "col1",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => null,
+                        "ordinalPosition" => "1"
+                    ], [
+                        "name" => "col2",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => null,
+                        "ordinalPosition" => "2"
+                    ]
+                ]
+            ], [
+                "name" => "sales",
+                "schema" => "test",
+                "type" => "BASE TABLE",
+                "rowCount" => "100",
+                "columns" => [
+                    [
+                        "name" => "usergender",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "1"
+                    ], [
+                        "name" => "usercity",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "2"
+                    ], [
+                        "name" => "usersentiment",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "3"
+                    ], [
+                        "name" => "zipcode",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "4"
+                    ], [
+                        "name" => "sku",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "5"
+                    ], [
+                        "name" => "createdat",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "6"
+                    ], [
+                        "name" => "category",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "7"
+                    ], [
+                        "name" => "price",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "8"
+                    ], [
+                        "name" => "county",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "9"
+                    ], [
+                        "name" => "countycode",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "10"
+                    ], [
+                        "name" => "userstate",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "11"
+                    ], [
+                        "name" => "categorygroup",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "12"
+                    ]
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedData, $result['tables']);
+        foreach ($result['tables'] as $table) {
+            $this->assertArrayHasKey('name', $table);
+            $this->assertArrayHasKey('schema', $table);
+            $this->assertArrayHasKey('type', $table);
+            $this->assertArrayHasKey('rowCount', $table);
+            $this->assertArrayHasKey('columns', $table);
+            switch ($table['name']) {
+                case 'escaping':
+                    $this->assertEquals('test', $table['schema']);
+                    $this->assertEquals('BASE TABLE', $table['type']);
+                    $this->assertEquals(7, $table['rowCount']);
+                    $this->assertCount(2, $table['columns']);
+                    break;
+                case 'sales':
+                    $this->assertEquals('test', $table['schema']);
+                    $this->assertEquals('BASE TABLE', $table['type']);
+                    $this->assertEquals(100, $table['rowCount']);
+                    $this->assertCount(12, $table['columns']);
+                    break;
+            }
+            foreach ($table['columns'] as $i => $column) {
+                // keys
+                $this->assertArrayHasKey('name', $column);
+                $this->assertArrayHasKey('type', $column);
+                $this->assertArrayHasKey('length', $column);
+                $this->assertArrayHasKey('default', $column);
+                $this->assertArrayHasKey('nullable', $column);
+                $this->assertArrayHasKey('primaryKey', $column);
+                $this->assertArrayHasKey('ordinalPosition', $column);
+                // values
+                $this->assertEquals("text", $column['type']);
+                $this->assertEquals(65535, $column['length']);
+                $this->assertTrue($column['nullable']);
+                $this->assertNull($column['default']);
+                $this->assertFalse($column['primaryKey']);
+                $this->assertEquals($i + 1, $column['ordinalPosition']);
+            }
+        }
+    }
+
+    public function testManifestMetadata()
+    {
+        $config = $this->getConfig();
+
+        $config['parameters']['tables'][0]['columns'] = ["usergender","usercity","usersentiment","zipcode"];
+        $config['parameters']['tables'][0]['table'] = 'sales';
+        $config['parameters']['tables'][0]['query'] = "SELECT usergender, usercity, usersentiment, zipcode FROM sales";
+        // use just 1 table
+        unset($config['parameters']['tables'][1]);
+
+        $app = new Application($config);
+
+        $result = $app->run();
+
+        $outputManifest = Yaml::parse(
+            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest')
+        );
+
+        $this->assertArrayHasKey('destination', $outputManifest);
+        $this->assertArrayHasKey('incremental', $outputManifest);
+        $this->assertArrayHasKey('metadata', $outputManifest);
+        $expectedMetadata = [
+            'KBC.name' => 'sales',
+            'KBC.schema' => 'test',
+            'KBC.type' => 'BASE TABLE',
+            'KBC.rowCount' => 100
+        ];
+        $tableMetadata = [];
+        foreach ($outputManifest['metadata'] as $i => $metadata) {
+            $this->assertArrayHasKey('key', $metadata);
+            $this->assertArrayHasKey('value', $metadata);
+            $tableMetadata[$metadata['key']] = $metadata['value'];
+        }
+        $this->assertEquals($expectedMetadata, $tableMetadata);
+
+        $this->assertArrayHasKey('column_metadata', $outputManifest);
+        $this->assertCount(4, $outputManifest['column_metadata']);
+
+        $expectedColumnMetadata = [
+            'KBC.datatype.type' => 'text',
+            'KBC.datatype.basetype' => 'STRING',
+            'KBC.datatype.nullable' => true,
+            'KBC.datatype.length' => '65535',
+            'KBC.primaryKey' => false,
+            'KBC.ordinalPosition' => '1'
+        ];
+        $columnMetadata = [];
+        foreach ($outputManifest['column_metadata']['usergender'] as $metadata) {
+            $this->assertArrayHasKey('key', $metadata);
+            $this->assertArrayHasKey('value', $metadata);
+            $columnMetadata[$metadata['key']] = $metadata['value'];
+        }
+        $this->assertEquals($expectedColumnMetadata, $columnMetadata);
+    }
 }
