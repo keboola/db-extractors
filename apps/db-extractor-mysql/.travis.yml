@@ -5,16 +5,29 @@ services:
 
 before_install:
   - docker-compose -v
+  - docker-compose build
 
 script:
-  - docker-compose run app
+  - docker-compose run --rm app
+  - docker pull quay.io/keboola/developer-portal-cli-v2:0.0.1
+  - export REPOSITORY=`docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD -e KBC_DEVELOPERPORTAL_URL quay.io/keboola/developer-portal-cli-v2:latest ecr:get-repository keboola keboola.ex-db-mysql`
+  - docker tag keboola/ex-db-mysql:latest $REPOSITORY:master
+  - eval $(docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD -e KBC_DEVELOPERPORTAL_URL quay.io/keboola/developer-portal-cli-v2:latest ecr:get-login keboola keboola.ex-db-mysql)
+  - docker push $REPOSITORY:master
+  # Run live test job on new master image
+  # env requires: KBC_STORAGE_TOKEN and KBC_APP_TEST_CONFIG (a token to a test project where the app has a configuration)
+  - docker pull quay.io/keboola/syrup-cli:latest
+  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287537333 master
+  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 287589303 master
+  - travis_wait docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-mysql 288410371 master
 
 deploy:
   provider: script
   skip_cleanup: true
-  script: ./deploy.sh
+  script: "./deploy.sh"
   on:
     tags: true
 
 notifications:
-  slack: $SLACK_INTEGRATION_DOMAIN:$SLACK_INTEGRATION_KEY
+  slack:
+    secure: X9mbMvtVEAwzXftPDyBsYMbPDabddSZrLGEqwGCGIdhWg4fJlmhJjDYM2KtWQO0m9E91Syl4uBxxJb0ZECYzN7xrbkqK4BmpzfYUH6dOTlz4zDZAix2e5Xs6aPqjANx7TqHZnJ7xY1atCQ01Mzvxh5cv4eFYw+V3ugIxR2ZvHuhxjXDrSkMwlmEjBlQbvjqJ3vph3+2rElk2BMZNGcjxL/AYlGbeGY2LGYghXS/S0qtVQcIDArQN9QeujjSvUBdrON2D1znQOpmLDBTd0y8APiJFhAwwbIPyMh7Iv8m1Cfh2X84NUoSxrQK8Kjay+T1ZwLsemVNYjstc2A3R9+BWYTENZdqQsH90izGKD2cSYImaO3OB3s5elmKMScc8VOvukuo5tqoHByHe+Eiv+Zoze924TbkQnLfHIL5AQKznoLeNB0DYPNh6MV7MAsaAQQQXRWLAwnYOB9UVXGGeHBsvoI4FlkL6eE1yDdGEA7JQnAx5axVfJvr6PDBAl5tcWmjBbutRhbN7ail+U4sMRFtgjodh9C//QVS9D/O+2XGYfw02eF8JoigED+0I/ntP+9LcVN2P5B3HodlZkF18YUJ8Ix48LJqP+nkXqd7N9bUHM2v7wvoqzPKphI/B+2i9+SgbCJSAM3bLT/b8FN/Ik5omL3xdfa1f2lpRhXLnZfAFYK0=
