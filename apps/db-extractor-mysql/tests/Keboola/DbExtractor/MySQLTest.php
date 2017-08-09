@@ -159,10 +159,143 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertCount(2, $result['tables']);
-        $this->assertArrayHasKey('name', $result['tables'][0]);
-        $this->assertEquals("escaping", $result['tables'][0]['name']);
-        $this->assertArrayHasKey('columns', $result['tables'][0]);
 
+        //var_dump($result['tables']);
+        //unset($result['tables'][0]['rowCount']);
+        //unset($result['tables'][1]['rowCount']);
+
+        $expectedData = [
+            [
+                "name" => "escaping",
+                "schema" => "test",
+                "type" => "BASE TABLE",
+                "rowCount" => '7',
+                "columns" => [
+                    [
+                        "name" => "col1",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => null,
+                        "ordinalPosition" => "1"
+                    ], [
+                        "name" => "col2",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => null,
+                        "ordinalPosition" => "2"
+                    ]
+                ]
+            ], [
+                "name" => "sales",
+                "schema" => "test",
+                "type" => "BASE TABLE",
+                "rowCount" => "100",
+                "columns" => [
+                    [
+                        "name" => "usergender",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "1"
+                    ], [
+                        "name" => "usercity",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "2"
+                    ], [
+                        "name" => "usersentiment",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "3"
+                    ], [
+                        "name" => "zipcode",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "4"
+                    ], [
+                        "name" => "sku",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "5"
+                    ], [
+                        "name" => "createdat",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "6"
+                    ], [
+                        "name" => "category",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "7"
+                    ], [
+                        "name" => "price",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "8"
+                    ], [
+                        "name" => "county",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "9"
+                    ], [
+                        "name" => "countycode",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "10"
+                    ], [
+                        "name" => "userstate",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "11"
+                    ], [
+                        "name" => "categorygroup",
+                        "type" => "text",
+                        "primaryKey" => false,
+                        "length" => "65535",
+                        "nullable" => true,
+                        "default" => NULL,
+                        "ordinalPosition" => "12"
+                    ]
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedData, $result['tables']);
         foreach ($result['tables'] as $table) {
             $this->assertArrayHasKey('name', $table);
             $this->assertArrayHasKey('schema', $table);
@@ -224,59 +357,37 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertArrayHasKey('destination', $outputManifest);
         $this->assertArrayHasKey('incremental', $outputManifest);
         $this->assertArrayHasKey('metadata', $outputManifest);
+        $expectedMetadata = [
+            'KBC.name' => 'sales',
+            'KBC.schema' => 'test',
+            'KBC.type' => 'BASE TABLE',
+            'KBC.rowCount' => 100
+        ];
+        $tableMetadata = [];
         foreach ($outputManifest['metadata'] as $i => $metadata) {
             $this->assertArrayHasKey('key', $metadata);
             $this->assertArrayHasKey('value', $metadata);
-            switch ($metadata['key']) {
-                case 'KBC.name':
-                    $this->assertEquals('sales', $metadata['value']);
-                    break;
-                case 'KBC.schema':
-                    $this->assertEquals('test', $metadata['value']);
-                    break;
-                case 'KBC.type':
-                    $this->assertEquals('BASE TABLE', $metadata['value']);
-                    break;
-                case 'KBC.rowCount':
-                    $this->assertEquals(100, $metadata['value']);
-                    break;
-                default:
-                    $this->fail('Unknown table metadata key: ' . $metadata['key']);
-            }
+            $tableMetadata[$metadata['key']] = $metadata['value'];
         }
+        $this->assertEquals($expectedMetadata, $tableMetadata);
+
         $this->assertArrayHasKey('column_metadata', $outputManifest);
         $this->assertCount(4, $outputManifest['column_metadata']);
+
+        $expectedColumnMetadata = [
+            'KBC.datatype.type' => 'text',
+            'KBC.datatype.basetype' => 'STRING',
+            'KBC.datatype.nullable' => true,
+            'KBC.datatype.length' => '65535',
+            'KBC.primaryKey' => false,
+            'KBC.ordinalPosition' => '1'
+        ];
+        $columnMetadata = [];
         foreach ($outputManifest['column_metadata']['usergender'] as $metadata) {
             $this->assertArrayHasKey('key', $metadata);
             $this->assertArrayHasKey('value', $metadata);
-            switch ($metadata['key']) {
-                case 'KBC.datatype.type':
-                    $this->assertEquals('text', $metadata['value']);
-                    break;
-                case 'KBC.datatype.basetype':
-                    $this->assertEquals('STRING', $metadata['value']);
-                    break;
-                case 'KBC.datatype.nullable':
-                    $this->assertTrue($metadata['value']);
-                    break;
-                case 'KBC.datatype.default':
-                    $this->assertNull($metadata['value']);
-                    break;
-                case 'KBC.datatype.length':
-                    $this->assertEquals('65535', $metadata['value']);
-                    break;
-                case 'KBC.primaryKey':
-                    $this->assertFalse($metadata['value']);
-                    break;
-                case 'KBC.ordinalPosition':
-                    $this->assertEquals(1, $metadata['value']);
-                    break;
-                case 'KBC.foreignKeyRefSchema':
-                    $this->assertEquals('test', $metadata['value']);
-                    break;
-                default:
-                    $this->fail("Unnexpected metadata key " . $metadata['key']);
-            }
+            $columnMetadata[$metadata['key']] = $metadata['value'];
         }
+        $this->assertEquals($expectedColumnMetadata, $columnMetadata);
     }
 }
