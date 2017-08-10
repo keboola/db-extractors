@@ -101,7 +101,7 @@ class RedshiftTest extends AbstractRedshiftTest
                     'name' => 'escaping',
                     'schema' => 'testing',
                     'type' => 'BASE TABLE',
-                    'catalog' => 'testing',
+                    'catalog' => 'travis_ex_db_tests',
                     'columns' =>
                         array (
                             0 =>
@@ -184,7 +184,7 @@ class RedshiftTest extends AbstractRedshiftTest
             3 =>
                 array (
                     'key' => 'KBC.catalog',
-                    'value' => 'testing',
+                    'value' => 'travis_ex_db_tests',
                 ),
         );
 
