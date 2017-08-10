@@ -35,7 +35,11 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $pdo->query("CREATE SCHEMA IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME. "\"");
         $pdo->query("DROP TABLE IF EXISTS \"" . self::TESTING_SCHEMA_NAME. "\".escaping;");
-        $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME. "\".escaping (col1 VARCHAR NOT NULL, col2 VARCHAR NOT NULL, col3 VARCHAR NOT NULL);");
+        $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME . "\".escaping 
+                      (col1 VARCHAR NOT NULL DEFAULT 'a', 
+                      col2 VARCHAR NOT NULL DEFAULT 'b', 
+                      col3 VARCHAR NULL,
+                      PRIMARY KEY (col1, col2));");
 
         $credStr = "aws_access_key_id={$config['aws']['s3key']};aws_secret_access_key={$config['aws']['s3secret']}";
 
