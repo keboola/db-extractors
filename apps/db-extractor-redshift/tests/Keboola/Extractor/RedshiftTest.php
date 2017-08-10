@@ -149,7 +149,7 @@ class RedshiftTest extends AbstractRedshiftTest
 
         $config['parameters']['tables'][0]['columns'] = ["col1","col2","col3"];
         $config['parameters']['tables'][0]['table'] = 'escaping';
-        $config['parameters']['tables'][0]['query'] = "SELECT col1, col2, col3 FROM escaping";
+        $config['parameters']['tables'][0]['query'] = "SELECT col1, col2, col3 FROM testing.escaping";
         // use just 1 table
         unset($config['parameters']['tables'][1]);
 
