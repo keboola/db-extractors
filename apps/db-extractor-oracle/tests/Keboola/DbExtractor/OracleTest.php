@@ -6,9 +6,9 @@
 namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Configuration\MSSSQLConfigDefinition;
 use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
 use Keboola\DbExtractor\Test\ExtractorTest;
+use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends ExtractorTest
 {
@@ -262,23 +262,164 @@ class OracleTest extends ExtractorTest
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
         $this->assertCount(95, $result['tables']);
-        foreach ($result['tables'] as $i => $table) {
-            $this->assertArrayHasKey('name', $table);
-            $this->assertArrayHasKey('columns', $table);
-            if (count($table['columns']) > 0) { // in case a table exists with no columns
-                foreach ($table['columns'] as $j => $column) {
-                    $this->assertArrayHasKey('name', $column);
-                    $this->assertArrayHasKey('type', $column);
-                    $this->assertArrayHasKey('length', $column);
-                    $this->assertArrayHasKey('nullable', $column);
-                    $this->assertArrayHasKey('default', $column);
-                    $this->assertArrayHasKey('ordinalPosition', $column);
-                }
-            }
-        }
+
+        $expectedTable0 = array (
+            0 =>
+                array (
+                    'name' => 'AGENT_NAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '1',
+                    'indexed' => true,
+                    'constraintName' => 'SYS_C001692',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                ),
+            1 =>
+                array (
+                    'name' => 'PROTOCOL',
+                    'type' => 'NUMBER',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '22',
+                    'ordinalPosition' => '2',
+                    'indexed' => true,
+                    'constraintName' => 'SYS_C001693',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                ),
+            2 =>
+                array (
+                    'name' => 'AGENT_NAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '1',
+                    'indexed' => true,
+                    'constraintName' => 'SYS_C001694',
+                    'primaryKey' => true,
+                    'uniqueKey' => false,
+                ),
+            3 =>
+                array (
+                    'name' => 'SPARE1',
+                    'type' => 'VARCHAR2',
+                    'nullable' => true,
+                    'default' => NULL,
+                    'length' => '128',
+                    'ordinalPosition' => '3',
+                ),
+        );
+        $this->assertEquals($expectedTable0, $result['tables'][0]);
+
+        $expectedTable1 = array (
+            0 =>
+                array (
+                    'name' => 'AGENT_NAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '1',
+                    'indexed' => true,
+                    'constraintName' => 'SYS_C001695',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                ),
+            1 =>
+                array (
+                    'name' => 'DB_USERNAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '2',
+                    'indexed' => true,
+                    'constraintName' => 'SYS_C001696',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                ),
+            2 =>
+                array (
+                    'name' => 'AGENT_NAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '1',
+                    'indexed' => true,
+                    'constraintName' => 'UNQ_PAIRS',
+                    'primaryKey' => false,
+                    'uniqueKey' => true,
+                ),
+            3 =>
+                array (
+                    'name' => 'DB_USERNAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '2',
+                    'indexed' => true,
+                    'constraintName' => 'UNQ_PAIRS',
+                    'primaryKey' => false,
+                    'uniqueKey' => true,
+                ),
+            4 =>
+                array (
+                    'name' => 'AGENT_NAME',
+                    'type' => 'VARCHAR2',
+                    'nullable' => false,
+                    'default' => NULL,
+                    'length' => '30',
+                    'ordinalPosition' => '1',
+                    'indexed' => true,
+                    'constraintName' => 'AGENT_MUST_BE_CREATED',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                    'foreignKeyRefTable' => 'SYSTEM',
+                    'foreignKeyRef' => 'SYS_C001694',
+                ),
+        );
+        $this->assertEquals($expectedTable1, $result['tables'][1]);
     }
 
-	/**
+    public function testMetadataManifest()
+    {
+        $config = $this->getConfig('oracle');
+        $config['parameters']['tables'][0]['columns'] = ['col1', 'col2'];
+        $config['parameters']['tables'][0]['table'] = 'escaping';
+
+        $manifestFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
+        @unlink($manifestFile);
+
+        $app = new Application($config);
+
+        $result = $app->run();
+
+        $outputManifest = Yaml::parse(
+            file_get_contents($manifestFile)
+        );
+
+        $this->assertArrayHasKey('destination', $outputManifest);
+        $this->assertArrayHasKey('incremental', $outputManifest);
+        $this->assertArrayHasKey('metadata', $outputManifest);
+
+        $expectedMetadata = [];
+
+        $this->assertEquals($expectedMetadata, $outputManifest['metadata']);
+        $this->assertArrayHasKey('column_metadata', $outputManifest);
+        $this->assertCount(2, $outputManifest['column_metadata']);
+
+        $expectedColumnMetadata = [];
+
+        $this->assertEquals($expectedColumnMetadata, $outputManifest['colMetadata']);
+    }
+
+    /**
 	 * @param array $config
 	 * @return OracleApplication
 	 */
