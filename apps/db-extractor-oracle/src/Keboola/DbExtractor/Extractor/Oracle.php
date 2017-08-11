@@ -66,9 +66,9 @@ class Oracle extends Extractor
 		return oci_execute($stmt);
 	}
 
-	public function listTables()
+	public function getTables(array $tables = null)
     {
-        $stmt = oci_parse($this->db, "SELECT OWNER, TABLESPACE_NAME, TABLE_NAME  FROM all_tables WHERE TABLESPACE_NAME != 'SYSAUX' AND OWNER != 'SYS'");
+        $stmt = oci_parse($this->db, "SELECT * FROM all_tables WHERE TABLESPACE_NAME != 'SYSAUX' AND OWNER != 'SYS' ORDER BY TABLE_NAME");
         $success = @oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
@@ -76,17 +76,15 @@ class Oracle extends Extractor
         }
 
         $output = [];
-
         $numTables = oci_fetch_all($stmt, $tables, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
         echo "FOUND $numTables TABLES \n";
         foreach ($tables as $table) {
-            var_dump($table);
-            $output[] = $table['TABLE_NAME'];
+            $output[] = $this->describeTable($table);
         }
         return $output;
     }
 
-    public function describeTable($tableName)
+    protected function describeTable(array $table)
     {
         $sql = sprintf(
             "SELECT COLS.*, 
@@ -100,7 +98,7 @@ class Oracle extends Extractor
                 ON ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME
             ) REFCOLS ON COLS.TABLE_NAME = REFCOLS.TABLE_NAME AND COLS.COLUMN_NAME = REFCOLS.COLUMN_NAME
             WHERE COLS.TABLE_NAME = '%s'",
-            $tableName
+            $table['TABLE_NAME']
         );
         $stmt = oci_parse($this->db, $sql);
 
