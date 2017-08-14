@@ -12,8 +12,8 @@ services:
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
-      ORACLE_DB_USER: system
-      ORACLE_DB_PASSWORD: oracle
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
       ORACLE_DB_DATABASE: xe
     links:
       - oracle
