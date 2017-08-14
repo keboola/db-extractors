@@ -5,3 +5,4 @@ vendor/
 composer.phar
 runtests.sh
 test.php
+dockerize-linux-amd64*
