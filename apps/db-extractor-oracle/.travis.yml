@@ -38,4 +38,4 @@ deploy:
     tags: true
 
 notifications:
-  slack: $SLACK_INTEGRATION_DOMAIN:$SLACK_INTEGRATION_KEY
+    slack: keboola:17MB3CrUjsyhv7troatWm1PX
