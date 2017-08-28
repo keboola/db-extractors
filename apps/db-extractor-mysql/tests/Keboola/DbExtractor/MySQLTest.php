@@ -78,10 +78,10 @@ class MySQLTest extends AbstractMySQLTest
 			],
 			'user' => 'root',
 			'sshHost' => 'sshproxy',
-			'remoteHost' => 'mysql',
-			'remotePort' => '3306',
 			'localPort' => '13306',
 		];
+
+
 
 		unset($config['parameters']['tables']);
 
@@ -104,8 +104,6 @@ class MySQLTest extends AbstractMySQLTest
 			],
 			'user' => 'root',
 			'sshHost' => 'sshproxy',
-			'remoteHost' => 'mysql',
-			'remotePort' => '3306',
 			'localPort' => '23306',
 		];
 
