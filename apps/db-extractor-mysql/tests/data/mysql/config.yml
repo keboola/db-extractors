@@ -1,4 +1,11 @@
 parameters:
+    db:
+        host: mysql
+        user: root
+        password: rootpassword
+        database: test
+        port: 3306
+
     tables:
         -
             id: 1

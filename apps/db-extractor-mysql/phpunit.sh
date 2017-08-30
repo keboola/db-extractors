@@ -33,7 +33,6 @@ export MYSQL_DB_SSH_KEY_PUBLIC="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2tGpPt3qr
 
 composer selfupdate
 composer install -n
-composer update
 
 # wait for mysql start
 sleep 90

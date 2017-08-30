@@ -62,6 +62,33 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals("", $process->getErrorOutput());
     }
 
+    public function testTestConnectionActionWithSSH()
+    {
+        $config = $this->getConfig();
+        @unlink($this->dataDir . '/config.yml');
+        $config['action'] = 'testConnection';
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'remoteHost' => 'mysql',
+            'remotePort' => '3306',
+            'localPort' => '15211',
+        ];
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+        $this->assertJson($process->getOutput());
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals("", $process->getErrorOutput());
+    }
+
     public function testGetTablesAction()
     {
         $config = $this->getConfig();
