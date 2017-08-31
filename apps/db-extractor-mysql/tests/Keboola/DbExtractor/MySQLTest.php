@@ -339,10 +339,8 @@ class MySQLTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
 
-        $config['parameters']['tables'][0]['columns'] = ["usergender","usercity","usersentiment","zipcode"];
-        $config['parameters']['tables'][0]['table'] = 'sales';
-        $config['parameters']['tables'][0]['query'] = "SELECT usergender, usercity, usersentiment, zipcode FROM sales";
-        // use just 1 table
+        // use just the last table from the config
+        unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
         $app = new Application($config);

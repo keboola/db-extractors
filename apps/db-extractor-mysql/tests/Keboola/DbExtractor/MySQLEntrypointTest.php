@@ -38,6 +38,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->run();
 //        die;
 
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');
@@ -104,5 +106,34 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
         $this->assertEquals("", $process->getErrorOutput());
+    }
+
+    public function testTableColumnsQuery()
+    {
+        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tableColumns.csv';
+
+        @unlink($outputCsvFile);
+
+        $config = $this->getConfig();
+        unset($config['tables'][0]);
+        unset($config['tables'][1]);
+        @unlink($this->dataDir . '/config.yml');
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $this->createTextTable($csv1);
+
+        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
+
+        // run entrypoint
+        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tableColumns.csv.manifest');
+        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileExists($outputCsvFile);
     }
 }

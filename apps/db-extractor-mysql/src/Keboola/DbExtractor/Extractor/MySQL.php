@@ -224,4 +224,22 @@ class MySQL extends Extractor
         }
         return file_put_contents($outFilename, Yaml::dump($manifestData));
     }
+
+    public function simpleQuery($table, $columns = array())
+    {
+        if (count($columns) > 0) {
+            return sprintf("SELECT %s FROM %s",
+                implode(', ', array_map(function ($column) {
+                    return $this->quote($column);
+                }, $columns)),
+                $this->quote($table)
+            );
+        } else {
+            return sprintf("SELECT * FROM %s", $this->quote($table));
+        }
+    }
+
+    private function quote($obj) {
+        return "`{$obj}`";
+    }
 }
