@@ -129,9 +129,9 @@ class MySQL extends Extractor
     {
         $tabledef = [
             'name' => $table['TABLE_NAME'],
-            'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : null,
-            'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : null,
-            'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : null
+            'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
+            'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
+            'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
         ];
 
         $sql = sprintf("SELECT c.*, 
@@ -223,5 +223,23 @@ class MySQL extends Extractor
             $manifestData['column_metadata'] = $columnMetadata;
         }
         return file_put_contents($outFilename, Yaml::dump($manifestData));
+    }
+
+    public function simpleQuery($table, $columns = array())
+    {
+        if (count($columns) > 0) {
+            return sprintf("SELECT %s FROM %s",
+                implode(', ', array_map(function ($column) {
+                    return $this->quote($column);
+                }, $columns)),
+                $this->quote($table)
+            );
+        } else {
+            return sprintf("SELECT * FROM %s", $this->quote($table));
+        }
+    }
+
+    private function quote($obj) {
+        return "`{$obj}`";
     }
 }

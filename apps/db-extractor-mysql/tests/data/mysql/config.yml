@@ -24,3 +24,20 @@ parameters:
             primaryKey:
               -  orderId
             enabled: true
+        -
+            id: 3
+            enabled: true
+            name: tableColumns
+            outputTable: in.c-main.tableColumns
+            incremental: false
+            primaryKey: null
+            table: sales
+            columns:
+              -
+                usergender
+              -
+                usercity
+              -
+                usersentiment
+              -
+                zipcode
