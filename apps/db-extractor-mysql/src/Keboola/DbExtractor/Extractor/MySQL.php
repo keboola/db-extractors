@@ -129,9 +129,9 @@ class MySQL extends Extractor
     {
         $tabledef = [
             'name' => $table['TABLE_NAME'],
-            'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : null,
-            'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : null,
-            'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : null
+            'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
+            'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
+            'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
         ];
 
         $sql = sprintf("SELECT c.*, 
