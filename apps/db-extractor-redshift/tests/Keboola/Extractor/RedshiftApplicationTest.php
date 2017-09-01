@@ -63,6 +63,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->setTimeout(300);
         $process->run();
 
+        var_dump($process->getErrorOutput());
+
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
 
