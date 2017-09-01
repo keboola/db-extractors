@@ -24,3 +24,17 @@ parameters:
             incremental: false
             primaryKey: ~
             enabled: true
+
+        -
+            id: 0
+            name: tableColumns
+            outputTable: in.c-main.tableColumns
+            incremental: false
+            primaryKey: null
+            enabled: true
+            table: escaping
+            columns:
+              -
+                col1
+              -
+                col2

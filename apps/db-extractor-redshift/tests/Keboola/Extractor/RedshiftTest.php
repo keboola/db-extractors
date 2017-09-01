@@ -147,10 +147,8 @@ class RedshiftTest extends AbstractRedshiftTest
     {
         $config = $this->getConfig();
 
-        $config['parameters']['tables'][0]['columns'] = ["col1","col2","col3"];
-        $config['parameters']['tables'][0]['table'] = 'escaping';
-        $config['parameters']['tables'][0]['query'] = "SELECT col1, col2, col3 FROM testing.escaping";
         // use just 1 table
+        unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
         $app = new Application($config);
@@ -275,44 +273,6 @@ class RedshiftTest extends AbstractRedshiftTest
                   array (
                       'key' => 'KBC.ordinalPosition',
                       'value' => 2,
-                  ),
-          ),
-          'col3' =>
-          array (
-              0 =>
-                  array (
-                      'key' => 'KBC.datatype.type',
-                      'value' => 'character varying',
-                  ),
-              1 =>
-                  array (
-                      'key' => 'KBC.datatype.nullable',
-                      'value' => true,
-                  ),
-              2 =>
-                  array (
-                      'key' => 'KBC.datatype.basetype',
-                      'value' => 'STRING',
-                  ),
-              3 =>
-                  array (
-                      'key' => 'KBC.datatype.length',
-                      'value' => 256,
-                  ),
-              4 =>
-                  array (
-                      'key' => 'KBC.primaryKey',
-                      'value' => false,
-                  ),
-              5 =>
-                  array (
-                      'key' => 'KBC.uniqueKey',
-                      'value' => false,
-                  ),
-              6 =>
-                  array (
-                      'key' => 'KBC.ordinalPosition',
-                      'value' => 3,
                   ),
           ),
         );

@@ -105,17 +105,29 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->assertEquals("", $process->getErrorOutput());
         $this->assertEquals(0, $process->getExitCode());
 
-        $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
-        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
-        $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
-        $manifest = Yaml::parse(file_get_contents($outputManifestFile));
+        $expectedCsvFile1 = $this->dataDir .  "/in/tables/escaping.csv";
+        $expectedCsvFile2 = $this->dataDir .  "/in/tables/tableColumns.csv";
+        $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
+        $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.tableColumns.csv';
+        $outputManifestFile1 = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
+        $outputManifestFile2 = $this->dataDir . '/out/tables/in.c-main.tableColumns.csv.manifest';
+        $manifest1 = Yaml::parse(file_get_contents($outputManifestFile1));
+        $manifest2 = Yaml::parse(file_get_contents($outputManifestFile2));
 
-        $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($outputManifestFile);;
-        $this->assertEquals(file_get_contents($expectedCsvFile), file_get_contents($outputCsvFile));
-        $this->assertEquals('in.c-main.escaping', $manifest['destination']);
-        $this->assertEquals(true, $manifest['incremental']);
-        $this->assertEquals('col3', $manifest['primary_key'][0]);
+        $this->assertFileExists($outputCsvFile1);
+        $this->assertFileExists($outputCsvFile2);
+        $this->assertFileExists($outputManifestFile1);
+        $this->assertFileExists($outputManifestFile2);
+        $this->assertEquals(file_get_contents($expectedCsvFile1), file_get_contents($outputCsvFile1));
+        $this->assertEquals(file_get_contents($expectedCsvFile2), file_get_contents($outputCsvFile2));
+        $this->assertEquals('in.c-main.escaping', $manifest1['destination']);
+        $this->assertEquals(true, $manifest1['incremental']);
+        $this->assertEquals('col3', $manifest1['primary_key'][0]);
+
+        $this->assertEquals('in.c-main.tableColumns', $manifest2['destination']);
+        $this->assertEquals(false, $manifest2['incremental']);
+        $this->assertArrayHasKey('metadata', $manifest2);
+        $this->assertArrayHasKey('column_metadata', $manifest2);
     }
 
     public function testGetTablesAction()
