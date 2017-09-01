@@ -54,7 +54,11 @@ class Redshift extends Extractor
         $outputTable = $table['outputTable'];
         $csv = $this->createOutputCsv($outputTable);
         $this->logger->info("Exporting to " . $outputTable);
-        $query = $table['query'];
+        if (isset($table['query']) && strlen($table['query']) > 0) {
+            $query = $table['query'];
+        } else {
+            $query = $this->simpleQuery($table['table'], $table['columns']);
+        }
         $tries = 0;
         $exception = null;
         $csvCreated = false;
@@ -213,5 +217,25 @@ class Redshift extends Extractor
 
         $tabledef['columns'] = $columns;
         return $tabledef;
+    }
+
+    public function simpleQuery($table, $columns = array())
+    {
+        if (count($columns) > 0) {
+            return sprintf("SELECT %s FROM %s",
+                implode(', ', array_map(function ($column) {
+                    return $this->quote($column);
+                }, $columns)),
+                $this->quote($table)
+            );
+        } else {
+            return sprintf("SELECT * FROM %s", $this->quote($table));
+        }
+    }
+
+    private function quote($obj)
+    {
+        $q = '"';
+        return ($q . str_replace("$q", "$q$q", $obj) . $q);
     }
 }
