@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f2ee418faa6ac41c9bde2edbd5325e9",
+    "content-hash": "30d8bec9924da61a1191c3aeac6b9094",
     "packages": [
         {
             "name": "keboola/csv",
@@ -39,16 +39,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "5.0.2",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "d31a4f970f1bb423d1d10216bdb7d6969a5704c6"
+                "reference": "4f0c047270932d360a5747dad0d52884d6885c5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/d31a4f970f1bb423d1d10216bdb7d6969a5704c6",
-                "reference": "d31a4f970f1bb423d1d10216bdb7d6969a5704c6",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/4f0c047270932d360a5747dad0d52884d6885c5f",
+                "reference": "4f0c047270932d360a5747dad0d52884d6885c5f",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                     "email": "miro@keboola.com"
                 }
             ],
-            "time": "2017-08-11T09:28:49+00:00"
+            "time": "2017-08-30T12:54:29+00:00"
         },
         {
             "name": "keboola/php-datatypes",
@@ -597,16 +597,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.35.0",
+            "version": "3.35.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "e9691180888d2679b24cbad1f805e48aadd1a346"
+                "reference": "47856d436ad8eb172c43c88b1861cd645882de56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/e9691180888d2679b24cbad1f805e48aadd1a346",
-                "reference": "e9691180888d2679b24cbad1f805e48aadd1a346",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/47856d436ad8eb172c43c88b1861cd645882de56",
+                "reference": "47856d436ad8eb172c43c88b1861cd645882de56",
                 "shasum": ""
             },
             "require": {
@@ -673,7 +673,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2017-08-25T23:24:46+00:00"
+            "time": "2017-08-31T21:23:59+00:00"
         },
         {
             "name": "doctrine/instantiator",
