@@ -31,7 +31,9 @@ parameters:
             outputTable: in.c-main.tableColumns
             incremental: false
             primaryKey: null
-            table: sales
+            table:
+              schema: test
+              tableName: sales
             columns:
               -
                 usergender
