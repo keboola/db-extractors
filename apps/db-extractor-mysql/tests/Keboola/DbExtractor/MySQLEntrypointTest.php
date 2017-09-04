@@ -115,8 +115,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($outputCsvFile);
 
         $config = $this->getConfig();
-        unset($config['tables'][0]);
-        unset($config['tables'][1]);
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 

@@ -108,9 +108,12 @@ class MySQL extends Extractor
 
         if (!is_null($tables) && count($tables) > 0) {
             $sql .= sprintf(
-                " AND TABLE_NAME IN (%s)",
+                " AND TABLE_NAME IN (%s) AND TABLE_SCHEMA IN (%s)",
                 implode(',', array_map(function ($table) {
-                    return $this->db->quote($table);
+                    return $this->db->quote($table['tableName']);
+                }, $tables)),
+                implode(',', array_map(function ($table) {
+                    return $this->db->quote($table['schema']);
                 }, $tables))
             );
         }
@@ -225,17 +228,22 @@ class MySQL extends Extractor
         return file_put_contents($outFilename, Yaml::dump($manifestData));
     }
 
-    public function simpleQuery($table, $columns = array())
+    public function simpleQuery(array $table, array $columns = array())
     {
         if (count($columns) > 0) {
-            return sprintf("SELECT %s FROM %s",
+            return sprintf("SELECT %s FROM %s.%s",
                 implode(', ', array_map(function ($column) {
                     return $this->quote($column);
                 }, $columns)),
-                $this->quote($table)
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
             );
         } else {
-            return sprintf("SELECT * FROM %s", $this->quote($table));
+            return sprintf(
+                "SELECT * FROM %s.%s",
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
+            );
         }
     }
 
