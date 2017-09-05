@@ -18,6 +18,7 @@ script:
   - docker pull quay.io/keboola/syrup-cli:latest
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-redshift 287551509 master
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-redshift 287589655 master
+  - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job keboola.ex-db-redshift 315245768 master
 
 deploy:
   provider: script

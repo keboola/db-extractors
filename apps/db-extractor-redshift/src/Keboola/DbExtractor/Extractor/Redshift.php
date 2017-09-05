@@ -54,7 +54,11 @@ class Redshift extends Extractor
         $outputTable = $table['outputTable'];
         $csv = $this->createOutputCsv($outputTable);
         $this->logger->info("Exporting to " . $outputTable);
-        $query = $table['query'];
+        if (isset($table['query']) && strlen($table['query']) > 0) {
+            $query = $table['query'];
+        } else {
+            $query = $this->simpleQuery($table['table'], $table['columns']);
+        }
         $tries = 0;
         $exception = null;
         $csvCreated = false;
@@ -119,9 +123,12 @@ class Redshift extends Extractor
 
         if (!is_null($tables) && count($tables) > 0) {
             $sql .= sprintf(
-                " AND table_name IN (%s)",
+                " AND table_name IN (%s) AND table_schema IN (%s)",
                 implode(',', array_map(function ($table) {
-                    return $this->db->quote($table);
+                    return $this->db->quote($table['tableName']);
+                }, $tables)),
+                implode(',', array_map(function ($table) {
+                    return $this->db->quote($table['schema']);
                 }, $tables))
             );
         }
@@ -213,5 +220,30 @@ class Redshift extends Extractor
 
         $tabledef['columns'] = $columns;
         return $tabledef;
+    }
+
+    public function simpleQuery(array $table, array $columns = array())
+    {
+        if (count($columns) > 0) {
+            return sprintf("SELECT %s FROM %s.%s",
+                implode(', ', array_map(function ($column) {
+                    return $this->quote($column);
+                }, $columns)),
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
+            );
+        } else {
+            return sprintf(
+                "SELECT * FROM %s.%s",
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
+            );
+        }
+    }
+
+    private function quote($obj)
+    {
+        $q = '"';
+        return ($q . str_replace("$q", "$q$q", $obj) . $q);
     }
 }

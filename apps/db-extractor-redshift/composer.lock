@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f2ee418faa6ac41c9bde2edbd5325e9",
+    "content-hash": "94363bdc1455b16d4e017248436bc6e5",
     "packages": [
         {
             "name": "keboola/csv",
@@ -39,16 +39,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "5.0.2",
+            "version": "5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "d31a4f970f1bb423d1d10216bdb7d6969a5704c6"
+                "reference": "e03ff5e4500f5604d235e7dce8f2f444fe3bbd22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/d31a4f970f1bb423d1d10216bdb7d6969a5704c6",
-                "reference": "d31a4f970f1bb423d1d10216bdb7d6969a5704c6",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/e03ff5e4500f5604d235e7dce8f2f444fe3bbd22",
+                "reference": "e03ff5e4500f5604d235e7dce8f2f444fe3bbd22",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                     "email": "miro@keboola.com"
                 }
             ],
-            "time": "2017-08-11T09:28:49+00:00"
+            "time": "2017-09-04T12:12:26+00:00"
         },
         {
             "name": "keboola/php-datatypes",
@@ -597,16 +597,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.35.0",
+            "version": "3.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "e9691180888d2679b24cbad1f805e48aadd1a346"
+                "reference": "69321675769dd3e3d00a94bfdc747bd3a5b75b3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/e9691180888d2679b24cbad1f805e48aadd1a346",
-                "reference": "e9691180888d2679b24cbad1f805e48aadd1a346",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/69321675769dd3e3d00a94bfdc747bd3a5b75b3b",
+                "reference": "69321675769dd3e3d00a94bfdc747bd3a5b75b3b",
                 "shasum": ""
             },
             "require": {
@@ -673,7 +673,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2017-08-25T23:24:46+00:00"
+            "time": "2017-09-01T22:52:38+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -1113,22 +1113,22 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "v1.7.0",
+            "version": "v1.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "93d39f1f7f9326d746203c7c056f300f7f126073"
+                "reference": "c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/93d39f1f7f9326d746203c7c056f300f7f126073",
-                "reference": "93d39f1f7f9326d746203c7c056f300f7f126073",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6",
+                "reference": "c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.0.2",
                 "php": "^5.3|^7.0",
-                "phpdocumentor/reflection-docblock": "^2.0|^3.0.2",
+                "phpdocumentor/reflection-docblock": "^2.0|^3.0.2|^4.0",
                 "sebastian/comparator": "^1.1|^2.0",
                 "sebastian/recursion-context": "^1.0|^2.0|^3.0"
             },
@@ -1139,7 +1139,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6.x-dev"
+                    "dev-master": "1.7.x-dev"
                 }
             },
             "autoload": {
@@ -1172,7 +1172,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2017-03-02T20:05:34+00:00"
+            "time": "2017-09-04T11:05:03+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
