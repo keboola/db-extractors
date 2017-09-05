@@ -2,6 +2,7 @@
 
 namespace Keboola\DbExtractor;
 
+use Keboola\Csv\CsvFile;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
@@ -120,8 +121,17 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->assertFileExists($outputCsvFile2);
         $this->assertFileExists($outputManifestFile1);
         $this->assertFileExists($outputManifestFile2);
-        $this->assertEquals(file_get_contents($expectedCsvFile1), file_get_contents($outputCsvFile1));
-        $this->assertEquals(file_get_contents($expectedCsvFile2), file_get_contents($outputCsvFile2));
+        $outputArr1 = iterator_to_array(new CsvFile($outputCsvFile1));
+        $expectedArr1 = iterator_to_array(new CsvFile($expectedCsvFile1));
+        foreach ($expectedArr1 as $row) {
+            $this->assertContains($row, $outputArr1);
+        }
+        $outputArr2 = iterator_to_array(new CsvFile($outputCsvFile2));
+        $expectedArr2 = iterator_to_array(new CsvFile($expectedCsvFile2));
+        foreach ($expectedArr2 as $row) {
+            $this->assertContains($row, $outputArr2);
+        }
+
         $this->assertEquals('in.c-main.escaping', $manifest1['destination']);
         $this->assertEquals(true, $manifest1['incremental']);
         $this->assertEquals('col3', $manifest1['primary_key'][0]);
