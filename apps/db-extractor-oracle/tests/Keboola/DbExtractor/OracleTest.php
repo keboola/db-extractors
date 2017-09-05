@@ -752,10 +752,10 @@ class OracleTest extends ExtractorTest
 
         $config['parameters']['tables'][0]['columns'] = ['EMPLOYEE_ID', 'START_DATE', 'END_DATE', 'JOB_ID', 'DEPARTMENT_ID'];
         $config['parameters']['tables'][0]['table'] = 'JOB_HISTORY';
-        $config['parameters']['tables'][0]['query'] = "SELECT \"EMPLOYEE_ID\", \"START_DATE\", \"END_DATE\", \"JOB_ID\", \"DEPARTMENT_ID\" FROM \"HR\".\"JOB_HISTORY\"";
         $config['parameters']['tables'][0]['outputTable'] = "in.c-main.JOB_HISTORY";
         // use just 1 table
         unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][2]);
 
         $app = $this->createApplication($config);
 

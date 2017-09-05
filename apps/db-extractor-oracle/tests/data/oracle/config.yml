@@ -17,3 +17,17 @@ parameters:
             primaryKey:
                 - primaryKey
             enabled: true
+
+        -
+            id: 2
+            name: tableColumns
+            outputTable: in.c-main.tableColumns
+            incremental: false
+            primaryKey: null
+            enabled: true
+            table: sales
+            columns:
+                - usergender
+                - usercity
+                - usersentiment
+                - zipcode
