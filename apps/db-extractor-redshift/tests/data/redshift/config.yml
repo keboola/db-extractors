@@ -32,7 +32,9 @@ parameters:
             incremental: false
             primaryKey: null
             enabled: true
-            table: escaping
+            table:
+              schema: testing
+              tableName: escaping
             columns:
               -
                 col1
