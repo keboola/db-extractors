@@ -17,3 +17,23 @@ parameters:
             primaryKey:
                 - primaryKey
             enabled: true
+        -
+            id: 3
+            name: tableColumns
+            outputTable: in.c-main.tableColumns
+            incremental: false
+            primaryKey: null
+            enabled: true
+            table:
+              schema: TESTER
+              tableName: SALES
+            columns:
+              -
+                USERGENDER
+              -
+                USERCITY
+              -
+                USERSENTIMENT
+              -
+                ZIPCODE
+

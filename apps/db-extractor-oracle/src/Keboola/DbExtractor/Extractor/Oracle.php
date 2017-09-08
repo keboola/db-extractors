@@ -27,7 +27,7 @@ class Oracle extends Extractor
 
 	protected function executeQuery($query, CsvFile $csv)
 	{
-		$stmt = oci_parse($this->db, $query);
+	    $stmt = oci_parse($this->db, $query);
 		$success = @oci_execute($stmt);
 
 		if (!$success) {
@@ -68,20 +68,31 @@ class Oracle extends Extractor
 
 	public function getTables(array $tables = null)
     {
-
-        $sql = "SELECT * FROM all_tables 
-                        WHERE TABLESPACE_NAME != 'SYSAUX' AND TABLESPACE_NAME != 'SYSTEM' 
-                        AND OWNER != 'SYS' AND OWNER != 'SYSTEM'";
+        $sql = <<<SQL_QUERY
+          SELECT * FROM all_tables 
+            JOIN (
+              SELECT owner own, table_name tname FROM user_tab_privs WHERE privilege='SELECT'
+                union 
+                select rtp.owner own, rtp.table_name tname from user_role_privs urp, role_tab_privs rtp
+                  where urp.granted_role = rtp.role and rtp.privilege='SELECT'
+                union
+                select user own, table_name tname from user_tables
+            ) priv ON priv.own = all_tables.OWNER AND priv.tname = all_tables.TABLE_NAME
+            WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.OWNER != 'SYS'
+SQL_QUERY;
 
         if (!is_null($tables) && count($tables) > 0) {
             $sql .= sprintf(
-                " AND TABLE_NAME IN ('%s')",
+                " AND all_tables.TABLE_NAME IN ('%s') AND all_tables.OWNER IN ('%s')",
                 implode("','", array_map(function ($table) {
-                    return $table;
+                    return $table['tableName'];
+                }, $tables)),
+                implode("','", array_map(function ($table) {
+                    return $table['schema'];
                 }, $tables))
             );
         }
-        $sql .= $stmt = " ORDER BY TABLE_NAME";
+        $sql .= $stmt = " ORDER BY all_tables.TABLE_NAME";
 
         $stmt = oci_parse($this->db, $sql);
 
@@ -92,8 +103,8 @@ class Oracle extends Extractor
         }
 
         $output = [];
-        $numTables = oci_fetch_all($stmt, $tables, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-        foreach ($tables as $table) {
+        $numTables = oci_fetch_all($stmt, $resTables, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
+        foreach ($resTables as $table) {
             $output[] = $this->describeTable($table);
         }
         return $output;
@@ -103,7 +114,8 @@ class Oracle extends Extractor
     {
         $tabledef = [
             'name' => $table['TABLE_NAME'],
-            'schema' => $table['TABLESPACE_NAME'],
+            'tablespaceName' => $table['TABLESPACE_NAME'],
+            'schema' => $table['OWNER'],
             'owner' => $table['OWNER'],
             'rowCount' => $table['NUM_ROWS']
         ];
@@ -176,5 +188,28 @@ class Oracle extends Extractor
         $tabledef['columns'] = $columns;
 
         return $tabledef;
+    }
+
+    public function simpleQuery(array $table, array $columns = array())
+    {
+        if (count($columns) > 0) {
+            return sprintf("SELECT %s FROM %s.%s",
+                implode(', ', array_map(function ($column) {
+                    return $this->quote($column);
+                }, $columns)),
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
+            );
+        } else {
+            return sprintf(
+                "SELECT * FROM %s.%s",
+                $this->quote($table['schema']),
+                $this->quote($table['tableName'])
+            );
+        }
+    }
+
+    private function quote($obj) {
+        return "\"{$obj}\"";
     }
 }
