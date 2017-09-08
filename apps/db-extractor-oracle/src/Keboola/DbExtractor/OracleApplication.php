@@ -5,7 +5,7 @@
  */
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
+use Keboola\DbExtractor\Configuration\ConfigDefinition;
 
 class OracleApplication extends Application
 {
@@ -16,6 +16,6 @@ class OracleApplication extends Application
 
 		parent::__construct($config);
 
-		$this->setConfigDefinition(new OracleConfigDefinition());
+		$this->setConfigDefinition(new ConfigDefinition());
 	}
 }

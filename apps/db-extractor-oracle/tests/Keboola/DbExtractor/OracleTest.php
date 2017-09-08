@@ -131,7 +131,7 @@ class OracleTest extends ExtractorTest
 		oci_execute($stmt);
 		$row = oci_fetch_assoc($stmt);
 
-		$this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
+        $this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
 	}
 
 	/**
@@ -287,456 +287,192 @@ class OracleTest extends ExtractorTest
         $config['action'] = 'getTables';
 
         $app = $this->createApplication($config);
+
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1);
+
+        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $this->createTextTable($csv2);
+
         $result = $app->run();
 
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(6, $result['tables']);
+        $this->assertCount(2, $result['tables']);
 
         $expectedTables = array (
             0 =>
                 array (
-                    'name' => 'DEPARTMENTS',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '27',
+                    'name' => 'ESCAPING',
+                    'tablespaceName' => 'SYSTEM',
+                    'schema' => 'TESTER',
+                    'owner' => 'TESTER',
+                    'rowCount' => NULL,
                     'columns' =>
                         array (
                             0 =>
                                 array (
-                                    'name' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
+                                    'name' => 'COL1',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '4,0',
+                                    'length' => '800',
                                     'ordinalPosition' => '1',
-                                    'primaryKey' => true,
+                                    'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'primaryKeyName' => 'DEPT_ID_PK',
                                 ),
                             1 =>
                                 array (
-                                    'name' => 'DEPARTMENT_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
+                                    'name' => 'COL2',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '30',
+                                    'length' => '800',
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'MANAGER_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'DEPT_MGR_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'LOCATION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'DEPT_LOC_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'LOC_ID_PK',
                                 ),
                         ),
                 ),
             1 =>
                 array (
-                    'name' => 'EMPLOYEES',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '107',
+                    'name' => 'SALES',
+                    'tablespaceName' => 'SYSTEM',
+                    'schema' => 'TESTER',
+                    'owner' => 'TESTER',
+                    'rowCount' => NULL,
                     'columns' =>
                         array (
                             0 =>
                                 array (
-                                    'name' => 'EMPLOYEE_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
+                                    'name' => 'USERGENDER',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '6,0',
+                                    'length' => '800',
                                     'ordinalPosition' => '1',
-                                    'primaryKey' => true,
+                                    'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'primaryKeyName' => 'EMP_EMP_ID_PK',
                                 ),
                             1 =>
                                 array (
-                                    'name' => 'FIRST_NAME',
-                                    'type' => 'VARCHAR2',
+                                    'name' => 'USERCITY',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '20',
+                                    'length' => '800',
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             2 =>
                                 array (
-                                    'name' => 'LAST_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
+                                    'name' => 'USERSENTIMENT',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '25',
+                                    'length' => '800',
                                     'ordinalPosition' => '3',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             3 =>
                                 array (
-                                    'name' => 'EMAIL',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
+                                    'name' => 'ZIPCODE',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '25',
+                                    'length' => '800',
                                     'ordinalPosition' => '4',
                                     'primaryKey' => false,
-                                    'uniqueKey' => true,
-                                    'uniqueKeyName' => 'EMP_EMAIL_UK',
+                                    'uniqueKey' => false,
                                 ),
                             4 =>
                                 array (
-                                    'name' => 'PHONE_NUMBER',
-                                    'type' => 'VARCHAR2',
+                                    'name' => 'SKU',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '20',
+                                    'length' => '800',
                                     'ordinalPosition' => '5',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             5 =>
                                 array (
-                                    'name' => 'HIRE_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
+                                    'name' => 'CREATEDAT',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '7',
+                                    'length' => '800',
                                     'ordinalPosition' => '6',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             6 =>
                                 array (
-                                    'name' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
+                                    'name' => 'CATEGORY',
+                                    'type' => 'NVARCHAR2',
+                                    'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '10',
+                                    'length' => '800',
                                     'ordinalPosition' => '7',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_JOB_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'JOB_ID_PK',
                                 ),
                             7 =>
                                 array (
-                                    'name' => 'SALARY',
-                                    'type' => 'NUMBER',
+                                    'name' => 'PRICE',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '8,2',
+                                    'length' => '800',
                                     'ordinalPosition' => '8',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             8 =>
                                 array (
-                                    'name' => 'COMMISSION_PCT',
-                                    'type' => 'NUMBER',
+                                    'name' => 'COUNTY',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '2,2',
+                                    'length' => '800',
                                     'ordinalPosition' => '9',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
                             9 =>
                                 array (
-                                    'name' => 'MANAGER_ID',
-                                    'type' => 'NUMBER',
+                                    'name' => 'COUNTYCODE',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '6,0',
+                                    'length' => '800',
                                     'ordinalPosition' => '10',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_MANAGER_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
                                 ),
                             10 =>
                                 array (
-                                    'name' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
+                                    'name' => 'USERSTATE',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '4,0',
+                                    'length' => '800',
                                     'ordinalPosition' => '11',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_DEPT_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'DEPT_ID_PK',
                                 ),
-                        ),
-                ),
-            2 =>
-                array (
-                    'name' => 'JOBS',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '19',
-                    'columns' =>
-                        array (
-                            0 =>
+                            11 =>
                                 array (
-                                    'name' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '10',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'JOB_ID_PK',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'JOB_TITLE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '35',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'MIN_SALARY',
-                                    'type' => 'NUMBER',
+                                    'name' => 'CATEGORYGROUP',
+                                    'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'default' => NULL,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'MAX_SALARY',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-            3 =>
-                array (
-                    'name' => 'JOB_HISTORY',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '10',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'EMPLOYEE_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                    'foreignKeyName' => 'JHIST_EMP_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'START_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '7',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'END_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '7',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '10',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'JHIST_JOB_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'JOB_ID_PK',
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '5',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'JHIST_DEPT_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'DEPT_ID_PK',
-                                ),
-                        ),
-                ),
-            4 =>
-                array (
-                    'name' => 'LOCATIONS',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '23',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'LOCATION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'LOC_ID_PK',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'STREET_ADDRESS',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '40',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'POSTAL_CODE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '12',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'CITY',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '30',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'STATE_PROVINCE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '25',
-                                    'ordinalPosition' => '5',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
-                            5 =>
-                                array (
-                                    'name' => 'COUNTRY_ID',
-                                    'type' => 'CHAR',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '2',
-                                    'ordinalPosition' => '6',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'LOC_C_ID_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'COUNTRY_C_ID_PK',
-                                ),
-                        ),
-                ),
-            5 =>
-                array (
-                    'name' => 'REGIONS',
-                    'schema' => 'USERS',
-                    'owner' => 'HR',
-                    'rowCount' => '4',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'REGION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'length' => '22',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'REG_ID_PK',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'REGION_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'default' => NULL,
-                                    'length' => '25',
-                                    'ordinalPosition' => '2',
+                                    'length' => '800',
+                                    'ordinalPosition' => '12',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
@@ -750,19 +486,19 @@ class OracleTest extends ExtractorTest
     {
         $config = $this->getConfig('oracle');
 
-        $config['parameters']['tables'][0]['columns'] = ['EMPLOYEE_ID', 'START_DATE', 'END_DATE', 'JOB_ID', 'DEPARTMENT_ID'];
-        $config['parameters']['tables'][0]['table'] = 'JOB_HISTORY';
-        $config['parameters']['tables'][0]['outputTable'] = "in.c-main.JOB_HISTORY";
         // use just 1 table
+        unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
-        unset($config['parameters']['tables'][2]);
 
         $app = $this->createApplication($config);
+
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1);
 
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/in.c-main.JOB_HISTORY.csv.manifest')
+            file_get_contents($this->dataDir . '/out/tables/in.c-main.tableColumns.csv.manifest')
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
@@ -773,51 +509,56 @@ class OracleTest extends ExtractorTest
             0 =>
                 array (
                     'key' => 'KBC.name',
-                    'value' => 'JOB_HISTORY',
+                    'value' => 'SALES',
                 ),
             1 =>
                 array (
-                    'key' => 'KBC.schema',
-                    'value' => 'USERS',
+                    'key' => 'KBC.tablespaceName',
+                    'value' => 'SYSTEM',
                 ),
             2 =>
                 array (
-                    'key' => 'KBC.owner',
-                    'value' => 'HR',
+                    'key' => 'KBC.schema',
+                    'value' => 'TESTER',
                 ),
             3 =>
                 array (
+                    'key' => 'KBC.owner',
+                    'value' => 'TESTER',
+                ),
+            4 =>
+                array (
                     'key' => 'KBC.rowCount',
-                    'value' => '10',
+                    'value' => NULL,
                 ),
         );
 
         $this->assertEquals($expectedMetadata, $outputManifest['metadata']);
         $this->assertArrayHasKey('column_metadata', $outputManifest);
-        $this->assertCount(5, $outputManifest['column_metadata']);
+        $this->assertCount(4, $outputManifest['column_metadata']);
 
         $expectedColumnMetadata = array (
-            'EMPLOYEE_ID' =>
+            'USERGENDER' =>
                 array (
                     0 =>
                         array (
                             'key' => 'KBC.datatype.type',
-                            'value' => 'NUMBER',
+                            'value' => 'NVARCHAR2',
                         ),
                     1 =>
                         array (
                             'key' => 'KBC.datatype.nullable',
-                            'value' => false,
+                            'value' => true,
                         ),
                     2 =>
                         array (
                             'key' => 'KBC.datatype.basetype',
-                            'value' => 'NUMERIC',
+                            'value' => 'STRING',
                         ),
                     3 =>
                         array (
                             'key' => 'KBC.datatype.length',
-                            'value' => '6,0',
+                            'value' => '800',
                         ),
                     4 =>
                         array (
@@ -827,55 +568,35 @@ class OracleTest extends ExtractorTest
                     5 =>
                         array (
                             'key' => 'KBC.primaryKey',
-                            'value' => true,
+                            'value' => false,
                         ),
                     6 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKeyName',
-                            'value' => 'JHIST_EMP_ID_ST_DATE_PK',
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.foreignKeyName',
-                            'value' => 'JHIST_EMP_FK',
-                        ),
-                    9 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRefTable',
-                            'value' => 'HR',
-                        ),
-                    10 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRef',
-                            'value' => 'EMP_EMP_ID_PK',
-                        ),
                 ),
-            'START_DATE' =>
+            'USERCITY' =>
                 array (
                     0 =>
                         array (
                             'key' => 'KBC.datatype.type',
-                            'value' => 'DATE',
+                            'value' => 'NVARCHAR2',
                         ),
                     1 =>
                         array (
                             'key' => 'KBC.datatype.nullable',
-                            'value' => false,
+                            'value' => true,
                         ),
                     2 =>
                         array (
                             'key' => 'KBC.datatype.basetype',
-                            'value' => 'DATE',
+                            'value' => 'STRING',
                         ),
                     3 =>
                         array (
                             'key' => 'KBC.datatype.length',
-                            'value' => '7',
+                            'value' => '800',
                         ),
                     4 =>
                         array (
@@ -885,40 +606,35 @@ class OracleTest extends ExtractorTest
                     5 =>
                         array (
                             'key' => 'KBC.primaryKey',
-                            'value' => true,
+                            'value' => false,
                         ),
                     6 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKeyName',
-                            'value' => 'JHIST_EMP_ID_ST_DATE_PK',
-                        ),
                 ),
-            'END_DATE' =>
+            'USERSENTIMENT' =>
                 array (
                     0 =>
                         array (
                             'key' => 'KBC.datatype.type',
-                            'value' => 'DATE',
+                            'value' => 'NVARCHAR2',
                         ),
                     1 =>
                         array (
                             'key' => 'KBC.datatype.nullable',
-                            'value' => false,
+                            'value' => true,
                         ),
                     2 =>
                         array (
                             'key' => 'KBC.datatype.basetype',
-                            'value' => 'DATE',
+                            'value' => 'STRING',
                         ),
                     3 =>
                         array (
                             'key' => 'KBC.datatype.length',
-                            'value' => '7',
+                            'value' => '800',
                         ),
                     4 =>
                         array (
@@ -936,17 +652,17 @@ class OracleTest extends ExtractorTest
                             'value' => false,
                         ),
                 ),
-            'JOB_ID' =>
+            'ZIPCODE' =>
                 array (
                     0 =>
                         array (
                             'key' => 'KBC.datatype.type',
-                            'value' => 'VARCHAR2',
+                            'value' => 'NVARCHAR2',
                         ),
                     1 =>
                         array (
                             'key' => 'KBC.datatype.nullable',
-                            'value' => false,
+                            'value' => true,
                         ),
                     2 =>
                         array (
@@ -956,7 +672,7 @@ class OracleTest extends ExtractorTest
                     3 =>
                         array (
                             'key' => 'KBC.datatype.length',
-                            'value' => '10',
+                            'value' => '800',
                         ),
                     4 =>
                         array (
@@ -972,74 +688,6 @@ class OracleTest extends ExtractorTest
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.foreignKeyName',
-                            'value' => 'JHIST_JOB_FK',
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRefTable',
-                            'value' => 'HR',
-                        ),
-                    9 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRef',
-                            'value' => 'JOB_ID_PK',
-                        ),
-                ),
-            'DEPARTMENT_ID' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'NUMBER',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => true,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'NUMERIC',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => '4,0',
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => '5',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => false,
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.foreignKeyName',
-                            'value' => 'JHIST_DEPT_FK',
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRefTable',
-                            'value' => 'HR',
-                        ),
-                    9 =>
-                        array (
-                            'key' => 'KBC.foreignKeyRef',
-                            'value' => 'DEPT_ID_PK',
                         ),
                 ),
         );
