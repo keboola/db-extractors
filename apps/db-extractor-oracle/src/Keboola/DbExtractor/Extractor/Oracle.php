@@ -116,9 +116,11 @@ SQL_QUERY;
             'name' => $table['TABLE_NAME'],
             'tablespaceName' => $table['TABLESPACE_NAME'],
             'schema' => $table['OWNER'],
-            'owner' => $table['OWNER'],
-            'rowCount' => $table['NUM_ROWS']
+            'owner' => $table['OWNER']
         ];
+        if ($table['NUM_ROWS']) {
+            $tabledef['rowCount'] = $table['NUM_ROWS'];
+        }
         $sql = sprintf(
             "SELECT COLS.*, 
             REFCOLS.CONSTRAINT_NAME, REFCOLS.CONSTRAINT_TYPE, REFCOLS.INDEX_NAME, 

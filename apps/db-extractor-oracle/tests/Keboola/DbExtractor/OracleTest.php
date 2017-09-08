@@ -308,7 +308,6 @@ class OracleTest extends ExtractorTest
                     'tablespaceName' => 'SYSTEM',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
-                    'rowCount' => NULL,
                     'columns' =>
                         array (
                             0 =>
@@ -341,7 +340,6 @@ class OracleTest extends ExtractorTest
                     'tablespaceName' => 'SYSTEM',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
-                    'rowCount' => NULL,
                     'columns' =>
                         array (
                             0 =>
@@ -525,11 +523,6 @@ class OracleTest extends ExtractorTest
                 array (
                     'key' => 'KBC.owner',
                     'value' => 'TESTER',
-                ),
-            4 =>
-                array (
-                    'key' => 'KBC.rowCount',
-                    'value' => NULL,
                 ),
         );
 
