@@ -19,10 +19,10 @@ RUN export ORACLE_HOME=/usr/lib/oracle/12.1/client64/lib/
 RUN echo 'instantclient,/usr/lib/oracle/12.1/client64/lib/' | pecl install -f oci8-1.4.10
 RUN echo "extension=oci8.so" > /etc/php.d/30-oci8.ini
 
-WORKDIR /home
+WORKDIR /code
 
 # Initialize
-COPY . /home/
+COPY . /code/
 RUN composer selfupdate && composer install --no-interaction
 
 CMD php ./src/run.php --data=/data
