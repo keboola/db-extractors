@@ -5,4 +5,5 @@ composer.phar
 runtests.sh
 test.php
 tests/data/out
+tests/data/config.yml
 .env
