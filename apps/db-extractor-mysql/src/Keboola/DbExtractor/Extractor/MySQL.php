@@ -118,37 +118,42 @@ class MySQL extends Extractor
             );
         }
 
+        $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
+
         $res = $this->db->query($sql);
         $arr = $res->fetchAll(\PDO::FETCH_ASSOC);
 
-        $output = [];
-        foreach ($arr as $table) {
-            $output[] = $this->describeTable($table);
+        if (count($arr) === 0) {
+            return [];
         }
-        return $output;
-    }
 
-    protected function describeTable(array $table)
-    {
-        $tabledef = [
-            'name' => $table['TABLE_NAME'],
-            'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
-            'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
-            'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
-        ];
+        $tableNameArray = [];
+        $tableDefs = [];
+        foreach ($arr as $table) {
+            $tableNameArray[] = $table['TABLE_NAME'];
+            $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']] = [
+                'name' => $table['TABLE_NAME'],
+                'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
+                'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
+                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
+            ];
+        }
 
         $sql = sprintf("SELECT c.*, 
-                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
-                    FROM INFORMATION_SCHEMA.COLUMNS as c 
-                    LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
-                    ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
-                    WHERE c.TABLE_NAME = %s", $this->db->quote($table['TABLE_NAME']));
+                CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
+                FROM INFORMATION_SCHEMA.COLUMNS as c 
+                LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
+                ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
+                WHERE c.TABLE_NAME IN (%s) ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION",
+                    implode(',', array_map(function ($table) {
+                        return $this->db->quote($table);
+                    }, $tableNameArray))
+                );
 
         $res = $this->db->query($sql);
-        $columns = [];
-
         $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($rows as $i => $column) {
+            $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
             $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
             if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
                 if ($column['NUMERIC_SCALE'] > 0) {
@@ -157,7 +162,7 @@ class MySQL extends Extractor
                     $length = $column['NUMERIC_PRECISION'];
                 }
             }
-            $columns[] = [
+            $curColumn = [
                 "name" => $column['COLUMN_NAME'],
                 "type" => $column['DATA_TYPE'],
                 "primaryKey" => ($column['COLUMN_KEY'] === "PRI") ? true : false,
@@ -168,16 +173,22 @@ class MySQL extends Extractor
             ];
 
             if (!is_null($column['CONSTRAINT_NAME']) ) {
-                $columns[$i]['constraintName'] = $column['CONSTRAINT_NAME'];
+                $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
             }
             if (!is_null($column['REFERENCED_TABLE_NAME'])) {
-                $columns[$i]['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
-                $columns[$i]['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
-                $columns[$i]['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
+                $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
+                $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
+                $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
             }
+            $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
         }
-        $tabledef['columns'] = $columns;
-        return $tabledef;
+        return array_values($tableDefs);
+    }
+
+    protected function describeTable(array $table)
+    {
+        // Deprecated
+        return null;
     }
 
     public function simpleQuery(array $table, array $columns = array())
