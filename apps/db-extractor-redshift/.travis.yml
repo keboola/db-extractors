@@ -3,7 +3,7 @@ sudo: false
 services:
   - docker
 
-before-script:
+before_script:
   - docker-compose -v
   - docker-compose build sshproxy app
   - docker-compose run --rm app
