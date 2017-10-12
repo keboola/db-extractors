@@ -133,29 +133,32 @@ class Redshift extends Extractor
             );
         }
 
+        $sql .= " ORDER BY table_schema, table_name";
+
         $res = $this->db->query($sql);
         $arr = $res->fetchAll();
 
-        $output = [];
-        foreach ($arr as $table) {
-            $output[] = $this->describeTable($table);
+        if (count($arr) === 0) {
+            return [];
         }
-        return $output;
-    }
 
-    public function describeTable(array $table)
-    {
-        $tabledef = [
-            'name' => $table['table_name'],
-            'schema' => (isset($table['table_schema'])) ? $table['table_schema'] : null,
-            'type' => (isset($table['table_type'])) ? $table['table_type'] : null,
-            'catalog' => (isset($table['table_catalog'])) ? $table['table_catalog'] : null
-        ];
+        $tableNameArray = [];
+        $tableDefs = [];
+        foreach ($arr as $table) {
+            $tableNameArray[] = $table['table_name'];
+            $tableDefs[$table['table_schema'] . '.' . $table['table_name']] = [
+                'name' => $table['table_name'],
+                'schema' => (isset($table['table_schema'])) ? $table['table_schema'] : null,
+                'type' => (isset($table['table_type'])) ? $table['table_type'] : null,
+                'catalog' => (isset($table['table_catalog'])) ? $table['table_catalog'] : null
+            ];
+        }
 
-        $sql = "
-            SELECT cols.column_name, cols.column_default, cols.is_nullable, cols.data_type, cols.ordinal_position,
-                        cols.character_maximum_length, cols.numeric_precision, cols.numeric_scale,
-                        def.contype, def.conkey
+        $sql = sprintf("
+            SELECT cols.column_name, cols.table_name, cols.table_schema, 
+                    cols.column_default, cols.is_nullable, cols.data_type, cols.ordinal_position,
+                    cols.character_maximum_length, cols.numeric_precision, cols.numeric_scale,
+                    def.contype, def.conkey
             FROM information_schema.columns as cols 
             JOIN (
               SELECT
@@ -178,22 +181,23 @@ class Redshift extends Extractor
                 LEFT OUTER JOIN pg_constraint AS co ON (co.conrelid = c.oid
                     AND a.attnum = ANY(co.conkey) AND (co.contype = 'p' OR co.contype = 'u'))
                 LEFT OUTER JOIN pg_attrdef AS d ON d.adrelid = c.oid AND d.adnum = a.attnum
-              WHERE a.attnum > 0 AND c.relname = " . $this->db->quote($tabledef['name']) . "
+              WHERE a.attnum > 0 AND c.relname IN (%s)
             ) as def 
-            ON cols.column_name = def.colname
-            WHERE cols.table_name = " . $this->db->quote($tabledef['name']);
-        if ($tabledef['schema']) {
-            $sql .= " AND cols.table_schema = " . $this->db->quote($tabledef['schema']);
-        }
-        $sql .= ' ORDER BY cols.ordinal_position';
-
+            ON cols.column_name = def.colname AND cols.table_name = def.relname
+            WHERE cols.table_name IN (%s) ORDER BY cols.table_schema, cols.table_name, cols.ordinal_position",
+            implode(', ', array_map(function ($tableName) {
+                return $this->db->quote($tableName);
+            }, $tableNameArray)),
+            implode(', ', array_map(function ($tableName) {
+                return $this->db->quote($tableName);
+            }, $tableNameArray))
+        );
         $res = $this->db->query($sql);
-
         $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
-        
+
         $columns = [];
         foreach ($rows as $i => $column) {
-
+            $curTable = $column['table_schema'] . '.' . $column['table_name'];
             $length = ($column['character_maximum_length']) ? $column['character_maximum_length'] : null;
             if (is_null($length) && !is_null($column['numeric_precision'])) {
                 if ($column['numeric_scale'] > 0) {
@@ -206,7 +210,7 @@ class Redshift extends Extractor
             if (!is_null($column['column_default'])) {
                 $default = str_replace("'", "", explode('::', $column['column_default'])[0]);
             }
-            $columns[$i] = [
+            $curColumn = [
                 "name" => $column['column_name'],
                 "type" => $column['data_type'],
                 "primaryKey" => ($column['contype'] === "p") ? true : false,
@@ -216,10 +220,18 @@ class Redshift extends Extractor
                 "default" => $default,
                 "ordinalPosition" => $column['ordinal_position']
             ];
+            if (!array_key_exists('columns', $tableDefs[$curTable])) {
+                $tableDefs[$curTable]['columns'] = [];
+            }
+            $tableDefs[$curTable]['columns'][] = $curColumn;
         }
+        return array_values($tableDefs);
+    }
 
-        $tabledef['columns'] = $columns;
-        return $tabledef;
+    public function describeTable(array $table)
+    {
+        // Deprecated
+        return null;
     }
 
     public function simpleQuery(array $table, array $columns = array())
