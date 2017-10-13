@@ -92,7 +92,7 @@ SQL_QUERY;
                 }, $tables))
             );
         }
-        $sql .= $stmt = " ORDER BY all_tables.TABLE_NAME";
+        $sql .= " ORDER BY all_tables.OWNER, all_tables.TABLE_NAME";
 
         $stmt = oci_parse($this->db, $sql);
 
@@ -102,25 +102,26 @@ SQL_QUERY;
             throw new UserException("Error attempting to list tables: " . $error['message']);
         }
 
-        $output = [];
         $numTables = oci_fetch_all($stmt, $resTables, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-        foreach ($resTables as $table) {
-            $output[] = $this->describeTable($table);
+        if ($numTables === 0) {
+            return [];
         }
-        return $output;
-    }
 
-    protected function describeTable(array $table)
-    {
-        $tabledef = [
-            'name' => $table['TABLE_NAME'],
-            'tablespaceName' => $table['TABLESPACE_NAME'],
-            'schema' => $table['OWNER'],
-            'owner' => $table['OWNER']
-        ];
-        if ($table['NUM_ROWS']) {
-            $tabledef['rowCount'] = $table['NUM_ROWS'];
+        $tableNameArray = [];
+        $tableDefs = [];
+        foreach ($resTables as $table) {
+            $tableNameArray[] = $table['TABLE_NAME'];
+            $tableDefs[$table['OWNER'] . '.' . $table['TABLE_NAME']] = [
+                'name' => $table['TABLE_NAME'],
+                'tablespaceName' => $table['TABLESPACE_NAME'],
+                'schema' => $table['OWNER'],
+                'owner' => $table['OWNER']
+            ];
+            if ($table['NUM_ROWS']) {
+                $tabledefs[$table['OWNER'] . '.' . $table['TABLE_NAME']]['rowCount'] = $table['NUM_ROWS'];
+            }
         }
+
         $sql = sprintf(
             "SELECT COLS.*, 
             REFCOLS.CONSTRAINT_NAME, REFCOLS.CONSTRAINT_TYPE, REFCOLS.INDEX_NAME, 
@@ -132,9 +133,12 @@ SQL_QUERY;
                 JOIN ALL_CONSTRAINTS AC 
                 ON ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME WHERE AC.CONSTRAINT_TYPE IN ('P', 'U', 'R')
             ) REFCOLS ON COLS.TABLE_NAME = REFCOLS.TABLE_NAME AND COLS.COLUMN_NAME = REFCOLS.COLUMN_NAME
-            WHERE COLS.TABLE_NAME = '%s' ORDER BY COLS.COLUMN_ID",
-            $table['TABLE_NAME']
+            WHERE COLS.TABLE_NAME IN (%s) ORDER BY COLS.OWNER, COLS.TABLE_NAME, COLS.COLUMN_ID",
+            implode(', ', array_map(function ($tableName) {
+                return "'" . $tableName . "'";
+            }, $tableNameArray))
         );
+
         $stmt = oci_parse($this->db, $sql);
 
         $success = @oci_execute($stmt);
@@ -145,16 +149,16 @@ SQL_QUERY;
 
         $numrows = oci_fetch_all($stmt, $desc, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
 
-        $columns = [];
         $previousOrdinalPos = 0;
+        $previousTableName = '';
         foreach ($desc as $i => $column) {
+            $curTable = $column['OWNER'] . '.' . $column['TABLE_NAME'];
             $length = $column['DATA_LENGTH'];
             if (!is_null($column['DATA_PRECISION'])  && !is_null($column['DATA_SCALE'])) {
                 $length = $column['DATA_PRECISION'] . "," . $column['DATA_SCALE'];
             }
-
-            if ($column['COLUMN_ID'] > $previousOrdinalPos) {
-                $columns[$column['COLUMN_ID'] - 1] = [
+            if ($column['COLUMN_ID'] > $previousOrdinalPos || $previousTableName !== $curTable) {
+                $curColumn = [
                     "name" => $column['COLUMN_NAME'],
                     "type" => $column['DATA_TYPE'],
                     "nullable" => ($column['NULLABLE'] === 'Y') ? true : false,
@@ -169,27 +173,43 @@ SQL_QUERY;
             if (!is_null($column['CONSTRAINT_TYPE'])) {
                 switch ($column['CONSTRAINT_TYPE']) {
                     case 'R':
-                        $columns[$column['COLUMN_ID'] - 1]['foreignKeyName'] = $column['CONSTRAINT_NAME'];
-                        $columns[$column['COLUMN_ID'] - 1]['foreignKeyRefTable'] = $column['R_OWNER'];
-                        $columns[$column['COLUMN_ID'] - 1]['foreignKeyRef'] = $column['R_CONSTRAINT_NAME'];
+                        $curColumn['foreignKeyName'] = $column['CONSTRAINT_NAME'];
+                        $curColumn['foreignKeyRefTable'] = $column['R_OWNER'];
+                        $curColumn['foreignKeyRef'] = $column['R_CONSTRAINT_NAME'];
                         break;
                     case 'P':
-                        $columns[$column['COLUMN_ID'] - 1]['primaryKey'] = true;
-                        $columns[$column['COLUMN_ID'] - 1]['primaryKeyName'] = $column['CONSTRAINT_NAME'];
+                        $curColumn['primaryKey'] = true;
+                        $curColumn['primaryKeyName'] = $column['CONSTRAINT_NAME'];
                         break;
                     case 'U':
-                        $columns[$column['COLUMN_ID'] - 1]['uniqueKey'] = true;
+                        $curColumn['uniqueKey'] = true;
                         $columns[$column['COLUMN_ID'] - 1]['uniqueKeyName'] = $column['CONSTRAINT_NAME'];
                         break;
                     default:
                         break;
                 }
             }
-            $previousOrdinalPos = $column['COLUMN_ID'];
+            if (!array_key_exists('columns', $tableDefs[$curTable])) {
+                $tableDefs[$curTable]['columns'] = [];
+            }
+            if ($column['COLUMN_ID'] > $previousOrdinalPos || $previousTableName !== $curTable) {
+                $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1] = $curColumn;
+            }
+            if ($previousTableName !== $curTable) {
+                $previousOrdinalPos = 0;
+            } else {
+                $previousOrdinalPos = $column['COLUMN_ID'];
+            }
+            $previousTableName = $curTable;
         }
-        $tabledef['columns'] = $columns;
 
-        return $tabledef;
+        return array_values($tableDefs);
+    }
+
+    protected function describeTable(array $table)
+    {
+        // Deprecated
+        return null;
     }
 
     public function simpleQuery(array $table, array $columns = array())
