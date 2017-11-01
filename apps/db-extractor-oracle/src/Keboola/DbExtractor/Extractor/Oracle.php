@@ -78,7 +78,7 @@ class Oracle extends Extractor
                 union
                 select user own, table_name tname from user_tables
             ) priv ON priv.own = all_tables.OWNER AND priv.tname = all_tables.TABLE_NAME
-            WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.OWNER != 'SYS'
+            WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.OWNER != 'SYS' AND all_tables.TABLESPACE_NAME != 'SYSTEM'
 SQL_QUERY;
 
         if (!is_null($tables) && count($tables) > 0) {
