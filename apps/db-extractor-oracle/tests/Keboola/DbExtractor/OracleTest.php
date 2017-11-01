@@ -30,7 +30,7 @@ class OracleTest extends ExtractorTest
             echo $error['message'];
         }
         try {
-            $createUserSql = sprintf("CREATE USER %s IDENTIFIED BY %s", $dbConfig['user'], $dbConfig['#password']);
+            $createUserSql = sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password']);
             // create test user
             oci_execute(oci_parse(
                 $adminConnection,
@@ -94,7 +94,7 @@ class OracleTest extends ExtractorTest
 		$header = $file->getHeader();
 
 		oci_execute(oci_parse($this->connection, sprintf(
-			'CREATE TABLE %s (%s)',
+			'CREATE TABLE %s (%s) tablespace users',
 			$tableName,
 			implode(
 				', ',
@@ -193,7 +193,7 @@ class OracleTest extends ExtractorTest
         $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
         $this->createTextTable($csv2);
 
-		$result = $app->run();
+        $result = $app->run();
 
 		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
@@ -305,7 +305,7 @@ class OracleTest extends ExtractorTest
             0 =>
                 array (
                     'name' => 'ESCAPING',
-                    'tablespaceName' => 'SYSTEM',
+                    'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
@@ -337,7 +337,7 @@ class OracleTest extends ExtractorTest
             1 =>
                 array (
                     'name' => 'SALES',
-                    'tablespaceName' => 'SYSTEM',
+                    'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
@@ -512,7 +512,7 @@ class OracleTest extends ExtractorTest
             1 =>
                 array (
                     'key' => 'KBC.tablespaceName',
-                    'value' => 'SYSTEM',
+                    'value' => 'USERS',
                 ),
             2 =>
                 array (

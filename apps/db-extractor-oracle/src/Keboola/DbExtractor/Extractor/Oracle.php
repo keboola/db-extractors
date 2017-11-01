@@ -83,7 +83,7 @@ SQL_QUERY;
 
         if (!is_null($tables) && count($tables) > 0) {
             $sql .= sprintf(
-                " AND all_tables.TABLE_NAME IN ('%s') AND all_tables.OWNER IN ('%s')",
+                " AND all_tables.TABLE_NAME IN ('%s')",
                 implode("','", array_map(function ($table) {
                     return $table['tableName'];
                 }, $tables)),
@@ -202,7 +202,7 @@ SQL_QUERY;
             }
             $previousTableName = $curTable;
         }
-
+        
         return array_values($tableDefs);
     }
 
