@@ -53,6 +53,24 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->runApp(new Application($config));
     }
 
+    public function testRunFailure()
+    {
+        $config = $this->getConfig();
+        $config['parameters']['tables'][] = [
+            'id' => 10,
+            'name' => 'bad',
+            'query' => 'SELECT something FROM non_existing_table;',
+            'outputTable' => 'dummy'
+        ];
+        try {
+            $this->runApp(new Application($config));
+            $this->fail("Failing query must raise exception.");
+        } catch (\Keboola\DbExtractor\Exception\UserException $e) {
+            // test that the error message contains the query name
+            $this->assertContains('[bad]', $e->getMessage());
+        }
+    }
+
     public function testTestConnection()
     {
         $config = $this->getConfig();

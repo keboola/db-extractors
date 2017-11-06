@@ -71,7 +71,7 @@ class Redshift extends Extractor
                 $csvCreated = $this->executeQuery($query, $csv);
                 break;
             } catch (\PDOException $e) {
-                $exception = new UserException("DB query failed: " . $e->getMessage(), 0, $e);
+                $exception = new UserException("DB query [{$table['name']}] failed: " . $e->getMessage(), 0, $e);
             }
             sleep(pow($tries, 2));
             $tries++;
