@@ -122,6 +122,10 @@ SQL_QUERY;
             }
         }
 
+        if (count($tableNameArray) === 0) {
+            return [];
+        }
+
         $sql = sprintf(
             "SELECT COLS.*, 
             REFCOLS.CONSTRAINT_NAME, REFCOLS.CONSTRAINT_TYPE, REFCOLS.INDEX_NAME, 
