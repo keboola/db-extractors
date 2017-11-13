@@ -79,9 +79,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
 	 *
 	 * @param CsvFile $file
 	 */
-	protected function createTextTable(CsvFile $file)
+	protected function createTextTable(CsvFile $file, $name = null)
 	{
-		$tableName = $this->generateTableName($file);
+        $tableName = $name;
+	    if (!$name) {
+            $tableName = $this->generateTableName($file);
+        }
 
 		$this->pdo->exec(sprintf(
 			'DROP TABLE IF EXISTS %s',

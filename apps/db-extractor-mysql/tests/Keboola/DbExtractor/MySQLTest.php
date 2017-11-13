@@ -387,4 +387,21 @@ class MySQLTest extends AbstractMySQLTest
         }
         $this->assertEquals($expectedColumnMetadata, $columnMetadata);
     }
+
+    public function testThousandsOfTables()
+    {
+        $this->markTestSkipped("No need to run this test every time.");
+        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+
+        for ($i = 0; $i < 3500; $i++) {
+            $this->createTextTable($csv1, "sales_" . $i);
+        }
+
+        $config = $this->getConfig();
+        $config['action'] = 'getTables';
+        $app = new Application($config);
+
+        $result = $app->run();
+        echo "\nThere are " . count($result['tables']) . " tables\n";
+    }
 }

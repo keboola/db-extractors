@@ -101,14 +101,16 @@ class MySQL extends Extractor
 
     public function getTables(array $tables = null)
     {
-        $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES 
-                                  WHERE TABLE_SCHEMA != 'performance_schema' 
-                                  AND TABLE_SCHEMA != 'mysql'
-                                  AND TABLE_SCHEMA != 'information_schema'";
 
+        $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c 
+                                  WHERE c.TABLE_SCHEMA != 'performance_schema' 
+                                  AND c.TABLE_SCHEMA != 'mysql'
+                                  AND c.TABLE_SCHEMA != 'information_schema'";
+
+        $additionalWhereClause = "";
         if (!is_null($tables) && count($tables) > 0) {
-            $sql .= sprintf(
-                " AND TABLE_NAME IN (%s) AND TABLE_SCHEMA IN (%s)",
+            $additionalWhereClause = sprintf(
+                " AND c.TABLE_NAME IN (%s) AND c.TABLE_SCHEMA IN (%s)",
                 implode(',', array_map(function ($table) {
                     return $this->db->quote($table['tableName']);
                 }, $tables)),
@@ -116,6 +118,7 @@ class MySQL extends Extractor
                     return $this->db->quote($table['schema']);
                 }, $tables))
             );
+            $sql .= $additionalWhereClause;
         }
 
         $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
@@ -139,16 +142,20 @@ class MySQL extends Extractor
             ];
         }
 
-        $sql = sprintf("SELECT c.*, 
+        $sql = "SELECT c.*, 
                 CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
                 FROM INFORMATION_SCHEMA.COLUMNS as c 
                 LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
                 ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
-                WHERE c.TABLE_NAME IN (%s) ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION",
-                    implode(',', array_map(function ($table) {
-                        return $this->db->quote($table);
-                    }, $tableNameArray))
-                );
+                WHERE c.TABLE_SCHEMA != 'performance_schema' 
+                AND c.TABLE_SCHEMA != 'mysql'
+                AND c.TABLE_SCHEMA != 'information_schema'";
+
+        if ($additionalWhereClause !== "") {
+            $sql .= $additionalWhereClause;
+        }
+
+        $sql .= " ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION";
 
         $res = $this->db->query($sql);
         $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
