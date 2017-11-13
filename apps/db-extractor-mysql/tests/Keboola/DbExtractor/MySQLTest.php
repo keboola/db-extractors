@@ -23,6 +23,20 @@ class MySQLTest extends AbstractMySQLTest
 		$this->assertEquals('success', $result['status']);
 	}
 
+	public function testCredentialsWithoutDatabase()
+    {
+        $config = $this->getConfig('mysql');
+        $config['action'] = 'testConnection';
+        unset($config['parameters']['tables']);
+        unset($config['parameters']['db']['database']);
+
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+    }
+
 	public function testRunWithoutTables()
 	{
 		$config = $this->getConfig('mysql');
@@ -64,6 +78,23 @@ class MySQLTest extends AbstractMySQLTest
 		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
 		$this->assertFileEquals((string) $csv2, $outputCsvFile);
 	}
+
+	public function testRunWithoutDatabase()
+    {
+        $config = $this->getConfig('mysql');
+        $config['action'] = 'testConnection';
+        unset($config['parameters']['db']['database']);
+
+        // Add schema to db query
+        $config['parameters']['tables'][0]['query'] = "SELECT * FROM test.sales";
+        $config['parameters']['tables'][1]['query'] = "SELECT * FROM test.escaping";
+
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+    }
 
 	public function testCredentialsWithSSH()
 	{
@@ -147,9 +178,16 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testGetTables()
     {
-        $config = $this->getConfig();
+        // add a table to a different schema (should not be fetched)
+        $this->createTextTable(
+            new CsvFile($this->dataDir . '/mysql/sales.csv'),
+            "ext_sales",
+            "temp_schema"
+        );
+
+        $config = $this->getConfig('mysql');
         $config['action'] = 'getTables';
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
 
@@ -158,10 +196,6 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertCount(2, $result['tables']);
-
-        //var_dump($result['tables']);
-        //unset($result['tables'][0]['rowCount']);
-        //unset($result['tables'][1]['rowCount']);
 
         $expectedData = [
             [
@@ -335,15 +369,164 @@ class MySQLTest extends AbstractMySQLTest
         }
     }
 
+    public function testGetTablesNoDatabase()
+    {
+        // add a table to a different schema
+        $this->createTextTable(
+            new CsvFile($this->dataDir . '/mysql/sales.csv'),
+            "ext_sales",
+            "temp_schema"
+        );
+
+        $config = $this->getConfig('mysql');
+        unset($config['parameters']['tables']);
+        unset($config['parameters']['db']['database']);
+        $config['action'] = 'getTables';
+        $app = $this->createApplication($config);
+
+        $result = $app->run();
+
+        $expectedFirstTable = array (
+            'name' => 'ext_sales',
+            'schema' => 'temp_schema',
+            'type' => 'BASE TABLE',
+            'rowCount' => '100',
+            'columns' =>
+                array (
+                    0 =>
+                        array (
+                            'name' => 'usergender',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '1',
+                        ),
+                    1 =>
+                        array (
+                            'name' => 'usercity',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '2',
+                        ),
+                    2 =>
+                        array (
+                            'name' => 'usersentiment',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '3',
+                        ),
+                    3 =>
+                        array (
+                            'name' => 'zipcode',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '4',
+                        ),
+                    4 =>
+                        array (
+                            'name' => 'sku',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '5',
+                        ),
+                    5 =>
+                        array (
+                            'name' => 'createdat',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '6',
+                        ),
+                    6 =>
+                        array (
+                            'name' => 'category',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '7',
+                        ),
+                    7 =>
+                        array (
+                            'name' => 'price',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '8',
+                        ),
+                    8 =>
+                        array (
+                            'name' => 'county',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '9',
+                        ),
+                    9 =>
+                        array (
+                            'name' => 'countycode',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '10',
+                        ),
+                    10 =>
+                        array (
+                            'name' => 'userstate',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '11',
+                        ),
+                    11 =>
+                        array (
+                            'name' => 'categorygroup',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                            'length' => '65535',
+                            'nullable' => true,
+                            'default' => NULL,
+                            'ordinalPosition' => '12',
+                        ),
+                ),
+        );
+        $this->assertEquals($result['tables'][0], $expectedFirstTable);
+    }
+
     public function testManifestMetadata()
     {
-        $config = $this->getConfig();
+        $config = $this->getConfig('mysql');
 
         // use just the last table from the config
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
 
