@@ -12,6 +12,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQL extends Extractor
 {
+    protected $database;
+
 	/**
 	 * @param $sslCa
 	 * @param Temp $temp
@@ -56,19 +58,29 @@ class MySQL extends Extractor
 			}
 		}
 
-		foreach (['host', 'database', 'user', 'password'] as $r) {
+		foreach (['host', 'user', 'password'] as $r) {
 			if (!array_key_exists($r, $params)) {
 				throw new UserException(sprintf("Parameter %s is missing.", $r));
 			}
 		}
 
 		$port = !empty($params['port']) ? $params['port'] : '3306';
-		$dsn = sprintf(
-			"mysql:host=%s;port=%s;dbname=%s;charset=utf8",
-			$params['host'],
-			$port,
-			$params['database']
-		);
+
+        $dsn = sprintf(
+            "mysql:host=%s;port=%s;charset=utf8",
+            $params['host'],
+            $port
+        );
+
+		if (isset($params['database'])) {
+            $dsn = sprintf(
+                "mysql:host=%s;port=%s;dbname=%s;charset=utf8",
+                $params['host'],
+                $port,
+                $params['database']
+            );
+            $this->database = $params['database'];
+        } 
 
 		$this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
@@ -102,14 +114,18 @@ class MySQL extends Extractor
     public function getTables(array $tables = null)
     {
 
-        $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c 
-                                  WHERE c.TABLE_SCHEMA != 'performance_schema' 
-                                  AND c.TABLE_SCHEMA != 'mysql'
-                                  AND c.TABLE_SCHEMA != 'information_schema'";
+        $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c";
 
-        $additionalWhereClause = "";
+        $whereClause = " WHERE c.TABLE_SCHEMA != 'performance_schema' 
+                          AND c.TABLE_SCHEMA != 'mysql'
+                          AND c.TABLE_SCHEMA != 'information_schema'";
+
+        if ($this->database) {
+            $whereClause = sprintf(" WHERE c.TABLE_SCHEMA = %s", $this->db->quote($this->database));
+        }
+
         if (!is_null($tables) && count($tables) > 0) {
-            $additionalWhereClause = sprintf(
+            $whereClause .= sprintf(
                 " AND c.TABLE_NAME IN (%s) AND c.TABLE_SCHEMA IN (%s)",
                 implode(',', array_map(function ($table) {
                     return $this->db->quote($table['tableName']);
@@ -118,8 +134,9 @@ class MySQL extends Extractor
                     return $this->db->quote($table['schema']);
                 }, $tables))
             );
-            $sql .= $additionalWhereClause;
         }
+
+        $sql .= $whereClause;
 
         $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
 
@@ -146,14 +163,9 @@ class MySQL extends Extractor
                 CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
                 FROM INFORMATION_SCHEMA.COLUMNS as c 
                 LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
-                ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
-                WHERE c.TABLE_SCHEMA != 'performance_schema' 
-                AND c.TABLE_SCHEMA != 'mysql'
-                AND c.TABLE_SCHEMA != 'information_schema'";
+                ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
 
-        if ($additionalWhereClause !== "") {
-            $sql .= $additionalWhereClause;
-        }
+        $sql .= $whereClause;
 
         $sql .= " ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION";
 

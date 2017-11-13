@@ -79,33 +79,39 @@ abstract class AbstractMySQLTest extends ExtractorTest
 	 *
 	 * @param CsvFile $file
 	 */
-	protected function createTextTable(CsvFile $file, $name = null)
+	protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null)
 	{
-        $tableName = $name;
-	    if (!$name) {
+	    if (!$tableName) {
             $tableName = $this->generateTableName($file);
         }
 
+        if (!$schemaName) {
+	        $schemaName = "test";
+        } else {
+	        $this->pdo->exec(sprintf("CREATE DATABASE IF NOT EXISTS %s", $schemaName));
+        }
+
 		$this->pdo->exec(sprintf(
-			'DROP TABLE IF EXISTS %s',
-			$tableName
+			'DROP TABLE IF EXISTS %s.%s',
+			$schemaName,
+            $tableName
 		));
 
 		$this->pdo->exec(sprintf(
-			'CREATE TABLE %s (%s) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;',
-			$tableName,
+			'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;',
+			$schemaName,
+            $tableName,
 			implode(
 				', ',
 				array_map(function ($column) {
 					return $column . ' text NULL';
 				}, $file->getHeader())
-			),
-			$tableName
+			)
 		));
 
 		$query = "
 			LOAD DATA LOCAL INFILE '{$file}'
-			INTO TABLE `{$tableName}`
+			INTO TABLE `{$schemaName}`.`{$tableName}`
 			CHARACTER SET utf8
 			FIELDS TERMINATED BY ','
 			OPTIONALLY ENCLOSED BY '\"'
@@ -115,7 +121,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
 		$this->pdo->exec($query);
 
-		$count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s', $tableName))->fetchColumn();
+		$count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s.%s', $schemaName, $tableName))->fetchColumn();
 		$this->assertEquals($this->countTable($file), (int) $count);
 	}
 
