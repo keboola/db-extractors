@@ -101,6 +101,7 @@ class MySQL extends Extractor
 
     public function getTables(array $tables = null)
     {
+
         $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES 
                                   WHERE TABLE_SCHEMA != 'performance_schema' 
                                   AND TABLE_SCHEMA != 'mysql'
@@ -144,11 +145,10 @@ class MySQL extends Extractor
                 FROM INFORMATION_SCHEMA.COLUMNS as c 
                 LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
                 ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME
-                WHERE c.TABLE_NAME IN (%s) ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION",
-                    implode(',', array_map(function ($table) {
-                        return $this->db->quote($table);
-                    }, $tableNameArray))
-                );
+                WHERE c.TABLE_SCHEMA != 'performance_schema' 
+                AND c.TABLE_SCHEMA != 'mysql'
+                AND c.TABLE_SCHEMA != 'information_schema' 
+                ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION");
 
         $res = $this->db->query($sql);
         $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
