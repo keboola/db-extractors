@@ -3,6 +3,7 @@
  * @package ex-db-mysql
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
+
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Exception\UserException;
@@ -14,57 +15,57 @@ class MySQL extends Extractor
 {
     protected $database;
 
-	/**
-	 * @param $sslCa
-	 * @param Temp $temp
-	 * @return string
-	 */
-	private function createSSLFile($sslCa, Temp $temp)
-	{
-		$filename = $temp->createTmpFile('ssl');
-		file_put_contents($filename, $sslCa);
-		return realpath($filename);
-	}
+    /**
+     * @param $sslCa
+     * @param Temp $temp
+     * @return string
+     */
+    private function createSSLFile($sslCa, Temp $temp)
+    {
+        $filename = $temp->createTmpFile('ssl');
+        file_put_contents($filename, $sslCa);
+        return realpath($filename);
+    }
 
-	public function createConnection($params)
-	{
-		$isSsl = false;
+    public function createConnection($params)
+    {
+        $isSsl = false;
 
-		// convert errors to PDOExceptions
-		$options = [
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-		];
+        // convert errors to PDOExceptions
+        $options = [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        ];
 
-		// ssl encryption
-		if (!empty($params['ssl']) && !empty($params['ssl']['enabled'])) {
-			$ssl = $params['ssl'];
+        // ssl encryption
+        if (!empty($params['ssl']) && !empty($params['ssl']['enabled'])) {
+            $ssl = $params['ssl'];
 
-			$temp = new Temp(defined('APP_NAME') ? APP_NAME : 'ex-db-mysql');
+            $temp = new Temp(defined('APP_NAME') ? APP_NAME : 'ex-db-mysql');
 
-			if (!empty($ssl['key'])) {
-				$options[\PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
-				$isSsl = true;
-			}
-			if (!empty($ssl['cert'])) {
-				$options[\PDO::MYSQL_ATTR_SSL_CERT] = $this->createSSLFile($ssl['cert'], $temp);
-				$isSsl = true;
-			}
-			if (!empty($ssl['ca'])) {
-				$options[\PDO::MYSQL_ATTR_SSL_CA] = $this->createSSLFile($ssl['ca'], $temp);
-				$isSsl = true;
-			}
-			if (!empty($ssl['cipher'])) {
-				$options[\PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
-			}
-		}
+            if (!empty($ssl['key'])) {
+                $options[\PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
+                $isSsl = true;
+            }
+            if (!empty($ssl['cert'])) {
+                $options[\PDO::MYSQL_ATTR_SSL_CERT] = $this->createSSLFile($ssl['cert'], $temp);
+                $isSsl = true;
+            }
+            if (!empty($ssl['ca'])) {
+                $options[\PDO::MYSQL_ATTR_SSL_CA] = $this->createSSLFile($ssl['ca'], $temp);
+                $isSsl = true;
+            }
+            if (!empty($ssl['cipher'])) {
+                $options[\PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
+            }
+        }
 
-		foreach (['host', 'user', 'password'] as $r) {
-			if (!array_key_exists($r, $params)) {
-				throw new UserException(sprintf("Parameter %s is missing.", $r));
-			}
-		}
+        foreach (['host', 'user', 'password'] as $r) {
+            if (!array_key_exists($r, $params)) {
+                throw new UserException(sprintf("Parameter %s is missing.", $r));
+            }
+        }
 
-		$port = !empty($params['port']) ? $params['port'] : '3306';
+        $port = !empty($params['port']) ? $params['port'] : '3306';
 
         $dsn = sprintf(
             "mysql:host=%s;port=%s;charset=utf8",
@@ -72,7 +73,7 @@ class MySQL extends Extractor
             $port
         );
 
-		if (isset($params['database'])) {
+        if (isset($params['database'])) {
             $dsn = sprintf(
                 "mysql:host=%s;port=%s;dbname=%s;charset=utf8",
                 $params['host'],
@@ -80,36 +81,36 @@ class MySQL extends Extractor
                 $params['database']
             );
             $this->database = $params['database'];
-        } 
+        }
 
-		$this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
+        $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
-		$pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
-		$pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-		$pdo->exec("SET NAMES utf8;");
+        $pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
+        $pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        $pdo->exec("SET NAMES utf8;");
 
-		if ($isSsl) {
-			$status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
+        if ($isSsl) {
+            $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
 
-			if (empty($status['Value'])) {
-				throw new UserException(sprintf("Connection is not encrypted"));
-			} else {
-				$this->logger->info("Using SSL cipher: " . $status['Value']);
-			}
-		}
+            if (empty($status['Value'])) {
+                throw new UserException(sprintf("Connection is not encrypted"));
+            } else {
+                $this->logger->info("Using SSL cipher: " . $status['Value']);
+            }
+        }
 
-		return $pdo;
-	}
+        return $pdo;
+    }
 
-	public function getConnection()
-	{
-		return $this->db;
-	}
+    public function getConnection()
+    {
+        return $this->db;
+    }
 
-	public function testConnection()
-	{
-		$this->db->query('SELECT NOW();')->execute();
-	}
+    public function testConnection()
+    {
+        $this->db->query('SELECT NOW();')->execute();
+    }
 
     public function getTables(array $tables = null)
     {
@@ -159,11 +160,16 @@ class MySQL extends Extractor
             ];
         }
 
-        $sql = "SELECT c.*, 
-                CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
-                FROM INFORMATION_SCHEMA.COLUMNS as c 
-                LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
-                ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
+        if (!is_null($tables) && count($tables) > 0) {
+            $sql = "SELECT c.*, 
+                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
+                    FROM INFORMATION_SCHEMA.COLUMNS as c 
+                    LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
+                    ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
+        } else {
+            $sql = "SELECT c.*
+                    FROM INFORMATION_SCHEMA.COLUMNS as c";
+        }
 
         $sql .= $whereClause;
 
@@ -191,10 +197,10 @@ class MySQL extends Extractor
                 "ordinalPosition" => $column['ORDINAL_POSITION']
             ];
 
-            if (!is_null($column['CONSTRAINT_NAME']) ) {
+            if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
                 $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
             }
-            if (!is_null($column['REFERENCED_TABLE_NAME'])) {
+            if (array_key_exists('REFERENCED_TABLE_NAME', $column) && !is_null($column['REFERENCED_TABLE_NAME'])) {
                 $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
                 $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
                 $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
@@ -213,7 +219,8 @@ class MySQL extends Extractor
     public function simpleQuery(array $table, array $columns = array())
     {
         if (count($columns) > 0) {
-            return sprintf("SELECT %s FROM %s.%s",
+            return sprintf(
+                "SELECT %s FROM %s.%s",
                 implode(', ', array_map(function ($column) {
                     return $this->quote($column);
                 }, $columns)),
@@ -229,7 +236,8 @@ class MySQL extends Extractor
         }
     }
 
-    private function quote($obj) {
+    private function quote($obj)
+    {
         return "`{$obj}`";
     }
 }

@@ -3,6 +3,7 @@
  * @package ex-db-mysql
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
+
 namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
@@ -10,10 +11,10 @@ use Keboola\DbExtractor\Test\ExtractorTest;
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
-	/**
-	 * @var \PDO
-	 */
-	protected $pdo;
+    /**
+     * @var \PDO
+     */
+    protected $pdo;
 
     public function setUp()
     {
@@ -46,70 +47,70 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec("SET NAMES utf8;");
     }
 
-	/**
-	 * @param string $driver
-	 * @return mixed
-	 */
-	public function getConfig($driver = 'mysql')
-	{
-		$config = parent::getConfig($driver);
-		if (!empty($config['parameters']['db']['#password'])) {
-			$config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
-		}
-		$config['parameters']['extractor_class'] = 'MySQL';
-		return $config;
-	}
+    /**
+     * @param string $driver
+     * @return mixed
+     */
+    public function getConfig($driver = 'mysql')
+    {
+        $config = parent::getConfig($driver);
+        if (!empty($config['parameters']['db']['#password'])) {
+            $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        }
+        $config['parameters']['extractor_class'] = 'MySQL';
+        return $config;
+    }
 
-	/**
-	 * @param CsvFile $file
-	 * @return string
-	 */
-	protected function generateTableName(CsvFile $file)
-	{
-		$tableName = sprintf(
-			'%s',
-			$file->getBasename('.' . $file->getExtension())
-		);
+    /**
+     * @param CsvFile $file
+     * @return string
+     */
+    protected function generateTableName(CsvFile $file)
+    {
+        $tableName = sprintf(
+            '%s',
+            $file->getBasename('.' . $file->getExtension())
+        );
 
-		return $tableName;
-	}
+        return $tableName;
+    }
 
-	/**
-	 * Create table from csv file with text columns
-	 *
-	 * @param CsvFile $file
-	 */
-	protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null)
-	{
-	    if (!$tableName) {
+    /**
+     * Create table from csv file with text columns
+     *
+     * @param CsvFile $file
+     */
+    protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null)
+    {
+        if (!$tableName) {
             $tableName = $this->generateTableName($file);
         }
 
         if (!$schemaName) {
-	        $schemaName = "test";
+            $schemaName = "test";
         } else {
-	        $this->pdo->exec(sprintf("CREATE DATABASE IF NOT EXISTS %s", $schemaName));
+            $this->pdo->exec(sprintf("CREATE DATABASE IF NOT EXISTS %s", $schemaName));
         }
 
-		$this->pdo->exec(sprintf(
-			'DROP TABLE IF EXISTS %s.%s',
-			$schemaName,
+        $this->pdo->exec(sprintf(
+            'DROP TABLE IF EXISTS %s.%s',
+            $schemaName,
             $tableName
-		));
+        ));
 
-		$this->pdo->exec(sprintf(
-			'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;',
-			$schemaName,
+        $this->pdo->exec(sprintf(
+            'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;',
+            $schemaName,
             $tableName,
-			implode(
-				', ',
-				array_map(function ($column) {
-					return $column . ' text NULL';
-				}, $file->getHeader())
-			)
-		));
+            implode(
+                ', ',
+                array_map(function ($column) {
+                    return $column . ' text NULL';
+                }, $file->getHeader())
+            )
+        ));
 
-		$query = "
+        $query = "
 			LOAD DATA LOCAL INFILE '{$file}'
 			INTO TABLE `{$schemaName}`.`{$tableName}`
 			CHARACTER SET utf8
@@ -119,42 +120,41 @@ abstract class AbstractMySQLTest extends ExtractorTest
 			IGNORE 1 LINES
 		";
 
-		$this->pdo->exec($query);
+        $this->pdo->exec($query);
 
-		$count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s.%s', $schemaName, $tableName))->fetchColumn();
-		$this->assertEquals($this->countTable($file), (int) $count);
-	}
+        $count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s.%s', $schemaName, $tableName))->fetchColumn();
+        $this->assertEquals($this->countTable($file), (int) $count);
+    }
 
-	/**
-	 * Count records in CSV (with headers)
-	 *
-	 * @param CsvFile $file
-	 * @return int
-	 */
-	protected function countTable(CsvFile $file)
-	{
-		$linesCount = 0;
-		foreach ($file AS $i => $line)
-		{
-			// skip header
-			if (!$i) {
-				continue;
-			}
+    /**
+     * Count records in CSV (with headers)
+     *
+     * @param CsvFile $file
+     * @return int
+     */
+    protected function countTable(CsvFile $file)
+    {
+        $linesCount = 0;
+        foreach ($file as $i => $line) {
+            // skip header
+            if (!$i) {
+                continue;
+            }
 
-			$linesCount++;
-		}
+            $linesCount++;
+        }
 
-		return $linesCount;
-	}
+        return $linesCount;
+    }
 
-	/**
-	 * @param array $config
-	 * @return MySQLApplication
-	 */
-	public function createApplication(array $config)
-	{
-		$app = new MySQLApplication($config, $this->dataDir);
+    /**
+     * @param array $config
+     * @return MySQLApplication
+     */
+    public function createApplication(array $config)
+    {
+        $app = new MySQLApplication($config, $this->dataDir);
 
-		return $app;
-	}
+        return $app;
+    }
 }

@@ -37,4 +37,6 @@ composer install -n
 # wait for mysql start
 sleep 90
 
+php ./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n .
+
 ./vendor/bin/phpunit "$@"

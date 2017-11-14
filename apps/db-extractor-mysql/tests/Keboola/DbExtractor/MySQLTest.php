@@ -3,6 +3,7 @@
  * @package ex-db-mysql
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
+
 namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
@@ -10,20 +11,20 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQLTest extends AbstractMySQLTest
 {
-	public function testCredentials()
-	{
-		$config = $this->getConfig('mysql');
-		$config['action'] = 'testConnection';
-		unset($config['parameters']['tables']);
+    public function testCredentials()
+    {
+        $config = $this->getConfig('mysql');
+        $config['action'] = 'testConnection';
+        unset($config['parameters']['tables']);
 
-		$app = $this->createApplication($config);
-		$result = $app->run();
+        $app = $this->createApplication($config);
+        $result = $app->run();
 
-		$this->assertArrayHasKey('status', $result);
-		$this->assertEquals('success', $result['status']);
-	}
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+    }
 
-	public function testCredentialsWithoutDatabase()
+    public function testCredentialsWithoutDatabase()
     {
         $config = $this->getConfig('mysql');
         $config['action'] = 'testConnection';
@@ -37,49 +38,49 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-	public function testRunWithoutTables()
-	{
-		$config = $this->getConfig('mysql');
+    public function testRunWithoutTables()
+    {
+        $config = $this->getConfig('mysql');
 
-		unset($config['parameters']['tables']);
+        unset($config['parameters']['tables']);
 
-		$app = $this->createApplication($config);
-		$result = $app->run();
+        $app = $this->createApplication($config);
+        $result = $app->run();
 
-		$this->assertArrayHasKey('status', $result);
-		$this->assertEquals('success', $result['status']);
-	}
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+    }
 
-	public function testRun()
-	{
-		$config = $this->getConfig('mysql');
-		$app = $this->createApplication($config);
+    public function testRun()
+    {
+        $config = $this->getConfig('mysql');
+        $app = $this->createApplication($config);
 
-		$csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
-		$this->createTextTable($csv1);
+        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $this->createTextTable($csv1);
 
-		$csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
-		$this->createTextTable($csv2);
+        $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+        $this->createTextTable($csv2);
 
-		$result = $app->run();
+        $result = $app->run();
 
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
-		$this->assertEquals('success', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv1, $outputCsvFile);
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileEquals((string) $csv1, $outputCsvFile);
 
 
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
 
-		$this->assertEquals('success', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv2, $outputCsvFile);
-	}
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+        $this->assertFileEquals((string) $csv2, $outputCsvFile);
+    }
 
-	public function testRunWithoutDatabase()
+    public function testRunWithoutDatabase()
     {
         $config = $this->getConfig('mysql');
         $config['action'] = 'testConnection';
@@ -96,85 +97,85 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-	public function testCredentialsWithSSH()
-	{
-		$config = $this->getConfig('mysql');
-		$config['action'] = 'testConnection';
+    public function testCredentialsWithSSH()
+    {
+        $config = $this->getConfig('mysql');
+        $config['action'] = 'testConnection';
 
-		$config['parameters']['db']['ssh'] = [
-			'enabled' => true,
-			'keys' => [
-				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
-				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
-			],
-			'user' => 'root',
-			'sshHost' => 'sshproxy',
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
             'sshPort' => '22',
             'remoteHost' => 'mysql',
             'remotePort' => '3306',
             'localPort' => '23305',
-		];
+        ];
 
-		unset($config['parameters']['tables']);
+        unset($config['parameters']['tables']);
 
-		$app = $this->createApplication($config);
+        $app = $this->createApplication($config);
 
-		$result = $app->run();
+        $result = $app->run();
 
-		$this->assertArrayHasKey('status', $result);
-		$this->assertEquals('success', $result['status']);
-	}
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+    }
 
-	public function testRunWithSSH()
-	{
-		$config = $this->getConfig('mysql');
-		$config['parameters']['db']['ssh'] = [
-			'enabled' => true,
-			'keys' => [
-				'#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
-				'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
-			],
-			'user' => 'root',
-			'sshHost' => 'sshproxy',
-			'localPort' => '23306',
-		];
+    public function testRunWithSSH()
+    {
+        $config = $this->getConfig('mysql');
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'localPort' => '23306',
+        ];
 
-		$app = $this->createApplication($config);
+        $app = $this->createApplication($config);
 
-		$csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
-		$this->createTextTable($csv1);
+        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $this->createTextTable($csv1);
 
-		$csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
-		$this->createTextTable($csv2);
+        $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+        $this->createTextTable($csv2);
 
-		$result = $app->run();
+        $result = $app->run();
 
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
-		$this->assertEquals('success', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv1, $outputCsvFile);
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileEquals((string) $csv1, $outputCsvFile);
 
-		$outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
 
-		$this->assertEquals('success', $result['status']);
-		$this->assertFileExists($outputCsvFile);
-		$this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-		$this->assertFileEquals((string) $csv2, $outputCsvFile);
-	}
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+        $this->assertFileEquals((string) $csv2, $outputCsvFile);
+    }
 
-	public function testUserException()
-	{
-		$this->setExpectedException('Keboola\DbExtractor\Exception\UserException');
+    public function testUserException()
+    {
+        $this->setExpectedException('Keboola\DbExtractor\Exception\UserException');
 
-		$config = $this->getConfig('mysql');
+        $config = $this->getConfig('mysql');
 
-		$config['parameters']['db']['host'] = 'nonexistinghost';
-		$app = $this->createApplication($config);
+        $config['parameters']['db']['host'] = 'nonexistinghost';
+        $app = $this->createApplication($config);
 
-		$app->run();
-	}
+        $app->run();
+    }
 
     public function testGetTables()
     {
@@ -234,7 +235,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "1"
                     ], [
                         "name" => "usercity",
@@ -242,7 +243,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "2"
                     ], [
                         "name" => "usersentiment",
@@ -250,7 +251,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "3"
                     ], [
                         "name" => "zipcode",
@@ -258,7 +259,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "4"
                     ], [
                         "name" => "sku",
@@ -266,7 +267,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "5"
                     ], [
                         "name" => "createdat",
@@ -274,7 +275,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "6"
                     ], [
                         "name" => "category",
@@ -282,7 +283,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "7"
                     ], [
                         "name" => "price",
@@ -290,7 +291,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "8"
                     ], [
                         "name" => "county",
@@ -298,7 +299,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "9"
                     ], [
                         "name" => "countycode",
@@ -306,7 +307,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "10"
                     ], [
                         "name" => "userstate",
@@ -314,7 +315,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "11"
                     ], [
                         "name" => "categorygroup",
@@ -322,7 +323,7 @@ class MySQLTest extends AbstractMySQLTest
                         "primaryKey" => false,
                         "length" => "65535",
                         "nullable" => true,
-                        "default" => NULL,
+                        "default" => null,
                         "ordinalPosition" => "12"
                     ]
                 ]
@@ -386,131 +387,131 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
-        $expectedFirstTable = array (
+        $expectedFirstTable = array(
             'name' => 'ext_sales',
             'schema' => 'temp_schema',
             'type' => 'BASE TABLE',
             'rowCount' => '100',
             'columns' =>
-                array (
+                array(
                     0 =>
-                        array (
+                        array(
                             'name' => 'usergender',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '1',
                         ),
                     1 =>
-                        array (
+                        array(
                             'name' => 'usercity',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '2',
                         ),
                     2 =>
-                        array (
+                        array(
                             'name' => 'usersentiment',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '3',
                         ),
                     3 =>
-                        array (
+                        array(
                             'name' => 'zipcode',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '4',
                         ),
                     4 =>
-                        array (
+                        array(
                             'name' => 'sku',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '5',
                         ),
                     5 =>
-                        array (
+                        array(
                             'name' => 'createdat',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '6',
                         ),
                     6 =>
-                        array (
+                        array(
                             'name' => 'category',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '7',
                         ),
                     7 =>
-                        array (
+                        array(
                             'name' => 'price',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '8',
                         ),
                     8 =>
-                        array (
+                        array(
                             'name' => 'county',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '9',
                         ),
                     9 =>
-                        array (
+                        array(
                             'name' => 'countycode',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '10',
                         ),
                     10 =>
-                        array (
+                        array(
                             'name' => 'userstate',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '11',
                         ),
                     11 =>
-                        array (
+                        array(
                             'name' => 'categorygroup',
                             'type' => 'text',
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => NULL,
+                            'default' => null,
                             'ordinalPosition' => '12',
                         ),
                 ),
