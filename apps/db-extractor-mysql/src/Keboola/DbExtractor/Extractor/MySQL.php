@@ -159,11 +159,16 @@ class MySQL extends Extractor
             ];
         }
 
-        $sql = "SELECT c.*, 
-                CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
-                FROM INFORMATION_SCHEMA.COLUMNS as c 
-                LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
-                ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
+        if (!is_null($tables) && count($tables) > 0) {
+            $sql = "SELECT c.*, 
+                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
+                    FROM INFORMATION_SCHEMA.COLUMNS as c 
+                    LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
+                    ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
+        } else {
+            $sql = "SELECT c.*
+                    FROM INFORMATION_SCHEMA.COLUMNS as c";
+        }
 
         $sql .= $whereClause;
 
@@ -191,10 +196,10 @@ class MySQL extends Extractor
                 "ordinalPosition" => $column['ORDINAL_POSITION']
             ];
 
-            if (!is_null($column['CONSTRAINT_NAME']) ) {
+            if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME']) ) {
                 $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
             }
-            if (!is_null($column['REFERENCED_TABLE_NAME'])) {
+            if (array_key_exists('REFERENCED_TABLE_NAME', $column) && !is_null($column['REFERENCED_TABLE_NAME'])) {
                 $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
                 $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
                 $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
