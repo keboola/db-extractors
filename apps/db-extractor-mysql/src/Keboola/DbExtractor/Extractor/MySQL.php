@@ -112,6 +112,21 @@ class MySQL extends Extractor
         $this->db->query('SELECT NOW();')->execute();
     }
 
+    public function export(array $table)
+    {
+        // if database set make sure the database and selected table schema match
+        if (isset($table['table']) && $this->database && $this->database !== $table['table']['schema']) {
+            throw new UserException(sprintf(
+                'Invalid Configuration in "%s".  The table schema "%s" is different from the connection database "%s"',
+                $table['name'],
+                $table['table']['schema'],
+                $this->database
+            ));
+        }
+
+        return parent::export($table);
+    }
+
     public function getTables(array $tables = null)
     {
 
