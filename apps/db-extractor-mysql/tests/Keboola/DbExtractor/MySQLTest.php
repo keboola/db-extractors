@@ -387,7 +387,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
-        $this->assertCount(3, $result['tables']);
+        $this->assertGreaterThanOrEqual(3, count($result['tables']));
 
         $expectedFirstTable = array(
             'name' => 'ext_sales',
