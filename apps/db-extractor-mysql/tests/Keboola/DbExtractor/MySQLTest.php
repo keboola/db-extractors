@@ -387,6 +387,8 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
+        $this->assertCount(3, $result['tables']);
+
         $expectedFirstTable = array(
             'name' => 'ext_sales',
             'schema' => 'temp_schema',
@@ -570,6 +572,29 @@ class MySQLTest extends AbstractMySQLTest
             $columnMetadata[$metadata['key']] = $metadata['value'];
         }
         $this->assertEquals($expectedColumnMetadata, $columnMetadata);
+    }
+
+    public function testSchemaNotEqualToDatabase()
+    {
+        $this->createTextTable(
+            new CsvFile($this->dataDir . '/mysql/sales.csv'),
+            "sales",
+            "temp_schema"
+        );
+
+        $config = $this->getConfig();
+
+        $config['parameters']['tables'][2]['table'] = ['schema' => 'temp_schema', 'tableName' => 'sales'];
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+
+        try {
+            $app = new Application($config);
+            $app->run();
+            $this->fail('table schema and database mismatch');
+        } catch (\Keboola\DbExtractor\Exception\UserException $e) {
+            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+        }
     }
 
     public function testThousandsOfTables()
