@@ -123,7 +123,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
 
-        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tablecolumns.csv');
+        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
         // run entrypoint
         $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
