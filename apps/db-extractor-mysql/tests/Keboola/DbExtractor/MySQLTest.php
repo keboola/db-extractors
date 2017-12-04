@@ -8,6 +8,7 @@ namespace Keboola\DbExtractor;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Yaml\Yaml;
+use Nette\Utils;
 
 class MySQLTest extends AbstractMySQLTest
 {
@@ -150,18 +151,20 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $sanitizedTable = Utils\Strings::webalize($result['imported'][0], '._');
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $sanitizedTable . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest');
         $this->assertFileEquals((string) $csv1, $outputCsvFile);
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $sanitizedTable = Utils\Strings::webalize($result['imported'][1], '._');
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $sanitizedTable . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest');
         $this->assertFileEquals((string) $csv2, $outputCsvFile);
     }
 
@@ -533,8 +536,9 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
+        $sanitizedTable = Utils\Strings::webalize($result['imported'][0], '._');
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest')
+            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest')
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);

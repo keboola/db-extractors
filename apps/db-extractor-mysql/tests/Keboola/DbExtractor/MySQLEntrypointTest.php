@@ -110,7 +110,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
     public function testTableColumnsQuery()
     {
-        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tableColumns.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
 
         @unlink($outputCsvFile);
 
@@ -132,7 +132,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tableColumns.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
         $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }
