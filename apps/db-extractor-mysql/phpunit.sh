@@ -33,6 +33,5 @@ export MYSQL_DB_SSH_KEY_PUBLIC="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2tGpPt3qr
 # wait for mysql start
 sleep 15
 
-php ./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n .
-
-./vendor/bin/phpunit "$@"
+./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n . \
+  && ./vendor/bin/phpunit
