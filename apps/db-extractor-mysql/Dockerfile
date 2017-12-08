@@ -19,6 +19,7 @@ RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.
 		php-devel \
 		php-pear \
 		php-mysql \
+		which \
 		&& \
 	yum clean all && \
 	echo "date.timezone=UTC" >> /etc/php.ini && \
