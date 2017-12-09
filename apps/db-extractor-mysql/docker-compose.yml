@@ -15,6 +15,7 @@ services:
       MYSQL_DB_PORT: 3306
     links:
       - mysql
+      - mysql:mysql-different-cn
       - sshproxy
 
   mysql:
