@@ -85,7 +85,20 @@ class MySQL extends Extractor
 
         $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
-        $pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
+        try {
+            $pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
+        } catch (\PDOException $e) {
+            $checkCnMismatch = function (\Exception $exception) {
+                if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {
+                    throw new UserException($exception->getMessage());
+                }
+            };
+            $checkCnMismatch($e);
+            if (($previous = $e->getPrevious()) !== null) {
+                $checkCnMismatch($previous);
+            }
+            throw $e;
+        }
         $pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
         $pdo->exec("SET NAMES utf8;");
 

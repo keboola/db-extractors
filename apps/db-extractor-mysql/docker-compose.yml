@@ -4,7 +4,7 @@ services:
     build: .
     image: keboola/ex-db-mysql
     working_dir: /code
-    command: "./phpunit.sh"
+    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./phpunit.sh"]
     tty: true
     stdin_open: true
     environment:
@@ -15,6 +15,7 @@ services:
       MYSQL_DB_PORT: 3306
     links:
       - mysql
+      - mysql:mysql-different-cn
       - sshproxy
 
   mysql:
