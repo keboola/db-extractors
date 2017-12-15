@@ -119,7 +119,8 @@ class OracleTest extends ExtractorTest
                 $sql = sprintf(
                     "INSERT INTO {$tableName} (%s) VALUES (%s)",
                     implode(',', $header),
-                    implode(',', $cols));
+                    implode(',', $cols)
+                );
 
                 oci_execute(oci_parse($this->connection, $sql));
 
@@ -143,8 +144,7 @@ class OracleTest extends ExtractorTest
     protected function countTable(CsvFile $file)
     {
         $linesCount = 0;
-        foreach ($file AS $i => $line)
-        {
+        foreach ($file as $i => $line) {
             // skip header
             if (!$i) {
                 continue;
@@ -315,7 +315,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'COL1',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '1',
                                     'primaryKey' => false,
@@ -326,7 +326,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'COL2',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
@@ -347,7 +347,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'USERGENDER',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '1',
                                     'primaryKey' => false,
@@ -358,7 +358,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'USERCITY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
@@ -369,7 +369,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'USERSENTIMENT',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '3',
                                     'primaryKey' => false,
@@ -380,7 +380,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'ZIPCODE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '4',
                                     'primaryKey' => false,
@@ -391,7 +391,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'SKU',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '5',
                                     'primaryKey' => false,
@@ -402,7 +402,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'CREATEDAT',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '6',
                                     'primaryKey' => false,
@@ -413,7 +413,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'CATEGORY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '7',
                                     'primaryKey' => false,
@@ -424,7 +424,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'PRICE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '8',
                                     'primaryKey' => false,
@@ -435,7 +435,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'COUNTY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '9',
                                     'primaryKey' => false,
@@ -446,7 +446,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'COUNTYCODE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '10',
                                     'primaryKey' => false,
@@ -457,7 +457,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'USERSTATE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '11',
                                     'primaryKey' => false,
@@ -468,7 +468,7 @@ class OracleTest extends ExtractorTest
                                     'name' => 'CATEGORYGROUP',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'length' => '800',
                                     'ordinalPosition' => '12',
                                     'primaryKey' => false,

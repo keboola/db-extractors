@@ -143,7 +143,6 @@ SQL;
             }
 
             if (!array_key_exists($column['COLUMN_ID'] - 1, $tableDefs[$curTable]['columns'])) {
-
                 $length = $column['DATA_LENGTH'];
                 if (!is_null($column['DATA_PRECISION'])  && !is_null($column['DATA_SCALE'])) {
                     $length = $column['DATA_PRECISION'] . "," . $column['DATA_SCALE'];
@@ -187,10 +186,17 @@ SQL;
     public function simpleQuery(array $table, array $columns = array())
     {
         if (count($columns) > 0) {
-            return sprintf("SELECT %s FROM %s.%s",
-                implode(', ', array_map(function ($column) {
-                    return $this->quote($column);
-                }, $columns)),
+            return sprintf(
+                "SELECT %s FROM %s.%s",
+                implode(
+                    ', ',
+                    array_map(
+                        function ($column) {
+                            return $this->quote($column);
+                        },
+                        $columns
+                    )
+                ),
                 $this->quote($table['schema']),
                 $this->quote($table['tableName'])
             );
@@ -203,7 +209,8 @@ SQL;
         }
     }
 
-    private function quote($obj) {
+    private function quote($obj)
+    {
         return "\"{$obj}\"";
     }
 }
