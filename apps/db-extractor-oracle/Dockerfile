@@ -2,7 +2,6 @@ FROM quay.io/keboola/docker-base-php56:0.0.2
 MAINTAINER Erik Zigo <erik.zigo@keboola.com>
 
 RUN yum install -y wget && yum install -y tar
-RUN yum -y install vim
 RUN yum -y --enablerepo=epel,remi,remi-php56 install gcc
 RUN yum -y --enablerepo=epel,remi,remi-php56 install make
 RUN yum -y --enablerepo=epel,remi,remi-php56 install php-devel
