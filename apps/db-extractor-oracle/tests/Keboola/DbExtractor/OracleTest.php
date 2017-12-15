@@ -496,7 +496,7 @@ class OracleTest extends ExtractorTest
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/in.c-main.tableColumns.csv.manifest')
+            file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest')
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
