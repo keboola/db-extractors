@@ -1,27 +1,37 @@
-FROM quay.io/keboola/docker-base-php56:0.0.2
-MAINTAINER Erik Zigo <erik.zigo@keboola.com>
+FROM php:7.1
 
-RUN yum install -y wget && yum install -y tar
-RUN yum -y --enablerepo=epel,remi,remi-php56 install gcc
-RUN yum -y --enablerepo=epel,remi,remi-php56 install make
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-devel
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-pear
-RUN yum -y --enablerepo=epel,remi,remi-php56 install php-odbc
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Oracle
-ADD oracle/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm /tmp/oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
-ADD oracle/oracle-instantclient12.1-devel-12.1.0.2.0-1.x86_64.rpm /tmp/oracle-instantclient12.1-devel-12.1.0.2.0-1.x86_64.rpm
-ADD oracle/oracle.sh /tmp/oracle.sh
-RUN yum -y --nogpgcheck install /tmp/oracle-instantclient*
-RUN export LD_LIBRARY_PATH=/usr/lib/oracle/12.1/client64/lib/
-RUN export ORACLE_HOME=/usr/lib/oracle/12.1/client64/lib/
-RUN echo 'instantclient,/usr/lib/oracle/12.1/client64/lib/' | pecl install -f oci8-1.4.10
-RUN echo "extension=oci8.so" > /etc/php.d/30-oci8.ini
+WORKDIR /code
+
+RUN apt-get update -q && apt-get install -y unzip ssh libmcrypt-dev libaio1 --no-install-recommends
+
+# Oracle instantclient
+ADD oracle/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
+ADD oracle/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
+ADD oracle/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
+
+RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip -d /usr/local/
+
+RUN ln -s /usr/local/instantclient_12_2 /usr/local/instantclient
+RUN ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
+RUN ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
+
+RUN export LD_LIBRARY_PATH=/usr/local/instantclient
+RUN export PATH=/usr/local/instantclient:$PATH
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8
+RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+
+WORKDIR /root
+RUN curl -sS https://getcomposer.org/installer | php \
+  && mv composer.phar /usr/local/bin/composer
 
 WORKDIR /code
 
 # Initialize
-COPY . /code/
+COPY . /code
 RUN composer selfupdate && composer install --no-interaction
 
 CMD php ./src/run.php --data=/data
