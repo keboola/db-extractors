@@ -10,11 +10,11 @@ use Keboola\DbExtractor\Exception\UserException;
 
 class Oracle extends Extractor
 {
-	protected $db;
+    protected $db;
 
-	public function createConnection($params)
-	{
-		$dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
+    public function createConnection($params)
+    {
+        $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
         $connection = @oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
 
         if (!$connection) {
@@ -22,21 +22,21 @@ class Oracle extends Extractor
             throw new UserException("Error connection to DB: " . $error['message']);
         }
 
-		return $connection;
-	}
+        return $connection;
+    }
 
-	protected function executeQuery($query, CsvFile $csv, $tableName)
-	{
-	    $stmt = oci_parse($this->db, $query);
-		$success = @oci_execute($stmt);
+    protected function executeQuery($query, CsvFile $csv, $tableName)
+    {
+        $stmt = oci_parse($this->db, $query);
+        $success = @oci_execute($stmt);
 
-		if (!$success) {
-			$error = oci_error($stmt);
-			throw new UserException("Error executing query: " . $error['message']);
-		}
+        if (!$success) {
+            $error = oci_error($stmt);
+            throw new UserException("Error executing query: " . $error['message']);
+        }
 
         $resultRow = oci_fetch_assoc($stmt);
-		if (!is_array($resultRow) || empty($resultRow)) {
+        if (!is_array($resultRow) || empty($resultRow)) {
             $this->logger->warn(sprintf(
                 "Query returned empty result. Nothing was imported for table [%s]",
                 $tableName
@@ -56,20 +56,20 @@ class Oracle extends Extractor
         }
 
         return $cnt;
-	}
+    }
 
-	public function getConnection()
-	{
-		return $this->db;
-	}
+    public function getConnection()
+    {
+        return $this->db;
+    }
 
-	public function testConnection()
-	{
-		$stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-		return oci_execute($stmt);
-	}
+    public function testConnection()
+    {
+        $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
+        return oci_execute($stmt);
+    }
 
-	public function getTables(array $tables = null)
+    public function getTables(array $tables = null)
     {
 
         $sql = <<<SQL
@@ -79,16 +79,16 @@ SELECT TABS.TABLE_NAME, TABS.TABLESPACE_NAME, TABS.OWNER, TABS.NUM_ROWS,
       REFCOLS.CONSTRAINT_NAME, REFCOLS.CONSTRAINT_TYPE, REFCOLS.INDEX_NAME, REFCOLS.R_CONSTRAINT_NAME, REFCOLS.R_OWNER 
 FROM ALL_TAB_COLUMNS COLS
 JOIN (
-	SELECT * FROM all_tables 
-	JOIN (
-		SELECT owner own, table_name tname FROM user_tab_privs WHERE privilege='SELECT'
-		union 
-		select rtp.owner own, rtp.table_name tname from user_role_privs urp, role_tab_privs rtp
-		  where urp.granted_role = rtp.role and rtp.privilege='SELECT'
-		union
-		select user own, table_name tname from user_tables
-	) priv ON priv.own = all_tables.OWNER AND priv.tname = all_tables.TABLE_NAME
-	WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.TABLESPACE_NAME != 'SYSTEM' AND all_tables.OWNER != 'SYS' AND all_tables.OWNER != 'SYSTEM'
+    SELECT * FROM all_tables 
+    JOIN (
+        SELECT owner own, table_name tname FROM user_tab_privs WHERE privilege='SELECT'
+        union 
+        select rtp.owner own, rtp.table_name tname from user_role_privs urp, role_tab_privs rtp
+          where urp.granted_role = rtp.role and rtp.privilege='SELECT'
+        union
+        select user own, table_name tname from user_tables
+    ) priv ON priv.own = all_tables.OWNER AND priv.tname = all_tables.TABLE_NAME
+    WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.TABLESPACE_NAME != 'SYSTEM' AND all_tables.OWNER != 'SYS' AND all_tables.OWNER != 'SYSTEM'
 ) TABS ON COLS.TABLE_NAME = TABS.TABLE_NAME AND COLS.OWNER = TABS.OWNER
 LEFT OUTER JOIN (
     SELECT  ACC.COLUMN_NAME, ACC.TABLE_NAME, AC.CONSTRAINT_NAME, 
