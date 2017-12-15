@@ -4,7 +4,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /code
 
-RUN apt-get update -q && apt-get install -y unzip ssh libmcrypt-dev libaio1 --no-install-recommends
+RUN apt-get update -q && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget --no-install-recommends
 
 # Oracle instantclient
 ADD oracle/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
