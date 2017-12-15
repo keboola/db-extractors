@@ -99,26 +99,23 @@ LEFT OUTER JOIN (
 ) REFCOLS ON COLS.TABLE_NAME = REFCOLS.TABLE_NAME AND COLS.COLUMN_NAME = REFCOLS.COLUMN_NAME
 SQL;
 
-        $whereClasue = "";
+        $whereClause = "";
         if (!is_null($tables) && count($tables) > 0) {
-            $whereClasue = sprintf(
-                " AND TABS.TABLE_NAME IN ('%s')",
+            $whereClause = sprintf(
+                " WHERE TABS.TABLE_NAME IN ('%s')",
                 implode("','", array_map(function ($table) {
                     return $table['tableName'];
-                }, $tables)),
-                implode("','", array_map(function ($table) {
-                    return $table['schema'];
                 }, $tables))
             );
         }
         $orderClause = " ORDER BY TABS.OWNER, TABS.TABLE_NAME, COLS.COLUMN_ID";
 
-        $stmt = oci_parse($this->db, $sql . $whereClasue . $orderClause);
+        $stmt = oci_parse($this->db, $sql . $whereClause . $orderClause);
 
         $success = @oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
-            throw new UserException("Error describing table {$table['TABLE_NAME']}: " . $error['message']);
+            throw new UserException("Error fetching table listing: " . $error['message']);
         }
 
         $numrows = oci_fetch_all($stmt, $desc, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
