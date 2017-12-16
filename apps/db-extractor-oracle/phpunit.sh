@@ -40,4 +40,6 @@ wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/d
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 dockerize -wait tcp://oracle:1521 -wait http://oracle:8080 -timeout 120s
 
-./vendor/bin/phpunit "$@"
+./vendor/bin/phpcs --standard=psr2 --ignore=vendor -n . && ./vendor/bin/phpunit
+
+
