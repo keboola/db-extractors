@@ -52,7 +52,6 @@ class Redshift extends Extractor
     public function export(array $table)
     {
         $outputTable = $table['outputTable'];
-        $csv = $this->createOutputCsv($outputTable);
         $this->logger->info("Exporting to " . $outputTable);
         if (isset($table['query']) && strlen($table['query']) > 0) {
             $query = $table['query'];
@@ -68,9 +67,10 @@ class Redshift extends Extractor
                 if ($tries > 0) {
                     $this->restartConnection();
                 }
-                $csvCreated = $this->executeQuery($query, $csv);
+                $csvCreated = $this->executeQuery($query, $this->createOutputCsv($outputTable));
                 break;
             } catch (\PDOException $e) {
+                $this->logger->info(sprintf('%s. Retrying... [%dx]', $e->getMessage(), $tries + 1));
                 $exception = new UserException("DB query [{$table['name']}] failed: " . $e->getMessage(), 0, $e);
             }
             sleep(pow($tries, 2));
