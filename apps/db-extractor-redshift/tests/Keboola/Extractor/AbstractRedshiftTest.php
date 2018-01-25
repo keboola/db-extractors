@@ -24,8 +24,11 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         if (!defined('APP_NAME')) {
             define('APP_NAME', 'ex-db-redshift');
         }
-        $config = $this->getConfig('redshift');
+        $this->initRedshiftData($this->getConfig('redshift'));
+    }
 
+    private function initRedshiftData(array $config)
+    {
         $pdo = new \PDO(
             "pgsql:dbname={$config['parameters']['db']['database']};port=5439;host=" . $config['parameters']['db']['host'],
             $config['parameters']['db']['user'],
@@ -33,8 +36,8 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
-        $pdo->query("CREATE SCHEMA IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME. "\"");
-        $pdo->query("DROP TABLE IF EXISTS \"" . self::TESTING_SCHEMA_NAME. "\".escaping;");
+        $pdo->query(sprintf('DROP SCHEMA IF EXISTS "%s" CASCADE', self::TESTING_SCHEMA_NAME));
+        $pdo->query("CREATE SCHEMA \"" . self::TESTING_SCHEMA_NAME. "\"");
         $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME . "\".escaping 
                       (col1 VARCHAR NOT NULL DEFAULT 'a', 
                       col2 VARCHAR NOT NULL DEFAULT 'b', 
@@ -66,6 +69,12 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $config['parameters']['extractor_class'] = 'Redshift';
         return $config;
+    }
+
+    public function getRedshiftPrivateKey()
+    {
+        // docker-compose .env file does not support new lines in variables so we have to modify the key https://github.com/moby/moby/issues/12997
+        return str_replace('"', '', str_replace('\n', "\n", $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE')));
     }
 
 }

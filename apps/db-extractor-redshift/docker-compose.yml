@@ -3,12 +3,10 @@ services:
   app:
     build: .
     image: keboola/ex-db-redshift
-    volumes:
-        - .:/code
-    working_dir: /code
-    command: "./phpunit.sh"
     tty: true
     stdin_open: true
+    env_file:
+      - ssh-keys.env
     environment:
       - REDSHIFT_DB_HOST
       - REDSHIFT_DB_PORT
@@ -20,8 +18,34 @@ services:
       - AWS_SECRET_KEY
       - AWS_REGION
       - AWS_S3_BUCKET
+      - ROOT_PATH=/code
     links:
       - sshproxy
+
+  dev:
+    image: keboola/ex-db-redshift
+    volumes:
+      - .:/code
+    tty: true
+    command: vendor/bin/phpunit
+    stdin_open: true
+    env_file:
+      - ssh-keys.env
+    environment:
+      - REDSHIFT_DB_HOST
+      - REDSHIFT_DB_PORT
+      - REDSHIFT_DB_DATABASE
+      - REDSHIFT_DB_USER
+      - REDSHIFT_DB_PASSWORD
+      - REDSHIFT_DB_SCHEMA
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - AWS_REGION
+      - AWS_S3_BUCKET
+      - ROOT_PATH=/code
+    links:
+      - sshproxy
+
 
   sshproxy:
     build: ./tests/env/sshproxy
