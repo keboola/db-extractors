@@ -41,7 +41,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getRedshiftPrivateKey(),
                 'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -89,7 +89,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getRedshiftPrivateKey(),
                 'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -111,6 +111,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $result = $app->run();
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
+
         $this->assertCount(3, $result['tables']);
 
         $expectedData = array (

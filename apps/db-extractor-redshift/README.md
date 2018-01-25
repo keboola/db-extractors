@@ -49,8 +49,13 @@ AWS_SECRET_KEY=aws_secret_key
 AWS_REGION=eu-west-1
 AWS_S3_BUCKET=test-bucket
 ```
+3. Install composer dependencies locally and load test fixtures to S3
+```$xslt
+docker-compose run --rm dev php ./tests/Keboola/loadS3.php
+docker-compose run --rm dev composer install
+```
 3. Run the tests:
 
 ```
-source set-env.sh && docker-compose run --rm app
+docker-compose run --rm app
 ```
