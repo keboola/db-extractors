@@ -46,6 +46,7 @@ try {
     $logger->log('error', $e->getMessage(), [
         'errFile' => $e->getFile(),
         'errLine' => $e->getLine(),
+        'code' => $e->getCode(),
         'trace' => $e->getTrace()
     ]);
     exit(2);
