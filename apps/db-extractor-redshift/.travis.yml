@@ -7,7 +7,7 @@ before_script:
   - docker-compose -v
   - docker-compose build sshproxy app
   - docker-compose run --rm app php ./tests/Keboola/loadS3.php
-  - docker-compose run --rm app
+  - docker-compose run --rm app vendor/bin/phpunit
 
 script:
   - docker pull quay.io/keboola/developer-portal-cli-v2:latest
