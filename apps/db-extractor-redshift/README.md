@@ -54,8 +54,13 @@ AWS_S3_BUCKET=test-bucket
 docker-compose run --rm dev php ./tests/Keboola/loadS3.php
 docker-compose run --rm dev composer install
 ```
-3. Run the tests:
+4. Run the tests:
 
 ```
 docker-compose run --rm app
+```
+
+Run single test example:
+```
+docker-compose run --rm dev ./vendor/bin/phpunit --debug --filter testGetTables
 ```
