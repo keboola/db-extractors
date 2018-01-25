@@ -112,112 +112,14 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
 
-        $this->assertCount(3, $result['tables']);
+        $this->assertCount(1, $result['tables']);
 
         $expectedData = array (
-            0 =>
-                array (
-                    'name' => 'bad_type',
-                    'schema' => 'public',
-                    'type' => 'BASE TABLE',
-                    'catalog' => 'travis_ex_db_tests',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'id',
-                                    'type' => 'integer',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 32,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 1,
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'name',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 255,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 2,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'glasses',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 255,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 3,
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'created',
-                                    'type' => 'date',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => NULL,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 4,
-                                ),
-                        ),
-                ),
-            1 =>
-                array (
-                    'name' => 'simple',
-                    'schema' => 'public',
-                    'type' => 'BASE TABLE',
-                    'catalog' => 'travis_ex_db_tests',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'id',
-                                    'type' => 'integer',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 32,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 1,
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'name',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 255,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 2,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'glasses',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 255,
-                                    'nullable' => false,
-                                    'default' => NULL,
-                                    'ordinalPosition' => 3,
-                                ),
-                        ),
-                ),
-            2 =>
                 array (
                     'name' => 'escaping',
-                    'schema' => 'testing',
+                    'schema' => self::TESTING_SCHEMA_NAME,
                     'type' => 'BASE TABLE',
-                    'catalog' => 'travis_ex_db_tests',
+                    'catalog' => $config['parameters']['db']['database'],
                     'columns' =>
                         array (
                             0 =>
