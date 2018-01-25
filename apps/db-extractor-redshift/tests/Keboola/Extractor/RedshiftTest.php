@@ -190,7 +190,7 @@ class RedshiftTest extends AbstractRedshiftTest
             1 =>
                 array (
                     'key' => 'KBC.schema',
-                    'value' => 'testing',
+                    'value' => self::TESTING_SCHEMA_NAME,
                 ),
             2 =>
                 array (
@@ -200,7 +200,7 @@ class RedshiftTest extends AbstractRedshiftTest
             3 =>
                 array (
                     'key' => 'KBC.catalog',
-                    'value' => 'travis_ex_db_tests',
+                    'value' => $config['parameters']['db']['database'],
                 ),
         );
 
