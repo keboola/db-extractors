@@ -106,7 +106,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getPrivateKey('mysql'),
                 'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -133,7 +133,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getPrivateKey('mysql'),
                 'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -521,7 +521,7 @@ class MySQLTest extends AbstractMySQLTest
                         ),
                 ),
         );
-        $this->assertEquals($result['tables'][0], $expectedFirstTable);
+        $this->assertEquals($expectedFirstTable, $result['tables'][0]);
     }
 
     public function testManifestMetadata()
