@@ -33,14 +33,10 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
         $this->createTextTable($csv2);
 
-        // run entrypoint
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-//        die;
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');
@@ -99,7 +95,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        // run entrypoint
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
@@ -126,7 +121,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
-        // run entrypoint
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
