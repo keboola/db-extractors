@@ -593,7 +593,7 @@ class MySQLTest extends AbstractMySQLTest
         unset($config['parameters']['tables'][1]);
 
         try {
-            $app = new Application($config);
+            $app = $this->createApplication($config);
             $app->run();
             $this->fail('table schema and database mismatch');
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
@@ -612,7 +612,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
         echo "\nThere are " . count($result['tables']) . " tables\n";

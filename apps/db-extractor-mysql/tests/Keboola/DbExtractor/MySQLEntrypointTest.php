@@ -14,6 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
+
     public function testRunAction()
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
@@ -33,7 +34,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->createTextTable($csv2);
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 //        die;
@@ -56,7 +57,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['action'] = 'testConnection';
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -83,7 +84,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         ];
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -99,7 +100,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -126,7 +127,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 

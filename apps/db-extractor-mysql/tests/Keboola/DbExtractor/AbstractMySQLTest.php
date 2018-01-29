@@ -7,7 +7,9 @@
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
+
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
@@ -16,10 +18,21 @@ abstract class AbstractMySQLTest extends ExtractorTest
      */
     protected $pdo;
 
+    protected $appName;
+
+    protected $rootPath;
+
     public function setUp()
     {
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-mysql');
+        if (!$this->appName) {
+            $this->appName = getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql';
+            if (!defined('APP_NAME')) {
+                define('APP_NAME', $this->appName);
+            }
+        }
+
+        if (!$this->rootPath) {
+            $this->rootPath = getenv('ROOT_PATH') ? getenv('ROOT_PATH') : '/code';
         }
 
         $options = [
