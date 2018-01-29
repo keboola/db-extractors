@@ -4,7 +4,7 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 

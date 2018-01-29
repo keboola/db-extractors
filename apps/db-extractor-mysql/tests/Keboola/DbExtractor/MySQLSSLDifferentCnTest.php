@@ -1,6 +1,6 @@
 <?php
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Exception\UserException;
 

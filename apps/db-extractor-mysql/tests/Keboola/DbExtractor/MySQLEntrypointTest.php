@@ -6,7 +6,7 @@
  * Time: 15:51
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Process\Process;

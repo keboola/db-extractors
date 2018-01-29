@@ -11,7 +11,6 @@ use Symfony\Component\Yaml\Yaml;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 
-define('APP_NAME', 'ex-db-mysql');
 
 require_once(__DIR__ . "/../bootstrap.php");
 
