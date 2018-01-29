@@ -14,7 +14,7 @@ class MySQLTest extends AbstractMySQLTest
 {
     public function testCredentials()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
@@ -27,7 +27,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testCredentialsWithoutDatabase()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
         unset($config['parameters']['db']['database']);
@@ -41,7 +41,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithoutTables()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
 
         unset($config['parameters']['tables']);
 
@@ -54,7 +54,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRun()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $app = $this->createApplication($config);
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
@@ -83,7 +83,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithoutDatabase()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['db']['database']);
 
@@ -100,7 +100,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testCredentialsWithSSH()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
         $config['parameters']['db']['ssh'] = [
@@ -129,7 +129,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithSSH()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -189,7 +189,7 @@ class MySQLTest extends AbstractMySQLTest
             "temp_schema"
         );
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'getTables';
         $app = $this->createApplication($config);
 
@@ -382,7 +382,7 @@ class MySQLTest extends AbstractMySQLTest
             "temp_schema"
         );
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         unset($config['parameters']['tables']);
         unset($config['parameters']['db']['database']);
         $config['action'] = 'getTables';
@@ -526,7 +526,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testManifestMetadata()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
 
         // use just the last table from the config
         unset($config['parameters']['tables'][0]);

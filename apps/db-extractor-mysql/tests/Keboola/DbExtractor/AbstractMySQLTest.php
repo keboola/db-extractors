@@ -12,9 +12,9 @@ use Keboola\DbExtractor\Test\ExtractorTest;
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
-    /**
-     * @var \PDO
-     */
+    const DRIVER = 'mysql';
+
+    /** @var \PDO */
     protected $pdo;
 
     protected $appName;
@@ -43,7 +43,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $options[\PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
         $options[\PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig(self::DRIVER);
         $dbConfig = $config['parameters']['db'];
 
         $dsn = sprintf(
@@ -63,7 +63,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
      * @param string $driver
      * @return mixed
      */
-    public function getConfig($driver = 'mysql')
+    public function getConfig($driver = self::DRIVER)
     {
         $config = parent::getConfig($driver);
         if (!empty($config['parameters']['db']['#password'])) {
