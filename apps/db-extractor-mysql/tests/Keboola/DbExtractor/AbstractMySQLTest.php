@@ -10,7 +10,6 @@ use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
-
 abstract class AbstractMySQLTest extends ExtractorTest
 {
     /**
