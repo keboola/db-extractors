@@ -1,6 +1,6 @@
 <?php
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Exception\UserException;
 
@@ -13,7 +13,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
             'Peer certificate CN=`mysql\' did not match expected CN=`mysql-different-cn'
         );
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
         $config['parameters']['db']['ssl'] = [

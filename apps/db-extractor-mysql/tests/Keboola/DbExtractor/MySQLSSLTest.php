@@ -4,7 +4,7 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 
@@ -20,7 +20,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 
     public function testCredentials()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
         $config['parameters']['db']['ssl'] = [
@@ -42,7 +42,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 
     public function testRun()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
 
         $config['parameters']['db']['ssl'] = [
             'enabled' => true,

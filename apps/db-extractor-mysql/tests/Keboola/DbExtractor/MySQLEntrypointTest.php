@@ -6,7 +6,7 @@
  * Time: 15:51
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Process\Process;
@@ -14,6 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
+
     public function testRunAction()
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
@@ -32,14 +33,10 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
         $this->createTextTable($csv2);
 
-        // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-//        die;
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');
@@ -56,7 +53,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['action'] = 'testConnection';
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -72,7 +69,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getPrivateKey('mysql'),
                 'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -83,7 +80,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         ];
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -98,8 +95,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -125,8 +121,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
-        // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/src/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 

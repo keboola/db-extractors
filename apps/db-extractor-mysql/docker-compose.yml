@@ -3,16 +3,41 @@ services:
   app:
     build: .
     image: keboola/ex-db-mysql
-    working_dir: /code
-    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./phpunit.sh"]
+    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
     tty: true
     stdin_open: true
+    env_file:
+      - ssh-keys.env
     environment:
       MYSQL_DB_HOST: mysql
       MYSQL_DB_USER: root
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
+      APP_NAME: ex-db-mysql
+      ROOT_PATH: /code
+    links:
+      - mysql
+      - mysql:mysql-different-cn
+      - sshproxy
+
+  dev:
+    image: keboola/ex-db-mysql
+    volumes:
+      - .:/code
+    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
+    tty: true
+    stdin_open: true
+    env_file:
+      - ssh-keys.env
+    environment:
+      MYSQL_DB_HOST: mysql
+      MYSQL_DB_USER: root
+      MYSQL_DB_PASSWORD: rootpassword
+      MYSQL_DB_DATABASE: test
+      MYSQL_DB_PORT: 3306
+      APP_NAME: ex-db-mysql
+      ROOT_PATH: /code
     links:
       - mysql
       - mysql:mysql-different-cn

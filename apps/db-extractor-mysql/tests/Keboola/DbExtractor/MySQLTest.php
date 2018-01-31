@@ -4,7 +4,7 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Yaml\Yaml;
@@ -14,7 +14,7 @@ class MySQLTest extends AbstractMySQLTest
 {
     public function testCredentials()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
@@ -27,7 +27,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testCredentialsWithoutDatabase()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
         unset($config['parameters']['db']['database']);
@@ -41,7 +41,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithoutTables()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
 
         unset($config['parameters']['tables']);
 
@@ -54,7 +54,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRun()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $app = $this->createApplication($config);
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
@@ -83,7 +83,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithoutDatabase()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
         unset($config['parameters']['db']['database']);
 
@@ -100,13 +100,13 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testCredentialsWithSSH()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getPrivateKey('mysql'),
                 'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -129,11 +129,11 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithSSH()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
+                '#private' => $this->getPrivateKey('mysql'),
                 'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
@@ -189,7 +189,7 @@ class MySQLTest extends AbstractMySQLTest
             "temp_schema"
         );
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         $config['action'] = 'getTables';
         $app = $this->createApplication($config);
 
@@ -382,7 +382,7 @@ class MySQLTest extends AbstractMySQLTest
             "temp_schema"
         );
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
         unset($config['parameters']['tables']);
         unset($config['parameters']['db']['database']);
         $config['action'] = 'getTables';
@@ -521,12 +521,12 @@ class MySQLTest extends AbstractMySQLTest
                         ),
                 ),
         );
-        $this->assertEquals($result['tables'][0], $expectedFirstTable);
+        $this->assertEquals($expectedFirstTable, $result['tables'][0]);
     }
 
     public function testManifestMetadata()
     {
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig();
 
         // use just the last table from the config
         unset($config['parameters']['tables'][0]);
@@ -593,7 +593,7 @@ class MySQLTest extends AbstractMySQLTest
         unset($config['parameters']['tables'][1]);
 
         try {
-            $app = new Application($config);
+            $app = $this->createApplication($config);
             $app->run();
             $this->fail('table schema and database mismatch');
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
@@ -612,7 +612,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
         echo "\nThere are " . count($result['tables']) . " tables\n";

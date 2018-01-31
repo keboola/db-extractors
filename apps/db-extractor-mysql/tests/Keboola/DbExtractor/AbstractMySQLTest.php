@@ -4,22 +4,34 @@
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
-    /**
-     * @var \PDO
-     */
+    const DRIVER = 'mysql';
+
+    /** @var \PDO */
     protected $pdo;
+
+    protected $appName;
+
+    protected $rootPath;
 
     public function setUp()
     {
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-mysql');
+        if (!$this->appName) {
+            $this->appName = getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql';
+            if (!defined('APP_NAME')) {
+                define('APP_NAME', $this->appName);
+            }
+        }
+
+        if (!$this->rootPath) {
+            $this->rootPath = getenv('ROOT_PATH') ? getenv('ROOT_PATH') : '/code';
         }
 
         $options = [
@@ -31,7 +43,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $options[\PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
         $options[\PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
 
-        $config = $this->getConfig('mysql');
+        $config = $this->getConfig(self::DRIVER);
         $dbConfig = $config['parameters']['db'];
 
         $dsn = sprintf(
@@ -51,7 +63,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
      * @param string $driver
      * @return mixed
      */
-    public function getConfig($driver = 'mysql')
+    public function getConfig($driver = self::DRIVER)
     {
         $config = parent::getConfig($driver);
         if (!empty($config['parameters']['db']['#password'])) {
