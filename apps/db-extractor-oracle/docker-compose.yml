@@ -5,7 +5,7 @@ services:
     image: keboola/db-extractor-oracle
     tty: true
     stdin_open: true
-    command: ["./wait-for-it.sh", "oracle:8080", "-t", "30", "--", "./vendor/bin/phpunit"]
+    command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
     env_file:
       - ssh-keys.env
     environment:
@@ -24,7 +24,7 @@ services:
       - .:/code
     tty: true
     stdin_open: true
-    command: ["./wait-for-it.sh", "oracle:8080", "-t", "30", "--", "./vendor/bin/phpunit"]
+    command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
     env_file:
       - ssh-keys.env
     environment:
