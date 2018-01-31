@@ -3,7 +3,23 @@ services:
   app:
     build: .
     image: keboola/db-extractor-oracle
-    working_dir: /code
+    tty: true
+    stdin_open: true
+    command: "./phpunit.sh"
+    environment:
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    links:
+      - oracle
+      - sshproxy
+
+  dev:
+    image: keboola/db-extractor-oracle
+    volumes:
+      - .:/code
     tty: true
     stdin_open: true
     command: "./phpunit.sh"
