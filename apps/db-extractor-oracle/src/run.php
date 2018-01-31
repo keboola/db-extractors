@@ -19,7 +19,6 @@ $logger = new \Keboola\DbExtractor\Logger('ex-db-oracle');
 $runAction = true;
 
 try {
-
     $arguments = getopt("d::", ["data::"]);
     if (!isset($arguments["data"])) {
         throw new UserException('Data folder not set.');
