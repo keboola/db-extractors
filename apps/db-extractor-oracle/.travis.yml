@@ -7,6 +7,8 @@ services:
 
 install:
   - docker-compose build
+  - docker-compose run --rm app /code/vendor/bin/phpcs --standard=psr2 -n --ignore=vendor --extensions=php .
+  - docker-compose run --rm app php /code/vendor/bin/phpstan.phar analyse --level=7 ./src ./tests
   - docker-compose run --rm app
 
 script:
@@ -16,7 +18,6 @@ script:
   - eval $(docker run --rm -e KBC_DEVELOPERPORTAL_USERNAME -e KBC_DEVELOPERPORTAL_PASSWORD quay.io/keboola/developer-portal-cli-v2:latest ecr:get-login $KBC_DEVELOPERPORTAL_VENDOR $KBC_DEVELOPERPORTAL_APP)
   - docker push $REPOSITORY:master
   # Run live test job on new master image
-  # env requires: KBC_STORAGE_TOKEN and KBC_APP_TEST_CONFIG (a token to a test project where the app has a configuration)
   - docker pull quay.io/keboola/syrup-cli:latest
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287646782 master
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287674685 master

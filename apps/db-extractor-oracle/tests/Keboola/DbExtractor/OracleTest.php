@@ -3,10 +3,10 @@
  * @package ex-db-oracle
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
+use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Yaml\Yaml;
 
@@ -101,8 +101,7 @@ class OracleTest extends ExtractorTest
                 array_map(function ($column) {
                     return $column . ' NVARCHAR2 (400)';
                 }, $header)
-            ),
-            $tableName
+            )
         )));
 
         // create the primary key if supplied
