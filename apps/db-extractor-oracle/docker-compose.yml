@@ -6,6 +6,8 @@ services:
     tty: true
     stdin_open: true
     command: "./phpunit.sh"
+    env_file:
+      - ssh-keys.env
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
@@ -23,6 +25,8 @@ services:
     tty: true
     stdin_open: true
     command: "./phpunit.sh"
+    env_file:
+      - ssh-keys.env
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
