@@ -3,10 +3,10 @@
  * @package ex-db-oracle
  * @author Erik Zigo <erik.zigo@keboola.com>
  */
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Configuration\OracleConfigDefinition;
+use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Yaml\Yaml;
 
@@ -81,7 +81,7 @@ class OracleTest extends ExtractorTest
      *
      * @param CsvFile $file
      */
-    private function createTextTable(CsvFile $file)
+    private function createTextTable(CsvFile $file, $primaryKey = [])
     {
         $tableName = $this->generateTableName($file);
 
@@ -101,9 +101,29 @@ class OracleTest extends ExtractorTest
                 array_map(function ($column) {
                     return $column . ' NVARCHAR2 (400)';
                 }, $header)
-            ),
-            $tableName
+            )
         )));
+
+        // create the primary key if supplied
+        if ($primaryKey && is_array($primaryKey) && !empty($primaryKey)) {
+            foreach ($primaryKey as $pk) {
+                oci_execute(
+                    oci_parse(
+                        $this->connection,
+                        sprintf("ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL", $tableName, $pk)
+                    )
+                );
+            }
+            oci_execute(oci_parse(
+                $this->connection,
+                sprintf(
+                    'ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s)',
+                    $tableName,
+                    $tableName,
+                    implode(',', $primaryKey)
+                )
+            ));
+        }
 
         $file->next();
 
@@ -188,7 +208,7 @@ class OracleTest extends ExtractorTest
         $app = $this->createApplication($config);
 
         $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1);
+        $this->createTextTable($csv1, ['CREATEDAT']);
 
         $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
         $this->createTextTable($csv2);
@@ -200,15 +220,14 @@ class OracleTest extends ExtractorTest
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-        $this->assertFileEquals((string) $csv1, $outputCsvFile);
-
+        $this->assertEquals(file_get_contents($csv1), file_get_contents($outputCsvFile));
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertFileEquals((string) $csv2, $outputCsvFile);
+        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
     }
 
     public function testCredentialsWithSSH()
@@ -218,8 +237,8 @@ class OracleTest extends ExtractorTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
-                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+                '#private' => $this->getPrivateKey('oracle'),
+                'public' => $this->getEnv('oracle', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -244,8 +263,8 @@ class OracleTest extends ExtractorTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getEnv('mysql', 'DB_SSH_KEY_PRIVATE'),
-                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+                '#private' => $this->getPrivateKey('oracle'),
+                'public' => $this->getEnv('oracle', 'DB_SSH_KEY_PUBLIC')
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -257,28 +276,26 @@ class OracleTest extends ExtractorTest
         $app = $this->createApplication($config);
 
         $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1);
+        $this->createTextTable($csv1, ['CREATEDAT']);
 
         $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
         $this->createTextTable($csv2);
 
         $result = $app->run();
 
-
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-        $this->assertFileEquals((string) $csv1, $outputCsvFile);
-
+        $this->assertEquals(file_get_contents($csv1), file_get_contents($outputCsvFile));
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertFileEquals((string) $csv2, $outputCsvFile);
+        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
     }
 
     public function testGetTables()

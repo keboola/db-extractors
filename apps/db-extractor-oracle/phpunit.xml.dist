@@ -6,9 +6,13 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="true"
+         stopOnFailure="false"
          syntaxCheck="false"
          bootstrap="bootstrap.php">
+
+    <php>
+        <const name="ROOT_PATH" value="/code/"/>
+    </php>
 
     <testsuite name="MSSQL Extractor Test Suite">
         <directory>tests</directory>

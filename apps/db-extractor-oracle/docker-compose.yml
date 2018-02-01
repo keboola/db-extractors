@@ -3,10 +3,30 @@ services:
   app:
     build: .
     image: keboola/db-extractor-oracle
-    working_dir: /code
     tty: true
     stdin_open: true
-    command: "./phpunit.sh"
+    command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
+    env_file:
+      - ssh-keys.env
+    environment:
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    links:
+      - oracle
+      - sshproxy
+
+  dev:
+    image: keboola/db-extractor-oracle
+    volumes:
+      - .:/code
+    tty: true
+    stdin_open: true
+    command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
+    env_file:
+      - ssh-keys.env
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
