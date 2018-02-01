@@ -154,7 +154,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $this->pdo->exec("DROP TABLE IF EXISTS `late_table`");
         $tableCreated = false;
-        echo "\n Table Not Created\n";
+        
         while ($process->isRunning()) {
             sleep(5);
             if (!$tableCreated) {
