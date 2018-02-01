@@ -131,4 +131,49 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }
+
+    public function testRetries()
+    {
+        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
+
+        @unlink($outputCsvFile);
+
+        $config = $this->getConfig();
+        $config['parameters']['tables'][2]['table']['tableName'] = 'late_table';
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+
+        @unlink($this->dataDir . '/config.yml');
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        // try exporting before the table exists
+
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->start();
+
+        $this->pdo->exec("DROP TABLE IF EXISTS `late_table`");
+        $tableCreated = false;
+        echo "\n Table Not Created\n";
+        while ($process->isRunning()) {
+            sleep(5);
+            if (!$tableCreated) {
+                $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+                $this->createTextTable($csv1, 'late_table');
+                $tableCreated = true;
+            }
+        }
+
+        // check that it had to retry at least 2x
+        $this->assertContains('[2x]', $process->getOutput());
+
+        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
+        // now create the table
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
+        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileExists($outputCsvFile);
+    }
 }
