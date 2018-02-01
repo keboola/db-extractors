@@ -139,7 +139,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($outputCsvFile);
 
         $config = $this->getConfig();
-        $config['parameters']['tables'][2]['table']['tableName'] = 'late_table';
+        $table = $config['parameters']['tables'][2]['table'];
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
@@ -152,14 +152,15 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->setTimeout(300);
         $process->start();
 
-        $this->pdo->exec("DROP TABLE IF EXISTS `late_table`");
+        // Drop the table if it exists
+        $this->pdo->exec(sprintf("DROP TABLE IF EXISTS `%s`.`%s`", $table['schema'], $table['tableName']));
+
         $tableCreated = false;
-        
         while ($process->isRunning()) {
             sleep(5);
             if (!$tableCreated) {
                 $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
-                $this->createTextTable($csv1, 'late_table');
+                $this->createTextTable($csv1, $table['tableName']);
                 $tableCreated = true;
             }
         }
@@ -168,7 +169,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertContains('[2x]', $process->getOutput());
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
-        // now create the table
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
