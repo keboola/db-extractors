@@ -106,7 +106,7 @@ class MySQL extends Extractor
         if ($isSsl) {
             $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
 
-            if (empty($status['Value']) || $status['Value']) {
+            if (empty($status['Value'])) {
                 throw new UserException(sprintf("Connection is not encrypted"));
             } else {
                 $this->logger->info("Using SSL cipher: " . $status['Value']);
