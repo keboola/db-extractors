@@ -34,6 +34,7 @@ class MySQL extends Extractor
         // convert errors to PDOExceptions
         $options = [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::MYSQL_ATTR_COMPRESS => true,
         ];
 
         // ssl encryption
