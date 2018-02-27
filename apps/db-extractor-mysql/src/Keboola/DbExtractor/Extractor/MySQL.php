@@ -106,11 +106,19 @@ class MySQL extends Extractor
         if ($isSsl) {
             $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
 
-            if (empty($status['Value'])) {
+            if (empty($status['Value']) || $status['Value']) {
                 throw new UserException(sprintf("Connection is not encrypted"));
             } else {
                 $this->logger->info("Using SSL cipher: " . $status['Value']);
             }
+        }
+
+        $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(\PDO::FETCH_ASSOC);
+
+        if (empty($status['Value']) || $status['Value'] !== 'ON') {
+            throw new UserException(sprintf("Network communication is not compressed"));
+        } else {
+            $this->logger->info("Using network communication compression");
         }
 
         return $pdo;
