@@ -15,7 +15,10 @@ use Symfony\Component\Yaml\Yaml;
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
 
-    public function testRunAction()
+    /**
+     * @dataProvider configTypesProvider
+     */
+    public function testRunAction($configType)
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -23,9 +26,15 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($outputCsvFile);
         @unlink($outputCsvFile2);
 
-        $config = $this->getConfig();
+        @unlink($this->dataDir . '/config.json');
         @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $config = $this->getConfig(self::DRIVER, $configType);
+        if ($configType === 'json') {
+            file_put_contents($this->dataDir . '/config.json', json_encode($config));
+        } else {
+            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        }
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
@@ -36,6 +45,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        echo $process->getErrorOutput();
+        echo $process->getOutput();
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
@@ -124,6 +136,51 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
+        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileExists($outputCsvFile);
+    }
+
+    public function testRetries()
+    {
+        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
+
+        @unlink($outputCsvFile);
+
+        $config = $this->getConfig();
+        $table = $config['parameters']['tables'][2]['table'];
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+
+        @unlink($this->dataDir . '/config.yml');
+        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        // try exporting before the table exists
+
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->start();
+
+        // Drop the table if it exists
+        $this->pdo->exec(sprintf("DROP TABLE IF EXISTS `%s`.`%s`", $table['schema'], $table['tableName']));
+
+        $tableCreated = false;
+        while ($process->isRunning()) {
+            sleep(5);
+            if (!$tableCreated) {
+                $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+                $this->createTextTable($csv1, $table['tableName']);
+                $tableCreated = true;
+            }
+        }
+
+        // check that it had to retry at least 2x
+        $this->assertContains('[2x]', $process->getOutput());
+
+        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
