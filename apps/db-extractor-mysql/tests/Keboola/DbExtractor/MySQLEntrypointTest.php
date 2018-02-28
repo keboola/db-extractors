@@ -15,7 +15,10 @@ use Symfony\Component\Yaml\Yaml;
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
 
-    public function testRunAction()
+    /**
+     * @dataProvider configTypesProvider
+     */
+    public function testRunAction($configType)
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -23,9 +26,15 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($outputCsvFile);
         @unlink($outputCsvFile2);
 
-        $config = $this->getConfig();
+        @unlink($this->dataDir . '/config.json');
         @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $config = $this->getConfig(self::DRIVER, $configType);
+        if ($configType === 'json') {
+            file_put_contents($this->dataDir . '/config.json', json_encode($config));
+        } else {
+            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        }
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
@@ -36,6 +45,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        echo $process->getErrorOutput();
+        echo $process->getOutput();
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);

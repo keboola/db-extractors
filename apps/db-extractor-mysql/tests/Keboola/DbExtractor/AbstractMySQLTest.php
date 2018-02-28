@@ -61,11 +61,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     /**
      * @param string $driver
+     * @param string $format (yaml || json)
      * @return mixed
      */
-    public function getConfig($driver = self::DRIVER)
+    public function getConfig($driver = self::DRIVER, $format = 'yaml')
     {
-        $config = parent::getConfig($driver);
+        $config = parent::getConfig($driver, $format);
         if (!empty($config['parameters']['db']['#password'])) {
             $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
         }
@@ -168,5 +169,13 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $app = new MySQLApplication($config, $this->dataDir);
 
         return $app;
+    }
+
+    public function configTypesProvider()
+    {
+        return [
+            ['yaml'],
+            ['json']
+        ];
     }
 }
