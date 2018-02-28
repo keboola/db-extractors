@@ -59,6 +59,35 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec("SET NAMES utf8;");
     }
 
+    protected function createAutoIncrementTable()
+    {
+        $this->pdo->exec('DROP TABLE IF EXISTS `test`.`auto-increment`');
+
+        $this->pdo->exec(
+          'CREATE TABLE `test`.`auto-increment` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            PRIMARY KEY (`id`)  
+          )'
+        );
+
+        $this->pdo->exec('INSERT INTO `test`.`auto-increment` VALUES (\'george\', \'henry\')');
+    }
+
+    protected function createTimestampTable()
+    {
+        $this->pdo->exec('DROP TABLE IF EXISTS `test`.`timestamp`');
+
+        $this->pdo->exec(
+            'CREATE TABLE `test`.`timestamp` (
+            `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+          )'
+        );
+
+        $this->pdo->exec('INSERT INTO `test`.`timestamp` VALUES (\'richard\', \'john\')');
+    }
+
     /**
      * @param string $driver
      * @param string $format (yaml || json)
