@@ -3,9 +3,8 @@
 namespace Keboola\DbExtractor\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class MySQLConfigRowDefinition implements ConfigurationInterface
+class MySQLConfigRowDefinition extends ConfigRowDefinition
 {
     /**
      * Generates the configuration tree builder.
@@ -32,16 +31,14 @@ class MySQLConfigRowDefinition implements ConfigurationInterface
                         ->scalarNode('driver')->end()
                         ->scalarNode('host')->end()
                         ->scalarNode('port')->end()
-                        ->scalarNode('database')
-                            ->isRequired()
-                            ->cannotBeEmpty()
-                        ->end()
+                        ->scalarNode('database')->end()
                         ->scalarNode('user')
                             ->isRequired()
                         ->end()
                         ->scalarNode('password')->end()
                         ->scalarNode('#password')->end()
                         ->append($this->addSshNode())
+                        ->append($this->addSslNode())
                     ->end()
                 ->end()
                 ->integerNode('id')
@@ -83,29 +80,20 @@ class MySQLConfigRowDefinition implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    public function addSshNode()
+    public function addSslNode()
     {
         $builder = new TreeBuilder();
-        $node = $builder->root('ssh');
+        $node = $builder->root('ssl');
 
         $node
             ->children()
                 ->booleanNode('enabled')->end()
-                ->arrayNode('keys')
-                    ->children()
-                        ->scalarNode('private')->end()
-                        ->scalarNode('#private')->end()
-                        ->scalarNode('public')->end()
-                    ->end()
-                ->end()
-                ->scalarNode('sshHost')->end()
-                ->scalarNode('sshPort')->end()
-                ->scalarNode('remoteHost')->end()
-                ->scalarNode('remotePort')->end()
-                ->scalarNode('localPort')->end()
-                ->scalarNode('user')->end()
-            ->end()
-        ;
+                ->scalarNode('ca')->end()
+                ->scalarNode('cert')->end()
+                ->scalarNode('key')->end()
+                ->scalarNode('cipher')->end()
+            ->end();
+
         return $node;
     }
 }
