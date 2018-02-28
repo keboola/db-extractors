@@ -23,7 +23,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
         ];
 
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
 
         $config['parameters']['db']['host'] = 'mysql-different-cn';
 

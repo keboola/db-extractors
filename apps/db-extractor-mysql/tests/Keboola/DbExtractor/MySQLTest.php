@@ -16,7 +16,7 @@ class MySQLTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
         $result = $app->run();
@@ -29,7 +29,7 @@ class MySQLTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
         unset($config['parameters']['db']['database']);
 
         $app = $this->createApplication($config);
@@ -43,7 +43,7 @@ class MySQLTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
 
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
         $result = $app->run();
@@ -58,7 +58,6 @@ class MySQLTest extends AbstractMySQLTest
      */
     public function testRunMain($configType)
     {
-        echo "testing config type $configType \n";
         $config = $this->getConfig(self::DRIVER, $configType);
         $app = $this->createApplication($config);
 
@@ -122,7 +121,7 @@ class MySQLTest extends AbstractMySQLTest
             'localPort' => '23305',
         ];
 
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
 
@@ -388,7 +387,7 @@ class MySQLTest extends AbstractMySQLTest
         );
 
         $config = $this->getConfig();
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
         unset($config['parameters']['db']['database']);
         $config['action'] = 'getTables';
         $app = $this->createApplication($config);

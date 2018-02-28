@@ -31,7 +31,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 //			'cipher' => '',
         ];
 
-        unset($config['parameters']['tables']);
+        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
         $result = $app->run();
