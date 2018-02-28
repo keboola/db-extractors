@@ -5,6 +5,7 @@ parameters:
         password: rootpassword
         database: test
         port: 3306
+        networkCompression: true
 
     tables:
         -
