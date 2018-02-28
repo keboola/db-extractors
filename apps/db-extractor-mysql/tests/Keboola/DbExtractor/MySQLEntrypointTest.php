@@ -188,4 +188,29 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }
+
+    public function testRunConfigRow()
+    {
+        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
+        @unlink($outputCsvFile);
+
+        $config = $this->getConfigRow(self::DRIVER);
+
+        @unlink($this->dataDir . '/config.yml');
+        @unlink($this->dataDir . '/config.json');
+
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
+
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $expectedOutput = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
+        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileExists($outputCsvFile);
+    }
 }
