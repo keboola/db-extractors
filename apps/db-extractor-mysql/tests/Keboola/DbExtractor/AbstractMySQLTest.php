@@ -63,13 +63,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
     {
         $this->pdo->exec('DROP TABLE IF EXISTS `test`.`auto-increment`');
 
-        $this->pdo->exec(
-          'CREATE TABLE `test`.`auto-increment` (
+        $this->pdo->exec('CREATE TABLE `test`.`auto-increment` (
             `id` INT NOT NULL AUTO_INCREMENT,
             `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
             PRIMARY KEY (`id`)  
-          )'
-        );
+          )');
 
         $this->pdo->exec('INSERT INTO `test`.`auto-increment` VALUES (\'george\', \'henry\')');
     }

@@ -228,7 +228,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => true,
                                     'length' => '10',
                                     'nullable' => false,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
                                     'autoIncrement' => '2',
@@ -260,7 +260,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -270,7 +270,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                         ),
@@ -290,7 +290,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -300,7 +300,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -310,7 +310,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -320,7 +320,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -330,7 +330,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -340,7 +340,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -350,7 +350,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -360,7 +360,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -370,7 +370,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -380,7 +380,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -390,7 +390,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -400,7 +400,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
@@ -428,7 +428,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'name' => 'timestamp',
                                     'type' => 'timestamp',
                                     'primaryKey' => false,
-                                    'length' => NULL,
+                                    'length' => null,
                                     'nullable' => false,
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '2',
@@ -482,7 +482,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -492,7 +492,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -502,7 +502,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -512,7 +512,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -522,7 +522,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -532,7 +532,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -542,7 +542,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -552,7 +552,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -562,7 +562,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -572,7 +572,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -582,7 +582,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -592,7 +592,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
@@ -612,7 +612,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -622,7 +622,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -632,7 +632,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -642,7 +642,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -652,7 +652,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -662,7 +662,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -672,7 +672,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -682,7 +682,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -692,7 +692,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -702,7 +702,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -712,7 +712,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -722,7 +722,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
@@ -743,7 +743,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => true,
                                     'length' => '10',
                                     'nullable' => false,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
                                     'autoIncrement' => '2',
@@ -775,7 +775,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -785,7 +785,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                         ),
@@ -805,7 +805,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -815,7 +815,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -825,7 +825,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -835,7 +835,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -845,7 +845,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -855,7 +855,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -865,7 +865,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -875,7 +875,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -885,7 +885,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -895,7 +895,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -905,7 +905,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -915,7 +915,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
@@ -943,7 +943,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'name' => 'timestamp',
                                     'type' => 'timestamp',
                                     'primaryKey' => false,
-                                    'length' => NULL,
+                                    'length' => null,
                                     'nullable' => false,
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '2',
