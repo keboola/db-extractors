@@ -182,7 +182,6 @@ class MySQL extends Extractor
 
         $res = $this->db->query($sql);
         $arr = $res->fetchAll(\PDO::FETCH_ASSOC);
-
         if (count($arr) === 0) {
             return [];
         }
@@ -195,8 +194,11 @@ class MySQL extends Extractor
                 'name' => $table['TABLE_NAME'],
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
-                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
+                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
             ];
+            if ($table["AUTO_INCREMENT"]) {
+                $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']]['autoIncrement'] = $table['AUTO_INCREMENT'];
+            }
         }
 
         if (!is_null($tables) && count($tables) > 0) {
@@ -216,6 +218,7 @@ class MySQL extends Extractor
 
         $res = $this->db->query($sql);
         $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
+
         foreach ($rows as $i => $column) {
             $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
             $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
@@ -233,7 +236,7 @@ class MySQL extends Extractor
                 "length" => $length,
                 "nullable" => ($column['IS_NULLABLE'] === "NO") ? false : true,
                 "default" => $column['COLUMN_DEFAULT'],
-                "ordinalPosition" => $column['ORDINAL_POSITION']
+                "ordinalPosition" => $column['ORDINAL_POSITION'],
             ];
 
             if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
@@ -243,6 +246,15 @@ class MySQL extends Extractor
                 $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
                 $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
                 $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
+            }
+            if ($column['EXTRA']) {
+                $curColumn["extra"] = $column["EXTRA"];
+                if ($column['EXTRA'] === 'auto_increment') {
+                    $curColumn['autoIncrement'] = $tableDefs[$curTable]['autoIncrement'];
+                }
+                if ($column['EXTRA'] === 'on update CURRENT_TIMESTAMP' && $column['COLUMN_DEFAULT'] === 'CURRENT_TIMESTAMP') {
+                    $tableDefs[$curTable]['timestampUpdateColumn'] = $column['COLUMN_NAME'];
+                }
             }
             $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
         }
