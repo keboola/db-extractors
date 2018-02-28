@@ -109,4 +109,3 @@ class MySQLConfigRowDefinition implements ConfigurationInterface
         return $node;
     }
 }
-
