@@ -30,11 +30,11 @@ class MySQL extends Extractor
     public function createConnection($params)
     {
         $isSsl = false;
+        $isCompression = !empty($params['networkCompression']) ? true :false;
 
-        // convert errors to PDOExceptions
         $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::MYSQL_ATTR_COMPRESS => true,
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
+            \PDO::MYSQL_ATTR_COMPRESS => $isCompression, // network compression
         ];
 
         // ssl encryption
@@ -113,12 +113,14 @@ class MySQL extends Extractor
             }
         }
 
-        $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(\PDO::FETCH_ASSOC);
+        if ($isCompression) {
+            $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(\PDO::FETCH_ASSOC);
 
-        if (empty($status['Value']) || $status['Value'] !== 'ON') {
-            throw new UserException(sprintf("Network communication is not compressed"));
-        } else {
-            $this->logger->info("Using network communication compression");
+            if (empty($status['Value']) || $status['Value'] !== 'ON') {
+                throw new UserException(sprintf("Network communication is not compressed"));
+            } else {
+                $this->logger->info("Using network communication compression");
+            }
         }
 
         return $pdo;
