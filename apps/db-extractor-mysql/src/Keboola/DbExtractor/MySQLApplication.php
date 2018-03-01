@@ -16,7 +16,7 @@ class MySQLApplication extends Application
      */
     private $state;
 
-    public function __construct(array $config, array $state = [], $dataDir)
+    public function __construct(array $config, array $state = [], $dataDir = '/data/')
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
