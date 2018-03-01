@@ -884,13 +884,13 @@ class MySQLTest extends AbstractMySQLTest
     {
         $this->createTextTable(
             new CsvFile($this->dataDir . '/mysql/sales.csv'),
-            "sales",
+            "ext_sales",
             "temp_schema"
         );
 
         $config = $this->getConfig();
 
-        $config['parameters']['tables'][2]['table'] = ['schema' => 'temp_schema', 'tableName' => 'sales'];
+        $config['parameters']['tables'][2]['table'] = ['schema' => 'temp_schema', 'tableName' => 'ext_sales'];
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 

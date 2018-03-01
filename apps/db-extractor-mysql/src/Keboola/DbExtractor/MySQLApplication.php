@@ -13,10 +13,10 @@ class MySQLApplication extends Application
 {
     public function __construct(array $config, $dataDir)
     {
-        parent::__construct($config);
-
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
+
+        parent::__construct($config);
 
         if (isset($this['parameters']['tables'])) {
             $this->setConfigDefinition(new MySQLConfigDefinition());
