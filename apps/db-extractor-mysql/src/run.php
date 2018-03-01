@@ -8,6 +8,8 @@ use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 
@@ -20,6 +22,8 @@ $logger = new \Keboola\DbExtractor\Logger(getenv('APP_NAME') ? getenv('APP_NAME'
 $runAction = true;
 
 try {
+    $jsonDecode = new JsonDecode(true);
+
     $arguments = getopt("d::", ["data::"]);
     if (!isset($arguments["data"])) {
         throw new UserException('Data folder not set.');
@@ -30,9 +34,9 @@ try {
             file_get_contents($arguments["data"] . "/config.yml")
         );
     } else if (file_exists($arguments["data"] . "/config.json")) {
-        $config = json_decode(
-            file_get_contents($arguments["data"] . "/config.json"),
-            true
+        $config = $jsonDecode->decode(
+            file_get_contents($arguments["data"] . '/config.json'),
+            JsonEncoder::FORMAT
         );
     } else {
         throw new UserException('Configuration file not found.');
@@ -42,8 +46,10 @@ try {
     $inputState = [];
     $inputStateFile = $arguments['data'] . '/in/state.json';
     if (file_exists($inputStateFile)) {
-        $inputState = json_decode(file_get_contents($inputStateFile), true);
-        var_dump($inputState);
+        $inputState = $jsonDecode->decode(
+            file_get_contents($inputStateFile),
+            JsonEncoder::FORMAT
+        );
     }
 
     $app = new MySQLApplication(
@@ -61,6 +67,11 @@ try {
 
     if (!$runAction) {
         echo json_encode($result);
+    } else {
+        // write state
+        $outputStateFile = $arguments['data'] . '/out/state.json';
+        $jsonEncode = new \Symfony\Component\Serializer\Encoder\JsonEncode();
+        file_put_contents($outputStateFile, $jsonEncode->encode($result, JsonEncoder::FORMAT));
     }
 
     $app['logger']->log('info', "Extractor finished successfully.");

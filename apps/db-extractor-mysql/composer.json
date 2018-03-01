@@ -8,7 +8,8 @@
     ],
     "require": {
         "keboola/db-extractor-common": "^6.2.0",
-        "keboola/php-temp": "^0.1.3"
+        "keboola/php-temp": "^0.1.3",
+        "symfony/serializer": "^3.1"
     },
     "require-dev": {
         "phpunit/phpunit": "4.6.*",
