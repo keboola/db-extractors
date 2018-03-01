@@ -7,13 +7,24 @@
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Logger;
 use Keboola\Temp\Temp;
-use Keboola\Datatype\Definition\GenericStorage;
-use Symfony\Component\Yaml\Yaml;
+
 
 class MySQL extends Extractor
 {
     protected $database;
+
+    /**
+     * @var array
+     */
+    private $state;
+
+    public function __construct(array $parameters, array $state = [], Logger $logger)
+    {
+        $this->state = $state;
+        parent::__construct($parameters, $logger);
+    }
 
     /**
      * @param $sslCa
@@ -261,10 +272,24 @@ class MySQL extends Extractor
         return array_values($tableDefs);
     }
 
-    public function simpleQuery(array $table, array $columns = array())
+    public function simpleQuery(array $table, array $columns = array()): string
     {
+        $incrementalAddons = [];
+        if (isset($this->state['lastFetchedRow'])) {
+            if (isset($this->state['lastFetchedRow']['autoIncrementId'])) {
+                $autoIncColumn = $this->state['lastFetchedRow']['autoIncrementId']['column'];
+                $autoIncValue = $this->state['lastFetchedRow']['autoIncrementId']['value'];
+                $incrementalAddons[] = sprintf(' %s > %d', $this->quote($autoIncColumn), (int) $autoIncValue);
+            }
+            if (isset($this->state['lastFetchRow']['updateTimestamp'])) {
+                $updateTimestampColumn = $this->state['lastFetchedRow']['updateTimestamp']['column'];
+                $updateTimestampValue = $this->state['lastFetchedRow']['updateTimestamp']['value'];
+                $incrementalAddons[] = sprintf(' %s > %s', $this->quote($updateTimestampColumn), $updateTimestampValue);
+            }
+        }
+        $query = "";
         if (count($columns) > 0) {
-            return sprintf(
+            $query = sprintf(
                 "SELECT %s FROM %s.%s",
                 implode(', ', array_map(function ($column) {
                     return $this->quote($column);
@@ -273,12 +298,17 @@ class MySQL extends Extractor
                 $this->quote($table['tableName'])
             );
         } else {
-            return sprintf(
+            $query = sprintf(
                 "SELECT * FROM %s.%s",
                 $this->quote($table['schema']),
                 $this->quote($table['tableName'])
             );
         }
+
+        if (!empty($incrementalAddons)) {
+            $query .= sprintf(" WHERE %s", implode(' OR ', $incrementalAddons));
+        }
+        return $query;
     }
 
     private function quote($obj)

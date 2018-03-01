@@ -28,7 +28,6 @@ class MySQLApplication extends Application
         } else {
             $this->setConfigDefinition(new MySQLConfigRowDefinition());
         }
-
         $this->state = $state;
     }
 }
