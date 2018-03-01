@@ -101,6 +101,16 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $config;
     }
 
+    public function getConfigRow($driver = self::DRIVER)
+    {
+        $config = parent::getConfigRow($driver);
+        if (!empty($config['parameters']['db']['#password'])) {
+            $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        }
+        $config['parameters']['extractor_class'] = 'MySQL';
+        return $config;
+    }
+
     /**
      * @param CsvFile $file
      * @return string
