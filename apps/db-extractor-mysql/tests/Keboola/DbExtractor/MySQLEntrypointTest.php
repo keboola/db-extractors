@@ -207,9 +207,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/escaping.csv');
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
-
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');

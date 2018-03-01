@@ -599,136 +599,6 @@ class MySQLTest extends AbstractMySQLTest
                 ),
             1 =>
                 array (
-                    'name' => 'sales',
-                    'schema' => 'temp_schema',
-                    'type' => 'BASE TABLE',
-                    'rowCount' => '100',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'usergender',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'usercity',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'usersentiment',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '3',
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'zipcode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '4',
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'sku',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '5',
-                                ),
-                            5 =>
-                                array (
-                                    'name' => 'createdat',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '6',
-                                ),
-                            6 =>
-                                array (
-                                    'name' => 'category',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '7',
-                                ),
-                            7 =>
-                                array (
-                                    'name' => 'price',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '8',
-                                ),
-                            8 =>
-                                array (
-                                    'name' => 'county',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '9',
-                                ),
-                            9 =>
-                                array (
-                                    'name' => 'countycode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '10',
-                                ),
-                            10 =>
-                                array (
-                                    'name' => 'userstate',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '11',
-                                ),
-                            11 =>
-                                array (
-                                    'name' => 'categorygroup',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '12',
-                                ),
-                        ),
-                ),
-            2 =>
-                array (
                     'name' => 'auto-increment',
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
@@ -760,7 +630,7 @@ class MySQLTest extends AbstractMySQLTest
                                 ),
                         ),
                 ),
-            3 =>
+            2 =>
                 array (
                     'name' => 'escaping',
                     'schema' => 'test',
@@ -790,7 +660,7 @@ class MySQLTest extends AbstractMySQLTest
                                 ),
                         ),
                 ),
-            4 =>
+            3 =>
                 array (
                     'name' => 'sales',
                     'schema' => 'test',
@@ -920,7 +790,7 @@ class MySQLTest extends AbstractMySQLTest
                                 ),
                         ),
                 ),
-            5 =>
+            4 =>
                 array (
                     'name' => 'timestamp',
                     'schema' => 'test',
