@@ -38,9 +38,17 @@ try {
         throw new UserException('Configuration file not found.');
     }
 
+    // get the state
+    $inputState = [];
+    $inputStateFile = $arguments['data'] . '/in/state.json';
+    if (file_exists($inputStateFile)) {
+        $inputState = json_decode(file_get_contents($inputStateFile), true);
+        var_dump($inputState);
+    }
 
     $app = new MySQLApplication(
         $config,
+        $inputState,
         $arguments["data"]
     );
 

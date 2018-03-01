@@ -11,7 +11,12 @@ use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
 
 class MySQLApplication extends Application
 {
-    public function __construct(array $config, $dataDir)
+    /**
+     * @var array
+     */
+    private $state;
+
+    public function __construct(array $config, array $state = [], $dataDir)
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
@@ -23,5 +28,7 @@ class MySQLApplication extends Application
         } else {
             $this->setConfigDefinition(new MySQLConfigRowDefinition());
         }
+
+        $this->state = $state;
     }
 }

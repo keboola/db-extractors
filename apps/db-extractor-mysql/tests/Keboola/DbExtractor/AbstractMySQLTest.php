@@ -199,11 +199,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     /**
      * @param array $config
+     * @param array $state
      * @return MySQLApplication
      */
-    public function createApplication(array $config)
+    public function createApplication(array $config, array $state = [])
     {
-        $app = new MySQLApplication($config, $this->dataDir);
+        $app = new MySQLApplication($config, [], $this->dataDir);
 
         return $app;
     }
