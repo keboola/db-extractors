@@ -68,12 +68,13 @@ try {
     if (!$runAction) {
         echo json_encode($result);
     } else {
-        // write state
-        $outputStateFile = $arguments['data'] . '/out/state.json';
-        $jsonEncode = new \Symfony\Component\Serializer\Encoder\JsonEncode();
-        file_put_contents($outputStateFile, $jsonEncode->encode($result, JsonEncoder::FORMAT));
+        if (!empty($result['state'])) {
+            // write state
+            $outputStateFile = $arguments['data'] . '/out/state.json';
+            $jsonEncode = new \Symfony\Component\Serializer\Encoder\JsonEncode();
+            file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
+        }
     }
-
     $app['logger']->log('info', "Extractor finished successfully.");
     exit(0);
 } catch (UserException $e) {
@@ -88,12 +89,6 @@ try {
     $logger->log('error', $e->getMessage(), $e->getData());
     exit(2);
 } catch (\Exception $e) {
-//	$logger->log('error', $e->getMessage(), [
-//		'errFile' => $e->getFile(),
-//		'errLine' => $e->getLine(),
-//		'trace' => $e->getTrace()
-//	]);
-
     print $e->getMessage();
     print $e->getTraceAsString();
 

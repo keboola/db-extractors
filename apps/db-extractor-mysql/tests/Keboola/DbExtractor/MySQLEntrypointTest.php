@@ -194,6 +194,10 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
         @unlink($outputCsvFile);
 
+        $outputStateFile = $this->dataDir . '/out/state.json';
+        // unset the state file
+        @unlink($outputStateFile);
+
         $config = $this->getConfigRow(self::DRIVER);
 
         @unlink($this->dataDir . '/config.yml');
@@ -208,9 +212,59 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/escaping.csv');
 
         $this->assertEquals(0, $process->getExitCode());
+        // state file should not be written if state is empty
+        $this->assertFileNotExists($outputStateFile);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
         $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
+    }
+
+    public function testRunIncrementalFetching()
+    {
+        $config = $this->getConfigRow(self::DRIVER);
+
+        @unlink($this->dataDir . '/config.yml');
+        @unlink($this->dataDir . '/config.json');
+
+        $inputStateFile = $this->dataDir . '/out/state.json';
+        $outputStateFile = $this->dataDir . '/out/state.json';
+        // unset the state file
+        @unlink($outputStateFile);
+
+        unset($config['parameters']['query']);
+        $config['parameters']['table'] = [
+            'tableName' => 'auto_increment_timestamp',
+            'schema' => 'test'
+        ];
+        $config['parameters']['incremental'] = true;
+        $config['parameters']['name'] = 'auto-increment-timestamp';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
+        $config['parameters']['primaryKey'] = ['id'];
+        $config['parameters']['incrementalFetchingColumn'] = 'id';
+
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
+
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputStateFile);
+        $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
+
+        // add a couple rows
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+
+        // copy state to input state file
+        file_put_contents($inputStateFile, json_decode(file_get_contents($outputStateFile), true));
+
+        // run the config again
+        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals(['lastFetchedRow' => '4'], json_decode(file_get_contents($outputStateFile), true));
     }
 }
