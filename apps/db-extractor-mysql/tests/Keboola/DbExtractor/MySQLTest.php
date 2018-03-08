@@ -7,6 +7,8 @@
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\MySQLApplication;
+use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Yaml\Yaml;
 use Nette\Utils;
 
@@ -186,11 +188,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testGetTables()
     {
-        // add a table with an auto_increment
-        $this->createAutoIncrementTable();
-
-        // add a table with a timestamp using ON UPDATE CURRENT_TIMESTAMP()
-        $this->createTimestampTable();
+        $this->createAutoIncrementAndTimestampTable();
 
         // add a table to a different schema (should not be fetched)
         $this->createTextTable(
@@ -209,16 +207,16 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertArrayHasKey('tables', $result);
 
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(4, $result['tables']);
-
+        $this->assertCount(3, $result['tables']);
+        
         $expectedData = array (
             0 =>
                 array (
-                    'name' => 'auto-increment',
+                    'name' => 'auto_increment_timestamp',
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
-                    'rowCount' => '1',
-                    'autoIncrement' => '2',
+                    'rowCount' => '2',
+                    'autoIncrement' => '3',
                     'columns' =>
                         array (
                             0 =>
@@ -228,10 +226,10 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => true,
                                     'length' => '10',
                                     'nullable' => false,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
-                                    'autoIncrement' => '2',
+                                    'autoIncrement' => '3',
                                 ),
                             1 =>
                                 array (
@@ -243,7 +241,19 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'pam',
                                     'ordinalPosition' => '2',
                                 ),
+                            2 =>
+                                array (
+                                    'name' => 'timestamp',
+                                    'type' => 'timestamp',
+                                    'primaryKey' => false,
+                                    'length' => NULL,
+                                    'nullable' => false,
+                                    'default' => 'CURRENT_TIMESTAMP',
+                                    'ordinalPosition' => '3',
+                                    'extra' => 'on update CURRENT_TIMESTAMP',
+                                ),
                         ),
+                    'timestampUpdateColumn' => 'timestamp',
                 ),
             1 =>
                 array (
@@ -260,7 +270,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -270,7 +280,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '2',
                                 ),
                         ),
@@ -290,7 +300,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -300,7 +310,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -310,7 +320,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -320,7 +330,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -330,7 +340,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -340,7 +350,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -350,7 +360,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -360,7 +370,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -370,7 +380,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -380,7 +390,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -390,7 +400,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -400,42 +410,10 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
-                ),
-            3 =>
-                array (
-                    'name' => 'timestamp',
-                    'schema' => 'test',
-                    'type' => 'BASE TABLE',
-                    'rowCount' => '1',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'name',
-                                    'type' => 'varchar',
-                                    'primaryKey' => false,
-                                    'length' => '30',
-                                    'nullable' => false,
-                                    'default' => 'pam',
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'timestamp',
-                                    'type' => 'timestamp',
-                                    'primaryKey' => false,
-                                    'length' => null,
-                                    'nullable' => false,
-                                    'default' => 'CURRENT_TIMESTAMP',
-                                    'ordinalPosition' => '2',
-                                    'extra' => 'on update CURRENT_TIMESTAMP',
-                                ),
-                        ),
-                    'timestampUpdateColumn' => 'timestamp',
                 ),
         );
         $this->assertEquals($expectedData, $result['tables']);
@@ -443,11 +421,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testGetTablesNoDatabase()
     {
-        // add a table with an auto_increment
-        $this->createAutoIncrementTable();
-
-        // add a table with a timestamp using ON UPDATE CURRENT_TIMESTAMP()
-        $this->createTimestampTable();
+        $this->createAutoIncrementAndTimestampTable();
 
         // add a table to a different schema
         $this->createTextTable(
@@ -464,7 +438,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
-        $this->assertGreaterThanOrEqual(5, count($result['tables']));
+        $this->assertGreaterThanOrEqual(4, count($result['tables']));
 
         $expectedTables = array (
             0 =>
@@ -482,7 +456,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -492,7 +466,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -502,7 +476,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -512,7 +486,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -522,7 +496,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -532,7 +506,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -542,7 +516,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -552,7 +526,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -562,7 +536,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -572,7 +546,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -582,7 +556,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -592,18 +566,18 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
                 ),
             1 =>
                 array (
-                    'name' => 'auto-increment',
+                    'name' => 'auto_increment_timestamp',
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
-                    'rowCount' => '1',
-                    'autoIncrement' => '2',
+                    'rowCount' => '2',
+                    'autoIncrement' => '3',
                     'columns' =>
                         array (
                             0 =>
@@ -613,10 +587,10 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => true,
                                     'length' => '10',
                                     'nullable' => false,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
-                                    'autoIncrement' => '2',
+                                    'autoIncrement' => '3',
                                 ),
                             1 =>
                                 array (
@@ -628,7 +602,19 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'pam',
                                     'ordinalPosition' => '2',
                                 ),
+                            2 =>
+                                array (
+                                    'name' => 'timestamp',
+                                    'type' => 'timestamp',
+                                    'primaryKey' => false,
+                                    'length' => NULL,
+                                    'nullable' => false,
+                                    'default' => 'CURRENT_TIMESTAMP',
+                                    'ordinalPosition' => '3',
+                                    'extra' => 'on update CURRENT_TIMESTAMP',
+                                ),
                         ),
+                    'timestampUpdateColumn' => 'timestamp',
                 ),
             2 =>
                 array (
@@ -645,7 +631,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -655,7 +641,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '2',
                                 ),
                         ),
@@ -675,7 +661,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '1',
                                 ),
                             1 =>
@@ -685,7 +671,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '2',
                                 ),
                             2 =>
@@ -695,7 +681,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '3',
                                 ),
                             3 =>
@@ -705,7 +691,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '4',
                                 ),
                             4 =>
@@ -715,7 +701,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '5',
                                 ),
                             5 =>
@@ -725,7 +711,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '6',
                                 ),
                             6 =>
@@ -735,7 +721,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '7',
                                 ),
                             7 =>
@@ -745,7 +731,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '8',
                                 ),
                             8 =>
@@ -755,7 +741,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '9',
                                 ),
                             9 =>
@@ -765,7 +751,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '10',
                                 ),
                             10 =>
@@ -775,7 +761,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '11',
                                 ),
                             11 =>
@@ -785,42 +771,10 @@ class MySQLTest extends AbstractMySQLTest
                                     'primaryKey' => false,
                                     'length' => '65535',
                                     'nullable' => true,
-                                    'default' => null,
+                                    'default' => NULL,
                                     'ordinalPosition' => '12',
                                 ),
                         ),
-                ),
-            4 =>
-                array (
-                    'name' => 'timestamp',
-                    'schema' => 'test',
-                    'type' => 'BASE TABLE',
-                    'rowCount' => '1',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'name',
-                                    'type' => 'varchar',
-                                    'primaryKey' => false,
-                                    'length' => '30',
-                                    'nullable' => false,
-                                    'default' => 'pam',
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'timestamp',
-                                    'type' => 'timestamp',
-                                    'primaryKey' => false,
-                                    'length' => null,
-                                    'nullable' => false,
-                                    'default' => 'CURRENT_TIMESTAMP',
-                                    'ordinalPosition' => '2',
-                                    'extra' => 'on update CURRENT_TIMESTAMP',
-                                ),
-                        ),
-                    'timestampUpdateColumn' => 'timestamp',
                 ),
         );
         $this->assertEquals($expectedTables, $result['tables']);
@@ -918,5 +872,141 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
         echo "\nThere are " . count($result['tables']) . " tables\n";
+    }
+
+    public function testIncrementalFetchingByTimestamp()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['incrementalFethcingColumn'] = 'timestamp';
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = (new MySQLApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertNotEmpty($result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should be empty
+        $emptyResult = (new MySQLApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $emptyResult['imported']['rows']);
+
+        sleep(2);
+        //now add a couple rows and run it again.
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+
+        $newResult = (new MySQLApplication($config, $result['state']))->run();
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertGreaterThan(
+            $result['state']['lastFetchedRow'],
+            $newResult['state']['lastFetchedRow']
+        );
+    }
+
+    public function testIncrementalFetchingByAutoIncrement()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['incrementalFethcingColumn'] = 'id';
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = (new MySQLApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should be empty
+        $emptyResult = (new MySQLApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $emptyResult['imported']['rows']);
+
+        sleep(2);
+        //now add a couple rows and run it again.
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+
+        $newResult = (new MySQLApplication($config, $result['state']))->run();
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(2, $newResult['imported']['rows']);
+    }
+
+    public function testIncrementalFetchingInvalidColumns()
+    {
+        $this->createAutoIncrementAndTimestampTable();
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingColumn'] = 'fakeCol'; // column does not exist
+
+        try {
+            $result = (new MySQLApplication($config))->run();
+            $this->fail('specified autoIncrement column does not exist, should fail.');
+        } catch (UserException $e) {
+            $this->assertStringStartsWith("Column [fakeCol]", $e->getMessage());
+        }
+
+        // column exists but is not auto-increment nor updating timestamp so should fail
+        $config['parameters']['incrementalFetchingColumn'] = 'name';
+        try {
+            $result = (new MySQLApplication($config))->run();
+            $this->fail('specified column is not auto increment nor timestamp, should fail.');
+        } catch (UserException $e) {
+            $this->assertStringStartsWith("Column [name] specified for incremental fetching", $e->getMessage());
+        }
+    }
+
+    public function testIncrementalFetchingInvalidConfig()
+    {
+        $this->createAutoIncrementAndTimestampTable();
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['query'] = 'SELECT * FROM auto_increment_timestamp';
+        unset($config['parameters']['table']);
+
+        try {
+            $result = (new MySQLApplication($config))->run();
+            $this->fail('cannot use incremental fetching with advanced query, should fail.');
+        } catch (UserException $e) {
+            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+        }
+    }
+
+    private function getIncrementalFetchingConfig()
+    {
+        $config = $this->getConfigRow(self::DRIVER);
+        unset($config['parameters']['query']);
+        $config['parameters']['table'] = [
+            'tableName' => 'auto_increment_timestamp',
+            'schema' => 'test'
+        ];
+        $config['parameters']['incremental'] = true;
+        $config['parameters']['name'] = 'auto-increment-timestamp';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
+        $config['parameters']['primaryKey'] = ['id'];
+        $config['parameters']['incrementalFetchingColumn'] = 'id';
+        return $config;
     }
 }

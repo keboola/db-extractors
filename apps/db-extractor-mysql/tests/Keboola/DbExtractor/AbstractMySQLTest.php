@@ -59,31 +59,17 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec("SET NAMES utf8;");
     }
 
-    protected function createAutoIncrementTable()
+    protected function createAutoIncrementAndTimestampTable()
     {
-        $this->pdo->exec('DROP TABLE IF EXISTS `test`.`auto-increment`');
+        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
 
-        $this->pdo->exec('CREATE TABLE `test`.`auto-increment` (
+        $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
             `id` INT NOT NULL AUTO_INCREMENT,
             `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)  
-          )');
-
-        $this->pdo->exec('INSERT INTO `test`.`auto-increment` VALUES (\'george\', \'henry\')');
-    }
-
-    protected function createTimestampTable()
-    {
-        $this->pdo->exec('DROP TABLE IF EXISTS `test`.`timestamp`');
-
-        $this->pdo->exec(
-            'CREATE TABLE `test`.`timestamp` (
-            `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
-            `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-          )'
-        );
-
-        $this->pdo->exec('INSERT INTO `test`.`timestamp` VALUES (\'richard\', \'john\')');
+        )');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'george\'), (\'henry\')');
     }
 
     /**
