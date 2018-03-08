@@ -6,6 +6,7 @@
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\Temp\Temp;
 
