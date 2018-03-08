@@ -7,9 +7,7 @@
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Logger;
 use Keboola\Temp\Temp;
-
 
 class MySQL extends Extractor
 {
@@ -17,11 +15,6 @@ class MySQL extends Extractor
     const TYPE_TIMESTAMP = 'timestamp';
 
     protected $database;
-
-    public function __construct(array $parameters, array $state = [], Logger $logger)
-    {
-        parent::__construct($parameters, $state, $logger);
-    }
 
     /**
      * @param $sslCa
