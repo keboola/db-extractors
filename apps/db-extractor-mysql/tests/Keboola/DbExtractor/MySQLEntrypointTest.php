@@ -222,6 +222,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
     public function testRunIncrementalFetching()
     {
+        $this->createAutoIncrementAndTimestampTable();
         $config = $this->getConfigRow(self::DRIVER);
 
         @unlink($this->dataDir . '/config.yml');
@@ -249,6 +250,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->setTimeout(300);
         $process->run();
 
+        var_dump($process->getErrorOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputStateFile);
         $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
