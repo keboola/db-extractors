@@ -13,6 +13,9 @@ use Keboola\Temp\Temp;
 
 class MySQL extends Extractor
 {
+    const TYPE_AUTO_INCREMENT = 'autoIncrement';
+    const TYPE_TIMESTAMP = 'timestamp';
+
     protected $database;
 
     public function __construct(array $parameters, array $state = [], Logger $logger)
@@ -266,22 +269,69 @@ class MySQL extends Extractor
         return array_values($tableDefs);
     }
 
+    /**
+     * @param array $table
+     * @param string $columnName
+     * @throws UserException
+     */
+    public function validateIncrementalFetching(array $table, string $columnName)
+    {
+        $res = $this->db->query(
+            sprintf(
+                'SELECT * FROM INFORMATION_SCHEMA.COLUMNS as cols 
+                            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+                $this->db->quote($table['schema']),
+                $this->db->quote($table['tableName']),
+                $this->db->quote($columnName)
+            )
+        );
+        $columns = $res->fetchAll();
+        if (count($columns) === 0) {
+            throw new UserException(
+                sprintf(
+                    'Column [%s] specified for incremental fetching was not found in the table',
+                    $columnName
+                )
+            );
+        }
+        if ($columns[0]['EXTRA'] === 'auto_increment') {
+            $this->incrementalFetching['column'] = $columnName;
+            $this->incrementalFetching['type'] = self::TYPE_AUTO_INCREMENT;
+        } else if ($columns[0]['EXTRA'] === 'on update CURRENT_TIMESTAMP' && $columns[0]['COLUMN_DEFAULT'] === 'CURRENT_TIMESTAMP') {
+            $this->incrementalFetching['column'] = $columnName;
+            $this->incrementalFetching['type'] = self::TYPE_TIMESTAMP;
+        } else {
+            throw new UserException(
+                sprintf(
+                    'Column [%s] specified for incremental fetching is not an auto increment column or an auto update timestamp',
+                    $columnName
+                )
+            );
+        }
+    }
+
     public function simpleQuery(array $table, array $columns = array()): string
     {
-        $incrementalAddons = [];
-        if (isset($this->state['lastFetchedRow'])) {
-            if (isset($this->state['lastFetchedRow']['autoIncrementId'])) {
-                $autoIncColumn = $this->state['lastFetchedRow']['autoIncrementId']['column'];
-                $autoIncValue = $this->state['lastFetchedRow']['autoIncrementId']['value'];
-                $incrementalAddons[] = sprintf(' %s > %d', $this->quote($autoIncColumn), (int) $autoIncValue);
-            }
-            if (isset($this->state['lastFetchRow']['updateTimestamp'])) {
-                $updateTimestampColumn = $this->state['lastFetchedRow']['updateTimestamp']['column'];
-                $updateTimestampValue = $this->state['lastFetchedRow']['updateTimestamp']['value'];
-                $incrementalAddons[] = sprintf(' %s > %s', $this->quote($updateTimestampColumn), $updateTimestampValue);
+        $incrementalAddon = null;
+        if ($this->incrementalFetching && isset($this->state['lastFetchedRow'])) {
+            if ($this->incrementalFetching['type'] === self::TYPE_AUTO_INCREMENT) {
+                $incrementalAddon = sprintf(
+                    ' %s > %d',
+                    $this->quote($this->incrementalFetching['column']),
+                    (int) $this->state['lastFetchedRow']
+                );
+            } else if ($this->incrementalFetching['type'] === self::TYPE_AUTO_INCREMENT) {
+                $incrementalAddon = sprintf(
+                    " %s > '%s'",
+                    $this->quote($this->incrementalFetching['column']),
+                    $this->state['lastFetchedRow']
+                );
+            } else {
+                throw new ApplicationException(
+                    sprintf('Unknown incremental fetching column type %s', $this->incrementalFetching['type'])
+                );
             }
         }
-        $query = "";
         if (count($columns) > 0) {
             $query = sprintf(
                 "SELECT %s FROM %s.%s",
@@ -299,8 +349,12 @@ class MySQL extends Extractor
             );
         }
 
-        if (!empty($incrementalAddons)) {
-            $query .= sprintf(" WHERE %s", implode(' OR ', $incrementalAddons));
+        if ($incrementalAddon) {
+            $query .= sprintf(
+                " WHERE %s ORDER BY %s",
+                $incrementalAddon,
+                $this->quote($this->incrementalFetching['column'])
+            );
         }
         return $query;
     }
