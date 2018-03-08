@@ -11,23 +11,17 @@ use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
 
 class MySQLApplication extends Application
 {
-    /**
-     * @var array
-     */
-    private $state;
-
     public function __construct(array $config, array $state = [], $dataDir = '/data/')
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
 
-        parent::__construct($config);
+        parent::__construct($config, $state);
 
         if (isset($this['parameters']['tables'])) {
             $this->setConfigDefinition(new MySQLConfigDefinition());
         } else {
             $this->setConfigDefinition(new MySQLConfigRowDefinition());
         }
-        $this->state = $state;
     }
 }

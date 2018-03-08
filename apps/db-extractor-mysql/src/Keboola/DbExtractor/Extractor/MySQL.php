@@ -15,15 +15,9 @@ class MySQL extends Extractor
 {
     protected $database;
 
-    /**
-     * @var array
-     */
-    private $state;
-
     public function __construct(array $parameters, array $state = [], Logger $logger)
     {
-        $this->state = $state;
-        parent::__construct($parameters, $logger);
+        parent::__construct($parameters, $state, $logger);
     }
 
     /**
