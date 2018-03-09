@@ -59,6 +59,19 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec("SET NAMES utf8;");
     }
 
+    protected function createAutoIncrementAndTimestampTable()
+    {
+        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
+
+        $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)  
+        )');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'george\'), (\'henry\')');
+    }
+
     /**
      * @param string $driver
      * @param string $format (yaml || json)
@@ -67,6 +80,16 @@ abstract class AbstractMySQLTest extends ExtractorTest
     public function getConfig($driver = self::DRIVER, $format = 'yaml')
     {
         $config = parent::getConfig($driver, $format);
+        if (!empty($config['parameters']['db']['#password'])) {
+            $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        }
+        $config['parameters']['extractor_class'] = 'MySQL';
+        return $config;
+    }
+
+    public function getConfigRow($driver = self::DRIVER)
+    {
+        $config = parent::getConfigRow($driver);
         if (!empty($config['parameters']['db']['#password'])) {
             $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
         }
@@ -162,11 +185,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     /**
      * @param array $config
+     * @param array $state
      * @return MySQLApplication
      */
-    public function createApplication(array $config)
+    public function createApplication(array $config, array $state = [])
     {
-        $app = new MySQLApplication($config, $this->dataDir);
+        $app = new MySQLApplication($config, [], $this->dataDir);
 
         return $app;
     }
