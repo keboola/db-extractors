@@ -9,6 +9,7 @@
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Symfony\Component\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
@@ -228,10 +229,17 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
 
-        $inputStateFile = $this->dataDir . '/out/state.json';
+        $inputStateFile = $this->dataDir . '/in/state.json';
+
+        $fs = new Filesystem\Filesystem();
+        if (!$fs->exists($inputStateFile)) {
+            $fs->mkdir($this->dataDir . '/in');
+            $fs->touch($inputStateFile);
+        }
         $outputStateFile = $this->dataDir . '/out/state.json';
         // unset the state file
         @unlink($outputStateFile);
+        @unlink($inputStateFile);
 
         unset($config['parameters']['query']);
         $config['parameters']['table'] = [
@@ -251,6 +259,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->run();
 
         var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputStateFile);
         $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
@@ -259,12 +268,15 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
 
         // copy state to input state file
-        file_put_contents($inputStateFile, json_decode(file_get_contents($outputStateFile), true));
+        file_put_contents($inputStateFile, file_get_contents($outputStateFile));
 
         // run the config again
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals(['lastFetchedRow' => '4'], json_decode(file_get_contents($outputStateFile), true));
