@@ -232,8 +232,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $inputStateFile = $this->dataDir . '/in/state.json';
 
         $fs = new Filesystem\Filesystem();
-        if (!$fs->exists($this->dataDir . '/in')) {
+        if (!$fs->exists($inputStateFile)) {
             $fs->mkdir($this->dataDir . '/in');
+            $fs->touch($inputStateFile);
         }
         $outputStateFile = $this->dataDir . '/out/state.json';
         // unset the state file
