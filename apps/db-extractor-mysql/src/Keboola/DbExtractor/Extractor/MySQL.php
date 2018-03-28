@@ -291,7 +291,7 @@ class MySQL extends Extractor
         if ($columns[0]['EXTRA'] === 'auto_increment') {
             $this->incrementalFetching['column'] = $columnName;
             $this->incrementalFetching['type'] = self::TYPE_AUTO_INCREMENT;
-        } else if ($columns[0]['EXTRA'] === 'on update CURRENT_TIMESTAMP' && $columns[0]['COLUMN_DEFAULT'] === 'CURRENT_TIMESTAMP') {
+        } else if ($columns[0]['DATA_TYPE'] === 'timestamp') {
             $this->incrementalFetching['column'] = $columnName;
             $this->incrementalFetching['type'] = self::TYPE_TIMESTAMP;
         } else {
@@ -314,7 +314,7 @@ class MySQL extends Extractor
                     $this->quote($this->incrementalFetching['column']),
                     (int) $this->state['lastFetchedRow']
                 );
-            } else if ($this->incrementalFetching['type'] === self::TYPE_AUTO_INCREMENT) {
+            } else if ($this->incrementalFetching['type'] === self::TYPE_TIMESTAMP) {
                 $incrementalAddon = sprintf(
                     " %s > '%s'",
                     $this->quote($this->incrementalFetching['column']),

@@ -9,6 +9,7 @@
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Symfony\Component\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
@@ -229,6 +230,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.json');
 
         $inputStateFile = $this->dataDir . '/in/state.json';
+
+        $fs = new Filesystem\Filesystem();
+        if (!$fs->exists($this->dataDir . '/in')) {
+            $fs->mkdir($this->dataDir . '/in');
+        }
         $outputStateFile = $this->dataDir . '/out/state.json';
         // unset the state file
         @unlink($outputStateFile);
