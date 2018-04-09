@@ -37,3 +37,13 @@ parameters:
               -
                 ZIPCODE
 
+        -
+            id: 4
+            name: regions
+            outputTable: in.c-main.regions
+            incremental: false
+            primaryKey: null
+            enabled: true
+            table:
+              schema: HR
+              tableName: REGIONS
