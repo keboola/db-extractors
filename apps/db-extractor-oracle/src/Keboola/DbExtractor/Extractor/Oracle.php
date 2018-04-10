@@ -80,14 +80,6 @@ SELECT TABS.TABLE_NAME, TABS.TABLESPACE_NAME, TABS.OWNER, TABS.NUM_ROWS,
 FROM ALL_TAB_COLUMNS COLS
 JOIN (
     SELECT * FROM all_tables 
-    JOIN (
-        SELECT owner own, table_name tname FROM user_tab_privs WHERE privilege='SELECT'
-        union 
-        select rtp.owner own, rtp.table_name tname from user_role_privs urp, role_tab_privs rtp
-          where urp.granted_role = rtp.role and rtp.privilege='SELECT'
-        union
-        select user own, table_name tname from user_tables
-    ) priv ON priv.own = all_tables.OWNER AND priv.tname = all_tables.TABLE_NAME
     WHERE all_tables.TABLESPACE_NAME != 'SYSAUX' AND all_tables.TABLESPACE_NAME != 'SYSTEM' AND all_tables.OWNER != 'SYS' AND all_tables.OWNER != 'SYSTEM'
 ) TABS ON COLS.TABLE_NAME = TABS.TABLE_NAME AND COLS.OWNER = TABS.OWNER
 LEFT OUTER JOIN (
