@@ -20,7 +20,8 @@ script:
   # Run live test job on new master image
   - docker pull quay.io/keboola/syrup-cli:latest
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287646782 master
-  - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287674685 master
+  # temporarily disabling the SSH tunneling test
+  # - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287674685 master
 
 after_success:
   - docker images
