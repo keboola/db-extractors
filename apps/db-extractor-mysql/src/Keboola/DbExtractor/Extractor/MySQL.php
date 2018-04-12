@@ -190,14 +190,15 @@ class MySQL extends Extractor
         $tableDefs = [];
         foreach ($arr as $table) {
             $tableNameArray[] = $table['TABLE_NAME'];
-            $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']] = [
+            $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
+            $tableDefs[$curTable] = [
                 'name' => $table['TABLE_NAME'],
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
                 'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
             ];
             if ($table["AUTO_INCREMENT"]) {
-                $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']]['autoIncrement'] = $table['AUTO_INCREMENT'];
+                $tableDefs[$curTable]['autoIncrement'] = $table['AUTO_INCREMENT'];
             }
         }
 
@@ -231,6 +232,7 @@ class MySQL extends Extractor
             }
             $curColumn = [
                 "name" => $column['COLUMN_NAME'],
+                "sanitizedName" => \Keboola\Utils\sanitizeColumnName($column['COLUMN_NAME']),
                 "type" => $column['DATA_TYPE'],
                 "primaryKey" => ($column['COLUMN_KEY'] === "PRI") ? true : false,
                 "length" => $length,

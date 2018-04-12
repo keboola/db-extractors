@@ -9,7 +9,7 @@
     "require": {
         "keboola/db-extractor-common": "^8.1.0",
         "keboola/php-temp": "^1.0",
-        "keboola/php-utils": "^2.3",
+        "keboola/php-utils": "^2.3.1",
         "symfony/serializer": "^3.1"
     },
     "require-dev": {

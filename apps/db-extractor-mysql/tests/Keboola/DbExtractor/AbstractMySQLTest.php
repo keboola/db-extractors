@@ -65,9 +65,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
             `_weird-I-d` INT NOT NULL AUTO_INCREMENT,
             `weird-Name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
             `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)  
+            PRIMARY KEY (`_weird-I-d`)  
         )');
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'george\'), (\'henry\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
     }
 
     /**
