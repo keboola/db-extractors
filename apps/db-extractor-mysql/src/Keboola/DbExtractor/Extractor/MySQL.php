@@ -264,11 +264,9 @@ class MySQL extends Extractor
     }
 
     /**
-     * @param array $table
-     * @param string $columnName
      * @throws UserException
      */
-    public function validateIncrementalFetching(array $table, string $columnName)
+    public function validateIncrementalFetching(array $table, string $columnName, int $limit = null)
     {
         $res = $this->db->query(
             sprintf(
@@ -301,6 +299,9 @@ class MySQL extends Extractor
                     $columnName
                 )
             );
+        }
+        if ($limit) {
+            $this->incrementalFetching['limit'] = $limit;
         }
     }
 
@@ -348,6 +349,12 @@ class MySQL extends Extractor
                 " WHERE %s ORDER BY %s",
                 $incrementalAddon,
                 $this->quote($this->incrementalFetching['column'])
+            );
+        }
+        if (isset($this->incrementalFetching['limit'])) {
+            $query .= sprintf(
+              " LIMIT %d",
+              $this->incrementalFetching['limit']
             );
         }
         return $query;
