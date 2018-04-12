@@ -23,8 +23,8 @@ class MySQL extends Extractor
     private function createSSLFile($sslCa, Temp $temp)
     {
         $filename = $temp->createTmpFile('ssl');
-        file_put_contents($filename, $sslCa);
-        return realpath($filename);
+        file_put_contents((string) $filename, $sslCa);
+        return realpath((string) $filename);
     }
 
     public function createConnection($params)
