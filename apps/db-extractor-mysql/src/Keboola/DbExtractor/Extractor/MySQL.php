@@ -353,8 +353,8 @@ class MySQL extends Extractor
         }
         if (isset($this->incrementalFetching['limit'])) {
             $query .= sprintf(
-              " LIMIT %d",
-              $this->incrementalFetching['limit']
+                " LIMIT %d",
+                $this->incrementalFetching['limit']
             );
         }
         return $query;
