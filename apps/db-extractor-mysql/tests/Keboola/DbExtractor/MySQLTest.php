@@ -960,7 +960,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingLimit'] = 1;
         $this->createAutoIncrementAndTimestampTable();
 
-        $result = (new Application($config))->run();
+        $result = (new MySQLApplication($config))->run();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals(
@@ -978,7 +978,7 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should contain the second row
-        $result = (new Application($config, $result['state']))->run();
+        $result = (new MySQLApplication($config, $result['state']))->run();
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
