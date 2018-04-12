@@ -872,6 +872,28 @@ class MySQLTest extends AbstractMySQLTest
         echo "\nThere are " . count($result['tables']) . " tables\n";
     }
 
+    public function testWeirdColumnNames()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = (new MySQLApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2
+            ],
+            $result['imported']
+        );
+        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
+        $manifest = json_decode(file_get_contents($outputManifestFile));
+        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp'];
+        $this->assertEquals($expectedColumns, $manifest['columns']);
+        $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
+    }
+
     public function testIncrementalFetchingByTimestamp()
     {
         $config = $this->getIncrementalFetchingConfig();
@@ -1043,8 +1065,8 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incremental'] = true;
         $config['parameters']['name'] = 'auto-increment-timestamp';
         $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
-        $config['parameters']['primaryKey'] = ['id'];
-        $config['parameters']['incrementalFetchingColumn'] = 'id';
+        $config['parameters']['primaryKey'] = ['_weird-I-d'];
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
         return $config;
     }
 }
