@@ -1,8 +1,6 @@
 <?php
-/**
- * @package ex-db-mysql
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 

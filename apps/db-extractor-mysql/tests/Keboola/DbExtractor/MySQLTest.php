@@ -1,8 +1,6 @@
 <?php
-/**
- * @package ex-db-mysql
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
@@ -221,7 +219,8 @@ class MySQLTest extends AbstractMySQLTest
                         array (
                             0 =>
                                 array (
-                                    'name' => 'id',
+                                    'name' => '_weird-I-d',
+                                    'sanitizedName' => 'weird_I_d',
                                     'type' => 'int',
                                     'primaryKey' => true,
                                     'length' => '10',
@@ -233,7 +232,8 @@ class MySQLTest extends AbstractMySQLTest
                                 ),
                             1 =>
                                 array (
-                                    'name' => 'name',
+                                    'name' => 'weird-Name',
+                                    'sanitizedName' => 'weird_Name',
                                     'type' => 'varchar',
                                     'primaryKey' => false,
                                     'length' => '30',
@@ -244,6 +244,7 @@ class MySQLTest extends AbstractMySQLTest
                             2 =>
                                 array (
                                     'name' => 'timestamp',
+                                    'sanitizedName' => 'timestamp',
                                     'type' => 'timestamp',
                                     'primaryKey' => false,
                                     'length' => null,
@@ -266,6 +267,7 @@ class MySQLTest extends AbstractMySQLTest
                             0 =>
                                 array (
                                     'name' => 'col1',
+                                    'sanitizedName' => 'col1',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -276,6 +278,7 @@ class MySQLTest extends AbstractMySQLTest
                             1 =>
                                 array (
                                     'name' => 'col2',
+                                    'sanitizedName' => 'col2',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -296,6 +299,7 @@ class MySQLTest extends AbstractMySQLTest
                             0 =>
                                 array (
                                     'name' => 'usergender',
+                                    'sanitizedName' => 'usergender',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -306,6 +310,7 @@ class MySQLTest extends AbstractMySQLTest
                             1 =>
                                 array (
                                     'name' => 'usercity',
+                                    'sanitizedName' => 'usercity',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -316,6 +321,7 @@ class MySQLTest extends AbstractMySQLTest
                             2 =>
                                 array (
                                     'name' => 'usersentiment',
+                                    'sanitizedName' => 'usersentiment',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -326,6 +332,7 @@ class MySQLTest extends AbstractMySQLTest
                             3 =>
                                 array (
                                     'name' => 'zipcode',
+                                    'sanitizedName' => 'zipcode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -336,6 +343,7 @@ class MySQLTest extends AbstractMySQLTest
                             4 =>
                                 array (
                                     'name' => 'sku',
+                                    'sanitizedName' => 'sku',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -346,6 +354,7 @@ class MySQLTest extends AbstractMySQLTest
                             5 =>
                                 array (
                                     'name' => 'createdat',
+                                    'sanitizedName' => 'createdat',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -356,6 +365,7 @@ class MySQLTest extends AbstractMySQLTest
                             6 =>
                                 array (
                                     'name' => 'category',
+                                    'sanitizedName' => 'category',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -366,6 +376,7 @@ class MySQLTest extends AbstractMySQLTest
                             7 =>
                                 array (
                                     'name' => 'price',
+                                    'sanitizedName' => 'price',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -376,6 +387,7 @@ class MySQLTest extends AbstractMySQLTest
                             8 =>
                                 array (
                                     'name' => 'county',
+                                    'sanitizedName' => 'county',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -386,6 +398,7 @@ class MySQLTest extends AbstractMySQLTest
                             9 =>
                                 array (
                                     'name' => 'countycode',
+                                    'sanitizedName' => 'countycode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -396,6 +409,7 @@ class MySQLTest extends AbstractMySQLTest
                             10 =>
                                 array (
                                     'name' => 'userstate',
+                                    'sanitizedName' => 'userstate',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -406,6 +420,7 @@ class MySQLTest extends AbstractMySQLTest
                             11 =>
                                 array (
                                     'name' => 'categorygroup',
+                                    'sanitizedName' => 'categorygroup',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -452,6 +467,7 @@ class MySQLTest extends AbstractMySQLTest
                             0 =>
                                 array (
                                     'name' => 'usergender',
+                                    'sanitizedName' => 'usergender',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -462,6 +478,7 @@ class MySQLTest extends AbstractMySQLTest
                             1 =>
                                 array (
                                     'name' => 'usercity',
+                                    'sanitizedName' => 'usercity',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -472,6 +489,7 @@ class MySQLTest extends AbstractMySQLTest
                             2 =>
                                 array (
                                     'name' => 'usersentiment',
+                                    'sanitizedName' => 'usersentiment',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -482,6 +500,7 @@ class MySQLTest extends AbstractMySQLTest
                             3 =>
                                 array (
                                     'name' => 'zipcode',
+                                    'sanitizedName' => 'zipcode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -492,6 +511,7 @@ class MySQLTest extends AbstractMySQLTest
                             4 =>
                                 array (
                                     'name' => 'sku',
+                                    'sanitizedName' => 'sku',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -502,6 +522,7 @@ class MySQLTest extends AbstractMySQLTest
                             5 =>
                                 array (
                                     'name' => 'createdat',
+                                    'sanitizedName' => 'createdat',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -512,6 +533,7 @@ class MySQLTest extends AbstractMySQLTest
                             6 =>
                                 array (
                                     'name' => 'category',
+                                    'sanitizedName' => 'category',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -522,6 +544,7 @@ class MySQLTest extends AbstractMySQLTest
                             7 =>
                                 array (
                                     'name' => 'price',
+                                    'sanitizedName' => 'price',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -532,6 +555,7 @@ class MySQLTest extends AbstractMySQLTest
                             8 =>
                                 array (
                                     'name' => 'county',
+                                    'sanitizedName' => 'county',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -542,6 +566,7 @@ class MySQLTest extends AbstractMySQLTest
                             9 =>
                                 array (
                                     'name' => 'countycode',
+                                    'sanitizedName' => 'countycode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -552,6 +577,7 @@ class MySQLTest extends AbstractMySQLTest
                             10 =>
                                 array (
                                     'name' => 'userstate',
+                                    'sanitizedName' => 'userstate',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -562,6 +588,7 @@ class MySQLTest extends AbstractMySQLTest
                             11 =>
                                 array (
                                     'name' => 'categorygroup',
+                                    'sanitizedName' => 'categorygroup',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -582,7 +609,8 @@ class MySQLTest extends AbstractMySQLTest
                         array (
                             0 =>
                                 array (
-                                    'name' => 'id',
+                                    'name' => '_weird-I-d',
+                                    'sanitizedName' => 'weird_I_d',
                                     'type' => 'int',
                                     'primaryKey' => true,
                                     'length' => '10',
@@ -594,7 +622,8 @@ class MySQLTest extends AbstractMySQLTest
                                 ),
                             1 =>
                                 array (
-                                    'name' => 'name',
+                                    'name' => 'weird-Name',
+                                    'sanitizedName' => 'weird_Name',
                                     'type' => 'varchar',
                                     'primaryKey' => false,
                                     'length' => '30',
@@ -605,6 +634,7 @@ class MySQLTest extends AbstractMySQLTest
                             2 =>
                                 array (
                                     'name' => 'timestamp',
+                                    'sanitizedName' => 'timestamp',
                                     'type' => 'timestamp',
                                     'primaryKey' => false,
                                     'length' => null,
@@ -627,6 +657,7 @@ class MySQLTest extends AbstractMySQLTest
                             0 =>
                                 array (
                                     'name' => 'col1',
+                                    'sanitizedName' => 'col1',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -637,6 +668,7 @@ class MySQLTest extends AbstractMySQLTest
                             1 =>
                                 array (
                                     'name' => 'col2',
+                                    'sanitizedName' => 'col2',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -657,6 +689,7 @@ class MySQLTest extends AbstractMySQLTest
                             0 =>
                                 array (
                                     'name' => 'usergender',
+                                    'sanitizedName' => 'usergender',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -667,6 +700,7 @@ class MySQLTest extends AbstractMySQLTest
                             1 =>
                                 array (
                                     'name' => 'usercity',
+                                    'sanitizedName' => 'usercity',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -677,6 +711,7 @@ class MySQLTest extends AbstractMySQLTest
                             2 =>
                                 array (
                                     'name' => 'usersentiment',
+                                    'sanitizedName' => 'usersentiment',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -687,6 +722,7 @@ class MySQLTest extends AbstractMySQLTest
                             3 =>
                                 array (
                                     'name' => 'zipcode',
+                                    'sanitizedName' => 'zipcode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -697,6 +733,7 @@ class MySQLTest extends AbstractMySQLTest
                             4 =>
                                 array (
                                     'name' => 'sku',
+                                    'sanitizedName' => 'sku',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -707,6 +744,7 @@ class MySQLTest extends AbstractMySQLTest
                             5 =>
                                 array (
                                     'name' => 'createdat',
+                                    'sanitizedName' => 'createdat',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -717,6 +755,7 @@ class MySQLTest extends AbstractMySQLTest
                             6 =>
                                 array (
                                     'name' => 'category',
+                                    'sanitizedName' => 'category',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -727,6 +766,7 @@ class MySQLTest extends AbstractMySQLTest
                             7 =>
                                 array (
                                     'name' => 'price',
+                                    'sanitizedName' => 'price',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -737,6 +777,7 @@ class MySQLTest extends AbstractMySQLTest
                             8 =>
                                 array (
                                     'name' => 'county',
+                                    'sanitizedName' => 'county',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -747,6 +788,7 @@ class MySQLTest extends AbstractMySQLTest
                             9 =>
                                 array (
                                     'name' => 'countycode',
+                                    'sanitizedName' => 'countycode',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -757,6 +799,7 @@ class MySQLTest extends AbstractMySQLTest
                             10 =>
                                 array (
                                     'name' => 'userstate',
+                                    'sanitizedName' => 'userstate',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -767,6 +810,7 @@ class MySQLTest extends AbstractMySQLTest
                             11 =>
                                 array (
                                     'name' => 'categorygroup',
+                                    'sanitizedName' => 'categorygroup',
                                     'type' => 'text',
                                     'primaryKey' => false,
                                     'length' => '65535',
@@ -818,6 +862,8 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertCount(4, $outputManifest['column_metadata']);
 
         $expectedColumnMetadata = [
+            'KBC.sourceName' => 'usergender',
+            'KBC.sanitizedName' => 'usergender',
             'KBC.datatype.type' => 'text',
             'KBC.datatype.basetype' => 'STRING',
             'KBC.datatype.nullable' => true,
@@ -874,10 +920,32 @@ class MySQLTest extends AbstractMySQLTest
         echo "\nThere are " . count($result['tables']) . " tables\n";
     }
 
+    public function testWeirdColumnNames()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = (new MySQLApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2
+            ],
+            $result['imported']
+        );
+        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
+        $manifest = json_decode(file_get_contents($outputManifestFile), true);
+        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp'];
+        $this->assertEquals($expectedColumns, $manifest['columns']);
+        $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
+    }
+
     public function testIncrementalFetchingByTimestamp()
     {
         $config = $this->getIncrementalFetchingConfig();
-        $config['incrementalFethcingColumn'] = 'timestamp';
+        $config['parameters']['incrementalFetchingColumn'] = 'timestamp';
         $this->createAutoIncrementAndTimestampTable();
 
         $result = (new MySQLApplication($config))->run();
@@ -903,7 +971,7 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
 
         $newResult = (new MySQLApplication($config, $result['state']))->run();
 
@@ -919,7 +987,7 @@ class MySQLTest extends AbstractMySQLTest
     public function testIncrementalFetchingByAutoIncrement()
     {
         $config = $this->getIncrementalFetchingConfig();
-        $config['incrementalFethcingColumn'] = 'id';
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
         $this->createAutoIncrementAndTimestampTable();
 
         $result = (new MySQLApplication($config))->run();
@@ -945,7 +1013,7 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
 
         $newResult = (new MySQLApplication($config, $result['state']))->run();
 
@@ -955,6 +1023,46 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
         $this->assertEquals(2, $newResult['imported']['rows']);
     }
+
+    public function testIncrementalFetchingLimit()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingLimit'] = 1;
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = (new MySQLApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 1
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(1, $result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should contain the second row
+        $result = (new MySQLApplication($config, $result['state']))->run();
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 1
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+    }
+
 
     public function testIncrementalFetchingInvalidColumns()
     {
@@ -970,12 +1078,12 @@ class MySQLTest extends AbstractMySQLTest
         }
 
         // column exists but is not auto-increment nor updating timestamp so should fail
-        $config['parameters']['incrementalFetchingColumn'] = 'name';
+        $config['parameters']['incrementalFetchingColumn'] = 'weird-Name';
         try {
             $result = (new MySQLApplication($config))->run();
             $this->fail('specified column is not auto increment nor timestamp, should fail.');
         } catch (UserException $e) {
-            $this->assertStringStartsWith("Column [name] specified for incremental fetching", $e->getMessage());
+            $this->assertStringStartsWith("Column [weird-Name] specified for incremental fetching", $e->getMessage());
         }
     }
 
@@ -1005,8 +1113,8 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incremental'] = true;
         $config['parameters']['name'] = 'auto-increment-timestamp';
         $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
-        $config['parameters']['primaryKey'] = ['id'];
-        $config['parameters']['incrementalFetchingColumn'] = 'id';
+        $config['parameters']['primaryKey'] = ['_weird-I-d'];
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
         return $config;
     }
 }

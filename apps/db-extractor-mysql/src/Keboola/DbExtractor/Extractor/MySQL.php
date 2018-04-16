@@ -1,8 +1,6 @@
 <?php
-/**
- * @package ex-db-mysql
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
@@ -25,8 +23,8 @@ class MySQL extends Extractor
     private function createSSLFile($sslCa, Temp $temp)
     {
         $filename = $temp->createTmpFile('ssl');
-        file_put_contents($filename, $sslCa);
-        return realpath($filename);
+        file_put_contents((string) $filename, $sslCa);
+        return realpath((string) $filename);
     }
 
     public function createConnection($params)
@@ -192,14 +190,15 @@ class MySQL extends Extractor
         $tableDefs = [];
         foreach ($arr as $table) {
             $tableNameArray[] = $table['TABLE_NAME'];
-            $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']] = [
+            $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
+            $tableDefs[$curTable] = [
                 'name' => $table['TABLE_NAME'],
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
                 'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
             ];
             if ($table["AUTO_INCREMENT"]) {
-                $tableDefs[$table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME']]['autoIncrement'] = $table['AUTO_INCREMENT'];
+                $tableDefs[$curTable]['autoIncrement'] = $table['AUTO_INCREMENT'];
             }
         }
 
@@ -233,6 +232,7 @@ class MySQL extends Extractor
             }
             $curColumn = [
                 "name" => $column['COLUMN_NAME'],
+                "sanitizedName" => \Keboola\Utils\sanitizeColumnName($column['COLUMN_NAME']),
                 "type" => $column['DATA_TYPE'],
                 "primaryKey" => ($column['COLUMN_KEY'] === "PRI") ? true : false,
                 "length" => $length,
@@ -264,11 +264,9 @@ class MySQL extends Extractor
     }
 
     /**
-     * @param array $table
-     * @param string $columnName
      * @throws UserException
      */
-    public function validateIncrementalFetching(array $table, string $columnName)
+    public function validateIncrementalFetching(array $table, string $columnName, int $limit = null)
     {
         $res = $this->db->query(
             sprintf(
@@ -301,6 +299,9 @@ class MySQL extends Extractor
                     $columnName
                 )
             );
+        }
+        if ($limit) {
+            $this->incrementalFetching['limit'] = $limit;
         }
     }
 
@@ -348,6 +349,12 @@ class MySQL extends Extractor
                 " WHERE %s ORDER BY %s",
                 $incrementalAddon,
                 $this->quote($this->incrementalFetching['column'])
+            );
+        }
+        if (isset($this->incrementalFetching['limit'])) {
+            $query .= sprintf(
+                " LIMIT %d",
+                $this->incrementalFetching['limit']
             );
         }
         return $query;

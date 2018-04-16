@@ -1,8 +1,6 @@
 <?php
-/**
- * @package ex-db-mysql
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
@@ -64,12 +62,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
 
         $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
-            `id` INT NOT NULL AUTO_INCREMENT,
-            `name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            `_weird-I-d` INT NOT NULL AUTO_INCREMENT,
+            `weird-Name` VARCHAR(30) NOT NULL DEFAULT \'pam\',
             `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`)  
+            PRIMARY KEY (`_weird-I-d`)  
         )');
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'george\'), (\'henry\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
     }
 
     /**

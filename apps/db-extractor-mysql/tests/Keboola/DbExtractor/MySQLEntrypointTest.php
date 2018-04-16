@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 11/11/16
- * Time: 15:51
- */
+
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
@@ -249,8 +245,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['parameters']['incremental'] = true;
         $config['parameters']['name'] = 'auto-increment-timestamp';
         $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
-        $config['parameters']['primaryKey'] = ['id'];
-        $config['parameters']['incrementalFetchingColumn'] = 'id';
+        $config['parameters']['primaryKey'] = ['_weird-I-d'];
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
@@ -265,7 +261,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
 
         // add a couple rows
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`name`) VALUES (\'charles\'), (\'william\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
 
         // copy state to input state file
         file_put_contents($inputStateFile, file_get_contents($outputStateFile));
