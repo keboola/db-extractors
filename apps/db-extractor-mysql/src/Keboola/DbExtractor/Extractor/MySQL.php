@@ -196,6 +196,7 @@ class MySQL extends Extractor
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
                 'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
+                'description' => (isset($table['TABLE_COMMENT'])) ? $table['TABLE_COMMENT'] : ''
             ];
             if ($table["AUTO_INCREMENT"]) {
                 $tableDefs[$curTable]['autoIncrement'] = $table['AUTO_INCREMENT'];
@@ -240,6 +241,10 @@ class MySQL extends Extractor
                 "default" => $column['COLUMN_DEFAULT'],
                 "ordinalPosition" => $column['ORDINAL_POSITION'],
             ];
+
+            if ($column['COLUMN_COMMENT']) {
+                $curColumn['description'] = $column['COLUMN_COMMENT'];
+            }
 
             if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
                 $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
