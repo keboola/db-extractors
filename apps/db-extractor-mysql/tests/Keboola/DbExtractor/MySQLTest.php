@@ -229,6 +229,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
                                     'autoIncrement' => '3',
+                                    'description' => 'This is a weird ID',
                                 ),
                             1 =>
                                 array (
@@ -240,6 +241,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => 'pam',
                                     'ordinalPosition' => '2',
+                                    'description' => 'This is a weird name',
                                 ),
                             2 =>
                                 array (
@@ -252,9 +254,11 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
                                     'extra' => 'on update CURRENT_TIMESTAMP',
+                                    'description' => 'This is a timestamp',
                                 ),
                         ),
                     'timestampUpdateColumn' => 'timestamp',
+                    'description' => 'This is a table comment',
                 ),
             1 =>
                 array (
@@ -619,6 +623,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'ordinalPosition' => '1',
                                     'extra' => 'auto_increment',
                                     'autoIncrement' => '3',
+                                    'description' => 'This is a weird ID',
                                 ),
                             1 =>
                                 array (
@@ -630,6 +635,7 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => 'pam',
                                     'ordinalPosition' => '2',
+                                    'description' => 'This is a weird name',
                                 ),
                             2 =>
                                 array (
@@ -642,9 +648,11 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
                                     'extra' => 'on update CURRENT_TIMESTAMP',
+                                    'description' => 'This is a timestamp',
                                 ),
                         ),
                     'timestampUpdateColumn' => 'timestamp',
+                    'description' => 'This is a table comment',
                 ),
             2 =>
                 array (
