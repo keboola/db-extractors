@@ -4,8 +4,6 @@ services:
     build: .
     image: keboola/ex-db-mysql
     command: composer ci
-    tty: true
-    stdin_open: true
     env_file:
       - ssh-keys.env
     environment:
@@ -26,8 +24,6 @@ services:
     volumes:
       - .:/code
     command: composer ci
-    tty: true
-    stdin_open: true
     env_file:
       - ssh-keys.env
     environment:
