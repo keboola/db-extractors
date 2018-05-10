@@ -7,34 +7,32 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\Temp\Temp;
+use PDO;
+use PDOException;
 
 class MySQL extends Extractor
 {
-    const TYPE_AUTO_INCREMENT = 'autoIncrement';
-    const TYPE_TIMESTAMP = 'timestamp';
+    public const TYPE_AUTO_INCREMENT = 'autoIncrement';
+    public const TYPE_TIMESTAMP = 'timestamp';
 
+    /** @var  string -- database name from connection parameters */
     protected $database;
 
-    /**
-     * @param $sslCa
-     * @param Temp $temp
-     * @return string
-     */
-    private function createSSLFile($sslCa, Temp $temp)
+    private function createSSLFile(string $sslCa, Temp $temp): string
     {
         $filename = $temp->createTmpFile('ssl');
         file_put_contents((string) $filename, $sslCa);
         return realpath((string) $filename);
     }
 
-    public function createConnection($params)
+    public function createConnection(array $params): PDO
     {
         $isSsl = false;
         $isCompression = !empty($params['networkCompression']) ? true :false;
 
         $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
-            \PDO::MYSQL_ATTR_COMPRESS => $isCompression, // network compression
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
+            PDO::MYSQL_ATTR_COMPRESS => $isCompression, // network compression
         ];
 
         // ssl encryption
@@ -44,19 +42,19 @@ class MySQL extends Extractor
             $temp = new Temp(getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql');
 
             if (!empty($ssl['key'])) {
-                $options[\PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
+                $options[PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
                 $isSsl = true;
             }
             if (!empty($ssl['cert'])) {
-                $options[\PDO::MYSQL_ATTR_SSL_CERT] = $this->createSSLFile($ssl['cert'], $temp);
+                $options[PDO::MYSQL_ATTR_SSL_CERT] = $this->createSSLFile($ssl['cert'], $temp);
                 $isSsl = true;
             }
             if (!empty($ssl['ca'])) {
-                $options[\PDO::MYSQL_ATTR_SSL_CA] = $this->createSSLFile($ssl['ca'], $temp);
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $this->createSSLFile($ssl['ca'], $temp);
                 $isSsl = true;
             }
             if (!empty($ssl['cipher'])) {
-                $options[\PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
+                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
             }
         }
 
@@ -87,8 +85,8 @@ class MySQL extends Extractor
         $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
         try {
-            $pdo = new \PDO($dsn, $params['user'], $params['password'], $options);
-        } catch (\PDOException $e) {
+            $pdo = new PDO($dsn, $params['user'], $params['password'], $options);
+        } catch (PDOException $e) {
             $checkCnMismatch = function (\Exception $exception) {
                 if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {
                     throw new UserException($exception->getMessage());
@@ -100,11 +98,11 @@ class MySQL extends Extractor
             }
             throw $e;
         }
-        $pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+        $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
         $pdo->exec("SET NAMES utf8;");
 
         if ($isSsl) {
-            $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
+            $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value'])) {
                 throw new UserException(sprintf("Connection is not encrypted"));
@@ -114,7 +112,7 @@ class MySQL extends Extractor
         }
 
         if ($isCompression) {
-            $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(\PDO::FETCH_ASSOC);
+            $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
                 throw new UserException(sprintf("Network communication is not compressed"));
@@ -126,17 +124,17 @@ class MySQL extends Extractor
         return $pdo;
     }
 
-    public function getConnection()
+    public function getConnection(): PDO
     {
         return $this->db;
     }
 
-    public function testConnection()
+    public function testConnection(): void
     {
         $this->db->query('SELECT NOW();')->execute();
     }
 
-    public function export(array $table)
+    public function export(array $table): array
     {
         // if database set make sure the database and selected table schema match
         if (isset($table['table']) && $this->database && $this->database !== $table['table']['schema']) {
@@ -151,7 +149,7 @@ class MySQL extends Extractor
         return parent::export($table);
     }
 
-    public function getTables(array $tables = null)
+    public function getTables(array $tables = null): array
     {
 
         $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c";
@@ -181,7 +179,7 @@ class MySQL extends Extractor
         $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
 
         $res = $this->db->query($sql);
-        $arr = $res->fetchAll(\PDO::FETCH_ASSOC);
+        $arr = $res->fetchAll(PDO::FETCH_ASSOC);
         if (count($arr) === 0) {
             return [];
         }
@@ -221,7 +219,7 @@ class MySQL extends Extractor
         $sql .= " ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION";
 
         $res = $this->db->query($sql);
-        $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $res->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($rows as $i => $column) {
             $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
@@ -270,10 +268,7 @@ class MySQL extends Extractor
         return array_values($tableDefs);
     }
 
-    /**
-     * @throws UserException
-     */
-    public function validateIncrementalFetching(array $table, string $columnName, int $limit = null)
+    public function validateIncrementalFetching(array $table, string $columnName, int $limit = null): void
     {
         $res = $this->db->query(
             sprintf(
@@ -312,7 +307,7 @@ class MySQL extends Extractor
         }
     }
 
-    public function simpleQuery(array $table, array $columns = array()): string
+    public function simpleQuery(array $table, array $columns = []): string
     {
         $incrementalAddon = null;
         if ($this->incrementalFetching && isset($this->state['lastFetchedRow'])) {
@@ -367,7 +362,7 @@ class MySQL extends Extractor
         return $query;
     }
 
-    private function quote($obj)
+    private function quote(string $obj): string
     {
         return "`{$obj}`";
     }
