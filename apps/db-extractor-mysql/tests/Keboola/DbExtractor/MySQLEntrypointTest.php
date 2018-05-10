@@ -15,7 +15,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     /**
      * @dataProvider configTypesProvider
      */
-    public function testRunAction($configType): void
+    public function testRunAction(string $configType): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';

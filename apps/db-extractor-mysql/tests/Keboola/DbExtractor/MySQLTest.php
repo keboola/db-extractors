@@ -56,7 +56,7 @@ class MySQLTest extends AbstractMySQLTest
      * @param $configType
      * @dataProvider configTypesProvider
      */
-    public function testRunMain($configType): void
+    public function testRunMain(string $configType): void
     {
         $config = $this->getConfig(self::DRIVER, $configType);
         $app = $this->createApplication($config);
@@ -1129,7 +1129,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
     }
 
-    private function getIncrementalFetchingConfig()
+    private function getIncrementalFetchingConfig(): array
     {
         $config = $this->getConfigRow(self::DRIVER);
         unset($config['parameters']['query']);

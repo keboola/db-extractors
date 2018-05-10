@@ -8,24 +8,25 @@ use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
+use PDO;
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
-    const DRIVER = 'mysql';
+    public const DRIVER = 'mysql';
 
-    /** @var \PDO */
+    /** @var PDO */
     protected $pdo;
 
     public function setUp(): void
     {
         $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_LOCAL_INFILE => true,
         ];
 
-        $options[\PDO::MYSQL_ATTR_SSL_KEY] = realpath($this->dataDir . '/mysql/ssl/client-key.pem');
-        $options[\PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
-        $options[\PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
+        $options[PDO::MYSQL_ATTR_SSL_KEY] = realpath($this->dataDir . '/mysql/ssl/client-key.pem');
+        $options[PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
+        $options[PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
 
         $config = $this->getConfig(self::DRIVER);
         $dbConfig = $config['parameters']['db'];
@@ -39,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
         $this->pdo = new \PDO($dsn, $dbConfig['user'], $dbConfig['password'], $options);
 
-        $this->pdo->setAttribute(\PDO::MYSQL_ATTR_LOCAL_INFILE, true);
+        $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
         $this->pdo->exec("SET NAMES utf8;");
     }
 
@@ -86,12 +87,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $tableName;
     }
 
-    /**
-     * Create table from csv file with text columns
-     *
-     * @param CsvFile $file
-     */
-    protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null): void
+    protected function createTextTable(CsvFile $file, ?string $tableName = null, ?string $schemaName = null): void
     {
         if (!$tableName) {
             $tableName = $this->generateTableName($file);
@@ -166,7 +162,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $app;
     }
 
-    public function configTypesProvider()
+    public function configTypesProvider(): array
     {
         return [
             [self::CONFIG_FORMAT_YAML],
