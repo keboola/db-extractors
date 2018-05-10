@@ -8,11 +8,7 @@
          processIsolation="false"
          stopOnFailure="false"
          syntaxCheck="false"
-         bootstrap="bootstrap.php">
-
-    <const>
-        <const name="ROOT_PATH" value="/code"/>
-    </const>
+         bootstrap="vendor/autoload.php">
 
     <testsuite name="MySQL Extractor Test Suite">
         <directory>tests</directory>
