@@ -195,7 +195,7 @@ class MySQL extends Extractor
                 'name' => $table['TABLE_NAME'],
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
-                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : ''
+                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
             ];
             if ($table["TABLE_COMMENT"]) {
                 $tableDefs[$curTable]['description'] = $table['TABLE_COMMENT'];
