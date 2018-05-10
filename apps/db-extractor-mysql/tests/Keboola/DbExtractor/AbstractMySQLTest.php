@@ -16,11 +16,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
     /** @var \PDO */
     protected $pdo;
 
-    public function setUp()
+    public function setUp(): void
     {
         $options = [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::MYSQL_ATTR_LOCAL_INFILE => true
+            \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
         ];
 
         $options[\PDO::MYSQL_ATTR_SSL_KEY] = realpath($this->dataDir . '/mysql/ssl/client-key.pem');
@@ -76,11 +76,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $config;
     }
 
-    /**
-     * @param CsvFile $file
-     * @return string
-     */
-    protected function generateTableName(CsvFile $file)
+    protected function generateTableName(CsvFile $file): string
     {
         $tableName = sprintf(
             '%s',
@@ -95,7 +91,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
      *
      * @param CsvFile $file
      */
-    protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null)
+    protected function createTextTable(CsvFile $file, $tableName = null, $schemaName = null): void
     {
         if (!$tableName) {
             $tableName = $this->generateTableName($file);
@@ -147,7 +143,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
      * @param CsvFile $file
      * @return int
      */
-    protected function countTable(CsvFile $file)
+    protected function countTable(CsvFile $file): int
     {
         $linesCount = 0;
         foreach ($file as $i => $line) {
@@ -174,7 +170,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
     {
         return [
             [self::CONFIG_FORMAT_YAML],
-            [self::CONFIG_FORMAT_JSON]
+            [self::CONFIG_FORMAT_JSON],
         ];
     }
 }

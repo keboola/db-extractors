@@ -9,7 +9,7 @@ use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
 
 class MySQLApplication extends Application
 {
-    public function __construct(array $config, Logger $logger = null, array $state = [], string $dataDir = '/data/')
+    public function __construct(array $config, ?Logger $logger = null, array $state = [], string $dataDir = '/data/')
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';

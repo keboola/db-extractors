@@ -83,11 +83,11 @@ try {
 } catch (ApplicationException $e) {
     $logger->log('error', $e->getMessage(), $e->getData());
     exit(2);
-} catch (\Exception $e) {
+} catch (\Throwable $e) {
     $logger->log('error', $e->getMessage(), [
         'errFile' => $e->getFile(),
         'errLine' => $e->getLine(),
-        'trace' => $e->getTrace()
+        'trace' => $e->getTrace(),
     ]);
     exit(2);
 }

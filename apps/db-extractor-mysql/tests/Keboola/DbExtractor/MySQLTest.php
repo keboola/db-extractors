@@ -12,7 +12,7 @@ use Nette\Utils;
 
 class MySQLTest extends AbstractMySQLTest
 {
-    public function testCredentials()
+    public function testCredentials(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -25,7 +25,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testCredentialsWithoutDatabase()
+    public function testCredentialsWithoutDatabase(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -39,7 +39,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithoutTables()
+    public function testRunWithoutTables(): void
     {
         $config = $this->getConfig();
 
@@ -56,7 +56,7 @@ class MySQLTest extends AbstractMySQLTest
      * @param $configType
      * @dataProvider configTypesProvider
      */
-    public function testRunMain($configType)
+    public function testRunMain($configType): void
     {
         $config = $this->getConfig(self::DRIVER, $configType);
         $app = $this->createApplication($config);
@@ -85,7 +85,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $csv2, $outputCsvFile);
     }
 
-    public function testRunWithoutDatabase()
+    public function testRunWithoutDatabase(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -102,7 +102,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testCredentialsWithSSH()
+    public function testCredentialsWithSSH(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -111,7 +111,7 @@ class MySQLTest extends AbstractMySQLTest
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getPrivateKey('mysql'),
-                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC'),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -131,14 +131,14 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithSSH()
+    public function testRunWithSSH(): void
     {
         $config = $this->getConfig();
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getPrivateKey('mysql'),
-                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC'),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -172,7 +172,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $csv2, $outputCsvFile);
     }
 
-    public function testUserException()
+    public function testUserException(): void
     {
         $this->setExpectedException('Keboola\DbExtractor\Exception\UserException');
 
@@ -184,7 +184,7 @@ class MySQLTest extends AbstractMySQLTest
         $app->run();
     }
 
-    public function testGetTables()
+    public function testGetTables(): void
     {
         $this->createAutoIncrementAndTimestampTable();
 
@@ -438,7 +438,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedData, $result['tables']);
     }
 
-    public function testGetTablesNoDatabase()
+    public function testGetTablesNoDatabase(): void
     {
         $this->createAutoIncrementAndTimestampTable();
 
@@ -832,7 +832,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testManifestMetadata()
+    public function testManifestMetadata(): void
     {
         $config = $this->getConfig();
 
@@ -856,7 +856,7 @@ class MySQLTest extends AbstractMySQLTest
             'KBC.name' => 'sales',
             'KBC.schema' => 'test',
             'KBC.type' => 'BASE TABLE',
-            'KBC.rowCount' => 100
+            'KBC.rowCount' => 100,
         ];
         $tableMetadata = [];
         foreach ($outputManifest['metadata'] as $i => $metadata) {
@@ -877,7 +877,7 @@ class MySQLTest extends AbstractMySQLTest
             'KBC.datatype.nullable' => true,
             'KBC.datatype.length' => '65535',
             'KBC.primaryKey' => false,
-            'KBC.ordinalPosition' => '1'
+            'KBC.ordinalPosition' => '1',
         ];
         $columnMetadata = [];
         foreach ($outputManifest['column_metadata']['usergender'] as $metadata) {
@@ -888,7 +888,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedColumnMetadata, $columnMetadata);
     }
 
-    public function testSchemaNotEqualToDatabase()
+    public function testSchemaNotEqualToDatabase(): void
     {
         $this->createTextTable(
             new CsvFile($this->dataDir . '/mysql/sales.csv'),
@@ -911,7 +911,7 @@ class MySQLTest extends AbstractMySQLTest
         }
     }
 
-    public function testThousandsOfTables()
+    public function testThousandsOfTables(): void
     {
         $this->markTestSkipped("No need to run this test every time.");
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
@@ -928,7 +928,7 @@ class MySQLTest extends AbstractMySQLTest
         echo "\nThere are " . count($result['tables']) . " tables\n";
     }
 
-    public function testWeirdColumnNames()
+    public function testWeirdColumnNames(): void
     {
         $config = $this->getIncrementalFetchingConfig();
         $this->createAutoIncrementAndTimestampTable();
@@ -939,7 +939,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2
+                'rows' => 2,
             ],
             $result['imported']
         );
@@ -950,7 +950,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
     }
 
-    public function testIncrementalFetchingByTimestamp()
+    public function testIncrementalFetchingByTimestamp(): void
     {
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['incrementalFetchingColumn'] = 'timestamp';
@@ -962,7 +962,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2
+                'rows' => 2,
             ],
             $result['imported']
         );
@@ -992,7 +992,7 @@ class MySQLTest extends AbstractMySQLTest
         );
     }
 
-    public function testIncrementalFetchingByAutoIncrement()
+    public function testIncrementalFetchingByAutoIncrement(): void
     {
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
@@ -1004,7 +1004,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2
+                'rows' => 2,
             ],
             $result['imported']
         );
@@ -1032,7 +1032,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(2, $newResult['imported']['rows']);
     }
 
-    public function testIncrementalFetchingLimit()
+    public function testIncrementalFetchingLimit(): void
     {
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['incrementalFetchingLimit'] = 1;
@@ -1044,7 +1044,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 1
+                'rows' => 1,
             ],
             $result['imported']
         );
@@ -1060,7 +1060,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 1
+                'rows' => 1,
             ],
             $result['imported']
         );
@@ -1072,7 +1072,7 @@ class MySQLTest extends AbstractMySQLTest
     }
 
 
-    public function testIncrementalFetchingInvalidColumns()
+    public function testIncrementalFetchingInvalidColumns(): void
     {
         $this->createAutoIncrementAndTimestampTable();
         $config = $this->getIncrementalFetchingConfig();
@@ -1095,7 +1095,7 @@ class MySQLTest extends AbstractMySQLTest
         }
     }
 
-    public function testIncrementalFetchingInvalidConfig()
+    public function testIncrementalFetchingInvalidConfig(): void
     {
         $this->createAutoIncrementAndTimestampTable();
         $config = $this->getIncrementalFetchingConfig();
@@ -1135,7 +1135,7 @@ class MySQLTest extends AbstractMySQLTest
         unset($config['parameters']['query']);
         $config['parameters']['table'] = [
             'tableName' => 'auto_increment_timestamp',
-            'schema' => 'test'
+            'schema' => 'test',
         ];
         $config['parameters']['incremental'] = true;
         $config['parameters']['name'] = 'auto-increment-timestamp';

@@ -87,7 +87,7 @@ class MySQL extends Extractor
         try {
             $pdo = new PDO($dsn, $params['user'], $params['password'], $options);
         } catch (PDOException $e) {
-            $checkCnMismatch = function (\Exception $exception) {
+            $checkCnMismatch = function (\Throwable $exception): void {
                 if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {
                     throw new UserException($exception->getMessage());
                 }
@@ -149,7 +149,7 @@ class MySQL extends Extractor
         return parent::export($table);
     }
 
-    public function getTables(array $tables = null): array
+    public function getTables(?array $tables = null): array
     {
 
         $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c";
@@ -268,7 +268,7 @@ class MySQL extends Extractor
         return array_values($tableDefs);
     }
 
-    public function validateIncrementalFetching(array $table, string $columnName, int $limit = null): void
+    public function validateIncrementalFetching(array $table, string $columnName, ?int $limit = null): void
     {
         $res = $this->db->query(
             sprintf(
