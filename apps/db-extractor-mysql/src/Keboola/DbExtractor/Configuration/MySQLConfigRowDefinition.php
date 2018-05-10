@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Configuration;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class MySQLConfigRowDefinition extends ConfigRowDefinition
 {
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('parameters');
 
+        // @formatter:off
         $rootNode
             ->children()
                 ->scalarNode('data_dir')
@@ -84,14 +81,16 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                 ->end()
             ->end()
         ;
+        // @formatter:on
         return $treeBuilder;
     }
 
-    public function addSslNode()
+    public function addSslNode(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('ssl');
 
+        // @formatter:off
         $node
             ->children()
                 ->booleanNode('enabled')->end()
@@ -100,7 +99,7 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                 ->scalarNode('key')->end()
                 ->scalarNode('cipher')->end()
             ->end();
-
+        // @formatter:on
         return $node;
     }
 }
