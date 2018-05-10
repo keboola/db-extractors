@@ -11,6 +11,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
+    /** @var string */
+    protected $rootPath = __DIR__ . '/../../..';
 
     /**
      * @dataProvider configTypesProvider
