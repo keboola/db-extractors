@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "dad7a3f368e8442e5c875e0e25d44e23",
+    "content-hash": "66c62712f811afc957e0ed452154a5a9",
     "packages": [
         {
             "name": "keboola/csv",
@@ -58,12 +58,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "8c8cd24b35c1283df14e33db4d46ab50bfc73586"
+                "reference": "7ea835114452f7d94fa799bf3551fa2c6b92fc7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/8c8cd24b35c1283df14e33db4d46ab50bfc73586",
-                "reference": "8c8cd24b35c1283df14e33db4d46ab50bfc73586",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/7ea835114452f7d94fa799bf3551fa2c6b92fc7c",
+                "reference": "7ea835114452f7d94fa799bf3551fa2c6b92fc7c",
                 "shasum": ""
             },
             "require": {
