@@ -19,6 +19,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     public function setUp(): void
     {
+        $this->dataDir = __DIR__ . '/../../data';
+
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::MYSQL_ATTR_LOCAL_INFILE => true,
@@ -38,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
             $dbConfig['database']
         );
 
-        $this->pdo = new \PDO($dsn, $dbConfig['user'], $dbConfig['password'], $options);
+        $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], $options);
 
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
         $this->pdo->exec("SET NAMES utf8;");
