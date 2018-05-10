@@ -933,7 +933,7 @@ class MySQLTest extends AbstractMySQLTest
         $config = $this->getIncrementalFetchingConfig();
         $this->createAutoIncrementAndTimestampTable();
 
-        $result = (new MySQLApplication($config))->run();
+        $result = ($this->createApplication($config))->run();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals(
@@ -956,7 +956,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingColumn'] = 'timestamp';
         $this->createAutoIncrementAndTimestampTable();
 
-        $result = (new MySQLApplication($config))->run();
+        $result = ($this->createApplication($config))->run();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals(
@@ -974,14 +974,14 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should be empty
-        $emptyResult = (new MySQLApplication($config, $result['state']))->run();
+        $emptyResult = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(0, $emptyResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
 
-        $newResult = (new MySQLApplication($config, $result['state']))->run();
+        $newResult = ($this->createApplication($config, $result['state']))->run();
 
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $newResult);
@@ -998,7 +998,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
         $this->createAutoIncrementAndTimestampTable();
 
-        $result = (new MySQLApplication($config))->run();
+        $result = ($this->createApplication($config))->run();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals(
@@ -1016,14 +1016,14 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should be empty
-        $emptyResult = (new MySQLApplication($config, $result['state']))->run();
+        $emptyResult = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(0, $emptyResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
 
-        $newResult = (new MySQLApplication($config, $result['state']))->run();
+        $newResult = ($this->createApplication($config, $result['state']))->run();
 
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $newResult);
@@ -1038,7 +1038,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingLimit'] = 1;
         $this->createAutoIncrementAndTimestampTable();
 
-        $result = (new MySQLApplication($config))->run();
+        $result = ($this->createApplication($config))->run();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals(
@@ -1056,7 +1056,7 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should contain the second row
-        $result = (new MySQLApplication($config, $result['state']))->run();
+        $result = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
@@ -1079,7 +1079,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingColumn'] = 'fakeCol'; // column does not exist
 
         try {
-            $result = (new MySQLApplication($config))->run();
+            $result = ($this->createApplication($config))->run();
             $this->fail('specified autoIncrement column does not exist, should fail.');
         } catch (UserException $e) {
             $this->assertStringStartsWith("Column [fakeCol]", $e->getMessage());
@@ -1088,7 +1088,7 @@ class MySQLTest extends AbstractMySQLTest
         // column exists but is not auto-increment nor updating timestamp so should fail
         $config['parameters']['incrementalFetchingColumn'] = 'weird-Name';
         try {
-            $result = (new MySQLApplication($config))->run();
+            $result = ($this->createApplication($config))->run();
             $this->fail('specified column is not auto increment nor timestamp, should fail.');
         } catch (UserException $e) {
             $this->assertStringStartsWith("Column [weird-Name] specified for incremental fetching", $e->getMessage());
@@ -1103,7 +1103,7 @@ class MySQLTest extends AbstractMySQLTest
         unset($config['parameters']['table']);
 
         try {
-            $result = (new MySQLApplication($config))->run();
+            $result = ($this->createApplication($config))->run();
             $this->fail('cannot use incremental fetching with advanced query, should fail.');
         } catch (UserException $e) {
             $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
