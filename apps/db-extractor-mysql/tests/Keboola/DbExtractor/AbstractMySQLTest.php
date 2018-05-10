@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
@@ -15,23 +16,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
     /** @var \PDO */
     protected $pdo;
 
-    protected $appName;
-
-    protected $rootPath;
-
     public function setUp()
     {
-        if (!$this->appName) {
-            $this->appName = getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql';
-            if (!defined('APP_NAME')) {
-                define('APP_NAME', $this->appName);
-            }
-        }
-
-        if (!$this->rootPath) {
-            $this->rootPath = getenv('ROOT_PATH') ? getenv('ROOT_PATH') : '/code';
-        }
-
         $options = [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::MYSQL_ATTR_LOCAL_INFILE => true
@@ -57,7 +43,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec("SET NAMES utf8;");
     }
 
-    protected function createAutoIncrementAndTimestampTable()
+    protected function createAutoIncrementAndTimestampTable(): void
     {
         $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
 
@@ -70,12 +56,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
     }
 
-    /**
-     * @param string $driver
-     * @param string $format (yaml || json)
-     * @return mixed
-     */
-    public function getConfig($driver = self::DRIVER, $format = 'yaml')
+    public function getConfig(string $driver = self::DRIVER, string $format = self::CONFIG_FORMAT_YAML): array
     {
         $config = parent::getConfig($driver, $format);
         if (!empty($config['parameters']['db']['#password'])) {
@@ -85,7 +66,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $config;
     }
 
-    public function getConfigRow($driver = self::DRIVER)
+    public function getConfigRow(string $driver = self::DRIVER): array
     {
         $config = parent::getConfigRow($driver);
         if (!empty($config['parameters']['db']['#password'])) {
@@ -181,14 +162,10 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $linesCount;
     }
 
-    /**
-     * @param array $config
-     * @param array $state
-     * @return MySQLApplication
-     */
-    public function createApplication(array $config, array $state = [])
+    public function createApplication(array $config, array $state = []): MySQLApplication
     {
-        $app = new MySQLApplication($config, [], $this->dataDir);
+        $logger = new Logger('ex-db-mysql-tests');
+        $app = new MySQLApplication($config, $logger, $state, $this->dataDir);
 
         return $app;
     }
@@ -196,8 +173,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
     public function configTypesProvider()
     {
         return [
-            ['yaml'],
-            ['json']
+            [self::CONFIG_FORMAT_YAML],
+            [self::CONFIG_FORMAT_JSON]
         ];
     }
 }
