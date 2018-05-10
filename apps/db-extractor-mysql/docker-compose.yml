@@ -3,7 +3,7 @@ services:
   app:
     build: .
     image: keboola/ex-db-mysql
-    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
+    command: composer ci
     tty: true
     stdin_open: true
     env_file:
@@ -25,7 +25,7 @@ services:
     image: keboola/ex-db-mysql
     volumes:
       - .:/code
-    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
+    command: composer ci
     tty: true
     stdin_open: true
     env_file:
