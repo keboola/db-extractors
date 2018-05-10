@@ -5,17 +5,13 @@ declare(strict_types=1);
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Logger;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Monolog\Handler\NullHandler;
-use Monolog\Logger;
 
-define('APP_NAME', 'ex-db-mysql');
-
-require_once(__DIR__ . "/../bootstrap.php");
-
-$logger = new \Keboola\DbExtractor\Logger(getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql');
+$logger = new Logger('ex-db-mysql');
 
 $runAction = true;
 
@@ -52,6 +48,7 @@ try {
 
     $app = new MySQLApplication(
         $config,
+        $logger,
         $inputState,
         $arguments["data"]
     );
