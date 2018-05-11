@@ -6,57 +6,53 @@
 - clone the repository
 - `docker-compose build`
 
-#### Code Sniffer
+#### Tools
 
-- `docker-compose run --rm dev /code/vendor/bin/phpcs --standard=psr2 -n --ignore=vendor --extensions=php .` 
+- codesniffer: `docker-compose run --rm dev composer phpcs` 
+- static analysis: `docker-compose run --rm dev composer phpstan`
+- unit tests: `docker-compose run --rm dev composer tests`
 
-#### Static Analysis
+#### Configuration Options
 
-- `docker-compose run --rm dev /code/vendor/bin/phpstan analyse --level=7 ./src ./tests`
+The configuration requires a `db` node with the following properties: 
 
-#### Tests
-
-- `docker-compose run --rm dev`
-
-#### Configurations
-
-The configuration is separated into 2 parts: 
-1. db -- where the connection is defined, 
-2. tables -- where the extractions are defined.
-  
+- host: string (required) the hostname of the database
+- port: numeric (required)
+- user: string (required)
+- \#password: string (required)
+- networkCompression: boolean 
+- ssl: array (optional, but if present, enabled, ca, cert, and key are required)
+  - enabled: boolean 
+  - ca: string
+  - cert: string
+  - key: string
+  - cipher: string
+- ssh: array (optional, but if present, enabled, keys/public, user, and sshHost are required)
+  - enabled: boolean 
+  - keys: array 
+    - \#private: string
+    - public: string                
+  - user string
+  - sshHost string,
+  - sshPort string
+   
 There are 2 possible types of table extraction.  
 1. A table defined by `schema` and `tableName`, this option can also include a columns list.
 2. A `query` which is the SQL SELECT statement to be executed to produce the result table.
 
-```yaml
-parameters:
-    db:
-        host: localhost
-        database: test
-        user: test
-        password:
-        port: 3306
+The extraction has the following configuration options:
 
-    tables:
-        -
-            id: 0
-            name: escaping
-            query: "SELECT * FROM escaping"
-            outputTable: in.c-main.escaping
-            incremental: false
-            primaryKey:
-              -
-                col1
-            enabled: true
-        -
-            id: 1
-            name: simple
-            outputTable: in.c-main.simple
-            incremental: false
-            primaryKey: null
-            table:
-              schema: testdb
-              tableName: escaping
-            retries: 1
-            columns:
-```
+- id: numeric (required),
+- name: string (required),
+- query: stirng (optional, but required if table not present)
+- table: array (optional, but required if table not present)
+  - tableName: string
+  - schema: string
+- columns: array of strings (only for table type configurations)
+- outputTable: string (required)
+- incremental: boolean (optional)
+- primaryKey: array of strings (optional)
+- incrementalFetchingColumn: string (optional)
+- incrementalFetchingLimit: integer (optional)
+- enabled: boolean (optional)
+- retries: integer (optional) number of times to retry failures
