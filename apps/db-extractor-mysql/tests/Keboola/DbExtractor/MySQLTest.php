@@ -1110,7 +1110,7 @@ class MySQLTest extends AbstractMySQLTest
         }
     }
 
-    public function testRunWithNetworkCompression()
+    public function testRunWithNetworkCompression(): void
     {
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['db']['networkCompression'] = true;
@@ -1118,7 +1118,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2
+                'rows' => 2,
             ],
             $result['imported']
         );
