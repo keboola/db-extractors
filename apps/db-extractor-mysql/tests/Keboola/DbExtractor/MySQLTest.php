@@ -1110,6 +1110,25 @@ class MySQLTest extends AbstractMySQLTest
         }
     }
 
+    public function testRunWithNetworkCompression()
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['db']['networkCompression'] = true;
+        $result = ($this->createApplication($config))->run();
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+    }
+
     private function getIncrementalFetchingConfig()
     {
         $config = $this->getConfigRow(self::DRIVER);
