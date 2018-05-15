@@ -26,7 +26,6 @@ class MySQLSSLTest extends AbstractMySQLTest
             'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
             'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
-//          'cipher' => '',
         ];
 
         $config['parameters']['tables'] = [];
@@ -47,7 +46,6 @@ class MySQLSSLTest extends AbstractMySQLTest
             'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
             'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
-//          'cipher' => '',
         ];
 
         $app = $this->createApplication($config);
