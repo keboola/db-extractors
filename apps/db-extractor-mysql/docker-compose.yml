@@ -3,9 +3,7 @@ services:
   app:
     build: .
     image: keboola/ex-db-mysql
-    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
-    tty: true
-    stdin_open: true
+    command: composer ci
     env_file:
       - ssh-keys.env
     environment:
@@ -14,8 +12,6 @@ services:
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
-      APP_NAME: ex-db-mysql
-      ROOT_PATH: /code
     links:
       - mysql
       - mysql:mysql-different-cn
@@ -25,9 +21,7 @@ services:
     image: keboola/ex-db-mysql
     volumes:
       - .:/code
-    command: ["./wait-for-it.sh", "mysql:3306", "-t", "30", "--", "./vendor/bin/phpunit"]
-    tty: true
-    stdin_open: true
+    command: composer ci
     env_file:
       - ssh-keys.env
     environment:
@@ -36,8 +30,6 @@ services:
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
-      APP_NAME: ex-db-mysql
-      ROOT_PATH: /code
     links:
       - mysql
       - mysql:mysql-different-cn

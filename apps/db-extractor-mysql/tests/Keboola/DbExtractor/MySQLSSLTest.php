@@ -8,7 +8,7 @@ use Keboola\Csv\CsvFile;
 
 class MySQLSSLTest extends AbstractMySQLTest
 {
-    public function testSSLEnabled()
+    public function testSSLEnabled(): void
     {
         $status = $this->pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
 
@@ -16,7 +16,7 @@ class MySQLSSLTest extends AbstractMySQLTest
         $this->assertNotEmpty($status['Value']);
     }
 
-    public function testCredentials()
+    public function testCredentials(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -26,7 +26,6 @@ class MySQLSSLTest extends AbstractMySQLTest
             'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
             'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
-//			'cipher' => '',
         ];
 
         $config['parameters']['tables'] = [];
@@ -38,7 +37,7 @@ class MySQLSSLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
         $config = $this->getConfig();
 
@@ -47,7 +46,6 @@ class MySQLSSLTest extends AbstractMySQLTest
             'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
             'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
-//			'cipher' => '',
         ];
 
         $app = $this->createApplication($config);

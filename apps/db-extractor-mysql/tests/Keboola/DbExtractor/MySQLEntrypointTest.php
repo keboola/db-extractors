@@ -11,11 +11,13 @@ use Symfony\Component\Yaml\Yaml;
 
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
+    /** @var string */
+    protected $rootPath = __DIR__ . '/../../..';
 
     /**
      * @dataProvider configTypesProvider
      */
-    public function testRunAction($configType)
+    public function testRunAction(string $configType): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -55,7 +57,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $csv2, $outputCsvFile2);
     }
 
-    public function testTestConnectionAction()
+    public function testTestConnectionAction(): void
     {
         $config = $this->getConfig();
         @unlink($this->dataDir . '/config.yml');
@@ -70,7 +72,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals("", $process->getErrorOutput());
     }
 
-    public function testTestConnectionActionWithSSH()
+    public function testTestConnectionActionWithSSH(): void
     {
         $config = $this->getConfig();
         @unlink($this->dataDir . '/config.yml');
@@ -79,7 +81,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getPrivateKey('mysql'),
-                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC')
+                'public' => $this->getEnv('mysql', 'DB_SSH_KEY_PUBLIC'),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -97,7 +99,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals("", $process->getErrorOutput());
     }
 
-    public function testGetTablesAction()
+    public function testGetTablesAction(): void
     {
         $config = $this->getConfig();
         $config['action'] = "getTables";
@@ -113,7 +115,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertEquals("", $process->getErrorOutput());
     }
 
-    public function testTableColumnsQuery()
+    public function testTableColumnsQuery(): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
 
@@ -141,7 +143,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileExists($outputCsvFile);
     }
 
-    public function testRetries()
+    public function testRetries(): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
 
@@ -186,7 +188,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileExists($outputCsvFile);
     }
 
-    public function testRunConfigRow()
+    public function testRunConfigRow(): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
         @unlink($outputCsvFile);
@@ -217,7 +219,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileExists($outputCsvFile);
     }
 
-    public function testRunIncrementalFetching()
+    public function testRunIncrementalFetching(): void
     {
         $this->createAutoIncrementAndTimestampTable();
         $config = $this->getConfigRow(self::DRIVER);
@@ -240,7 +242,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         unset($config['parameters']['query']);
         $config['parameters']['table'] = [
             'tableName' => 'auto_increment_timestamp',
-            'schema' => 'test'
+            'schema' => 'test',
         ];
         $config['parameters']['incremental'] = true;
         $config['parameters']['name'] = 'auto-increment-timestamp';

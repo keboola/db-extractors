@@ -8,7 +8,7 @@ use Keboola\DbExtractor\Exception\UserException;
 
 class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 {
-    public function testCredentials()
+    public function testCredentials(): void
     {
         $this->setExpectedException(
             UserException::class,
