@@ -71,11 +71,6 @@ class Oracle extends Extractor
         return $cnt;
     }
 
-    private function write(CsvFile $csv, $stmt)
-    {
-
-    }
-
     public function getConnection()
     {
         return $this->db;
