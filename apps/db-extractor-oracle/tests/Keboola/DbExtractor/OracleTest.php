@@ -1169,6 +1169,41 @@ class OracleTest extends ExtractorTest
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
+    public function testExtractClob()
+    {
+        // create the clob table
+        try {
+            oci_execute(oci_parse($this->connection,"DROP TABLE CLOB_TEST"));
+        } catch (\Exception $e) {
+            // table dont exists
+        }
+        oci_execute(
+            oci_parse(
+                $this->connection,
+                "CREATE TABLE CLOB_TEST (clob_col CLOB) tablespace users"
+            )
+        );
+        oci_execute(
+            oci_parse(
+                $this->connection,
+                "INSERT INTO CLOB_TEST VALUES ('<test>some test xml>')"
+            )
+        );
+
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][0]['query']);
+        $config['parameters']['tables'][0]['name'] = 'clob_test';
+        $config['parameters']['tables'][0]['table']['tableName'] = 'CLOB_TEST';
+        $config['parameters']['tables'][0]['table']['schema'] = 'TESTER';
+        $config['parameters']['tables'][0]['outputTable'] = 'in.c-main.clob_test';
+
+        var_dump($config);
+        $result = ($this->createApplication($config))->run();
+        var_dump($result);
+    }
+
     /**
      * @param array $config
      * @return OracleApplication
