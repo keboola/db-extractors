@@ -1212,7 +1212,9 @@ class OracleTest extends ExtractorTest
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $output = file_get_contents($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $this->assertEquals(
-            "\"ID\",\"CLOB_COL\"\n\"hello\",\"<test>some test xml </test>\"\n\"goodbye\",\"<test>some test xml </test>\"\n", $output);
+            "\"ID\",\"CLOB_COL\"\n\"hello\",\"<test>some test xml </test>\"\n\"goodbye\",\"<test>some test xml </test>\"\n",
+            $output
+        );
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
 
