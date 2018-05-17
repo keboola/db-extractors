@@ -54,6 +54,13 @@ class OracleTest extends ExtractorTest
         }
         @oci_close($adminConnection);
         $this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+
+        // drop the clob test table
+        try {
+            oci_execute(oci_parse($this->connection, "DROP TABLE CLOB_TEST"));
+        } catch (\Exception $e) {
+            // table doesn't exists
+        }
     }
 
     public function tearDown()
@@ -1172,11 +1179,6 @@ class OracleTest extends ExtractorTest
     public function testExtractClob()
     {
         // create the clob table
-        try {
-            oci_execute(oci_parse($this->connection,"DROP TABLE CLOB_TEST"));
-        } catch (\Exception $e) {
-            // table dont exists
-        }
         oci_execute(
             oci_parse(
                 $this->connection,
