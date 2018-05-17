@@ -54,6 +54,13 @@ class OracleTest extends ExtractorTest
         }
         @oci_close($adminConnection);
         $this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+
+        // drop the clob test table
+        try {
+            oci_execute(oci_parse($this->connection, "DROP TABLE CLOB_TEST"));
+        } catch (\Exception $e) {
+            // table doesn't exists
+        }
     }
 
     public function tearDown()
@@ -1167,6 +1174,39 @@ class OracleTest extends ExtractorTest
                 ),
         );
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
+    }
+
+    public function testExtractClob()
+    {
+        // create the clob table
+        oci_execute(
+            oci_parse(
+                $this->connection,
+                "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
+            )
+        );
+        oci_execute(
+            oci_parse(
+                $this->connection,
+                "INSERT INTO CLOB_TEST VALUES ('hello', '<test>some test xml </test>')"
+            )
+        );
+
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][0]['query']);
+        $config['parameters']['tables'][0]['name'] = 'clob_test';
+        $config['parameters']['tables'][0]['table']['tableName'] = 'CLOB_TEST';
+        $config['parameters']['tables'][0]['table']['schema'] = 'TESTER';
+        $config['parameters']['tables'][0]['outputTable'] = 'in.c-main.clob_test';
+
+        $result = ($this->createApplication($config))->run();
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
+        $output = file_get_contents($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
+        $this->assertEquals("\"ID\",\"CLOB_COL\"\n\"hello\",\"<test>some test xml </test>\"\n", $output);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
 
     /**

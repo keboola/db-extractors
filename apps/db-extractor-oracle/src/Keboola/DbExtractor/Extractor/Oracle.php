@@ -44,17 +44,30 @@ class Oracle extends Extractor
             return 0;
         }
 
+        // check for LOB objects
+        $lobCol = null;
+        foreach ($resultRow as $key => $value) {
+            if (is_object($value) && get_class($value) === 'OCI-Lob') {
+                $lobCol = $key;
+            }
+        }
+
         // write header and first line
         $csv->writeRow(array_keys($resultRow));
+        if ($lobCol) {
+            $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+        }
         $csv->writeRow($resultRow);
 
         // write the rest
         $cnt = 1;
         while ($resultRow = oci_fetch_assoc($stmt)) {
+            if ($lobCol) {
+                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+            }
             $csv->writeRow($resultRow);
             $cnt++;
         }
-
         return $cnt;
     }
 
