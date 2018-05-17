@@ -1180,13 +1180,13 @@ class OracleTest extends ExtractorTest
         oci_execute(
             oci_parse(
                 $this->connection,
-                "CREATE TABLE CLOB_TEST (clob_col CLOB) tablespace users"
+                "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
             )
         );
         oci_execute(
             oci_parse(
                 $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('<test>some test xml>')"
+                "INSERT INTO CLOB_TEST VALUES ('hello', '<test>some test xml </test>')"
             )
         );
 
@@ -1199,9 +1199,12 @@ class OracleTest extends ExtractorTest
         $config['parameters']['tables'][0]['table']['schema'] = 'TESTER';
         $config['parameters']['tables'][0]['outputTable'] = 'in.c-main.clob_test';
 
-        var_dump($config);
         $result = ($this->createApplication($config))->run();
-        var_dump($result);
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
+        $output = file_get_contents($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
+        $this->assertEquals("\"ID\",\"CLOB_COL\"\n\"hello\",\"<test>some test xml </test>\"\n", $output);
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
 
     /**
