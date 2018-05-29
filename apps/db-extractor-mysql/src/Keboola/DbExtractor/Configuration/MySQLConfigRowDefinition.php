@@ -79,6 +79,7 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                 ->integerNode('retries')
                     ->min(1)
                 ->end()
+                ->booleanNode('advancedMode')->end()
             ->end()
         ;
         // @formatter:on

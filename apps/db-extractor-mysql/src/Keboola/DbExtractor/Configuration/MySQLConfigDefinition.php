@@ -60,6 +60,7 @@ class MySQLConfigDefinition extends ConfigDefinition
                                 ->prototype('scalar')->end()
                             ->end()
                             ->integerNode('retries')->min(1)->end()
+                            ->booleanNode('advancedMode')->end()
                         ->end()
                     ->end()
                 ->end()
