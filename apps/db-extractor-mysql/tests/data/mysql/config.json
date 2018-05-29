@@ -16,7 +16,8 @@
         "outputTable": "in.c-main.sales",
         "incremental": false,
         "primaryKey": null,
-        "enabled": true
+        "enabled": true,
+        "advancedMode": true
       },
       {
         "id": 2,
@@ -27,7 +28,8 @@
         "primaryKey": [
           "orderId"
         ],
-        "enabled": true
+        "enabled": true,
+        "advancedMode": true
       },
       {
         "id": 3,
