@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "88bab45c0423a61bd0091c795369a4a6",
+    "content-hash": "f68403b8401e739da17238e8151a407b",
     "packages": [
         {
             "name": "keboola/csv",
@@ -54,16 +54,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "9.1.1",
+            "version": "9.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "0e9b9130be76acf030b231a613f787956cc9379a"
+                "reference": "3da330d3e9bf5afafeb49b55b6263bbfdfab0b1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/0e9b9130be76acf030b231a613f787956cc9379a",
-                "reference": "0e9b9130be76acf030b231a613f787956cc9379a",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/3da330d3e9bf5afafeb49b55b6263bbfdfab0b1d",
+                "reference": "3da330d3e9bf5afafeb49b55b6263bbfdfab0b1d",
                 "shasum": ""
             },
             "require": {
@@ -104,7 +104,7 @@
                 }
             ],
             "description": "Common library from Keboola Database Extractors",
-            "time": "2018-05-30T13:27:23+00:00"
+            "time": "2018-06-01T08:04:10+00:00"
         },
         {
             "name": "keboola/php-datatypes",
