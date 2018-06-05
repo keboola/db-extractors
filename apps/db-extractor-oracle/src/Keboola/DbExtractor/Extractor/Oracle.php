@@ -63,7 +63,7 @@ class Oracle extends Extractor
         $cnt = 1;
         while ($resultRow = oci_fetch_assoc($stmt)) {
             if ($lobCol) {
-                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+                $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
             }
             $csv->writeRow($resultRow);
             $cnt++;
