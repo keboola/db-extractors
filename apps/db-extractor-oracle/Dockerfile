@@ -23,6 +23,8 @@ RUN export LD_LIBRARY_PATH=/usr/local/instantclient
 RUN export PATH=/usr/local/instantclient:$PATH
 RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8
 RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+RUN echo /usr/local/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf
+RUN ldconfig
 
 WORKDIR /root
 RUN curl -sS https://getcomposer.org/installer | php \
