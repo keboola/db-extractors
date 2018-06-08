@@ -69,7 +69,7 @@ class Oracle extends Extractor
             $csv->writeRow($resultRow);
             $cnt++;
             if (($cnt % 10000) == 0) {
-                $this->logger->info("Fetched 10k rows");
+                $this->logger->info(sprintf("Fetched %d rows", $cnt));
             }
         }
         return $cnt;
