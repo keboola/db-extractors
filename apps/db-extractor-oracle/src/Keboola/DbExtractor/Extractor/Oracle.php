@@ -29,7 +29,7 @@ class Oracle extends Extractor
     {
         $stmt = oci_parse($this->db, $query);
         $success = @oci_execute($stmt);
-
+        $this->logger->info("Query executed");
         if (!$success) {
             $error = oci_error($stmt);
             throw new UserException("Error executing query: " . $error['message']);
@@ -58,6 +58,7 @@ class Oracle extends Extractor
             $resultRow[$lobCol] = $resultRow[$lobCol]->load();
         }
         $csv->writeRow($resultRow);
+        $this->logger->info("Fetching results");
 
         // write the rest
         $cnt = 1;
@@ -67,6 +68,9 @@ class Oracle extends Extractor
             }
             $csv->writeRow($resultRow);
             $cnt++;
+            if (($cnt % 10000) == 0) {
+                $this->logger->info(sprintf("Fetched %d rows", $cnt));
+            }
         }
         return $cnt;
     }
