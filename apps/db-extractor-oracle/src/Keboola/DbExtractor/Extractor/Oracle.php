@@ -88,15 +88,12 @@ class Oracle extends Extractor
 
     public function getTables(array $tables = null)
     {
-
         $sql = <<<SQL
 SELECT TABS.TABLE_NAME ,
     TABS.TABLESPACE_NAME ,
     TABS.OWNER ,
     TABS.NUM_ROWS ,
-    COLS.TABLE_NAME ,
     COLS.COLUMN_NAME ,
-    COLS.OWNER ,
     COLS.DATA_LENGTH ,
     COLS.DATA_PRECISION ,
     COLS.DATA_SCALE ,
@@ -152,9 +149,9 @@ SQL;
                 }, $tables))
             );
         }
-        $orderClause = " ORDER BY TABS.OWNER, TABS.TABLE_NAME, COLS.COLUMN_ID";
+        // $orderClause = " ORDER BY TABS.OWNER, TABS.TABLE_NAME, COLS.COLUMN_ID";
 
-        $stmt = oci_parse($this->db, $sql . $whereClause . $orderClause);
+        $stmt = oci_parse($this->db, $sql . $whereClause);
 
         $success = @oci_execute($stmt);
         if (!$success) {
@@ -220,6 +217,7 @@ SQL;
                 }
             }
         }
+        ksort($tableDefs);
         return array_values($tableDefs);
     }
 
