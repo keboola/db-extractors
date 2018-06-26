@@ -21,7 +21,6 @@ class Oracle extends Extractor
             $error = oci_error();
             throw new UserException("Error connection to DB: " . $error['message']);
         }
-
         return $connection;
     }
 
@@ -45,17 +44,19 @@ class Oracle extends Extractor
         }
 
         // check for LOB objects
-        $lobCol = null;
+        $lobCols = [];
         foreach ($resultRow as $key => $value) {
             if (is_object($value) && get_class($value) === 'OCI-Lob') {
-                $lobCol = $key;
+                $lobCols[] = $key;
             }
         }
 
         // write header and first line
         $csv->writeRow(array_keys($resultRow));
-        if ($lobCol) {
-            $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+        if (count($lobCols) > 0) {
+            foreach ($lobCols as $lobCol) {
+                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+            }
         }
         $csv->writeRow($resultRow);
         $this->logger->info("Fetching results");
@@ -63,8 +64,10 @@ class Oracle extends Extractor
         // write the rest
         $cnt = 1;
         while ($resultRow = oci_fetch_assoc($stmt)) {
-            if ($lobCol) {
-                $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
+            if (count($lobCols) > 0) {
+                foreach ($lobCols as $lobCol) {
+                    $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
+                }
             }
             $csv->writeRow($resultRow);
             $cnt++;
