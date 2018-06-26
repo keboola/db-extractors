@@ -72,6 +72,7 @@ class Oracle extends Extractor
                 $this->logger->info(sprintf("Fetched %d rows", $cnt));
             }
         }
+        oci_free_statement($stmt);
         return $cnt;
     }
 
@@ -83,7 +84,9 @@ class Oracle extends Extractor
     public function testConnection()
     {
         $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-        return oci_execute($stmt);
+        $success = oci_execute($stmt);
+        oci_free_statement($stmt);
+        return $success;
     }
 
     public function getTables(array $tables = null)
@@ -160,7 +163,7 @@ SQL;
         }
 
         $numrows = oci_fetch_all($stmt, $desc, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-
+        oci_free_statement($stmt);
         $tableDefs = [];
         foreach ($desc as $i => $column) {
             $curTable = $column['OWNER'] . '.' . $column['TABLE_NAME'];
@@ -250,5 +253,10 @@ SQL;
     private function quote($obj)
     {
         return "\"{$obj}\"";
+    }
+
+    public function __destruct()
+    {
+        oci_close($this->db);
     }
 }
