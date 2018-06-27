@@ -41,6 +41,10 @@ class Oracle extends Extractor
 
     protected function executeQuery($query, CsvFile $csv, $tableName)
     {
+        $sqlcl = new Sqlcl($this->dbParams, $this->logger);
+
+        return $sqlcl->export($query, (string) $csv);
+        /*
         $stmt = oci_parse($this->db, $query);
         $success = oci_execute($stmt);
         $this->logger->info("Query executed");
@@ -94,6 +98,7 @@ class Oracle extends Extractor
         }
         oci_free_statement($stmt);
         return $cnt;
+        */
     }
 
     public function getConnection()
