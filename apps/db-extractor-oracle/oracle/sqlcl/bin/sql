@@ -89,6 +89,7 @@ function setupArgs {
 	AddVMOption -Djava.awt.headless=true
 	AddVMOption -Dapple.awt.UIElement=true
 	AddVMOption -Xss10M
+	AddVMOption -Doracle.jdbc.timezoneAsRegion=false
 }
 
 #
