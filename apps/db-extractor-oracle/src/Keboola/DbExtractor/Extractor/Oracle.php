@@ -7,10 +7,19 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Logger;
 
 class Oracle extends Extractor
 {
     protected $db;
+
+    protected $dbParams;
+
+    public function __construct($parameters, Logger $logger)
+    {
+        $this->dbParams = $parameters['db'];
+        parent::__construct($parameters, $logger);
+    }
 
     public function createConnection($params)
     {
@@ -22,6 +31,12 @@ class Oracle extends Extractor
             throw new UserException("Error connection to DB: " . $error['message']);
         }
         return $connection;
+    }
+
+    public function createSshTunnel($dbConfig)
+    {
+        $this->dbParams = parent::createSshTunnel($dbConfig);
+        return $this->dbParams;
     }
 
     protected function executeQuery($query, CsvFile $csv, $tableName)
