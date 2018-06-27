@@ -7,10 +7,18 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
+use Keboola\Temp\Temp;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use SplFileInfo;
 
 class Sqlcl
 {
+    private const SQLCL_SH = 'sqlclsh';
+
+    /** @var TEMP */
+    private $tmp;
+
     /** @var array */
     private $dbParams;
 
@@ -21,11 +29,14 @@ class Sqlcl
     {
         $this->dbParams = $dbParams;
         $this->logger = $logger;
+        $this->tmp = new Temp();
     }
 
     public function export(string $query, string $filename): int
     {
-        $process = new Process($this->createSqlclCommand($filename, $query));
+        $runfile = $this->createSqlclCommandFile($filename, $query);
+
+        $process = new Process('/bin/bash ' . $runfile->getPathname());
         $process->setTimeout(null);
         $process->run();
 
@@ -51,7 +62,7 @@ class Sqlcl
         return $numRows;
     }
 
-    private function createSqlclCommand(string $filename, string $query): string
+    private function createSqlclCommandFile(string $filename, string $query): SplFileInfo
     {
         $connectionString = sprintf(
             "%s/%s@%s:%d/%s",
@@ -82,6 +93,12 @@ EOT;
             "Executing this SQLCL command: %s", $fullcmd
         ));
 
-        return $fullcmd;
+        $runfile = $this->tmp->createFile(self::SQLCL_SH);
+
+        $fd = $runfile->openFile('w');
+
+        $fd->fwrite($fullcmd);
+
+        return $runfile;
     }
 }
