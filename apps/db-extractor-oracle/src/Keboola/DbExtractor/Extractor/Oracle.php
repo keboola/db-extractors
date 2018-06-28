@@ -15,7 +15,7 @@ class Oracle extends Extractor
     public function createConnection($params)
     {
         $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
-        $connection = @oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
+        $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
 
         if (!$connection) {
             $error = oci_error();
@@ -27,7 +27,7 @@ class Oracle extends Extractor
     protected function executeQuery($query, CsvFile $csv, $tableName)
     {
         $stmt = oci_parse($this->db, $query);
-        $success = @oci_execute($stmt);
+        $success = oci_execute($stmt);
         $this->logger->info("Query executed");
         if (!$success) {
             $error = oci_error($stmt);
@@ -157,11 +157,10 @@ SQL;
                 }, $tables))
             );
         }
-        // $orderClause = " ORDER BY TABS.OWNER, TABS.TABLE_NAME, COLS.COLUMN_ID";
 
         $stmt = oci_parse($this->db, $sql . $whereClause);
 
-        $success = @oci_execute($stmt);
+        $success = oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
             oci_free_statement($stmt);
