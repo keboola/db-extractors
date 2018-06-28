@@ -8,7 +8,6 @@ use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\Temp\Temp;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use SplFileInfo;
 
@@ -16,7 +15,7 @@ class Sqlcl
 {
     private const SQLCL_SH = 'sqlclsh';
 
-    /** @var TEMP */
+    /** @var Temp */
     private $tmp;
 
     /** @var array */
