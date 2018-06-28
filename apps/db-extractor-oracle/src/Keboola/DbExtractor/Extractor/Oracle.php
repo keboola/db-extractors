@@ -15,23 +15,23 @@ class Oracle extends Extractor
     public function createConnection($params)
     {
         $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
-        $connection = @oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
+        $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
 
         if (!$connection) {
             $error = oci_error();
             throw new UserException("Error connection to DB: " . $error['message']);
         }
-
         return $connection;
     }
 
     protected function executeQuery($query, CsvFile $csv, $tableName)
     {
         $stmt = oci_parse($this->db, $query);
-        $success = @oci_execute($stmt);
+        $success = oci_execute($stmt);
         $this->logger->info("Query executed");
         if (!$success) {
             $error = oci_error($stmt);
+            oci_free_statement($stmt);
             throw new UserException("Error executing query: " . $error['message']);
         }
 
@@ -41,21 +41,24 @@ class Oracle extends Extractor
                 "Query returned empty result. Nothing was imported for table [%s]",
                 $tableName
             ));
+            oci_free_statement($stmt);
             return 0;
         }
 
         // check for LOB objects
-        $lobCol = null;
+        $lobCols = [];
         foreach ($resultRow as $key => $value) {
             if (is_object($value) && get_class($value) === 'OCI-Lob') {
-                $lobCol = $key;
+                $lobCols[] = $key;
             }
         }
 
         // write header and first line
         $csv->writeRow(array_keys($resultRow));
-        if ($lobCol) {
-            $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+        if (count($lobCols) > 0) {
+            foreach ($lobCols as $lobCol) {
+                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
+            }
         }
         $csv->writeRow($resultRow);
         $this->logger->info("Fetching results");
@@ -63,8 +66,10 @@ class Oracle extends Extractor
         // write the rest
         $cnt = 1;
         while ($resultRow = oci_fetch_assoc($stmt)) {
-            if ($lobCol) {
-                $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
+            if (count($lobCols) > 0) {
+                foreach ($lobCols as $lobCol) {
+                    $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
+                }
             }
             $csv->writeRow($resultRow);
             $cnt++;
@@ -72,6 +77,7 @@ class Oracle extends Extractor
                 $this->logger->info(sprintf("Fetched %d rows", $cnt));
             }
         }
+        oci_free_statement($stmt);
         return $cnt;
     }
 
@@ -83,7 +89,9 @@ class Oracle extends Extractor
     public function testConnection()
     {
         $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-        return oci_execute($stmt);
+        $success = oci_execute($stmt);
+        oci_free_statement($stmt);
+        return $success;
     }
 
     public function getTables(array $tables = null)
@@ -149,18 +157,18 @@ SQL;
                 }, $tables))
             );
         }
-        // $orderClause = " ORDER BY TABS.OWNER, TABS.TABLE_NAME, COLS.COLUMN_ID";
 
         $stmt = oci_parse($this->db, $sql . $whereClause);
 
-        $success = @oci_execute($stmt);
+        $success = oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
+            oci_free_statement($stmt);
             throw new UserException("Error fetching table listing: " . $error['message']);
         }
 
         $numrows = oci_fetch_all($stmt, $desc, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-
+        oci_free_statement($stmt);
         $tableDefs = [];
         foreach ($desc as $i => $column) {
             $curTable = $column['OWNER'] . '.' . $column['TABLE_NAME'];
@@ -250,5 +258,10 @@ SQL;
     private function quote($obj)
     {
         return "\"{$obj}\"";
+    }
+
+    public function __destruct()
+    {
+        oci_close($this->db);
     }
 }
