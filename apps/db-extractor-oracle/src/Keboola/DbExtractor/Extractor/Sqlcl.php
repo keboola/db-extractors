@@ -45,17 +45,6 @@ class Sqlcl
                 file_get_contents($errorFile->getPathname())
             ));
         }
-
-        $outputFile = new CsvFile($filename);
-        $numRows = 0;
-        $colCount = $outputFile->getColumnsCount();
-        while ($outputFile->valid()) {
-            if (count($outputFile->current()) !== $colCount) {
-                throw new UserException("The SQLCL command produced an invalid csv.");
-            }
-            $outputFile->next();
-            $numRows++;
-        }
         $this->logger->info(sprintf("SQLCL successfully exported %d rows.", $numRows));
         return $numRows;
     }
