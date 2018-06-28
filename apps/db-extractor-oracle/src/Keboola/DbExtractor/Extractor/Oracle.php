@@ -31,6 +31,7 @@ class Oracle extends Extractor
         $this->logger->info("Query executed");
         if (!$success) {
             $error = oci_error($stmt);
+            oci_free_statement($stmt);
             throw new UserException("Error executing query: " . $error['message']);
         }
 
@@ -40,6 +41,7 @@ class Oracle extends Extractor
                 "Query returned empty result. Nothing was imported for table [%s]",
                 $tableName
             ));
+            oci_free_statement($stmt);
             return 0;
         }
 
@@ -162,6 +164,7 @@ SQL;
         $success = @oci_execute($stmt);
         if (!$success) {
             $error = oci_error($stmt);
+            oci_free_statement($stmt);
             throw new UserException("Error fetching table listing: " . $error['message']);
         }
 
