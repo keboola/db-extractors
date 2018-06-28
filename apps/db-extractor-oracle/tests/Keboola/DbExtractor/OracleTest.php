@@ -1,8 +1,5 @@
 <?php
-/**
- * @package ex-db-oracle
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;

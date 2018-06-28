@@ -1,8 +1,5 @@
 <?php
-/**
- * @package ex-db-oracle
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
