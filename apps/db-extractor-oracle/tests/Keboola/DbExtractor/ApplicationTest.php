@@ -129,8 +129,6 @@ class ApplicationTest extends OracleBaseTest
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
-        // verify that the bcp command uses the proxy
-        $this->assertContains("-S \"127.0.0.1,1234\"", $process->getOutput());
 
         $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
         $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
@@ -177,9 +175,7 @@ class ApplicationTest extends OracleBaseTest
         $process->setTimeout(300);
         $process->run();
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
-
         $this->assertEquals(1, $process->getExitCode());
+        $this->assertContains("Export process failed.", $process->getErrorOutput());
     }
 }
