@@ -74,7 +74,7 @@ class Sqlcl
         );
 
         $cmdString = <<<EOT
-SET SQLFORMAT CSV\nSET FEEDBACK OFF\nSPOOL %s\n%s;\nSPOOL OFF\n
+SET SQLFORMAT CSV\nSET FEEDBACK OFF\nSET ENCODING UTF-8\nSPOOL %s\n%s;\nSPOOL OFF\n
 EOT;
 
         $cmd = sprintf(
