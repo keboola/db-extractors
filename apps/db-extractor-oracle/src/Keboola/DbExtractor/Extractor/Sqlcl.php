@@ -90,7 +90,8 @@ EOT;
         );
 
         $this->logger->info(sprintf(
-            "Executing this SQLCL command: %s", $fullcmd
+            "Executing this SQLCL command: %s",
+            $fullcmd
         ));
 
         $runfile = $this->tmp->createFile(self::SQLCL_SH);
