@@ -1,8 +1,5 @@
 <?php
-/**
- * @package ex-db-oracle
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
@@ -44,61 +41,6 @@ class Oracle extends Extractor
         $sqlcl = new Sqlcl($this->dbParams, $this->logger);
 
         return $sqlcl->export($query, (string) $csv);
-        /*
-        $stmt = oci_parse($this->db, $query);
-        $success = oci_execute($stmt);
-        $this->logger->info("Query executed");
-        if (!$success) {
-            $error = oci_error($stmt);
-            oci_free_statement($stmt);
-            throw new UserException("Error executing query: " . $error['message']);
-        }
-
-        $resultRow = oci_fetch_assoc($stmt);
-        if (!is_array($resultRow) || empty($resultRow)) {
-            $this->logger->warn(sprintf(
-                "Query returned empty result. Nothing was imported for table [%s]",
-                $tableName
-            ));
-            oci_free_statement($stmt);
-            return 0;
-        }
-
-        // check for LOB objects
-        $lobCols = [];
-        foreach ($resultRow as $key => $value) {
-            if (is_object($value) && get_class($value) === 'OCI-Lob') {
-                $lobCols[] = $key;
-            }
-        }
-
-        // write header and first line
-        $csv->writeRow(array_keys($resultRow));
-        if (count($lobCols) > 0) {
-            foreach ($lobCols as $lobCol) {
-                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
-            }
-        }
-        $csv->writeRow($resultRow);
-        $this->logger->info("Fetching results");
-
-        // write the rest
-        $cnt = 1;
-        while ($resultRow = oci_fetch_assoc($stmt)) {
-            if (count($lobCols) > 0) {
-                foreach ($lobCols as $lobCol) {
-                    $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
-                }
-            }
-            $csv->writeRow($resultRow);
-            $cnt++;
-            if (($cnt % 10000) == 0) {
-                $this->logger->info(sprintf("Fetched %d rows", $cnt));
-            }
-        }
-        oci_free_statement($stmt);
-        return $cnt;
-        */
     }
 
     public function getConnection()
