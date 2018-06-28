@@ -33,17 +33,16 @@ class Sqlcl
 
     public function export(string $query, string $filename): int
     {
-        $runfile = $this->createSqlclCommandFile($filename, $query);
-
-        $process = new Process('/bin/bash ' . $runfile->getPathname());
-        $process->setTimeout(null);
-        $process->run();
+        /** @var Process $process */
+        $process = $this->runSqlclProcess($filename, $query);
 
         if (!$process->isSuccessful()) {
+            // there was an error.  We'll run it again with feedback on to retrieve the error.
+            $errorFile = $this->tmp->createTmpFile('errorFile');
+            $errorProcess = $this->runSqlclProcess($errorFile->getPathname(), $query, "ON");
             throw new UserException(sprintf(
-                "Export process failed. Output: %s. \n\n Error Output: %s.",
-                $process->getOutput(),
-                $process->getErrorOutput()
+                "Export process failed.\n\n Error Output: %s.",
+                file_get_contents($errorFile->getPathname())
             ));
         }
 
@@ -61,7 +60,18 @@ class Sqlcl
         return $numRows;
     }
 
-    private function createSqlclCommandFile(string $filename, string $query): SplFileInfo
+    private function runSqlclProcess(string $filename, string $query, string $feedback = "OFF")
+    {
+        $runfile = $this->createSqlclCommandFile($filename, $query, $feedback);
+
+        $process = new Process('/bin/bash ' . $runfile->getPathname());
+        $process->setTimeout(null);
+        $process->run();
+
+        return $process;
+    }
+
+    private function createSqlclCommandFile(string $filename, string $query, string $feedback): SplFileInfo
     {
         $connectionString = sprintf(
             "%s/%s@%s:%d/%s",
@@ -73,24 +83,33 @@ class Sqlcl
         );
 
         $cmdString = <<<EOT
-SET SQLFORMAT CSV\nSET FEEDBACK OFF\nSET ENCODING UTF-8\nSPOOL %s\n%s;\nSPOOL OFF\n
+SET SQLFORMAT CSV\n
+SET FEEDBACK %s\n
+SET ENCODING UTF-8\n
+SET ERRORLOGGING OFF\n
+whenever sqlerror exit sql.sqlcode\n
+SPOOL %s\n
+%s;\n
+SPOOL OFF\n
 EOT;
 
         $cmd = sprintf(
             $cmdString,
+            $feedback,
             $filename,
             rtrim($query, ';')
         );
 
         $fullcmd = sprintf(
-            "#!/bin/bash\nexport SQLFORMAT=CSV\nexport FEEDBACK=OFF\necho -e \"%s\" | ./oracle/sqlcl/bin/sql %s",
+            "#!/bin/bash\nexport SQLFORMAT=CSV\nexport FEEDBACK=%s\necho -e \"%s\" | ./oracle/sqlcl/bin/sql %s 1>/dev/null",
+            $feedback,
             $cmd,
             $connectionString
         );
 
         $this->logger->info(sprintf(
             "Executing this SQLCL command: %s",
-            $fullcmd
+            $cmd
         ));
 
         $runfile = $this->tmp->createFile(self::SQLCL_SH);
