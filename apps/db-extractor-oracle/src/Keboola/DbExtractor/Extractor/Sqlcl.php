@@ -31,7 +31,7 @@ class Sqlcl
         $this->tmp = new Temp();
     }
 
-    public function export(string $query, string $filename): int
+    public function export(string $query, string $filename): void
     {
         /** @var Process $process */
         $process = $this->runSqlclProcess($filename, $query);
@@ -45,8 +45,7 @@ class Sqlcl
                 file_get_contents($errorFile->getPathname())
             ));
         }
-        $this->logger->info(sprintf("SQLCL successfully exported %d rows.", $numRows));
-        return $numRows;
+        $this->logger->info("SQLCL export completed successfully.");
     }
 
     private function runSqlclProcess(string $filename, string $query, string $feedback = "OFF")
