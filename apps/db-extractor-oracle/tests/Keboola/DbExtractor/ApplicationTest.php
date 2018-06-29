@@ -59,6 +59,8 @@ class ApplicationTest extends OracleBaseTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
+        $this->setupTestTables();
+
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
@@ -124,6 +126,8 @@ class ApplicationTest extends OracleBaseTest
         ];
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $this->setupTestTables();
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);

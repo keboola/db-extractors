@@ -37,12 +37,7 @@ class OracleTest extends OracleBaseTest
     {
         $config = $this->getConfig('oracle');
         $app = $this->createApplication($config);
-
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1, ['CREATEDAT']);
-
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-        $this->createTextTable($csv2);
+        $this->setupTestTables();
 
         $result = $app->run();
 
@@ -55,7 +50,7 @@ class OracleTest extends OracleBaseTest
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($csv1);
+        $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
@@ -66,7 +61,10 @@ class OracleTest extends OracleBaseTest
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
+        $this->assertEquals(
+            file_get_contents($this->dataDir . '/oracle/escaping.csv'),
+            file_get_contents($outputCsvFile)
+        );
     }
 
     public function testCredentialsWithSSH()
@@ -114,13 +112,10 @@ class OracleTest extends OracleBaseTest
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1, ['CREATEDAT']);
+        $this->setupTestTables();
 
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-        $this->createTextTable($csv2);
-
-        $csv3 = new CsvFile($this->dataDir. '/oracle/tablecolumns.csv');
+        $salesCsv = new CsvFile($this->dataDir. '/oracle/sales.csv');
+        $escapingCsv = new CsvFile($this->dataDir. '/oracle/escaping.csv');
 
         $result = $app->run();
 
@@ -133,7 +128,7 @@ class OracleTest extends OracleBaseTest
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($csv1);
+        $origContents = file_get_contents($salesCsv);
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
@@ -144,7 +139,7 @@ class OracleTest extends OracleBaseTest
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
+        $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
     }
 
     public function testGetTables()
@@ -757,8 +752,7 @@ class OracleTest extends OracleBaseTest
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1);
+        $this->setupTestTables();
 
         $result = $app->run();
 
@@ -954,6 +948,30 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
+    public function testRunEmptyResultSet()
+    {
+        $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
+        $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
+        @unlink($regionsDataFile);
+        @unlink($regionsManifestFile);
+
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][3]['table']);
+        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5;";
+
+        $result = ($this->createApplication($config)->run());
+
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+
+        $this->assertFileNotExists($regionsManifestFile);
+        $this->assertFileNotExists($regionsDataFile);
+    }
+
     public function testExtractClob()
     {
         $this->createClobTable();
@@ -978,29 +996,5 @@ class OracleTest extends OracleBaseTest
             $output
         );
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-    }
-
-    public function testRunEmptyResultset()
-    {
-        $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
-        $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
-        @unlink($regionsDataFile);
-        @unlink($regionsManifestFile);
-
-        $config = $this->getConfig('oracle');
-        unset($config['parameters']['tables'][0]);
-        unset($config['parameters']['tables'][1]);
-        unset($config['parameters']['tables'][2]);
-        unset($config['parameters']['tables'][3]['table']);
-        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5;";
-
-        $result = ($this->createApplication($config)->run());
-
-
-        $this->assertArrayHasKey('status', $result);
-        $this->assertEquals('success', $result['status']);
-
-        $this->assertFileNotExists($regionsManifestFile);
-        $this->assertFileNotExists($regionsDataFile);
     }
 }

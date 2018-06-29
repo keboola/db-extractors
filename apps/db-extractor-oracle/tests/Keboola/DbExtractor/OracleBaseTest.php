@@ -14,9 +14,6 @@ abstract class OracleBaseTest extends ExtractorTest
 
     public const DRIVER = 'oracle';
 
-    /** @var string */
-    protected $dataDir = __DIR__ . '/../../data';
-
     public function setUp(): void
     {
         if (!defined('APP_NAME')) {
@@ -61,7 +58,7 @@ abstract class OracleBaseTest extends ExtractorTest
             oci_close($adminConnection);
         }
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
-        $this->dropTableIfExists("CLOB_TEST");
+        $this->setupTestTables();
     }
 
     public function tearDown()
@@ -71,6 +68,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
         parent::tearDown();
     }
+
     /**
      * @param array $config
      * @return OracleApplication
@@ -92,6 +90,15 @@ abstract class OracleBaseTest extends ExtractorTest
         } finally {
             oci_free_statement($stmt);
         }
+    }
+
+    protected function setupTestTables()
+    {
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1, ['CREATEDAT']);
+
+        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $this->createTextTable($csv2);
     }
 
     /**
