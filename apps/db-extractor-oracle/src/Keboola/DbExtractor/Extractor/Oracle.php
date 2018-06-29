@@ -36,7 +36,7 @@ class Oracle extends Extractor
         return $this->dbParams;
     }
 
-    protected function executeQuery($query, CsvFile $csv, $tableName)
+    protected function executeQuery($query, CsvFile $csv, $tableName): int
     {
         $sqlcl = new Sqlcl($this->dbParams, $this->logger);
 
@@ -45,6 +45,7 @@ class Oracle extends Extractor
             // remove the output file that only contains header
             @unlink((string) $csv);
         }
+        return $linesWritten;
     }
 
     public function getConnection()
