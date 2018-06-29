@@ -40,7 +40,11 @@ class Oracle extends Extractor
     {
         $sqlcl = new Sqlcl($this->dbParams, $this->logger);
 
-        return $sqlcl->export($query, (string) $csv);
+        $linesWritten = $sqlcl->export($query, (string) $csv);
+        if ($linesWritten === 0) {
+            // remove the output file that only contains header
+            @unlink((string) $csv);
+        }
     }
 
     public function getConnection()
