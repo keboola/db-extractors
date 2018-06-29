@@ -85,7 +85,7 @@ class OracleTest extends OracleBaseTest
             'sshHost' => 'sshproxy',
             'remoteHost' => 'oracle',
             'remotePort' => $config['parameters']['db']['port'],
-            'localPort' => '15212',
+            'localPort' => '15211',
         ];
 
         $config['action'] = 'testConnection';
@@ -111,7 +111,7 @@ class OracleTest extends OracleBaseTest
             'sshHost' => 'sshproxy',
             'remoteHost' => 'oracle',
             'remotePort' => $config['parameters']['db']['port'],
-            'localPort' => '15211',
+            'localPort' => '15212',
         ];
 
         $app = $this->createApplication($config);
@@ -958,6 +958,7 @@ class OracleTest extends OracleBaseTest
 
     public function testExtractClob()
     {
+        $this->createClobTable();
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);

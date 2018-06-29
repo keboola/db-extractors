@@ -52,13 +52,15 @@ abstract class OracleBaseTest extends ExtractorTest
         } catch (\Exception $e) {
             // make sure this is the case that TESTER already exists
             if (!strstr($e->getMessage(), "ORA-01920")) {
-                throw $e;
+                echo "\nCreate test user error: " . $e->getMessage() . "\n";
+                echo "\nError code: " . $e->getCode() . "\n";
             }
         }
         if ($adminConnection) {
             oci_close($adminConnection);
         }
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+        $this->dropTableIfExists("CLOB_TEST");
     }
 
     public function tearDown()
