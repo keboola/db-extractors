@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;
 
@@ -69,6 +70,16 @@ abstract class OracleBaseTest extends ExtractorTest
             oci_close($this->connection);
         }
         parent::tearDown();
+    }
+    /**
+     * @param array $config
+     * @return OracleApplication
+     */
+    public function createApplication(array $config)
+    {
+        $app = new OracleApplication($config, $this->dataDir);
+
+        return $app;
     }
 
     private function executeStatement($connection, string $sql): void

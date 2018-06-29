@@ -3,8 +3,6 @@
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\OracleApplication;
-use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest
@@ -982,14 +980,27 @@ class OracleTest extends OracleBaseTest
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
 
-    /**
-     * @param array $config
-     * @return OracleApplication
-     */
-    public function createApplication(array $config)
+    public function testRunEmptyResultset()
     {
-        $app = new OracleApplication($config, $this->dataDir);
+        $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
+        $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
+        @unlink($regionsDataFile);
+        @unlink($regionsManifestFile);
 
-        return $app;
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][3]['table']);
+        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5;";
+
+        $result = ($this->createApplication($config)->run());
+
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+
+        $this->assertFileNotExists($regionsManifestFile);
+        $this->assertFileNotExists($regionsDataFile);
     }
 }
