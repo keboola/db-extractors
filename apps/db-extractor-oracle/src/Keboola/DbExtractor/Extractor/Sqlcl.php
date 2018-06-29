@@ -54,7 +54,7 @@ class Sqlcl
         }
         $this->logger->info("SQLCL export completed successfully.");
 
-        return (int) $process->getOutput() <= 1 ? 0 : (int) $process->getOutput();;
+        return (int) $process->getOutput() <= 1 ? 0 : (int) $process->getOutput();
     }
 
     private function runSqlclProcess(string $filename, string $query, string $feedback = "OFF")
