@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\Temp\Temp;
@@ -31,7 +32,7 @@ class Sqlcl
         $this->tmp = new Temp();
     }
 
-    public function export(string $query, string $filename): void
+    public function export(string $query, string $filename): int
     {
         /** @var Process $process */
         $process = $this->runSqlclProcess($filename, $query);
@@ -45,7 +46,15 @@ class Sqlcl
                 file_get_contents($errorFile->getPathname())
             ));
         }
+
+        $process = new Process(sprintf("cat %s | wc -l", $filename));
+        $process->run();
+        if (!$process->isSuccessful()) {
+            throw new ApplicationException("Was unable to get the number of lines from the output file.");
+        }
         $this->logger->info("SQLCL export completed successfully.");
+
+        return (int) $process->getOutput() <= 1 ? 0 : (int) $process->getOutput();;
     }
 
     private function runSqlclProcess(string $filename, string $query, string $feedback = "OFF")
