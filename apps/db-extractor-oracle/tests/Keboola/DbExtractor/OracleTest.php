@@ -958,32 +958,6 @@ class OracleTest extends OracleBaseTest
 
     public function testExtractClob()
     {
-        // create the clob table
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('hello', '<test>some test xml </test>')"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('nullTest', null)"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('goodbye', '<test>some test xml </test>')"
-            )
-        );
-
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);

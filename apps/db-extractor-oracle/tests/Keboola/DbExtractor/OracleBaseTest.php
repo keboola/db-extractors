@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\MSSQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Logger;
 
 abstract class OracleBaseTest extends ExtractorTest
 {
@@ -36,28 +33,22 @@ abstract class OracleBaseTest extends ExtractorTest
         }
         try {
             // create test user
-            $stmt = oci_parse(
+            $this->executeStatement(
                 $adminConnection,
                 sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password'])
             );
-            oci_execute($stmt);
-            oci_free_statement($stmt);
 
             // provide roles
-            $stmt = oci_parse(
+            $this->executeStatement(
                 $adminConnection,
                 sprintf("GRANT CONNECT,RESOURCE,DBA TO %s", $dbConfig['user'])
             );
-            oci_execute($stmt);
-            oci_free_statement($stmt);
 
             // grant privileges
-            $stmt = oci_parse(
+            $this->executeStatement(
                 $adminConnection,
                 sprintf("GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s", $dbConfig['user'])
             );
-            oci_execute($stmt);
-            oci_free_statement($stmt);
         } catch (\Exception $e) {
             // make sure this is the case that TESTER already exists
             if (!strstr($e->getMessage(), "ORA-01920")) {
@@ -68,16 +59,6 @@ abstract class OracleBaseTest extends ExtractorTest
             oci_close($adminConnection);
         }
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
-
-        // drop the clob test table
-        $stmt = oci_parse($this->connection, "DROP TABLE CLOB_TEST");
-        try {
-            oci_execute($stmt);
-        } catch (\Exception $e) {
-            // table doesn't exists
-        } finally {
-            oci_free_statement($stmt);
-        }
     }
 
     public function tearDown()
@@ -86,6 +67,18 @@ abstract class OracleBaseTest extends ExtractorTest
             oci_close($this->connection);
         }
         parent::tearDown();
+    }
+
+    private function executeStatement($connection, string $sql): void
+    {
+        $stmt = oci_parse($connection, $sql);
+        try {
+            oci_execute($stmt);
+        } catch (\Exception $e) {
+            throw $e;
+        } finally {
+            oci_free_statement($stmt);
+        }
     }
 
     /**
@@ -102,6 +95,48 @@ abstract class OracleBaseTest extends ExtractorTest
         return $tableName;
     }
 
+    private function dropTableIfExists(string $tablename)
+    {
+        $sql = <<<EOT
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE %s';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -942 THEN
+         RAISE;
+      END IF;
+END;
+EOT;
+        $this->executeStatement(
+            $this->connection,
+            sprintf($sql, $tablename)
+        );
+    }
+
+    protected function createClobTable()
+    {
+        // drop the
+        $this->dropTableIfExists("CLOB_TEST");
+
+        // create the clob table
+        $this->executeStatement(
+            $this->connection,
+            "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
+        );
+        $this->executeStatement(
+            $this->connection,
+            "INSERT INTO CLOB_TEST VALUES ('hello', '<test>some test xml </test>')"
+        );
+        $this->executeStatement(
+            $this->connection,
+            "INSERT INTO CLOB_TEST VALUES ('nullTest', null)"
+        );
+        $this->executeStatement(
+            $this->connection,
+            "INSERT INTO CLOB_TEST VALUES ('goodbye', '<test>some test xml </test>')"
+        );
+    }
+
     /**
      * Create table from csv file with text columns
      *
@@ -111,36 +146,33 @@ abstract class OracleBaseTest extends ExtractorTest
     {
         $tableName = $this->generateTableName($file);
 
-        try {
-            oci_execute(oci_parse($this->connection, sprintf("DROP TABLE %s", $tableName)));
-        } catch (\Exception $e) {
-            // table dont exists
-        }
+        $this->dropTableIfExists($tableName);
 
         $header = $file->getHeader();
 
-        oci_execute(oci_parse($this->connection, sprintf(
-            'CREATE TABLE %s (%s) tablespace users',
-            $tableName,
-            implode(
-                ', ',
-                array_map(function ($column) {
-                    return $column . ' NVARCHAR2 (400)';
-                }, $header)
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'CREATE TABLE %s (%s) tablespace users',
+                $tableName,
+                implode(
+                    ', ',
+                    array_map(function ($column) {
+                        return $column . ' NVARCHAR2 (400)';
+                    }, $header)
+                )
             )
-        )));
+        );
 
         // create the primary key if supplied
         if ($primaryKey && is_array($primaryKey) && !empty($primaryKey)) {
             foreach ($primaryKey as $pk) {
-                oci_execute(
-                    oci_parse(
-                        $this->connection,
-                        sprintf("ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL", $tableName, $pk)
-                    )
+                $this->executeStatement(
+                    $this->connection,
+                    sprintf("ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL", $tableName, $pk)
                 );
             }
-            oci_execute(oci_parse(
+            $this->executeStatement(
                 $this->connection,
                 sprintf(
                     'ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s)',
@@ -148,7 +180,7 @@ abstract class OracleBaseTest extends ExtractorTest
                     $tableName,
                     implode(',', $primaryKey)
                 )
-            ));
+            );
         }
 
         $file->next();
@@ -168,7 +200,7 @@ abstract class OracleBaseTest extends ExtractorTest
                     implode(',', $cols)
                 );
 
-                oci_execute(oci_parse($this->connection, $sql));
+                $this->executeStatement($this->connection, $sql);
 
                 $file->next();
             }
@@ -177,7 +209,7 @@ abstract class OracleBaseTest extends ExtractorTest
         $stmt = oci_parse($this->connection, sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName));
         oci_execute($stmt);
         $row = oci_fetch_assoc($stmt);
-
+        oci_free_statement($stmt);
         $this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
     }
 
