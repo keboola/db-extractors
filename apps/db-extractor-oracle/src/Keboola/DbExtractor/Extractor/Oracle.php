@@ -48,11 +48,6 @@ class Oracle extends Extractor
         return $linesWritten;
     }
 
-    public function getConnection()
-    {
-        return $this->db;
-    }
-
     public function testConnection()
     {
         $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
@@ -125,6 +120,12 @@ SQL;
             );
         }
 
+        // reset the connection because after a long export it may have been dropped
+        if ($this->db) {
+            oci_close($this->db);
+            $this->db = $this->createConnection($this->dbParams);
+        }
+        
         $stmt = oci_parse($this->db, $sql . $whereClause);
 
         $success = oci_execute($stmt);
