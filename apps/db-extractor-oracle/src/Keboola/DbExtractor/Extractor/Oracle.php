@@ -121,11 +121,11 @@ SQL;
         }
 
         // reset the connection because after a long export it may have been dropped
-        if ($this->db) {
-            oci_close($this->db);
+        if (!is_null($tables)) {
+            @oci_close($this->db);
             $this->db = $this->createConnection($this->dbParams);
         }
-        
+
         $stmt = oci_parse($this->db, $sql . $whereClause);
 
         $success = oci_execute($stmt);
