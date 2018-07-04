@@ -1,188 +1,12 @@
 <?php
-/**
- * @package ex-db-oracle
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\OracleApplication;
-use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Yaml\Yaml;
 
-class OracleTest extends ExtractorTest
+class OracleTest extends OracleBaseTest
 {
-    protected $connection;
-
-    public function setUp()
-    {
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-oracle');
-        }
-
-        $config = $this->getConfig('oracle');
-        $dbConfig = $config['parameters']['db'];
-        $dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
-
-        $adminConnection = @oci_connect('system', 'oracle', $dbString, 'AL32UTF8');
-        if (!$adminConnection) {
-            $error = oci_error();
-            echo $error['message'];
-        }
-        try {
-            $createUserSql = sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password']);
-            // create test user
-            oci_execute(oci_parse(
-                $adminConnection,
-                $createUserSql
-            ));
-            // provide roles
-            oci_execute(oci_parse(
-                $adminConnection,
-                sprintf("GRANT CONNECT,RESOURCE,DBA TO %s", $dbConfig['user'])
-            ));
-            // grant privileges
-            oci_execute(oci_parse(
-                $adminConnection,
-                sprintf("GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s", $dbConfig['user'])
-            ));
-        } catch (\Exception $e) {
-            // make sure this is the case that TESTER already exists
-            if (!strstr($e->getMessage(), "ORA-01920")) {
-                echo "Error creating user: " . $e->getMessage();
-            }
-        }
-        @oci_close($adminConnection);
-        $this->connection = @oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
-
-        // drop the clob test table
-        try {
-            oci_execute(oci_parse($this->connection, "DROP TABLE CLOB_TEST"));
-        } catch (\Exception $e) {
-            // table doesn't exists
-        }
-    }
-
-    public function tearDown()
-    {
-        @oci_close($this->connection);
-        parent::tearDown();
-    }
-
-    /**
-     * @param CsvFile $file
-     * @return string
-     */
-    private function generateTableName(CsvFile $file)
-    {
-        $tableName = sprintf(
-            '%s',
-            $file->getBasename('.' . $file->getExtension())
-        );
-
-        return $tableName;
-    }
-
-    /**
-     * Create table from csv file with text columns
-     *
-     * @param CsvFile $file
-     */
-    private function createTextTable(CsvFile $file, $primaryKey = [])
-    {
-        $tableName = $this->generateTableName($file);
-
-        try {
-            oci_execute(oci_parse($this->connection, sprintf("DROP TABLE %s", $tableName)));
-        } catch (\Exception $e) {
-            // table dont exists
-        }
-
-        $header = $file->getHeader();
-
-        oci_execute(oci_parse($this->connection, sprintf(
-            'CREATE TABLE %s (%s) tablespace users',
-            $tableName,
-            implode(
-                ', ',
-                array_map(function ($column) {
-                    return $column . ' NVARCHAR2 (400)';
-                }, $header)
-            )
-        )));
-
-        // create the primary key if supplied
-        if ($primaryKey && is_array($primaryKey) && !empty($primaryKey)) {
-            foreach ($primaryKey as $pk) {
-                oci_execute(
-                    oci_parse(
-                        $this->connection,
-                        sprintf("ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL", $tableName, $pk)
-                    )
-                );
-            }
-            oci_execute(oci_parse(
-                $this->connection,
-                sprintf(
-                    'ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s)',
-                    $tableName,
-                    $tableName,
-                    implode(',', $primaryKey)
-                )
-            ));
-        }
-
-        $file->next();
-
-        $columnsCount = count($file->current());
-        $rowsPerInsert = intval((1000 / $columnsCount) - 1);
-
-        while ($file->current() != false) {
-            for ($i=0; $i<$rowsPerInsert && $file->current() !== false; $i++) {
-                $cols = [];
-                foreach ($file->current() as $col) {
-                    $cols[] = "'" . $col . "'";
-                }
-                $sql = sprintf(
-                    "INSERT INTO {$tableName} (%s) VALUES (%s)",
-                    implode(',', $header),
-                    implode(',', $cols)
-                );
-
-                oci_execute(oci_parse($this->connection, $sql));
-
-                $file->next();
-            }
-        }
-
-        $stmt = oci_parse($this->connection, sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName));
-        oci_execute($stmt);
-        $row = oci_fetch_assoc($stmt);
-
-        $this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
-    }
-
-    /**
-     * Count records in CSV (with headers)
-     *
-     * @param CsvFile $file
-     * @return int
-     */
-    protected function countTable(CsvFile $file)
-    {
-        $linesCount = 0;
-        foreach ($file as $i => $line) {
-            // skip header
-            if (!$i) {
-                continue;
-            }
-
-            $linesCount++;
-        }
-
-        return $linesCount;
-    }
-
     public function testCredentials()
     {
         $config = $this->getConfig('oracle');
@@ -213,12 +37,7 @@ class OracleTest extends ExtractorTest
     {
         $config = $this->getConfig('oracle');
         $app = $this->createApplication($config);
-
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1, ['CREATEDAT']);
-
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-        $this->createTextTable($csv2);
+        $this->setupTestTables();
 
         $result = $app->run();
 
@@ -231,7 +50,7 @@ class OracleTest extends ExtractorTest
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($csv1);
+        $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
@@ -242,7 +61,10 @@ class OracleTest extends ExtractorTest
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
+        $this->assertEquals(
+            file_get_contents($this->dataDir . '/oracle/escaping.csv'),
+            file_get_contents($outputCsvFile)
+        );
     }
 
     public function testCredentialsWithSSH()
@@ -259,7 +81,7 @@ class OracleTest extends ExtractorTest
             'sshHost' => 'sshproxy',
             'remoteHost' => 'oracle',
             'remotePort' => $config['parameters']['db']['port'],
-            'localPort' => '15212',
+            'localPort' => '15211',
         ];
 
         $config['action'] = 'testConnection';
@@ -285,18 +107,15 @@ class OracleTest extends ExtractorTest
             'sshHost' => 'sshproxy',
             'remoteHost' => 'oracle',
             'remotePort' => $config['parameters']['db']['port'],
-            'localPort' => '15211',
+            'localPort' => '15212',
         ];
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1, ['CREATEDAT']);
+        $this->setupTestTables();
 
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
-        $this->createTextTable($csv2);
-
-        $csv3 = new CsvFile($this->dataDir. '/oracle/tablecolumns.csv');
+        $salesCsv = new CsvFile($this->dataDir. '/oracle/sales.csv');
+        $escapingCsv = new CsvFile($this->dataDir. '/oracle/escaping.csv');
 
         $result = $app->run();
 
@@ -309,7 +128,7 @@ class OracleTest extends ExtractorTest
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($csv1);
+        $origContents = file_get_contents($salesCsv);
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
@@ -320,7 +139,7 @@ class OracleTest extends ExtractorTest
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($csv2), file_get_contents($outputCsvFile));
+        $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
     }
 
     public function testGetTables()
@@ -933,8 +752,7 @@ class OracleTest extends ExtractorTest
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
-        $this->createTextTable($csv1);
+        $this->setupTestTables();
 
         $result = $app->run();
 
@@ -1130,34 +948,33 @@ class OracleTest extends ExtractorTest
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
+    public function testRunEmptyResultSet()
+    {
+        $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
+        $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
+        @unlink($regionsDataFile);
+        @unlink($regionsManifestFile);
+
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][3]['table']);
+        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5;";
+
+        $result = ($this->createApplication($config)->run());
+
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+
+        $this->assertFileNotExists($regionsManifestFile);
+        $this->assertFileNotExists($regionsDataFile);
+    }
+
     public function testExtractClob()
     {
-        // create the clob table
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('hello', '<test>some test xml </test>')"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('nullTest', null)"
-            )
-        );
-        oci_execute(
-            oci_parse(
-                $this->connection,
-                "INSERT INTO CLOB_TEST VALUES ('goodbye', '<test>some test xml </test>')"
-            )
-        );
-
+        $this->createClobTable();
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);
@@ -1179,16 +996,5 @@ class OracleTest extends ExtractorTest
             $output
         );
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-    }
-
-    /**
-     * @param array $config
-     * @return OracleApplication
-     */
-    public function createApplication(array $config)
-    {
-        $app = new OracleApplication($config, $this->dataDir);
-
-        return $app;
     }
 }

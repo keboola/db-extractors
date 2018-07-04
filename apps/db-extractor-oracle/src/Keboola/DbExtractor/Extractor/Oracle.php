@@ -1,16 +1,22 @@
 <?php
-/**
- * @package ex-db-oracle
- * @author Erik Zigo <erik.zigo@keboola.com>
- */
+
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Logger;
 
 class Oracle extends Extractor
 {
     protected $db;
+
+    protected $dbParams;
+
+    public function __construct($parameters, Logger $logger)
+    {
+        $this->dbParams = $parameters['db'];
+        parent::__construct($parameters, $logger);
+    }
 
     public function createConnection($params)
     {
@@ -24,66 +30,22 @@ class Oracle extends Extractor
         return $connection;
     }
 
-    protected function executeQuery($query, CsvFile $csv, $tableName)
+    public function createSshTunnel($dbConfig)
     {
-        $stmt = oci_parse($this->db, $query);
-        $success = oci_execute($stmt);
-        $this->logger->info("Query executed");
-        if (!$success) {
-            $error = oci_error($stmt);
-            oci_free_statement($stmt);
-            throw new UserException("Error executing query: " . $error['message']);
-        }
-
-        $resultRow = oci_fetch_assoc($stmt);
-        if (!is_array($resultRow) || empty($resultRow)) {
-            $this->logger->warn(sprintf(
-                "Query returned empty result. Nothing was imported for table [%s]",
-                $tableName
-            ));
-            oci_free_statement($stmt);
-            return 0;
-        }
-
-        // check for LOB objects
-        $lobCols = [];
-        foreach ($resultRow as $key => $value) {
-            if (is_object($value) && get_class($value) === 'OCI-Lob') {
-                $lobCols[] = $key;
-            }
-        }
-
-        // write header and first line
-        $csv->writeRow(array_keys($resultRow));
-        if (count($lobCols) > 0) {
-            foreach ($lobCols as $lobCol) {
-                $resultRow[$lobCol] = $resultRow[$lobCol]->load();
-            }
-        }
-        $csv->writeRow($resultRow);
-        $this->logger->info("Fetching results");
-
-        // write the rest
-        $cnt = 1;
-        while ($resultRow = oci_fetch_assoc($stmt)) {
-            if (count($lobCols) > 0) {
-                foreach ($lobCols as $lobCol) {
-                    $resultRow[$lobCol] = $resultRow[$lobCol] ? $resultRow[$lobCol]->load() : '';
-                }
-            }
-            $csv->writeRow($resultRow);
-            $cnt++;
-            if (($cnt % 10000) == 0) {
-                $this->logger->info(sprintf("Fetched %d rows", $cnt));
-            }
-        }
-        oci_free_statement($stmt);
-        return $cnt;
+        $this->dbParams = parent::createSshTunnel($dbConfig);
+        return $this->dbParams;
     }
 
-    public function getConnection()
+    protected function executeQuery($query, CsvFile $csv, $tableName): int
     {
-        return $this->db;
+        $sqlcl = new Sqlcl($this->dbParams, $this->logger);
+
+        $linesWritten = $sqlcl->export($query, (string) $csv);
+        if ($linesWritten === 0) {
+            // remove the output file that only contains header
+            @unlink((string) $csv);
+        }
+        return $linesWritten;
     }
 
     public function testConnection()
@@ -156,6 +118,12 @@ SQL;
                     return $table['tableName'];
                 }, $tables))
             );
+        }
+
+        // reset the connection because after a long export it may have been dropped
+        if (!is_null($tables)) {
+            @oci_close($this->db);
+            $this->db = $this->createConnection($this->dbParams);
         }
 
         $stmt = oci_parse($this->db, $sql . $whereClause);
