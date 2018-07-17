@@ -63,10 +63,24 @@ class Oracle extends Extractor
 
     protected function executeQuery($query, CsvFile $csv, $tableName): int
     {
-        $sqlcl = new Sqlcl($this->dbParams, $this->logger);
+        $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
+        $process->setTimeout(300);
+        $process->run();
 
-        $linesWritten = $sqlcl->export($query, (string) $csv);
-        if ($linesWritten === 0) {
+        if (!$process->isSuccessful()) {
+            throw new UserException('Export process failed: ' . $process->getErrorOutput());
+        }
+        $output = $process->getOutput();
+        $fetchedPos = strpos($output, "Fetched");
+        $rowCountStr = substr($output, $fetchedPos, strpos($output, "rows in") - $fetchedPos);
+        $linesWritten = (int) filter_var(
+            $rowCountStr,
+            FILTER_SANITIZE_NUMBER_INT
+        );
+
+        echo "\nWrote $linesWritten rows\n";
+
+        if ($linesWritten <= 1) {
             // remove the output file that only contains header
             @unlink((string) $csv);
         }
