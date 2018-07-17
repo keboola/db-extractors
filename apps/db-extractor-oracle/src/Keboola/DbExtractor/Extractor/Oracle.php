@@ -5,17 +5,42 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
+use Symfony\Component\Process\Process;
 
 class Oracle extends Extractor
 {
     protected $db;
 
+    /** @var  array */
     protected $dbParams;
+
+    /** @var  array */
+    protected $exportConfigFiles;
 
     public function __construct($parameters, Logger $logger)
     {
         $this->dbParams = $parameters['db'];
         parent::__construct($parameters, $logger);
+        // setup the export config files for the export tool
+        foreach ($parameters['tables'] as $table) {
+            $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
+            $this->writeExportConfig($this->dbParams, $table);
+        }
+    }
+
+    private function writeExportConfig(array $dbParams, array $table)
+    {
+        if (!isset($table['query'])) {
+            $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
+        }
+        $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
+        $parameters = array(
+            "db" => $dbParams
+        );
+        $config = array(
+            "parameters" => array_merge($parameters, $table)
+        );
+        file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
     public function createConnection($params)
