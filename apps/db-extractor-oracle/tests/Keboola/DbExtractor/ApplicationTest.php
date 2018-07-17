@@ -184,6 +184,6 @@ class ApplicationTest extends OracleBaseTest
         $process->run();
 
         $this->assertEquals(1, $process->getExitCode());
-        $this->assertContains("Export process failed.", $process->getErrorOutput());
+        $this->assertContains("Export process failed:", $process->getErrorOutput());
     }
 }
