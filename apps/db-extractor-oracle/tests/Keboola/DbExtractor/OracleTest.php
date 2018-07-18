@@ -1003,7 +1003,6 @@ class OracleTest extends OracleBaseTest
 
     public function testExtractClob()
     {
-        $this->createClobTable();
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);

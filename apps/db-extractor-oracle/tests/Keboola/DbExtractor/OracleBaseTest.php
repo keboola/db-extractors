@@ -63,6 +63,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
+        $this->createClobTable();
     }
 
     public function tearDown()
