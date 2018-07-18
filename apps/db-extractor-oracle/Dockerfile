@@ -6,7 +6,7 @@ ENV TZ=UTC
 WORKDIR /code
 
 RUN apt-get update -q \
-  && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg dirmngr --no-install-recommends
+  && apt-get install -y sudo unzip ssh libmcrypt-dev libaio1 wget gnupg dirmngr --no-install-recommends
 
 # Oracle instantclient
 ADD oracle/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
@@ -39,8 +39,19 @@ RUN apt-get update
 
 RUN mkdir -p /usr/share/man/man1
 
-# install java
-RUN apt-get install oracle-java8-installer -y
+# install java -- this will fail, but it will at least create the req'd files for the below sed commands
+RUN apt-get install -y --no-install-recommends oracle-java8-installer || true
+
+#RUN dpkg -L oracle-java8-installer
+WORKDIR /var/lib/dpkg/info
+# RUN ls -haltr /var/lib/dpkg/info/*java*
+RUN sudo sed -i 's|JAVA_VERSION=8u171|JAVA_VERSION=8u181|' oracle-java8-installer.*
+RUN sudo sed -i 's|PARTNER_URL=http://download.oracle.com/otn-pub/java/jdk/8u171-b11/512cd62ec5174c3487ac17c61aaa89e8/|PARTNER_URL=http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/|' oracle-java8-installer.*
+RUN sudo sed -i 's|SHA256SUM_TGZ="b6dd2837efaaec4109b36cfbb94a774db100029f98b0d78be68c27bec0275982"|SHA256SUM_TGZ="1845567095bfbfebd42ed0d09397939796d05456290fb20a83c476ba09f991d3"|' oracle-java8-installer.*
+RUN sudo sed -i 's|J_DIR=jdk1.8.0_171|J_DIR=jdk1.8.0_181|' oracle-java8-installer.*
+
+# install java (again)
+RUN apt-get install -y --no-install-recommends oracle-java8-installer oracle-java8-set-default
 
 RUN apt-get clean
 
