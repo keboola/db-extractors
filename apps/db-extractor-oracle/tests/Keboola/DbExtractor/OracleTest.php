@@ -979,6 +979,7 @@ class OracleTest extends OracleBaseTest
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][0]['query']);
+        $config['parameters']['tables'][0]['id'] = 'clob';
         $config['parameters']['tables'][0]['name'] = 'clob_test';
         $config['parameters']['tables'][0]['table']['tableName'] = 'CLOB_TEST';
         $config['parameters']['tables'][0]['table']['schema'] = 'TESTER';
