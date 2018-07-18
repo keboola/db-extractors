@@ -122,9 +122,9 @@ class OracleTest extends OracleBaseTest
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
         $this->assertEquals('success', $result['status']);
+
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
@@ -136,7 +136,6 @@ class OracleTest extends OracleBaseTest
         }
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
-
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
         $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
@@ -160,7 +159,6 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        var_export($result['tables']);
         $this->assertCount(9, $result['tables']);
 
         $expectedTables = array (
