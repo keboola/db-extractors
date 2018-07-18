@@ -34,6 +34,7 @@ class Oracle extends Extractor
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
         }
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
+        $dbParams['port'] = (string) $dbParams['port'];
         $parameters = array(
             "db" => $dbParams
         );
