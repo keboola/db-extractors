@@ -12,7 +12,7 @@ abstract class OracleBaseTest extends ExtractorTest
 {
     protected $connection;
 
-    protected $dataDir = ROOT_PATH . "tests/data";
+    protected $dataDir = __DIR__ . '/../../data';
 
     public const DRIVER = 'oracle';
 
