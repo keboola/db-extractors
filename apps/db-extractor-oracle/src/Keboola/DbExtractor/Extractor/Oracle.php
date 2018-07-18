@@ -70,15 +70,16 @@ class Oracle extends Extractor
         if (!$process->isSuccessful()) {
             throw new UserException('Export process failed: ' . $process->getErrorOutput());
         }
+        // log the process output
         $output = $process->getOutput();
+        $this->logger->info($output);
+
         $fetchedPos = strpos($output, "Fetched");
         $rowCountStr = substr($output, $fetchedPos, strpos($output, "rows in") - $fetchedPos);
         $linesWritten = (int) filter_var(
             $rowCountStr,
             FILTER_SANITIZE_NUMBER_INT
         );
-
-        echo "\nWrote $linesWritten rows\n";
 
         if ($linesWritten <= 1) {
             // remove the output file that only contains header
