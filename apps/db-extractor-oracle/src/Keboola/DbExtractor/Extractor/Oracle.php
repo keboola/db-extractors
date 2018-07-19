@@ -65,7 +65,6 @@ class Oracle extends Extractor
     protected function executeQuery($query, CsvFile $csv, $tableName): int
     {
         $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
-        $process->setTimeout(300);
         $process->run();
 
         if (!$process->isSuccessful()) {
