@@ -12,6 +12,8 @@ abstract class OracleBaseTest extends ExtractorTest
 {
     protected $connection;
 
+    protected $dataDir = __DIR__ . '/../../data';
+
     public const DRIVER = 'oracle';
 
     public function setUp(): void
@@ -21,6 +23,8 @@ abstract class OracleBaseTest extends ExtractorTest
         }
 
         $config = $this->getConfig('oracle');
+        // write configuration file for exporter
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
         $dbConfig = $config['parameters']['db'];
         $dbString = '//' . $dbConfig['host'] . ':' . $dbConfig['port'] . '/' . $dbConfig['database'];
 
@@ -59,6 +63,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
+        $this->createClobTable();
     }
 
     public function tearDown()

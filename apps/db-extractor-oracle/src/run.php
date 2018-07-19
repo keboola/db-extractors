@@ -21,12 +21,25 @@ try {
         throw new UserException('Data folder not set.');
     }
 
-    $app = new OracleApplication(
-        Yaml::parse(
-            file_get_contents($arguments["data"] . "/config.yml")
-        ),
-        $arguments["data"]
-    );
+    if (file_exists($arguments["data"] . "/config.yml")) {
+        $app = new OracleApplication(
+            Yaml::parse(
+                file_get_contents($arguments["data"] . "/config.yml")
+            ),
+            $arguments["data"]
+        );
+    } else if (file_exists($arguments["data"] . "/config.json")) {
+        $app = new OracleApplication(
+            json_decode(
+                file_get_contents($arguments["data"] . "/config.yml"),
+                true
+            ),
+            $arguments["data"]
+        );
+    } else {
+        throw new UserException('Invalid configuration file type');
+    }
+
 
     if ($app['action'] !== 'run') {
         $app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));

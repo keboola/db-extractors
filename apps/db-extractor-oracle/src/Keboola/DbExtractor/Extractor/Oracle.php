@@ -5,17 +5,43 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
+use Symfony\Component\Process\Process;
 
 class Oracle extends Extractor
 {
     protected $db;
 
+    /** @var  array */
     protected $dbParams;
+
+    /** @var  array */
+    protected $exportConfigFiles;
 
     public function __construct($parameters, Logger $logger)
     {
         $this->dbParams = $parameters['db'];
         parent::__construct($parameters, $logger);
+        // setup the export config files for the export tool
+        foreach ($parameters['tables'] as $table) {
+            $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
+            $this->writeExportConfig($this->dbParams, $table);
+        }
+    }
+
+    private function writeExportConfig(array $dbParams, array $table)
+    {
+        if (!isset($table['query'])) {
+            $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
+        }
+        $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
+        $dbParams['port'] = (string) $dbParams['port'];
+        $parameters = array(
+            'db' => $dbParams
+        );
+        $config = array(
+            'parameters' => array_merge($parameters, $table)
+        );
+        file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
     public function createConnection($params)
@@ -38,12 +64,26 @@ class Oracle extends Extractor
 
     protected function executeQuery($query, CsvFile $csv, $tableName): int
     {
-        $sqlcl = new Sqlcl($this->dbParams, $this->logger);
+        $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
+        $process->run();
 
-        $linesWritten = $sqlcl->export($query, (string) $csv);
-        if ($linesWritten === 0) {
+        if (!$process->isSuccessful()) {
+            throw new UserException('Export process failed: ' . $process->getErrorOutput());
+        }
+        // log the process output
+        $output = $process->getOutput();
+        $this->logger->info($output);
+
+        $fetchedPos = strpos($output, "Fetched");
+        $rowCountStr = substr($output, $fetchedPos, strpos($output, "rows in") - $fetchedPos);
+        $linesWritten = (int) filter_var(
+            $rowCountStr,
+            FILTER_SANITIZE_NUMBER_INT
+        );
+
+        if ($linesWritten <= 1) {
             // remove the output file that only contains header
-            @unlink((string) $csv);
+            @unlink($csv->getPathname());
         }
         return $linesWritten;
     }

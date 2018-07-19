@@ -122,9 +122,9 @@ class OracleTest extends OracleBaseTest
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
 
         $this->assertEquals('success', $result['status']);
+
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
-
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
@@ -136,7 +136,6 @@ class OracleTest extends OracleBaseTest
         }
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
-
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
         $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
@@ -160,7 +159,7 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(8, $result['tables']);
+        $this->assertCount(9, $result['tables']);
 
         $expectedTables = array (
             0 =>
@@ -580,6 +579,36 @@ class OracleTest extends OracleBaseTest
                 ),
             6 =>
                 array (
+                    'name' => 'CLOB_TEST',
+                    'tablespaceName' => 'USERS',
+                    'schema' => 'TESTER',
+                    'owner' => 'TESTER',
+                    'columns' =>
+                        array (
+                            1 =>
+                                array (
+                                    'name' => 'CLOB_COL',
+                                    'type' => 'CLOB',
+                                    'nullable' => true,
+                                    'length' => '4000',
+                                    'ordinalPosition' => '2',
+                                    'primaryKey' => false,
+                                    'uniqueKey' => false,
+                                ),
+                            0 =>
+                                array (
+                                    'name' => 'ID',
+                                    'type' => 'VARCHAR2',
+                                    'nullable' => true,
+                                    'length' => '25',
+                                    'ordinalPosition' => '1',
+                                    'primaryKey' => false,
+                                    'uniqueKey' => false,
+                                ),
+                        ),
+                ),
+            7 =>
+                array (
                     'name' => 'ESCAPING',
                     'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
@@ -608,7 +637,7 @@ class OracleTest extends OracleBaseTest
                                 ),
                         ),
                 ),
-            7 =>
+            8 =>
                 array (
                     'name' => 'SALES',
                     'tablespaceName' => 'USERS',
@@ -960,7 +989,7 @@ class OracleTest extends OracleBaseTest
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][3]['table']);
-        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5;";
+        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5";
 
         $result = ($this->createApplication($config)->run());
 
@@ -974,11 +1003,11 @@ class OracleTest extends OracleBaseTest
 
     public function testExtractClob()
     {
-        $this->createClobTable();
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][0]['query']);
+        $config['parameters']['tables'][0]['id'] = 342;
         $config['parameters']['tables'][0]['name'] = 'clob_test';
         $config['parameters']['tables'][0]['table']['tableName'] = 'CLOB_TEST';
         $config['parameters']['tables'][0]['table']['schema'] = 'TESTER';
