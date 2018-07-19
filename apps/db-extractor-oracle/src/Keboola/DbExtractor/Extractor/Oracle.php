@@ -36,10 +36,10 @@ class Oracle extends Extractor
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
         $dbParams['port'] = (string) $dbParams['port'];
         $parameters = array(
-            "db" => $dbParams
+            'db' => $dbParams
         );
         $config = array(
-            "parameters" => array_merge($parameters, $table)
+            'parameters' => array_merge($parameters, $table)
         );
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
