@@ -55,8 +55,6 @@ RUN apt-get clean
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
-ADD oracle/sqlcl /code/
-
 WORKDIR /root
 RUN curl -sS https://getcomposer.org/installer | php \
   && mv composer.phar /usr/local/bin/composer
