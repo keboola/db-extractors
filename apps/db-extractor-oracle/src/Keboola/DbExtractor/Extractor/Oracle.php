@@ -84,7 +84,7 @@ class Oracle extends Extractor
 
         if ($linesWritten <= 1) {
             // remove the output file that only contains header
-            @unlink((string) $csv);
+            @unlink($csv->getFilename());
         }
         return $linesWritten;
     }
