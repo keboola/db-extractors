@@ -21,6 +21,8 @@ script:
   - docker pull quay.io/keboola/syrup-cli:latest
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287646782 master
   - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 287674685 master
+  # Test Oracle Cloud instance
+  - docker run --rm -e KBC_STORAGE_TOKEN quay.io/keboola/syrup-cli:latest run-job $KBC_DEVELOPERPORTAL_APP 419388902 master
 
 after_success:
   - docker images
