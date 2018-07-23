@@ -1026,4 +1026,22 @@ class OracleTest extends OracleBaseTest
         );
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
+
+    public function testTrailingSemiColon()
+    {
+        $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
+        $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
+        @unlink($regionsDataFile);
+        @unlink($regionsManifestFile);
+
+        $config = $this->getConfig('oracle');
+        unset($config['parameters']['tables'][0]);
+        unset($config['parameters']['tables'][1]);
+        unset($config['parameters']['tables'][2]);
+        unset($config['parameters']['tables'][3]['table']);
+        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS;";
+
+        $result = ($this->createApplication($config))->run();
+        $this->assertEquals('success', $result['status']);
+    }
 }
