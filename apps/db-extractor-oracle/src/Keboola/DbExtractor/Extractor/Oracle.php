@@ -32,6 +32,8 @@ class Oracle extends Extractor
     {
         if (!isset($table['query'])) {
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
+        } else {
+            $table['query'] = rtrim($table['query'], " ;");
         }
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
         $dbParams['port'] = (string) $dbParams['port'];
