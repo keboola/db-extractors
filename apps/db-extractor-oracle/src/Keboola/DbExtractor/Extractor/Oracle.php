@@ -72,7 +72,7 @@ class Oracle extends Extractor
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new UserException('Export process failed: ' . $process->getErrorOutput());
+            throw new \ErrorException('Export process failed: ' . $process->getErrorOutput());
         }
         // log the process output
         $output = $process->getOutput();

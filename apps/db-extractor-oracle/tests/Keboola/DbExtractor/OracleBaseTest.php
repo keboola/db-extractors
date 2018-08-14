@@ -32,30 +32,32 @@ abstract class OracleBaseTest extends ExtractorTest
         if (!$adminConnection) {
             $error = oci_error();
             echo "ADMIN CONNECTION ERROR: " . $error['message'];
-        }
-        try {
-            // create test user
-            $this->executeStatement(
-                $adminConnection,
-                sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password'])
-            );
+        } else {
+            try {
+                var_dump($dbConfig);
+                // create test user
+                $this->executeStatement(
+                    $adminConnection,
+                    sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password'])
+                );
 
-            // provide roles
-            $this->executeStatement(
-                $adminConnection,
-                sprintf("GRANT CONNECT,RESOURCE,DBA TO %s", $dbConfig['user'])
-            );
+                // provide roles
+                $this->executeStatement(
+                    $adminConnection,
+                    sprintf("GRANT CONNECT,RESOURCE,DBA TO %s", $dbConfig['user'])
+                );
 
-            // grant privileges
-            $this->executeStatement(
-                $adminConnection,
-                sprintf("GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s", $dbConfig['user'])
-            );
-        } catch (\Exception $e) {
-            // make sure this is the case that TESTER already exists
-            if (!strstr($e->getMessage(), "ORA-01920")) {
-                echo "\nCreate test user error: " . $e->getMessage() . "\n";
-                echo "\nError code: " . $e->getCode() . "\n";
+                // grant privileges
+                $this->executeStatement(
+                    $adminConnection,
+                    sprintf("GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s", $dbConfig['user'])
+                );
+            } catch (\Exception $e) {
+                // make sure this is the case that TESTER already exists
+                if (!strstr($e->getMessage(), "ORA-01920")) {
+                    echo "\nCreate test user error: " . $e->getMessage() . "\n";
+                    echo "\nError code: " . $e->getCode() . "\n";
+                }
             }
         }
         if ($adminConnection) {

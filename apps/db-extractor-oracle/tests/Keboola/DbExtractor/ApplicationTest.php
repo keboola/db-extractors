@@ -185,5 +185,7 @@ class ApplicationTest extends OracleBaseTest
 
         $this->assertEquals(1, $process->getExitCode());
         $this->assertContains("Export process failed:", $process->getErrorOutput());
+        // verify that it retries 5 times
+        $this->assertContains("[5x]", $process->getOutput());
     }
 }
