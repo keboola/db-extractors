@@ -2,8 +2,10 @@ vendor/
 /data/
 /tests/data/out/
 /tests/data/config.yml
+/tests/data/*.json
 .idea/
 composer.phar
 runtests.sh
 test.php
+/tmp/
 dockerize-linux-amd64*
