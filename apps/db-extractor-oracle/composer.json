@@ -8,7 +8,7 @@
     ],
     "require": {
         "php": "~7.1",
-        "keboola/db-extractor-common": "~5.2",
+        "keboola/db-extractor-common": "~9.1.4",
         "keboola/php-temp": "~1.0.0"
     },
     "require-dev": {
