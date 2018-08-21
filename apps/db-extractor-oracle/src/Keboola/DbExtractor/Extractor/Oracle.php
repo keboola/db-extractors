@@ -23,10 +23,10 @@ class Oracle extends Extractor
     /** @var  array */
     protected $exportConfigFiles;
 
-    public function __construct($parameters, Logger $logger)
+    public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
         $this->dbParams = $parameters['db'];
-        parent::__construct($parameters, $logger);
+        parent::__construct($parameters, $state, $logger);
         // setup the export config files for the export tool
         foreach ($parameters['tables'] as $table) {
             $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
@@ -101,17 +101,21 @@ class Oracle extends Extractor
 
         $proxy = new RetryProxy($this->logger, $maxTries);
         $tableName = $table['name'];
-        $linesWritten = $proxy->call(function () use ($query, $tableName) {
-            try {
-                return $this->exportTable($query, $tableName);
-            } catch (Throwable $e) {
+        try {
+            $linesWritten = $proxy->call(function () use ($query, $tableName) {
                 try {
-                    $this->db = $this->createConnection($this->dbParams);
+                    return $this->exportTable($query, $tableName);
                 } catch (Throwable $e) {
-                };
-                throw $e;
-            }
-        });
+                    try {
+                        $this->db = $this->createConnection($this->dbParams);
+                    } catch (Throwable $e) {
+                    };
+                    throw $e;
+                }
+            });
+        } catch (Throwable $e) {
+            throw $this->handleDbError($e, $table, $maxTries);
+        }
 
         if ($linesWritten <= 1) {
             // remove the output file that only contains header
