@@ -8,6 +8,8 @@ use Keboola\DbExtractor\Logger;
 use Symfony\Component\Yaml\Yaml;
 use Monolog\Handler\NullHandler;
 
+require_once(dirname(__FILE__) . "/../vendor/autoload.php");
+
 $logger = new Logger('ex-db-oracle');
 
 $runAction = true;
