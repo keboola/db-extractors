@@ -183,6 +183,8 @@ class ApplicationTest extends OracleBaseTest
         $process->setTimeout(300);
         $process->run();
 
+        var_dump($process->getOutput());
+
         $this->assertEquals(1, $process->getExitCode());
         $this->assertContains("Export process failed:", $process->getErrorOutput());
         // verify that it retries 5 times

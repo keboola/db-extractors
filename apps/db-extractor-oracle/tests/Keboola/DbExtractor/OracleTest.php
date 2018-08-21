@@ -43,11 +43,14 @@ class OracleTest extends OracleBaseTest
 
         $result = $app->run();
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(100, $result['imported'][0]['rows']);
 
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
@@ -59,10 +62,13 @@ class OracleTest extends OracleBaseTest
             }
         }
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
 
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(7, $result['imported'][1]['rows']);
         $this->assertEquals(
             file_get_contents($this->dataDir . '/oracle/escaping.csv'),
             file_get_contents($outputCsvFile)
@@ -121,26 +127,26 @@ class OracleTest extends OracleBaseTest
 
         $result = $app->run();
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
 
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($salesCsv);
+        $origContents = file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
             }
         }
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest');
+        $this->assertEquals(file_get_contents($escapingCsv->getPathname()), file_get_contents($outputCsvFile));
     }
 
     public function testGetTables(): void
@@ -1026,7 +1032,7 @@ class OracleTest extends OracleBaseTest
 \"goodbye\",\"<test>some test xml </test>\"\n",
             $output
         );
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
     }
 
     public function testTrailingSemiColon(): void
