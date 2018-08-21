@@ -102,9 +102,9 @@ class Oracle extends Extractor
         $proxy = new RetryProxy($this->logger, $maxTries);
         $tableName = $table['name'];
         try {
-            $linesWritten = $proxy->call(function () use ($query, $tableName) {
+            $linesWritten = $proxy->call(function () use ($query, $tableName, $isAdvancedQuery) {
                 try {
-                    return $this->exportTable($query, $tableName);
+                    return $this->exportTable($query, $tableName, $isAdvancedQuery);
                 } catch (Throwable $e) {
                     try {
                         $this->db = $this->createConnection($this->dbParams);
@@ -144,9 +144,11 @@ class Oracle extends Extractor
         return $output;
     }
 
-    protected function exportTable(string $query, string $tableName): int
+    protected function exportTable(string $query, string $tableName, bool $advancedQuery): int
     {
-        $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
+        $process = new Process(
+            'java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName] . ' ' . $advancedQuery
+        );
         $process->setTimeout(null);
         $process->setIdleTimeout(null);
         $process->run();
