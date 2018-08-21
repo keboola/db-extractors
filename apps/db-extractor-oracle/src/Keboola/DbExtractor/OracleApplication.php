@@ -8,12 +8,12 @@ use Keboola\DbExtractor\Configuration\ConfigDefinition;
 
 class OracleApplication extends Application
 {
-    public function __construct(array $config, $dataDir)
+    public function __construct(array $config, ?Logger $logger = null, array $state = [], string $dataDir = '/data/')
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'Oracle';
 
-        parent::__construct($config);
+        parent::__construct($config, ($logger) ? $logger : new Logger("ex-db-mysql"), $state);
 
         $this->setConfigDefinition(new ConfigDefinition());
     }
