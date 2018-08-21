@@ -2,8 +2,8 @@
     "name": "keboola/db-extractor-oracle",
     "authors": [
         {
-            "name": "Erik Zigo",
-            "email": "erik.zigo@keboola.com"
+            "name": "Keboola",
+            "email": "devel@keboola.com"
         }
     ],
     "require": {
