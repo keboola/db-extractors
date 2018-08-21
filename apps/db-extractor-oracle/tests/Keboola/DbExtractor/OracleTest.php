@@ -9,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest
 {
-    public function testCredentials()
+    public function testCredentials(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'testConnection';
@@ -22,7 +22,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithoutTables()
+    public function testRunWithoutTables(): void
     {
         $config = $this->getConfig('oracle');
 
@@ -35,7 +35,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
         $config = $this->getConfig('oracle');
         $app = $this->createApplication($config);
@@ -69,7 +69,7 @@ class OracleTest extends OracleBaseTest
         );
     }
 
-    public function testCredentialsWithSSH()
+    public function testCredentialsWithSSH(): void
     {
         $config = $this->getConfig('oracle');
 
@@ -96,7 +96,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithSSH()
+    public function testRunWithSSH(): void
     {
         $config = $this->getConfig('oracle');
         $config['parameters']['db']['ssh'] = [
@@ -143,7 +143,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
     }
 
-    public function testGetTables()
+    public function testGetTables(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
@@ -773,7 +773,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testMetadataManifest()
+    public function testMetadataManifest():void
     {
         $config = $this->getConfig('oracle');
 
@@ -979,7 +979,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
-    public function testRunEmptyResultSet()
+    public function testRunEmptyResultSet(): void
     {
         $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
         $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
@@ -1003,7 +1003,7 @@ class OracleTest extends OracleBaseTest
         $this->assertFileNotExists($regionsDataFile);
     }
 
-    public function testExtractClob()
+    public function testExtractClob(): void
     {
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
@@ -1029,7 +1029,7 @@ class OracleTest extends OracleBaseTest
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
     }
 
-    public function testTrailingSemiColon()
+    public function testTrailingSemiColon(): void
     {
         $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
         $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
