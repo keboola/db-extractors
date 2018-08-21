@@ -75,21 +75,21 @@ try {
     $app['logger']->log('info', "Extractor finished successfully.");
     exit(0);
 } catch (UserException $e) {
-    $logger->log('error', $e->getMessage(), $e->getData());
-
+    $logger->log('error', $e->getMessage());
     if (!$runAction) {
         echo $e->getMessage();
     }
-
     exit(1);
-} catch (ApplicationException $e) {
-    $logger->log('error', $e->getMessage(), $e->getData());
-    exit(2);
 } catch (\Throwable $e) {
-    $logger->log('error', $e->getMessage(), [
-        'errFile' => $e->getFile(),
-        'errLine' => $e->getLine(),
-        'trace' => $e->getTrace(),
-    ]);
+    $logger->critical(
+        get_class($e) . ':' . $e->getMessage(),
+        [
+            'errFile' => $e->getFile(),
+            'errLine' => $e->getLine(),
+            'errCode' => $e->getCode(),
+            'errTrace' => $e->getTraceAsString(),
+            'errPrevious' => $e->getPrevious() ? get_class($e->getPrevious()) : '',
+        ]
+    );
     exit(2);
 }
