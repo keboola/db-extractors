@@ -6,8 +6,12 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractor\RetryProxy;
 use Symfony\Component\Process\Process;
+
+use Throwable;
 
 class Oracle extends Extractor
 {
@@ -30,7 +34,7 @@ class Oracle extends Extractor
         }
     }
 
-    private function writeExportConfig(array $dbParams, array $table)
+    private function writeExportConfig(array $dbParams, array $table): void
     {
         if (!isset($table['query'])) {
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
@@ -48,7 +52,7 @@ class Oracle extends Extractor
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
-    public function createConnection($params)
+    public function createConnection(array $params)
     {
         $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
         $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
@@ -60,13 +64,83 @@ class Oracle extends Extractor
         return $connection;
     }
 
-    public function createSshTunnel($dbConfig)
+    public function createSshTunnel(array $dbConfig): array
     {
         $this->dbParams = parent::createSshTunnel($dbConfig);
         return $this->dbParams;
     }
 
-    protected function executeQuery($query, CsvFile $csv, $tableName): int
+    protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
+    {
+        $message = "";
+        if ($table) {
+            $message = sprintf("[%s]: ", $table['name']);
+        }
+        $message .= sprintf('DB query failed: %s', $e->getMessage());
+        if ($counter) {
+            $message .= sprintf(' Tried %d times.', $counter);
+        }
+        return new UserException($message, 0, $e);
+    }
+
+    public function export(array $table): array
+    {
+        $outputTable = $table['outputTable'];
+        $csv = $this->createOutputCsv($outputTable);
+
+        $this->logger->info("Exporting to " . $outputTable);
+
+        $isAdvancedQuery = true;
+        if (array_key_exists('table', $table) && !array_key_exists('query', $table)) {
+            $isAdvancedQuery = false;
+            $query = $this->simpleQuery($table['table'], $table['columns']);
+        } else {
+            $query = $table['query'];
+        }
+        $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
+
+        $proxy = new RetryProxy($this->logger, $maxTries);
+        $tableName = $table['name'];
+        $linesWritten = $proxy->call(function () use ($query, $tableName) {
+            try {
+                return $this->exportTable($query, $tableName);
+            } catch (Throwable $e) {
+                try {
+                    $this->db = $this->createConnection($this->dbParams);
+                } catch (Throwable $e) {
+                };
+                throw $e;
+            }
+        });
+
+        if ($linesWritten <= 1) {
+            // remove the output file that only contains header
+            @unlink($csv->getPathname());
+        }
+
+        if ($linesWritten > 0) {
+            $this->createManifest($table);
+        } else {
+            $this->logger->warn(
+                sprintf(
+                    "Query returned empty result. Nothing was imported for table [%s]",
+                    $table['name']
+                )
+            );
+        }
+
+        $output = [
+            "outputTable"=> $outputTable,
+            "rows" => $linesWritten,
+        ];
+        // output state
+        if (!empty($result['lastFetchedRow'])) {
+            $output["state"]['lastFetchedRow'] = $result['lastFetchedRow'];
+        }
+        return $output;
+    }
+
+    protected function exportTable(string $query, string $tableName): int
     {
         $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
         $process->setTimeout(null);
@@ -86,16 +160,10 @@ class Oracle extends Extractor
             $rowCountStr,
             FILTER_SANITIZE_NUMBER_INT
         );
-
-        if ($linesWritten <= 1) {
-            // remove the output file that only contains header
-            @unlink($csv->getPathname());
-            return 0;
-        }
         return $linesWritten;
     }
 
-    public function testConnection()
+    public function testConnection(): bool
     {
         $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
         $success = oci_execute($stmt);
@@ -103,7 +171,7 @@ class Oracle extends Extractor
         return $success;
     }
 
-    public function getTables(array $tables = null)
+    public function getTables(array $tables = null): array
     {
         $sql = <<<SQL
 SELECT TABS.TABLE_NAME ,
@@ -244,7 +312,7 @@ SQL;
         return array_values($tableDefs);
     }
 
-    public function simpleQuery(array $table, array $columns = array())
+    public function simpleQuery(array $table, array $columns = array()): string
     {
         if (count($columns) > 0) {
             return sprintf(
