@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;
@@ -18,10 +19,6 @@ abstract class OracleBaseTest extends ExtractorTest
 
     public function setUp(): void
     {
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-oracle');
-        }
-
         $config = $this->getConfig('oracle');
         // write configuration file for exporter
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
@@ -68,7 +65,7 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->createClobTable();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection) {
             oci_close($this->connection);
@@ -80,11 +77,10 @@ abstract class OracleBaseTest extends ExtractorTest
      * @param array $config
      * @return OracleApplication
      */
-    public function createApplication(array $config)
+    public function createApplication(array $config, array $state = []): OracleApplication
     {
-        $app = new OracleApplication($config, $this->dataDir);
-
-        return $app;
+        $logger = new Logger('ex-db-mysql-tests');
+        return new OracleApplication($config, $logger, $state, $this->dataDir);
     }
 
     private function executeStatement($connection, string $sql): void
@@ -99,7 +95,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
     }
 
-    protected function setupTestTables()
+    protected function setupTestTables(): void
     {
         $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
         $this->createTextTable($csv1, ['CREATEDAT']);
@@ -112,7 +108,7 @@ abstract class OracleBaseTest extends ExtractorTest
      * @param CsvFile $file
      * @return string
      */
-    protected function generateTableName(CsvFile $file)
+    protected function generateTableName(CsvFile $file): string
     {
         $tableName = sprintf(
             '%s',
@@ -122,7 +118,7 @@ abstract class OracleBaseTest extends ExtractorTest
         return $tableName;
     }
 
-    private function dropTableIfExists(string $tablename)
+    private function dropTableIfExists(string $tablename): void
     {
         $sql = <<<EOT
 BEGIN
@@ -140,7 +136,7 @@ EOT;
         );
     }
 
-    protected function createClobTable()
+    protected function createClobTable(): void
     {
         // drop the
         $this->dropTableIfExists("CLOB_TEST");
@@ -169,7 +165,7 @@ EOT;
      *
      * @param CsvFile $file
      */
-    protected function createTextTable(CsvFile $file, $primaryKey = [])
+    protected function createTextTable(CsvFile $file, array $primaryKey = []): void
     {
         $tableName = $this->generateTableName($file);
 
@@ -246,7 +242,7 @@ EOT;
      * @param CsvFile $file
      * @return int
      */
-    protected function countTable(CsvFile $file)
+    protected function countTable(CsvFile $file): int
     {
         $linesCount = 0;
         foreach ($file as $i => $line) {
