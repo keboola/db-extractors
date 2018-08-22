@@ -116,15 +116,11 @@ class Oracle extends Extractor
         } catch (Throwable $e) {
             throw $this->handleDbError($e, $table, $maxTries);
         }
-
-        if ($linesWritten <= 1) {
-            // remove the output file that only contains header
-            @unlink($csv->getPathname());
-        }
-
-        if ($linesWritten > 0) {
+        $rowCount = $linesWritten - 1;
+        if ($rowCount > 0) {
             $this->createManifest($table);
         } else {
+            @unlink($csv->getPathname());
             $this->logger->warn(
                 sprintf(
                     "Query returned empty result. Nothing was imported for table [%s]",
@@ -135,19 +131,18 @@ class Oracle extends Extractor
 
         $output = [
             "outputTable"=> $outputTable,
-            "rows" => $linesWritten,
+            "rows" => $rowCount,
         ];
-        // output state
-        if (!empty($result['lastFetchedRow'])) {
-            $output["state"]['lastFetchedRow'] = $result['lastFetchedRow'];
-        }
         return $output;
     }
 
     protected function exportTable(string $query, string $tableName, bool $advancedQuery): int
     {
+        $cmd = 'java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName];
+        $cmd .= ($advancedQuery) ? ' true' : ' false';
+
         $process = new Process(
-            'java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName] . ' ' . $advancedQuery
+            $cmd
         );
         $process->setTimeout(null);
         $process->setIdleTimeout(null);
