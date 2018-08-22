@@ -35,14 +35,13 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRun(): void
+    public function testRunConfig(): void
     {
         $config = $this->getConfig('oracle');
         $app = $this->createApplication($config);
         $this->setupTestTables();
 
         $result = $app->run();
-
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
@@ -50,7 +49,7 @@ class OracleTest extends OracleBaseTest
         $this->assertFileExists(
             $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest'
         );
-        $this->assertEquals(100, $result['imported'][0]['rows']);
+        $this->assertEquals(99, $result['imported'][0]['rows']);
 
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
@@ -71,6 +70,28 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(7, $result['imported'][1]['rows']);
         $this->assertEquals(
             file_get_contents($this->dataDir . '/oracle/escaping.csv'),
+            file_get_contents($outputCsvFile)
+        );
+
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][2]['outputTable'] . '.csv';
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][2]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(99, $result['imported'][2]['rows']);
+        $this->assertEquals(
+            file_get_contents($this->dataDir . '/oracle/tableColumns.csv'),
+            file_get_contents($outputCsvFile)
+        );
+
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][3]['outputTable'] . '.csv';
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][3]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(4, $result['imported'][3]['rows']);
+        $this->assertEquals(
+            file_get_contents($this->dataDir . '/oracle/regions.csv'),
             file_get_contents($outputCsvFile)
         );
     }
@@ -853,15 +874,20 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERGENDER',
+                        ),
+                    5 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '1',
                         ),
-                    5 =>
+                    6 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    7 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -891,15 +917,20 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERCITY',
+                        ),
+                    5 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '2',
                         ),
-                    5 =>
+                    6 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    7 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -929,15 +960,20 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERSENTIMENT',
+                        ),
+                    5 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '3',
                         ),
-                    5 =>
+                    6 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    7 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -967,15 +1003,20 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'ZIPCODE',
+                        ),
+                    5 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '4',
                         ),
-                    5 =>
+                    6 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    7 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -1026,8 +1067,7 @@ class OracleTest extends OracleBaseTest
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $output = file_get_contents($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $this->assertEquals(
-            "\"ID\",\"CLOB_COL\"
-\"hello\",\"<test>some test xml </test>\"
+            "\"hello\",\"<test>some test xml </test>\"
 \"nullTest\",\"\"
 \"goodbye\",\"<test>some test xml </test>\"\n",
             $output

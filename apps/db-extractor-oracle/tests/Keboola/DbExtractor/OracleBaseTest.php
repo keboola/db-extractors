@@ -31,7 +31,6 @@ abstract class OracleBaseTest extends ExtractorTest
             echo "ADMIN CONNECTION ERROR: " . $error['message'];
         } else {
             try {
-                var_dump($dbConfig);
                 // create test user
                 $this->executeStatement(
                     $adminConnection,
