@@ -79,10 +79,14 @@ class OracleTest extends OracleBaseTest
             $this->dataDir . '/out/tables/' . $result['imported'][2]['outputTable'] . '.csv.manifest'
         );
         $this->assertEquals(99, $result['imported'][2]['rows']);
-        $this->assertEquals(
-            file_get_contents($this->dataDir . '/oracle/tableColumns.csv'),
-            file_get_contents($outputCsvFile)
-        );
+        $output = file_get_contents($outputCsvFile);
+        $outputLines = explode("\n", $output);
+        $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
+        foreach ($outputLines as $line) {
+            if (trim($line) !== "") {
+                $this->assertContains($line, $origContents);
+            }
+        }
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][3]['outputTable'] . '.csv';
         $this->assertFileExists($outputCsvFile);

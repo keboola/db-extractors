@@ -62,6 +62,7 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
         $this->createClobTable();
+        $this->cleanupOutputDirectory();
     }
 
     public function tearDown(): void
@@ -70,6 +71,16 @@ abstract class OracleBaseTest extends ExtractorTest
             oci_close($this->connection);
         }
         parent::tearDown();
+    }
+
+    private function cleanupOutputDirectory(): void
+    {
+        if (file_exists($this->dataDir . '/out/tables')) {
+            $dh = opendir($this->dataDir . '/out/tables');
+            while (false !== ($file = readdir($dh))) {
+                @unlink($file);
+            }
+        }
     }
 
     /**
