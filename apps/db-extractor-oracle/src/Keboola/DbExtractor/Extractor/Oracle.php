@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
-use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
+use Keboola\Utils;
 use Symfony\Component\Process\Process;
 
 use Throwable;
@@ -279,12 +278,13 @@ SQL;
                 }
                 $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1] = [
                     "name" => $column['COLUMN_NAME'],
+                    "sanitizedName" => Utils\sanitizeColumnName($column["COLUMN_NAME"]),
                     "type" => $column['DATA_TYPE'],
                     "nullable" => ($column['NULLABLE'] === 'Y') ? true : false,
                     "length" => $length,
                     "ordinalPosition" => $column['COLUMN_ID'],
                     "primaryKey" => false,
-                    "uniqueKey" => false
+                    "uniqueKey" => false,
                 ];
             }
 
