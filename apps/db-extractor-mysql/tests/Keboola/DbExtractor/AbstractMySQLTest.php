@@ -53,7 +53,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
             `_weird-I-d` INT NOT NULL AUTO_INCREMENT COMMENT \'This is a weird ID\',
             `weird-Name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
-            `timestamp` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'This is a timestamp\',
+            `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'This is a timestamp\',
             PRIMARY KEY (`_weird-I-d`)  
         ) COMMENT=\'This is a table comment\'');
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
