@@ -8,8 +8,9 @@ services:
 before_install:
   - docker-compose -v
   - docker-compose build
-  - docker-compose run --rm app
-  - docker-compose run --rm app8  
+  - docker-compose run app
+  - docker-compose rm -s -f
+  - docker-compose run app8  
 
 script:
   - docker pull quay.io/keboola/developer-portal-cli-v2:latest
