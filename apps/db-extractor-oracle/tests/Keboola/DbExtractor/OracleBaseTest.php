@@ -183,18 +183,20 @@ EOT;
 
         $header = $file->getHeader();
 
+        $createTableStatement = sprintf(
+            'CREATE TABLE %s (%s) tablespace users',
+            $tableName,
+            implode(
+                ', ',
+                array_map(function ($column) {
+                    return '"' . $column . '" NVARCHAR2 (400)';
+                }, $header)
+            )
+        );
+        
         $this->executeStatement(
             $this->connection,
-            sprintf(
-                'CREATE TABLE %s (%s) tablespace users',
-                $tableName,
-                implode(
-                    ', ',
-                    array_map(function ($column) {
-                        return $column . ' NVARCHAR2 (400)';
-                    }, $header)
-                )
-            )
+            $createTableStatement
         );
 
         // create the primary key if supplied
@@ -228,8 +230,8 @@ EOT;
                     $cols[] = "'" . $col . "'";
                 }
                 $sql = sprintf(
-                    "INSERT INTO {$tableName} (%s) VALUES (%s)",
-                    implode(',', $header),
+                    "INSERT INTO {$tableName} (\"%s\") VALUES (%s)",
+                    implode('","', $header),
                     implode(',', $cols)
                 );
 

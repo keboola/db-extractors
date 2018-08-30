@@ -11,11 +11,13 @@ parameters:
         -
             id: 2
             name: escaping
-            query: SELECT * FROM escaping
+            table:
+              schema: TESTER
+              tableName: ESCAPING
             outputTable: in.c-main.escaping
             incremental: false
             primaryKey:
-                - primaryKey
+                - _funnY#-col
             enabled: true
         -
             id: 3
