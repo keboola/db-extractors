@@ -17,6 +17,23 @@ services:
       - mysql:mysql-different-cn
       - sshproxy
 
+  app8:
+    build: .
+    image: keboola/ex-db-mysql
+    command: composer ci
+    env_file:
+      - ssh-keys.env
+    environment:
+      MYSQL_DB_HOST: mysql
+      MYSQL_DB_USER: root
+      MYSQL_DB_PASSWORD: rootpassword
+      MYSQL_DB_DATABASE: test
+      MYSQL_DB_PORT: 3307
+    links:
+      - mysql8:mysql
+      - mysql8:mysql-different-cn
+      - sshproxy8:sshproxy
+
   dev:
     image: keboola/ex-db-mysql
     volumes:
@@ -44,6 +61,21 @@ services:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: rootpassword
 
+  mysql8:
+    image: mysql:8
+    volumes:
+        - ./tests/data/mysql/ssl:/ssl-cert
+        - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: rootpassword
+    command:
+      - mysqld
+      - --local-infile
+      - --port=3307
+    expose:
+      - "3307"
+
   sshproxy:
     build: ./tests/env/sshproxy
     volumes:
@@ -53,3 +85,13 @@ services:
       - "2222:22"
     links:
       - mysql
+
+  sshproxy8:
+    build: ./tests/env/sshproxy
+    volumes:
+        - ./tests/env/sshproxy:/code
+    working_dir: /code
+    ports:
+      - "2222:22"
+    links:
+      - mysql8:mysql

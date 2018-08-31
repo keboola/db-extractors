@@ -156,7 +156,8 @@ class MySQL extends Extractor
 
         $whereClause = " WHERE c.TABLE_SCHEMA != 'performance_schema' 
                           AND c.TABLE_SCHEMA != 'mysql'
-                          AND c.TABLE_SCHEMA != 'information_schema'";
+                          AND c.TABLE_SCHEMA != 'information_schema'
+                          AND c.TABLE_SCHEMA != 'sys'";
 
         if ($this->database) {
             $whereClause = sprintf(" WHERE c.TABLE_SCHEMA = %s", $this->db->quote($this->database));

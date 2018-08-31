@@ -117,7 +117,7 @@ class MySQLTest extends AbstractMySQLTest
             'sshHost' => 'sshproxy',
             'sshPort' => '22',
             'remoteHost' => 'mysql',
-            'remotePort' => '3306',
+            'remotePort' => $this->getEnv('mysql', 'DB_PORT'),
             'localPort' => '23305',
         ];
 
