@@ -71,6 +71,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     command:
       - mysqld
+      - --local-infile
       - --port=3307
     expose:
       - "3307"
