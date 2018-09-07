@@ -58,6 +58,7 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                     ->prototype('scalar')->end()
                 ->end()
                 ->scalarNode('outputTable')
+                    ->isRequired()
                 ->end()
                 ->booleanNode('incremental')
                     ->defaultValue(false)

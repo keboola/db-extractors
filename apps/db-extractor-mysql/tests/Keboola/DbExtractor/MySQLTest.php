@@ -16,7 +16,6 @@ class MySQLTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
-        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
         $result = $app->run();
@@ -120,8 +119,6 @@ class MySQLTest extends AbstractMySQLTest
             'remotePort' => $this->getEnv('mysql', 'DB_PORT'),
             'localPort' => '23305',
         ];
-
-        $config['parameters']['tables'] = [];
 
         $app = $this->createApplication($config);
 
