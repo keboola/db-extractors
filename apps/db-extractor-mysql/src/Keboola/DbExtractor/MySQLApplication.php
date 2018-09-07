@@ -19,7 +19,9 @@ class MySQLApplication extends Application
         if (isset($this['parameters']['tables'])) {
             $this->setConfigDefinition(new MySQLConfigDefinition());
         } else {
-            $this->setConfigDefinition(new MySQLConfigRowDefinition());
+            if ($this['action'] === 'run') {
+                $this->setConfigDefinition(new MySQLConfigRowDefinition());
+            }
         }
     }
 }
