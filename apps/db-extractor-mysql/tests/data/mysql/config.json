@@ -3,7 +3,7 @@
     "db": {
       "host": "mysql",
       "user": "root",
-      "password": "rootpassword",
+      "#password": "rootpassword",
       "database": "test",
       "port": 3306,
       "networkCompression": true

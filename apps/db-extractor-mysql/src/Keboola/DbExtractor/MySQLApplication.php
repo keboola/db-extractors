@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\MySQLConfigDefinition;
 use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
+use Keboola\DbExtractor\Configuration\MySQLConfigRowActionDefinition;
 
 class MySQLApplication extends Application
 {
@@ -21,6 +22,8 @@ class MySQLApplication extends Application
         } else {
             if ($this['action'] === 'run') {
                 $this->setConfigDefinition(new MySQLConfigRowDefinition());
+            } else {
+                $this->setConfigDefinition(new MySQLConfigRowActionDefinition());
             }
         }
     }

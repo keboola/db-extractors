@@ -40,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
             $dbConfig['database']
         );
 
-        $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['password'], $options);
+        $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['#password'], $options);
 
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
         $this->pdo->exec("SET NAMES utf8;");
@@ -62,9 +62,6 @@ abstract class AbstractMySQLTest extends ExtractorTest
     public function getConfig(string $driver = self::DRIVER, string $format = self::CONFIG_FORMAT_YAML): array
     {
         $config = parent::getConfig($driver, $format);
-        if (!empty($config['parameters']['db']['#password'])) {
-            $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
-        }
         $config['parameters']['extractor_class'] = 'MySQL';
         return $config;
     }
@@ -72,9 +69,6 @@ abstract class AbstractMySQLTest extends ExtractorTest
     public function getConfigRow(string $driver = self::DRIVER): array
     {
         $config = parent::getConfigRow($driver);
-        if (!empty($config['parameters']['db']['#password'])) {
-            $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
-        }
         $config['parameters']['extractor_class'] = 'MySQL';
         return $config;
     }

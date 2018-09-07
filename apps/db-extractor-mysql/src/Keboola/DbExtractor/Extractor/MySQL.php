@@ -58,7 +58,7 @@ class MySQL extends Extractor
             }
         }
 
-        foreach (['host', 'user', 'password'] as $r) {
+        foreach (['host', 'user', '#password'] as $r) {
             if (!array_key_exists($r, $params)) {
                 throw new UserException(sprintf("Parameter %s is missing.", $r));
             }
@@ -85,7 +85,7 @@ class MySQL extends Extractor
         $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
         try {
-            $pdo = new PDO($dsn, $params['user'], $params['password'], $options);
+            $pdo = new PDO($dsn, $params['user'], $params['#password'], $options);
         } catch (PDOException $e) {
             $checkCnMismatch = function (\Throwable $exception): void {
                 if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {

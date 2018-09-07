@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Configuration;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class MySQLConfigRowDefinition extends ConfigRowDefinition
+class MySQLConfigRowActionDefinition extends ConfigRowDefinition
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -28,13 +28,17 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                 ->arrayNode('db')
                     ->children()
                         ->scalarNode('driver')->end()
-                        ->scalarNode('host')->end()
+                        ->scalarNode('host')
+                            ->isRequired()
+                        ->end()
                         ->scalarNode('port')->end()
                         ->scalarNode('database')->end()
                         ->scalarNode('user')
                             ->isRequired()
                         ->end()
-                        ->scalarNode('#password')->end()
+                        ->scalarNode('#password')
+                            ->isRequired()
+                        ->end()
                         ->append($this->addSshNode())
                         ->append($this->addSslNode())
                         ->booleanNode('networkCompression')
@@ -42,38 +46,6 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                         ->end()
                     ->end()
                 ->end()
-                ->integerNode('id')
-                ->end()
-                ->scalarNode('name')
-                ->end()
-                ->scalarNode('query')->end()
-                ->arrayNode('table')
-                    ->children()
-                        ->scalarNode('schema')->end()
-                        ->scalarNode('tableName')->end()
-                    ->end()
-                ->end()
-                ->arrayNode('columns')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->scalarNode('outputTable')
-                    ->isRequired()
-                ->end()
-                ->booleanNode('incremental')
-                    ->defaultValue(false)
-                ->end()
-                ->scalarNode('incrementalFetchingColumn')->end()
-                ->scalarNode('incrementalFetchingLimit')->end()
-                ->booleanNode('enabled')
-                    ->defaultValue(true)
-                ->end()
-                ->arrayNode('primaryKey')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->integerNode('retries')
-                    ->min(1)
-                ->end()
-                ->booleanNode('advancedMode')->end()
             ->end()
         ;
         // @formatter:on

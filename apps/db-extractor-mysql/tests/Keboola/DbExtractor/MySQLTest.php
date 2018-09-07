@@ -15,8 +15,11 @@ class MySQLTest extends AbstractMySQLTest
     public function testCredentials(): void
     {
         $config = $this->getConfig();
-        $config['action'] = 'testConnection';
 
+        $config['action'] = 'testConnection';
+        unset($config['parameters']['tables']);
+        $config['parameters']['db']['networkCompression'] = true;
+        
         $app = $this->createApplication($config);
         $result = $app->run();
 
