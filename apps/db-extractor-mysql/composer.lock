@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "863539fc00254727fb8b4ca16a341a60",
+    "content-hash": "fce9df9313a7a42e3ecf5610b19977f0",
     "packages": [
         {
             "name": "keboola/csv",
@@ -54,16 +54,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "9.1.4",
+            "version": "9.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82"
+                "reference": "c7dbe3e6ecbe36b30ef7807d18d248d3ecc5be5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82",
-                "reference": "2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/c7dbe3e6ecbe36b30ef7807d18d248d3ecc5be5e",
+                "reference": "c7dbe3e6ecbe36b30ef7807d18d248d3ecc5be5e",
                 "shasum": ""
             },
             "require": {
@@ -104,7 +104,7 @@
                 }
             ],
             "description": "Common library from Keboola Database Extractors",
-            "time": "2018-08-17T08:09:18+00:00"
+            "time": "2018-09-07T12:36:01+00:00"
         },
         {
             "name": "keboola/php-datatypes",
