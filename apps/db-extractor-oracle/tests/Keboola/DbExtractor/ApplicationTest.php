@@ -64,9 +64,7 @@ class ApplicationTest extends OracleBaseTest
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-        var_dump($process->getOutput());
-        var_dump($process->getErrorOutput());
-
+        
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
 
@@ -133,8 +131,6 @@ class ApplicationTest extends OracleBaseTest
         $process->setTimeout(300);
         $process->run();
 
-        var_dump($process->getOutput());
-        var_dump($process->getErrorOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
 
@@ -182,8 +178,6 @@ class ApplicationTest extends OracleBaseTest
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getOutput());
 
         $this->assertEquals(1, $process->getExitCode());
         $this->assertContains("Export process failed:", $process->getErrorOutput());
