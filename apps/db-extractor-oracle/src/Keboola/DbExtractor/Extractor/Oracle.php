@@ -101,7 +101,7 @@ class Oracle extends Extractor
         $proxy = new RetryProxy($this->logger, $maxTries);
         $tableName = $table['name'];
         try {
-            $linesWritten = $proxy->call(function () use ($query, $tableName, $isAdvancedQuery) {
+            $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
                 try {
                     return $this->exportTable($tableName, $isAdvancedQuery);
                 } catch (Throwable $e) {
