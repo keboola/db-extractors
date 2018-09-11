@@ -308,6 +308,7 @@ SQL;
                         break;
                 }
             }
+            ksort($tableDefs[$curTable]['columns']);
         }
         ksort($tableDefs);
         return array_values($tableDefs);
