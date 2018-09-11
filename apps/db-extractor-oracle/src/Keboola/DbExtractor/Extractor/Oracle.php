@@ -103,7 +103,7 @@ class Oracle extends Extractor
         try {
             $linesWritten = $proxy->call(function () use ($query, $tableName, $isAdvancedQuery) {
                 try {
-                    return $this->exportTable($query, $tableName, $isAdvancedQuery);
+                    return $this->exportTable($tableName, $isAdvancedQuery);
                 } catch (Throwable $e) {
                     try {
                         $this->db = $this->createConnection($this->dbParams);
@@ -135,7 +135,7 @@ class Oracle extends Extractor
         return $output;
     }
 
-    protected function exportTable(string $query, string $tableName, bool $advancedQuery): int
+    protected function exportTable(string $tableName, bool $advancedQuery): int
     {
         $cmd = 'java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName];
         $cmd .= ($advancedQuery) ? ' true' : ' false';
