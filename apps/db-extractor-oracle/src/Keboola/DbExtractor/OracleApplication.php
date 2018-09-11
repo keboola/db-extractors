@@ -12,8 +12,8 @@ class OracleApplication extends Application
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'Oracle';
-
-        parent::__construct($config, $logger ?? new Logger("ex-db-oracle"), $state);
+        $logger = $logger ?? new Logger("ex-db-oracle");
+        parent::__construct($config, $logger, $state);
 
         $this->setConfigDefinition(new ConfigDefinition());
     }
