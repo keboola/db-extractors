@@ -106,6 +106,7 @@ class Oracle extends Extractor
                     return $this->exportTable($tableName, $isAdvancedQuery);
                 } catch (Throwable $e) {
                     try {
+                        oci_close($this->db);
                         $this->db = $this->createConnection($this->dbParams);
                     } catch (Throwable $e) {
                     };
