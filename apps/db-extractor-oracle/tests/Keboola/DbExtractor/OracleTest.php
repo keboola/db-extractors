@@ -199,7 +199,7 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
         $this->assertCount(9, $result['tables']);
-        
+
         $expectedTables = array (
             0 =>
                 array (

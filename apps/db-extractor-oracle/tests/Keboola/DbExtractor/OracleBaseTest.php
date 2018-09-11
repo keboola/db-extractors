@@ -114,17 +114,9 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->createTextTable($csv2);
     }
 
-    /**
-     * @param CsvFile $file
-     * @return string
-     */
     protected function generateTableName(CsvFile $file): string
     {
-        $tableName = sprintf(
-            '%s',
-            $file->getBasename('.' . $file->getExtension())
-        );
-
+        $tableName = $file->getBasename('.' . $file->getExtension());
         return $tableName;
     }
 
