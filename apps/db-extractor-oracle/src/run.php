@@ -10,6 +10,8 @@ use Monolog\Handler\NullHandler;
 
 require_once(__DIR__ . "/../vendor/autoload.php");
 
+$logger = new Logger('ex-db-oracle');
+
 $runAction = true;
 
 try {
@@ -30,7 +32,7 @@ try {
     } else {
         throw new UserException('Invalid configuration file type');
     }
-    $logger = new Logger('ex-db-oracle');
+
     $app = new OracleApplication($config, $logger, [], $arguments['data']);
 
     if ($app['action'] !== 'run') {
