@@ -139,14 +139,14 @@ class Oracle extends Extractor
     protected function exportTable(string $tableName, bool $advancedQuery): int
     {
         $cmd = [
-            'java -jar /code/oracle/table-exporter.jar',
+            'java',
+            '-jar',
+            '/code/oracle/table-exporter.jar',
             $this->exportConfigFiles[$tableName],
             var_export($advancedQuery, true),
         ];
 
-        $process = new Process(
-            $cmd
-        );
+        $process = new Process($cmd);
         $process->setTimeout(null);
         $process->setIdleTimeout(null);
         $process->run();
