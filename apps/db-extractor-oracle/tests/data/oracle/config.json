@@ -14,7 +14,10 @@
         "id": 2,
         "enabled": true,
         "name": "escaping",
-        "query": "SELECT * FROM escaping",
+        "table": {
+          "schema": "TESTER",
+          "tableName": "ESCAPING"
+        },
         "outputTable": "in.c-main.escaping",
         "incremental": false,
         "primaryKey": null

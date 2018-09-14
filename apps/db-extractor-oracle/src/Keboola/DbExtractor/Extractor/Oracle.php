@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\DbExtractor\Extractor;
 
-use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractor\RetryProxy;
+use Keboola\Utils;
 use Symfony\Component\Process\Process;
+
+use Throwable;
 
 class Oracle extends Extractor
 {
@@ -17,10 +22,10 @@ class Oracle extends Extractor
     /** @var  array */
     protected $exportConfigFiles;
 
-    public function __construct($parameters, Logger $logger)
+    public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
         $this->dbParams = $parameters['db'];
-        parent::__construct($parameters, $logger);
+        parent::__construct($parameters, $state, $logger);
         // setup the export config files for the export tool
         foreach ($parameters['tables'] as $table) {
             $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
@@ -28,7 +33,7 @@ class Oracle extends Extractor
         }
     }
 
-    private function writeExportConfig(array $dbParams, array $table)
+    private function writeExportConfig(array $dbParams, array $table): void
     {
         if (!isset($table['query'])) {
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
@@ -46,7 +51,7 @@ class Oracle extends Extractor
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
-    public function createConnection($params)
+    public function createConnection(array $params)
     {
         $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
         $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
@@ -58,15 +63,90 @@ class Oracle extends Extractor
         return $connection;
     }
 
-    public function createSshTunnel($dbConfig)
+    public function createSshTunnel(array $dbConfig): array
     {
         $this->dbParams = parent::createSshTunnel($dbConfig);
         return $this->dbParams;
     }
 
-    protected function executeQuery($query, CsvFile $csv, $tableName): int
+    protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
     {
-        $process = new Process('java -jar /code/oracle/table-exporter.jar ' . $this->exportConfigFiles[$tableName]);
+        $message = "";
+        if ($table) {
+            $message = sprintf("[%s]: ", $table['name']);
+        }
+        $message .= sprintf('DB query failed: %s', $e->getMessage());
+        if ($counter) {
+            $message .= sprintf(' Tried %d times.', $counter);
+        }
+        return new UserException($message, 0, $e);
+    }
+
+    public function export(array $table): array
+    {
+        $outputTable = $table['outputTable'];
+        $csv = $this->createOutputCsv($outputTable);
+
+        $this->logger->info("Exporting to " . $outputTable);
+
+        $isAdvancedQuery = true;
+        if (array_key_exists('table', $table) && !array_key_exists('query', $table)) {
+            $isAdvancedQuery = false;
+            $query = $this->simpleQuery($table['table'], $table['columns']);
+        } else {
+            $query = $table['query'];
+        }
+        $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
+
+        $proxy = new RetryProxy($this->logger, $maxTries);
+        $tableName = $table['name'];
+        try {
+            $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
+                try {
+                    return $this->exportTable($tableName, $isAdvancedQuery);
+                } catch (Throwable $e) {
+                    try {
+                        oci_close($this->db);
+                        $this->db = $this->createConnection($this->dbParams);
+                    } catch (Throwable $e) {
+                    };
+                    throw $e;
+                }
+            });
+        } catch (Throwable $e) {
+            throw $this->handleDbError($e, $table, $maxTries);
+        }
+        $rowCount = $linesWritten - 1;
+        if ($rowCount > 0) {
+            $this->createManifest($table);
+        } else {
+            @unlink($csv->getPathname());
+            $this->logger->warn(
+                sprintf(
+                    "Query returned empty result. Nothing was imported for table [%s]",
+                    $table['name']
+                )
+            );
+        }
+
+        $output = [
+            "outputTable"=> $outputTable,
+            "rows" => $rowCount,
+        ];
+        return $output;
+    }
+
+    protected function exportTable(string $tableName, bool $advancedQuery): int
+    {
+        $cmd = [
+            'java',
+            '-jar',
+            '/code/oracle/table-exporter.jar',
+            $this->exportConfigFiles[$tableName],
+            var_export($advancedQuery, true),
+        ];
+
+        $process = new Process($cmd);
         $process->setTimeout(null);
         $process->setIdleTimeout(null);
         $process->run();
@@ -84,16 +164,10 @@ class Oracle extends Extractor
             $rowCountStr,
             FILTER_SANITIZE_NUMBER_INT
         );
-
-        if ($linesWritten <= 1) {
-            // remove the output file that only contains header
-            @unlink($csv->getPathname());
-            return 0;
-        }
         return $linesWritten;
     }
 
-    public function testConnection()
+    public function testConnection(): bool
     {
         $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
         $success = oci_execute($stmt);
@@ -101,7 +175,7 @@ class Oracle extends Extractor
         return $success;
     }
 
-    public function getTables(array $tables = null)
+    public function getTables(array $tables = null): array
     {
         $sql = <<<SQL
 SELECT TABS.TABLE_NAME ,
@@ -208,12 +282,13 @@ SQL;
                 }
                 $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1] = [
                     "name" => $column['COLUMN_NAME'],
+                    "sanitizedName" => Utils\sanitizeColumnName($column["COLUMN_NAME"]),
                     "type" => $column['DATA_TYPE'],
                     "nullable" => ($column['NULLABLE'] === 'Y') ? true : false,
                     "length" => $length,
                     "ordinalPosition" => $column['COLUMN_ID'],
                     "primaryKey" => false,
-                    "uniqueKey" => false
+                    "uniqueKey" => false,
                 ];
             }
 
@@ -237,12 +312,13 @@ SQL;
                         break;
                 }
             }
+            ksort($tableDefs[$curTable]['columns']);
         }
         ksort($tableDefs);
         return array_values($tableDefs);
     }
 
-    public function simpleQuery(array $table, array $columns = array())
+    public function simpleQuery(array $table, array $columns = array()): string
     {
         if (count($columns) > 0) {
             return sprintf(

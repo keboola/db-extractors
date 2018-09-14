@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;
@@ -18,10 +19,6 @@ abstract class OracleBaseTest extends ExtractorTest
 
     public function setUp(): void
     {
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-oracle');
-        }
-
         $config = $this->getConfig('oracle');
         // write configuration file for exporter
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
@@ -34,7 +31,6 @@ abstract class OracleBaseTest extends ExtractorTest
             echo "ADMIN CONNECTION ERROR: " . $error['message'];
         } else {
             try {
-                var_dump($dbConfig);
                 // create test user
                 $this->executeStatement(
                     $adminConnection,
@@ -66,9 +62,10 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
         $this->createClobTable();
+        $this->cleanupOutputDirectory();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection) {
             oci_close($this->connection);
@@ -76,15 +73,24 @@ abstract class OracleBaseTest extends ExtractorTest
         parent::tearDown();
     }
 
+    private function cleanupOutputDirectory(): void
+    {
+        if (file_exists($this->dataDir . '/out/tables')) {
+            $dh = opendir($this->dataDir . '/out/tables');
+            while (false !== ($file = readdir($dh))) {
+                @unlink($file);
+            }
+        }
+    }
+
     /**
      * @param array $config
      * @return OracleApplication
      */
-    public function createApplication(array $config)
+    public function createApplication(array $config, array $state = []): OracleApplication
     {
-        $app = new OracleApplication($config, $this->dataDir);
-
-        return $app;
+        $logger = new Logger('ex-db-mysql-tests');
+        return new OracleApplication($config, $logger, $state, $this->dataDir);
     }
 
     private function executeStatement($connection, string $sql): void
@@ -99,7 +105,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
     }
 
-    protected function setupTestTables()
+    protected function setupTestTables(): void
     {
         $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
         $this->createTextTable($csv1, ['CREATEDAT']);
@@ -108,21 +114,13 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->createTextTable($csv2);
     }
 
-    /**
-     * @param CsvFile $file
-     * @return string
-     */
-    protected function generateTableName(CsvFile $file)
+    protected function generateTableName(CsvFile $file): string
     {
-        $tableName = sprintf(
-            '%s',
-            $file->getBasename('.' . $file->getExtension())
-        );
-
+        $tableName = $file->getBasename('.' . $file->getExtension());
         return $tableName;
     }
 
-    private function dropTableIfExists(string $tablename)
+    private function dropTableIfExists(string $tablename): void
     {
         $sql = <<<EOT
 BEGIN
@@ -140,7 +138,7 @@ EOT;
         );
     }
 
-    protected function createClobTable()
+    protected function createClobTable(): void
     {
         // drop the
         $this->dropTableIfExists("CLOB_TEST");
@@ -169,7 +167,7 @@ EOT;
      *
      * @param CsvFile $file
      */
-    protected function createTextTable(CsvFile $file, $primaryKey = [])
+    protected function createTextTable(CsvFile $file, array $primaryKey = []): void
     {
         $tableName = $this->generateTableName($file);
 
@@ -177,18 +175,20 @@ EOT;
 
         $header = $file->getHeader();
 
+        $createTableStatement = sprintf(
+            'CREATE TABLE %s (%s) tablespace users',
+            $tableName,
+            implode(
+                ', ',
+                array_map(function ($column) {
+                    return '"' . $column . '" NVARCHAR2 (400)';
+                }, $header)
+            )
+        );
+        
         $this->executeStatement(
             $this->connection,
-            sprintf(
-                'CREATE TABLE %s (%s) tablespace users',
-                $tableName,
-                implode(
-                    ', ',
-                    array_map(function ($column) {
-                        return $column . ' NVARCHAR2 (400)';
-                    }, $header)
-                )
-            )
+            $createTableStatement
         );
 
         // create the primary key if supplied
@@ -222,8 +222,8 @@ EOT;
                     $cols[] = "'" . $col . "'";
                 }
                 $sql = sprintf(
-                    "INSERT INTO {$tableName} (%s) VALUES (%s)",
-                    implode(',', $header),
+                    "INSERT INTO {$tableName} (\"%s\") VALUES (%s)",
+                    implode('","', $header),
                     implode(',', $cols)
                 );
 
@@ -246,7 +246,7 @@ EOT;
      * @param CsvFile $file
      * @return int
      */
-    protected function countTable(CsvFile $file)
+    protected function countTable(CsvFile $file): int
     {
         $linesCount = 0;
         foreach ($file as $i => $line) {

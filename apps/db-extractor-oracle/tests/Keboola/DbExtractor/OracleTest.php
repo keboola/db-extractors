@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
@@ -7,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest
 {
-    public function testCredentials()
+    public function testCredentials(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'testConnection';
@@ -20,7 +22,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithoutTables()
+    public function testRunWithoutTables(): void
     {
         $config = $this->getConfig('oracle');
 
@@ -33,19 +35,21 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRun()
+    public function testRunConfig(): void
     {
         $config = $this->getConfig('oracle');
         $app = $this->createApplication($config);
         $this->setupTestTables();
 
         $result = $app->run();
-
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(99, $result['imported'][0]['rows']);
 
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
@@ -57,17 +61,52 @@ class OracleTest extends OracleBaseTest
             }
         }
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
 
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'
+        );
+        $manifest = json_decode(
+            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'),
+            true
+        );
+        $this->assertEquals(["funnY_col", "s_d_col"], $manifest['columns']);
+        $this->assertEquals(["funnY_col"], $manifest["primary_key"]);
+        $this->assertEquals(7, $result['imported'][1]['rows']);
         $this->assertEquals(
-            file_get_contents($this->dataDir . '/oracle/escaping.csv'),
+            file_get_contents($this->dataDir . '/oracle/headerlessEscaping.csv'),
+            file_get_contents($outputCsvFile)
+        );
+
+        $outputCsvFile = $this->dataDir . '/out/tables/' . strtolower($result['imported'][2]['outputTable']) . '.csv';
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists(
+            $outputCsvFile . '.manifest'
+        );
+        $this->assertEquals(99, $result['imported'][2]['rows']);
+        $output = file_get_contents($outputCsvFile);
+        $outputLines = explode("\n", $output);
+        $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
+        foreach ($outputLines as $line) {
+            if (trim($line) !== "") {
+                $this->assertContains($line, $origContents);
+            }
+        }
+
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][3]['outputTable'] . '.csv';
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported'][3]['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(4, $result['imported'][3]['rows']);
+        $this->assertEquals(
+            file_get_contents($this->dataDir . '/oracle/regions.csv'),
             file_get_contents($outputCsvFile)
         );
     }
 
-    public function testCredentialsWithSSH()
+    public function testCredentialsWithSSH(): void
     {
         $config = $this->getConfig('oracle');
 
@@ -94,7 +133,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testRunWithSSH()
+    public function testRunWithSSH(): void
     {
         $config = $this->getConfig('oracle');
         $config['parameters']['db']['ssh'] = [
@@ -115,33 +154,33 @@ class OracleTest extends OracleBaseTest
         $this->setupTestTables();
 
         $salesCsv = new CsvFile($this->dataDir. '/oracle/sales.csv');
-        $escapingCsv = new CsvFile($this->dataDir. '/oracle/escaping.csv');
+        $escapingCsv = new CsvFile($this->dataDir. '/oracle/headerlessEscaping.csv');
 
         $result = $app->run();
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
 
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
         // will check this one line by line because it randomly orders it sometimes
         $output = file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($salesCsv);
+        $origContents = file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
             if (trim($line) !== "") {
                 $this->assertContains($line, $origContents);
             }
         }
 
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1] . '.csv.manifest');
-        $this->assertEquals(file_get_contents($escapingCsv), file_get_contents($outputCsvFile));
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest');
+        $this->assertEquals(file_get_contents($escapingCsv->getPathname()), file_get_contents($outputCsvFile));
     }
 
-    public function testGetTables()
+    public function testGetTables(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
@@ -173,6 +212,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'DEPARTMENT_ID',
+                                    'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => false,
                                     'length' => '4,0',
@@ -184,6 +224,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'DEPARTMENT_NAME',
+                                    'sanitizedName' => 'DEPARTMENT_NAME',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '30',
@@ -194,6 +235,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'MANAGER_ID',
+                                    'sanitizedName' => 'MANAGER_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '6,0',
@@ -207,6 +249,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'LOCATION_ID',
+                                    'sanitizedName' => 'LOCATION_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '4,0',
@@ -230,6 +273,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'EMPLOYEE_ID',
+                                    'sanitizedName' => 'EMPLOYEE_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => false,
                                     'length' => '6,0',
@@ -241,6 +285,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'FIRST_NAME',
+                                    'sanitizedName' => 'FIRST_NAME',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '20',
@@ -251,6 +296,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'LAST_NAME',
+                                    'sanitizedName' => 'LAST_NAME',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '25',
@@ -261,6 +307,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'EMAIL',
+                                    'sanitizedName' => 'EMAIL',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '25',
@@ -272,6 +319,7 @@ class OracleTest extends OracleBaseTest
                             4 =>
                                 array (
                                     'name' => 'PHONE_NUMBER',
+                                    'sanitizedName' => 'PHONE_NUMBER',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '20',
@@ -282,6 +330,7 @@ class OracleTest extends OracleBaseTest
                             5 =>
                                 array (
                                     'name' => 'HIRE_DATE',
+                                    'sanitizedName' => 'HIRE_DATE',
                                     'type' => 'DATE',
                                     'nullable' => false,
                                     'length' => '7',
@@ -292,6 +341,7 @@ class OracleTest extends OracleBaseTest
                             6 =>
                                 array (
                                     'name' => 'JOB_ID',
+                                    'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '10',
@@ -305,6 +355,7 @@ class OracleTest extends OracleBaseTest
                             7 =>
                                 array (
                                     'name' => 'SALARY',
+                                    'sanitizedName' => 'SALARY',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '8,2',
@@ -315,6 +366,7 @@ class OracleTest extends OracleBaseTest
                             8 =>
                                 array (
                                     'name' => 'COMMISSION_PCT',
+                                    'sanitizedName' => 'COMMISSION_PCT',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '2,2',
@@ -325,6 +377,7 @@ class OracleTest extends OracleBaseTest
                             9 =>
                                 array (
                                     'name' => 'MANAGER_ID',
+                                    'sanitizedName' => 'MANAGER_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '6,0',
@@ -338,6 +391,7 @@ class OracleTest extends OracleBaseTest
                             10 =>
                                 array (
                                     'name' => 'DEPARTMENT_ID',
+                                    'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '4,0',
@@ -361,6 +415,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'JOB_ID',
+                                    'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '10',
@@ -372,6 +427,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'JOB_TITLE',
+                                    'sanitizedName' => 'JOB_TITLE',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '35',
@@ -382,6 +438,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'MIN_SALARY',
+                                    'sanitizedName' => 'MIN_SALARY',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '6,0',
@@ -392,6 +449,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'MAX_SALARY',
+                                    'sanitizedName' => 'MAX_SALARY',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '6,0',
@@ -412,20 +470,22 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'EMPLOYEE_ID',
+                                    'sanitizedName' => 'EMPLOYEE_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => false,
                                     'length' => '6,0',
                                     'ordinalPosition' => '1',
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
-                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
                                     'foreignKeyName' => 'JHIST_EMP_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'EMP_EMP_ID_PK',
+                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
                                 ),
                             1 =>
                                 array (
                                     'name' => 'START_DATE',
+                                    'sanitizedName' => 'START_DATE',
                                     'type' => 'DATE',
                                     'nullable' => false,
                                     'length' => '7',
@@ -437,6 +497,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'END_DATE',
+                                    'sanitizedName' => 'END_DATE',
                                     'type' => 'DATE',
                                     'nullable' => false,
                                     'length' => '7',
@@ -447,6 +508,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'JOB_ID',
+                                    'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '10',
@@ -460,6 +522,7 @@ class OracleTest extends OracleBaseTest
                             4 =>
                                 array (
                                     'name' => 'DEPARTMENT_ID',
+                                    'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => true,
                                     'length' => '4,0',
@@ -483,6 +546,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'LOCATION_ID',
+                                    'sanitizedName' => 'LOCATION_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => false,
                                     'length' => '4,0',
@@ -494,6 +558,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'STREET_ADDRESS',
+                                    'sanitizedName' => 'STREET_ADDRESS',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '40',
@@ -504,6 +569,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'POSTAL_CODE',
+                                    'sanitizedName' => 'POSTAL_CODE',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '12',
@@ -514,6 +580,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'CITY',
+                                    'sanitizedName' => 'CITY',
                                     'type' => 'VARCHAR2',
                                     'nullable' => false,
                                     'length' => '30',
@@ -524,6 +591,7 @@ class OracleTest extends OracleBaseTest
                             4 =>
                                 array (
                                     'name' => 'STATE_PROVINCE',
+                                    'sanitizedName' => 'STATE_PROVINCE',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '25',
@@ -534,6 +602,7 @@ class OracleTest extends OracleBaseTest
                             5 =>
                                 array (
                                     'name' => 'COUNTRY_ID',
+                                    'sanitizedName' => 'COUNTRY_ID',
                                     'type' => 'CHAR',
                                     'nullable' => true,
                                     'length' => '2',
@@ -557,6 +626,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'REGION_ID',
+                                    'sanitizedName' => 'REGION_ID',
                                     'type' => 'NUMBER',
                                     'nullable' => false,
                                     'length' => '22',
@@ -568,6 +638,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'REGION_NAME',
+                                    'sanitizedName' => 'REGION_NAME',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '25',
@@ -585,23 +656,25 @@ class OracleTest extends OracleBaseTest
                     'owner' => 'TESTER',
                     'columns' =>
                         array (
-                            1 =>
-                                array (
-                                    'name' => 'CLOB_COL',
-                                    'type' => 'CLOB',
-                                    'nullable' => true,
-                                    'length' => '4000',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ),
                             0 =>
                                 array (
                                     'name' => 'ID',
+                                    'sanitizedName' => 'ID',
                                     'type' => 'VARCHAR2',
                                     'nullable' => true,
                                     'length' => '25',
                                     'ordinalPosition' => '1',
+                                    'primaryKey' => false,
+                                    'uniqueKey' => false,
+                                ),
+                            1 =>
+                                array (
+                                    'name' => 'CLOB_COL',
+                                    'sanitizedName' => 'CLOB_COL',
+                                    'type' => 'CLOB',
+                                    'nullable' => true,
+                                    'length' => '4000',
+                                    'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
                                 ),
@@ -617,7 +690,8 @@ class OracleTest extends OracleBaseTest
                         array (
                             0 =>
                                 array (
-                                    'name' => 'COL1',
+                                    'name' => '_funnY#-col',
+                                    'sanitizedName' => 'funnY_col',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -627,7 +701,8 @@ class OracleTest extends OracleBaseTest
                                 ),
                             1 =>
                                 array (
-                                    'name' => 'COL2',
+                                    'name' => '_s%d-col',
+                                    'sanitizedName' => 's_d_col',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -648,6 +723,7 @@ class OracleTest extends OracleBaseTest
                             0 =>
                                 array (
                                     'name' => 'USERGENDER',
+                                    'sanitizedName' => 'USERGENDER',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -658,6 +734,7 @@ class OracleTest extends OracleBaseTest
                             1 =>
                                 array (
                                     'name' => 'USERCITY',
+                                    'sanitizedName' => 'USERCITY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -668,6 +745,7 @@ class OracleTest extends OracleBaseTest
                             2 =>
                                 array (
                                     'name' => 'USERSENTIMENT',
+                                    'sanitizedName' => 'USERSENTIMENT',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -678,6 +756,7 @@ class OracleTest extends OracleBaseTest
                             3 =>
                                 array (
                                     'name' => 'ZIPCODE',
+                                    'sanitizedName' => 'ZIPCODE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -688,6 +767,7 @@ class OracleTest extends OracleBaseTest
                             4 =>
                                 array (
                                     'name' => 'SKU',
+                                    'sanitizedName' => 'SKU',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -698,6 +778,7 @@ class OracleTest extends OracleBaseTest
                             5 =>
                                 array (
                                     'name' => 'CREATEDAT',
+                                    'sanitizedName' => 'CREATEDAT',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -708,6 +789,7 @@ class OracleTest extends OracleBaseTest
                             6 =>
                                 array (
                                     'name' => 'CATEGORY',
+                                    'sanitizedName' => 'CATEGORY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -718,6 +800,7 @@ class OracleTest extends OracleBaseTest
                             7 =>
                                 array (
                                     'name' => 'PRICE',
+                                    'sanitizedName' => 'PRICE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -728,6 +811,7 @@ class OracleTest extends OracleBaseTest
                             8 =>
                                 array (
                                     'name' => 'COUNTY',
+                                    'sanitizedName' => 'COUNTY',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -738,6 +822,7 @@ class OracleTest extends OracleBaseTest
                             9 =>
                                 array (
                                     'name' => 'COUNTYCODE',
+                                    'sanitizedName' => 'COUNTYCODE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -748,6 +833,7 @@ class OracleTest extends OracleBaseTest
                             10 =>
                                 array (
                                     'name' => 'USERSTATE',
+                                    'sanitizedName' => 'USERSTATE',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -758,6 +844,7 @@ class OracleTest extends OracleBaseTest
                             11 =>
                                 array (
                                     'name' => 'CATEGORYGROUP',
+                                    'sanitizedName' => 'CATEGORYGROUP',
                                     'type' => 'NVARCHAR2',
                                     'nullable' => true,
                                     'length' => '800',
@@ -771,7 +858,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testMetadataManifest()
+    public function testMetadataManifest():void
     {
         $config = $this->getConfig('oracle');
 
@@ -845,15 +932,25 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERGENDER',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'USERGENDER',
+                        ),
+                    6 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '1',
                         ),
-                    5 =>
+                    7 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -883,15 +980,25 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERCITY',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'USERCITY',
+                        ),
+                    6 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '2',
                         ),
-                    5 =>
+                    7 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -921,15 +1028,25 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'USERSENTIMENT',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'USERSENTIMENT',
+                        ),
+                    6 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '3',
                         ),
-                    5 =>
+                    7 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -959,15 +1076,25 @@ class OracleTest extends OracleBaseTest
                         ),
                     4 =>
                         array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'ZIPCODE',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'ZIPCODE',
+                        ),
+                    6 =>
+                        array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => '4',
                         ),
-                    5 =>
+                    7 =>
                         array (
                             'key' => 'KBC.primaryKey',
                             'value' => false,
                         ),
-                    6 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
@@ -977,7 +1104,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
-    public function testRunEmptyResultSet()
+    public function testRunEmptyResultSet(): void
     {
         $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
         $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';
@@ -1001,7 +1128,7 @@ class OracleTest extends OracleBaseTest
         $this->assertFileNotExists($regionsDataFile);
     }
 
-    public function testExtractClob()
+    public function testExtractClob(): void
     {
         $config = $this->getConfig('oracle');
         unset($config['parameters']['tables'][2]);
@@ -1018,16 +1145,15 @@ class OracleTest extends OracleBaseTest
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $output = file_get_contents($this->dataDir . '/out/tables/in.c-main.clob_test.csv');
         $this->assertEquals(
-            "\"ID\",\"CLOB_COL\"
-\"hello\",\"<test>some test xml </test>\"
+            "\"hello\",\"<test>some test xml </test>\"
 \"nullTest\",\"\"
 \"goodbye\",\"<test>some test xml </test>\"\n",
             $output
         );
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
     }
 
-    public function testTrailingSemiColon()
+    public function testTrailingSemiColon(): void
     {
         $regionsManifestFile = $this->dataDir . '/out/tables/in.c-main.regions.csv.manifest';
         $regionsDataFile = $this->dataDir . '/out/tables/in.c-main.regions.csv';

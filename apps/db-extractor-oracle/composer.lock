@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c571ec709d58569be917ff616261211a",
+    "content-hash": "77df7324d1d45435e565fb05a6e4d15b",
     "packages": [
         {
             "name": "keboola/csv",
@@ -54,34 +54,38 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "5.3.1",
+            "version": "9.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "7df4dfb44ec37cd1699bc57349d85f7d10bc9ef0"
+                "reference": "2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/7df4dfb44ec37cd1699bc57349d85f7d10bc9ef0",
-                "reference": "7df4dfb44ec37cd1699bc57349d85f7d10bc9ef0",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82",
+                "reference": "2c0cf3720e8af963d1fcaf3f3b2270e60f86cf82",
                 "shasum": ""
             },
             "require": {
                 "keboola/csv": "^1.1",
-                "keboola/php-datatypes": "^2.0.1",
+                "keboola/php-datatypes": "^3.2",
+                "keboola/php-utils": "^2.3",
                 "keboola/ssh-tunnel": "^1.0",
                 "monolog/monolog": "^1.17",
                 "nette/utils": "^2.4",
-                "php": ">=5.6",
+                "php": ">=7.1",
                 "pimple/pimple": "^3.0",
                 "symfony/config": "^3.0",
                 "symfony/process": "^3.0",
-                "symfony/yaml": "^3.0"
+                "symfony/serializer": "^3.1",
+                "symfony/yaml": "^3.0",
+                "vkartaviy/retry": "^0.2"
             },
             "require-dev": {
+                "keboola/coding-standard": "^2.0",
                 "phpstan/phpstan": "^0.8",
                 "phpunit/phpunit": "4.6.*",
-                "squizlabs/php_codesniffer": "^2.6"
+                "symfony/finder": "*"
             },
             "type": "library",
             "autoload": {
@@ -90,31 +94,35 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
-                    "name": "Miroslav Cillik",
-                    "email": "miro@keboola.com"
+                    "name": "keboola",
+                    "email": "devel@keboola.com"
                 }
             ],
-            "time": "2018-01-29T09:58:19+00:00"
+            "description": "Common library from Keboola Database Extractors",
+            "time": "2018-08-17T08:09:18+00:00"
         },
         {
             "name": "keboola/php-datatypes",
-            "version": "2.1.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-datatypes.git",
-                "reference": "4da9c61e8f711123ef3c1e041564557a79c0fcf8"
+                "reference": "f16967a5da1b67e4a9fb38b07a1b0df3e588abb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/4da9c61e8f711123ef3c1e041564557a79c0fcf8",
-                "reference": "4da9c61e8f711123ef3c1e041564557a79c0fcf8",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/f16967a5da1b67e4a9fb38b07a1b0df3e588abb8",
+                "reference": "f16967a5da1b67e4a9fb38b07a1b0df3e588abb8",
                 "shasum": ""
             },
             "require-dev": {
                 "codeclimate/php-test-reporter": "~0.4",
-                "phpstan/phpstan": "~0.6",
+                "phpstan/phpstan": "~0.9",
                 "phpunit/phpunit": "^5.0",
                 "squizlabs/php_codesniffer": "^2.6"
             },
@@ -127,11 +135,11 @@
             "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
-                    "name": "Ondrej Hlavacek",
+                    "name": "Ondřej Hlaváček",
                     "email": "ondrej.hlavacek@keboola.com"
                 }
             ],
-            "time": "2017-05-30T16:30:33+00:00"
+            "time": "2018-08-02T15:13:46+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -181,6 +189,72 @@
                 "temp"
             ],
             "time": "2017-11-13T13:02:19+00:00"
+        },
+        {
+            "name": "keboola/php-utils",
+            "version": "2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/php-utils.git",
+                "reference": "ec4d582994f2961bd16a6f6be40d3e8608ef5ec3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/php-utils/zipball/ec4d582994f2961bd16a6f6be40d3e8608ef5ec3",
+                "reference": "ec4d582994f2961bd16a6f6be40d3e8608ef5ec3",
+                "shasum": ""
+            },
+            "require": {
+                "keboola/php-temp": "^1.0",
+                "php": ">=5.6.0",
+                "seld/jsonlint": "^1.4"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "~0.2",
+                "phpunit/phpunit": "~5.0",
+                "squizlabs/php_codesniffer": "~2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Keboola/Utils/jsonDecode.php",
+                    "src/Keboola/Utils/sanitizeUtf8.php",
+                    "src/Keboola/Utils/objectToArray.php",
+                    "src/Keboola/Utils/formatDateTime.php",
+                    "src/Keboola/Utils/replaceDates.php",
+                    "src/Keboola/Utils/replaceDatesInArray.php",
+                    "src/Keboola/Utils/buildUrl.php",
+                    "src/Keboola/Utils/httpBuildUrl.php",
+                    "src/Keboola/Utils/returnBytes.php",
+                    "src/Keboola/Utils/camelize.php",
+                    "src/Keboola/Utils/getDataFromPath.php",
+                    "src/Keboola/Utils/isValidDateTimeString.php",
+                    "src/Keboola/Utils/flattenArray.php",
+                    "src/Keboola/Utils/arrayToObject.php",
+                    "src/Keboola/Utils/isEmptyObject.php",
+                    "src/Keboola/Utils/stripInvalidUtf16.php",
+                    "src/Keboola/Utils/toAscii.php",
+                    "src/Keboola/Utils/sanitizeColumnName.php"
+                ],
+                "psr-0": {
+                    "Keboola\\Utils": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Keboola",
+                    "email": "devel@keboola.com"
+                }
+            ],
+            "description": "Misc utility functions",
+            "keywords": [
+                "utility"
+            ],
+            "time": "2018-04-11T14:40:53+00:00"
         },
         {
             "name": "keboola/ssh-tunnel",
@@ -528,17 +602,66 @@
             "time": "2016-10-10T12:19:37+00:00"
         },
         {
-            "name": "symfony/config",
-            "version": "v3.4.12",
+            "name": "seld/jsonlint",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/config.git",
-                "reference": "1fffdeb349ff36a25184e5564c25289b1dbfc402"
+                "url": "https://github.com/Seldaek/jsonlint.git",
+                "reference": "d15f59a67ff805a44c50ea0516d2341740f81a38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/1fffdeb349ff36a25184e5564c25289b1dbfc402",
-                "reference": "1fffdeb349ff36a25184e5564c25289b1dbfc402",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/d15f59a67ff805a44c50ea0516d2341740f81a38",
+                "reference": "d15f59a67ff805a44c50ea0516d2341740f81a38",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
+            },
+            "bin": [
+                "bin/jsonlint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Seld\\JsonLint\\": "src/Seld/JsonLint/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "JSON Linter",
+            "keywords": [
+                "json",
+                "linter",
+                "parser",
+                "validator"
+            ],
+            "time": "2018-01-24T12:46:19+00:00"
+        },
+        {
+            "name": "symfony/config",
+            "version": "v3.4.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/config.git",
+                "reference": "7b08223b7f6abd859651c56bcabf900d1627d085"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/config/zipball/7b08223b7f6abd859651c56bcabf900d1627d085",
+                "reference": "7b08223b7f6abd859651c56bcabf900d1627d085",
                 "shasum": ""
             },
             "require": {
@@ -589,20 +712,20 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2018-06-19T14:02:58+00:00"
+            "time": "2018-07-26T11:19:56+00:00"
         },
         {
             "name": "symfony/filesystem",
-            "version": "v4.1.1",
+            "version": "v4.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "562bf7005b55fd80d26b582d28e3e10f2dd5ae9c"
+                "reference": "2e30335e0aafeaa86645555959572fe7cea22b43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/562bf7005b55fd80d26b582d28e3e10f2dd5ae9c",
-                "reference": "562bf7005b55fd80d26b582d28e3e10f2dd5ae9c",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/2e30335e0aafeaa86645555959572fe7cea22b43",
+                "reference": "2e30335e0aafeaa86645555959572fe7cea22b43",
                 "shasum": ""
             },
             "require": {
@@ -639,29 +762,32 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-30T07:26:09+00:00"
+            "time": "2018-07-26T11:24:31+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.8.0",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae"
+                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
-                "reference": "7cc359f1b7b80fc25ed7796be7d96adc9b354bae",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/e3d826245268269cd66f8326bd8bc066687b4a19",
+                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
+            "suggest": {
+                "ext-ctype": "For best performance"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8-dev"
+                    "dev-master": "1.9-dev"
                 }
             },
             "autoload": {
@@ -694,20 +820,20 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-04-30T19:57:29+00:00"
+            "time": "2018-08-06T14:22:27+00:00"
         },
         {
             "name": "symfony/process",
-            "version": "v3.4.12",
+            "version": "v3.4.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "acc5a37c706ace827962851b69705b24e71ca17c"
+                "reference": "0414db29bd770ec5a4152683e655f55efd4fa60f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/acc5a37c706ace827962851b69705b24e71ca17c",
-                "reference": "acc5a37c706ace827962851b69705b24e71ca17c",
+                "url": "https://api.github.com/repos/symfony/process/zipball/0414db29bd770ec5a4152683e655f55efd4fa60f",
+                "reference": "0414db29bd770ec5a4152683e655f55efd4fa60f",
                 "shasum": ""
             },
             "require": {
@@ -743,20 +869,99 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-30T04:24:30+00:00"
+            "time": "2018-07-26T11:19:56+00:00"
         },
         {
-            "name": "symfony/yaml",
-            "version": "v3.4.12",
+            "name": "symfony/serializer",
+            "version": "v3.4.14",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "c5010cc1692ce1fa328b1fb666961eb3d4a85bb0"
+                "url": "https://github.com/symfony/serializer.git",
+                "reference": "40031683816470610af87c2d03ea86d1cf0f0104"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/c5010cc1692ce1fa328b1fb666961eb3d4a85bb0",
-                "reference": "c5010cc1692ce1fa328b1fb666961eb3d4a85bb0",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/40031683816470610af87c2d03ea86d1cf0f0104",
+                "reference": "40031683816470610af87c2d03ea86d1cf0f0104",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "conflict": {
+                "phpdocumentor/type-resolver": "<0.2.1",
+                "symfony/dependency-injection": "<3.2",
+                "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4",
+                "symfony/property-info": "<3.1",
+                "symfony/yaml": "<3.4"
+            },
+            "require-dev": {
+                "doctrine/annotations": "~1.0",
+                "doctrine/cache": "~1.0",
+                "phpdocumentor/reflection-docblock": "^3.0|^4.0",
+                "symfony/cache": "~3.1|~4.0",
+                "symfony/config": "~2.8|~3.0|~4.0",
+                "symfony/dependency-injection": "~3.2|~4.0",
+                "symfony/http-foundation": "~2.8|~3.0|~4.0",
+                "symfony/property-access": "~2.8|~3.0|~4.0",
+                "symfony/property-info": "~3.1|~4.0",
+                "symfony/yaml": "~3.4|~4.0"
+            },
+            "suggest": {
+                "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+                "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+                "psr/cache-implementation": "For using the metadata cache.",
+                "symfony/config": "For using the XML mapping loader.",
+                "symfony/http-foundation": "To use the DataUriNormalizer.",
+                "symfony/property-access": "For using the ObjectNormalizer.",
+                "symfony/property-info": "To deserialize relations.",
+                "symfony/yaml": "For using the default YAML mapping loader."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Serializer\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Serializer Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-07-26T11:58:24+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v3.4.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "810af2d35fc72b6cf5c01116806d2b65ccaaf2e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/810af2d35fc72b6cf5c01116806d2b65ccaaf2e2",
+                "reference": "810af2d35fc72b6cf5c01116806d2b65ccaaf2e2",
                 "shasum": ""
             },
             "require": {
@@ -802,7 +1007,54 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-05-03T23:18:14+00:00"
+            "time": "2018-07-26T11:19:56+00:00"
+        },
+        {
+            "name": "vkartaviy/retry",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vkartaviy/retry.git",
+                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vkartaviy/retry/zipball/8d726458bec9a773e4ae8baf8afd9666f0d1142d",
+                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Retry": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladimir Kartaviy",
+                    "email": "vkartaviy@gmail.com",
+                    "homepage": "http://vkartaviy.name"
+                }
+            ],
+            "description": "The library for repeatable and retryable operations",
+            "homepage": "https://github.com/vkartaviy/retry",
+            "keywords": [
+                "backoff",
+                "proxy",
+                "repeat",
+                "retry"
+            ],
+            "time": "2015-05-06T17:39:09+00:00"
         }
     ],
     "packages-dev": [
@@ -1014,16 +1266,16 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "1.7.6",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712"
+                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
-                "reference": "33a7e3c4fda54e912ff6338c48823bd5c0f0b712",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
+                "reference": "4ba436b55987b4bf311cb7c6ba82aa528aac0a06",
                 "shasum": ""
             },
             "require": {
@@ -1035,12 +1287,12 @@
             },
             "require-dev": {
                 "phpspec/phpspec": "^2.5|^3.2",
-                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5 || ^7.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.7.x-dev"
+                    "dev-master": "1.8.x-dev"
                 }
             },
             "autoload": {
@@ -1073,7 +1325,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2018-04-18T13:57:24+00:00"
+            "time": "2018-08-05T17:53:17+00:00"
         },
         {
             "name": "phpstan/phpstan-shim",
