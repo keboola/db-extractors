@@ -177,8 +177,6 @@ class MySQL extends Extractor
 
         $sql .= $whereClause;
 
-        $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
-
         $res = $this->db->query($sql);
         $arr = $res->fetchAll(PDO::FETCH_ASSOC);
         if (count($arr) === 0) {
@@ -202,6 +200,8 @@ class MySQL extends Extractor
             }
         }
 
+        ksort($tableDefs);
+
         if (!is_null($tables) && count($tables) > 0) {
             $sql = "SELECT c.*, 
                     CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
@@ -214,8 +214,6 @@ class MySQL extends Extractor
         }
 
         $sql .= $whereClause;
-
-        $sql .= " ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION";
 
         $res = $this->db->query($sql);
         $rows = $res->fetchAll(PDO::FETCH_ASSOC);
@@ -263,6 +261,7 @@ class MySQL extends Extractor
                 }
             }
             $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
+            ksort($tableDefs[$curTable]['columns']);
         }
         return array_values($tableDefs);
     }
