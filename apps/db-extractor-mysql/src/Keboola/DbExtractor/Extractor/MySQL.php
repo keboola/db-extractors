@@ -185,10 +185,8 @@ class MySQL extends Extractor
             return [];
         }
 
-        $tableNameArray = [];
         $tableDefs = [];
         foreach ($arr as $table) {
-            $tableNameArray[] = $table['TABLE_NAME'];
             $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
             $tableDefs[$curTable] = [
                 'name' => $table['TABLE_NAME'],
