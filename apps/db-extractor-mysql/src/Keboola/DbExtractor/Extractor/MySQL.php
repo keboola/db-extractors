@@ -257,7 +257,7 @@ class MySQL extends Extractor
             }
             if ($column['EXTRA']) {
                 $curColumn["extra"] = $column["EXTRA"];
-                if ($column['EXTRA'] === 'auto_increment') {
+                if ($column['EXTRA'] === 'auto_increment' && isset($tableDefs[$curTable]['autoIncrement'])) {
                     $curColumn['autoIncrement'] = $tableDefs[$curTable]['autoIncrement'];
                 }
                 if ($column['EXTRA'] === 'on update CURRENT_TIMESTAMP' && $column['COLUMN_DEFAULT'] === 'CURRENT_TIMESTAMP') {
