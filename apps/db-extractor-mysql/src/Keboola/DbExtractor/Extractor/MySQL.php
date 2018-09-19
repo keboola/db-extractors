@@ -265,16 +265,16 @@ class MySQL extends Extractor
                     $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
                 }
                 if (count($curColumn) > 0) {
-                    $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
+                    $curTableName = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
                     $filteredColumns = array_filter(
-                        $tableDefs[$curTable]['columns'],
+                        $tableDefs[$curTableName]['columns'],
                         function ($existingCol) use ($column) {
                             return $existingCol['name'] === $column['COLUMN_NAME'];
                         }
                     );
                     $existingColumn = $filteredColumns[0];
                     foreach ($curColumn as $key => $value) {
-                        $tableDefs[$curTable]['columns'][$existingColumn['ordinalPosition'] - 1][$key] = $value;
+                        $tableDefs[$curTableName]['columns'][$existingColumn['ordinalPosition'] - 1][$key] = $value;
                     }
                 }
             }
