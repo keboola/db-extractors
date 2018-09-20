@@ -840,7 +840,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['primaryKey'] = ['some_primary_key'];
         $config['parameters']['table'] = [
             'tableName' => 'auto_increment_timestamp_withFK',
-            'schema' => 'test'
+            'schema' => 'test',
         ];
 
         $this->createAutoIncrementAndTimestampTable();

@@ -275,7 +275,7 @@ class MySQL extends Extractor
                     if (count($filteredColumns) === 0) {
                         throw new ApplicationException(
                             sprintf(
-                                "This should never happen: Could not find reference column [%] in table definition",
+                                "This should never happen: Could not find reference column [%s] in table definition",
                                 $column['COLUMN_NAME']
                             )
                         );
