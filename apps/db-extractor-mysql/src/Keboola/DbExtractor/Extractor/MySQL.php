@@ -272,9 +272,17 @@ class MySQL extends Extractor
                             return $existingCol['name'] === $column['COLUMN_NAME'];
                         }
                     );
-                    $existingColumn = $filteredColumns[0];
+                    if (count($filteredColumns) === 0) {
+                        throw new ApplicationException(
+                            sprintf(
+                                "This should never happen: Could not find reference column [%] in table definition",
+                                $column['COLUMN_NAME']
+                            )
+                        );
+                    }
+                    $existingColumnKey = array_keys($filteredColumns)[0];
                     foreach ($curColumn as $key => $value) {
-                        $tableDefs[$curTableName]['columns'][$existingColumn['ordinalPosition'] - 1][$key] = $value;
+                        $tableDefs[$curTableName]['columns'][$existingColumnKey][$key] = $value;
                     }
                 }
             }
