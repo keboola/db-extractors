@@ -48,6 +48,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     protected function createAutoIncrementAndTimestampTable(): void
     {
+        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp_withFK');
         $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
 
         $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
@@ -57,6 +58,20 @@ abstract class AbstractMySQLTest extends ExtractorTest
             PRIMARY KEY (`_weird-I-d`)  
         ) COMMENT=\'This is a table comment\'');
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
+    }
+
+    protected function createAutoIncrementAndTimestampTableWithFK(): void
+    {
+        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp_withFK');
+
+        $this->pdo->exec('CREATE TABLE auto_increment_timestamp_withFK (
+            `some_primary_key` INT NOT NULL AUTO_INCREMENT COMMENT \'This is a weird ID\',
+            `random_name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
+            `foreign_key` INT COMMENT \'This is a foreign key\',
+            PRIMARY KEY (`some_primary_key`),
+            FOREIGN KEY (`foreign_key`) REFERENCES auto_increment_timestamp(`_weird-I-d`) ON DELETE CASCADE 
+        ) COMMENT=\'This is a table comment\'');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`, `foreign_key`) VALUES (\'sue\',1)');
     }
 
     public function getConfig(string $driver = self::DRIVER, string $format = self::CONFIG_FORMAT_YAML): array
