@@ -196,7 +196,8 @@ class ApplicationTest extends OracleBaseTest
         $this->assertContains("[5x]", $process->getOutput());
     }
 
-    private function configSetup(array $config, string $configType) {
+    private function configSetup(array $config, string $configType)
+    {
         if ($configType === self::CONFIG_FORMAT_YAML) {
             @unlink($this->dataDir . '/config.yml');
             file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));

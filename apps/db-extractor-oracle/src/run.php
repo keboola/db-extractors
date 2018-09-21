@@ -26,7 +26,7 @@ try {
         );
     } else if (file_exists($arguments["data"] . "/config.json")) {
         $config = json_decode(
-            file_get_contents($arguments["data"] . "/config.yml"),
+            file_get_contents($arguments["data"] . "/config.json"),
             true
         );
     } else {
