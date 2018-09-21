@@ -89,11 +89,7 @@ class ApplicationTest extends OracleBaseTest
         $this->assertFileExists($manifestFile3);
     }
 
-    /**
-     * @param $configType
-     * @dataProvider configTypesProvider
-     */
-    public function testRunActionSshTunnel(string $configType): void
+    public function testRunActionSshTunnel(): void
     {
         $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -119,7 +115,7 @@ class ApplicationTest extends OracleBaseTest
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
-        $config = $this->getConfig('oracle');
+        $config = $this->getConfig('oracle', self::CONFIG_FORMAT_JSON);
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -132,12 +128,14 @@ class ApplicationTest extends OracleBaseTest
             'remotePort' => $config['parameters']['db']['port'],
             'localPort' => '15213',
         ];
-        $this->configSetup($config, $configType);
+        $this->configSetup($config, self::CONFIG_FORMAT_JSON);
         $this->setupTestTables();
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        var_dump($process->getErrorOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
