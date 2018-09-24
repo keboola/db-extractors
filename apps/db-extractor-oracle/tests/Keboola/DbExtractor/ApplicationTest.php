@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
@@ -13,12 +14,15 @@ class ApplicationTest extends OracleBaseTest
     /** @var string */
     protected $rootPath = __DIR__ . '/../../..';
 
-    public function testTestConnectionAction(): void
+    /**
+     * @param $configType
+     * @dataProvider configTypesProvider
+     */
+    public function testTestConnectionAction(string $configType): void
     {
-        $config = $this->getConfig('oracle');
+        $config = $this->getConfig('oracle', $configType);
         $config['action'] = 'testConnection';
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $this->putConfig($config, $configType);
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -29,7 +33,11 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
-    public function testRunAction(): void
+    /**
+     * @param $configType
+     * @dataProvider configTypesProvider
+     */
+    public function testRunAction(string $configType): void
     {
         $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -55,9 +63,8 @@ class ApplicationTest extends OracleBaseTest
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
-        $config = $this->getConfig('oracle');
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $config = $this->getConfig('oracle', $configType);
+        $this->putConfig($config, $configType);
 
         $this->setupTestTables();
 
@@ -109,7 +116,7 @@ class ApplicationTest extends OracleBaseTest
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
-        $config = $this->getConfig('oracle');
+        $config = $this->getConfig('oracle', self::CONFIG_FORMAT_JSON);
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -122,9 +129,7 @@ class ApplicationTest extends OracleBaseTest
             'remotePort' => $config['parameters']['db']['port'],
             'localPort' => '15213',
         ];
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
-
+        $this->putConfig($config, self::CONFIG_FORMAT_JSON);
         $this->setupTestTables();
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
@@ -149,12 +154,15 @@ class ApplicationTest extends OracleBaseTest
         $this->assertFileExists($manifestFile3);
     }
 
-    public function testGetTablesAction(): void
+    /**
+     * @param $configType
+     * @dataProvider configTypesProvider
+     */
+    public function testGetTablesAction(string $configType): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $this->putConfig($config, $configType);
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -183,5 +191,18 @@ class ApplicationTest extends OracleBaseTest
         $this->assertContains("Export process failed:", $process->getErrorOutput());
         // verify that it retries 5 times
         $this->assertContains("[5x]", $process->getOutput());
+    }
+
+    private function putConfig(array $config, string $configType)
+    {
+        if ($configType === self::CONFIG_FORMAT_YAML) {
+            @unlink($this->dataDir . '/config.yml');
+            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        } else if ($configType === self::CONFIG_FORMAT_JSON) {
+            @unlink($this->dataDir . '/config.json');
+            file_put_contents($this->dataDir . '/config.json', json_encode($config));
+        } else {
+            throw new UserException(sprintf("Unsupported configuration type: [%s]", $configType));
+        }
     }
 }
