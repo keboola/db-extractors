@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
@@ -197,9 +198,11 @@ class ApplicationTest extends OracleBaseTest
         if ($configType === self::CONFIG_FORMAT_YAML) {
             @unlink($this->dataDir . '/config.yml');
             file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
-        } else {
+        } else if ($configType === self::CONFIG_FORMAT_JSON) {
             @unlink($this->dataDir . '/config.json');
             file_put_contents($this->dataDir . '/config.json', json_encode($config));
+        } else {
+            throw new UserException(sprintf("Unsupported configuration type: [%s]", $configType));
         }
     }
 }
