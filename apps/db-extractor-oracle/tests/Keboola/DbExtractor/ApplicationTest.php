@@ -22,7 +22,7 @@ class ApplicationTest extends OracleBaseTest
     {
         $config = $this->getConfig('oracle', $configType);
         $config['action'] = 'testConnection';
-        $this->configSetup($config, $configType);
+        $this->putConfig($config, $configType);
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -64,7 +64,7 @@ class ApplicationTest extends OracleBaseTest
         array_shift($expectedCsv3);
 
         $config = $this->getConfig('oracle', $configType);
-        $this->configSetup($config, $configType);
+        $this->putConfig($config, $configType);
 
         $this->setupTestTables();
 
@@ -129,7 +129,7 @@ class ApplicationTest extends OracleBaseTest
             'remotePort' => $config['parameters']['db']['port'],
             'localPort' => '15213',
         ];
-        $this->configSetup($config, self::CONFIG_FORMAT_JSON);
+        $this->putConfig($config, self::CONFIG_FORMAT_JSON);
         $this->setupTestTables();
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
@@ -162,7 +162,7 @@ class ApplicationTest extends OracleBaseTest
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
-        $this->configSetup($config, $configType);
+        $this->putConfig($config, $configType);
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -193,7 +193,7 @@ class ApplicationTest extends OracleBaseTest
         $this->assertContains("[5x]", $process->getOutput());
     }
 
-    private function configSetup(array $config, string $configType)
+    private function putConfig(array $config, string $configType)
     {
         if ($configType === self::CONFIG_FORMAT_YAML) {
             @unlink($this->dataDir . '/config.yml');
