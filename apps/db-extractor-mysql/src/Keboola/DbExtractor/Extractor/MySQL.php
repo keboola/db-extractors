@@ -249,8 +249,8 @@ class MySQL extends Extractor
         // add additional info
         if (!is_null($tables) && count($tables) > 0) {
             $additionalSql = "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
-                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
-                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ";
+                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
+                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ";
 
             $res = $this->db->query($additionalSql . $whereClause);
             $rows = $res->fetchAll(PDO::FETCH_ASSOC);

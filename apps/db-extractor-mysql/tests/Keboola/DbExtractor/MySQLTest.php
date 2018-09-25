@@ -1059,7 +1059,7 @@ class MySQLTest extends AbstractMySQLTest
                     12 =>
                         array (
                             'key' => 'KBC.foreignKeyRefColumn',
-                            'value' => '_weird-I-d',
+                            'value' => '_weird-i-d',
                         ),
                 ),
         );

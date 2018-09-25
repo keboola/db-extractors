@@ -69,7 +69,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
             `random_name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
             `foreign_key` INT COMMENT \'This is a foreign key\',
             PRIMARY KEY (`some_primary_key`),
-            FOREIGN KEY (`foreign_key`) REFERENCES auto_increment_timestamp(`_weird-I-d`) ON DELETE CASCADE 
+            FOREIGN KEY (`foreign_key`) REFERENCES auto_increment_timestamp (`_weird-I-d`) ON DELETE CASCADE 
         ) COMMENT=\'This is a table comment\'');
         $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`, `foreign_key`) VALUES (\'sue\',1)');
     }
