@@ -832,16 +832,28 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testManifestMetadata(): void
+    /**
+     * @dataProvider configProvider
+     */
+    public function testManifestMetadata(array $config): void
     {
-        $config = $this->getConfigRow();
-        unset($config['parameters']['query']);
-        $config['parameters']['outputTable'] = 'in.c-main.foreignkey';
-        $config['parameters']['primaryKey'] = ['some_primary_key'];
-        $config['parameters']['table'] = [
+        $isConfigRow = !isset($config['parameters']['tables']);
+
+        $tableParams = ($isConfigRow) ? $config['parameters'] : $config['parameters']['tables'][0];
+        unset($tableParams['query']);
+        $tableParams['outputTable'] = 'in.c-main.foreignkey';
+        $tableParams['primaryKey'] = ['some_primary_key'];
+        $tableParams['table'] = [
             'tableName' => 'auto_increment_timestamp_withFK',
             'schema' => 'test',
         ];
+        if ($isConfigRow) {
+            $config['parameters'] = $tableParams;
+        } else {
+            $config['parameters']['tables'][0] = $tableParams;
+            unset($config['parameters']['tables'][1]);
+            unset($config['parameters']['tables'][2]);
+        }
 
         $this->createAutoIncrementAndTimestampTable();
         $this->createAutoIncrementAndTimestampTableWithFK();
@@ -850,9 +862,12 @@ class MySQLTest extends AbstractMySQLTest
 
         $result = $app->run();
 
-        $sanitizedTable = Utils\Strings::webalize($result['imported']['outputTable'], '._');
-        $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest')
+        $importedTable = ($isConfigRow) ? $result['imported']['outputTable'] : $result['imported'][0]['outputTable'];
+
+        $sanitizedTable = Utils\Strings::webalize($importedTable, '._');
+        $outputManifest = json_decode(
+            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest'),
+            true
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);

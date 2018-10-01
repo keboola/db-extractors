@@ -180,4 +180,14 @@ abstract class AbstractMySQLTest extends ExtractorTest
             [self::CONFIG_FORMAT_JSON],
         ];
     }
+
+    public function configProvider(): array
+    {
+        $this->dataDir = __DIR__ . '/../../data';
+        return [
+            [$this->getConfig(self::DRIVER, self::CONFIG_FORMAT_YAML)],
+            [$this->getConfig(self::DRIVER, self::CONFIG_FORMAT_JSON)],
+            [$this->getConfigRow()],
+        ];
+    }
 }
