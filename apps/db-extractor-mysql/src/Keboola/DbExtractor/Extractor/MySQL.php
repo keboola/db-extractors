@@ -177,18 +177,14 @@ class MySQL extends Extractor
 
         $sql .= $whereClause;
 
-        $sql .= " ORDER BY TABLE_SCHEMA, TABLE_NAME";
-
         $res = $this->db->query($sql);
         $arr = $res->fetchAll(PDO::FETCH_ASSOC);
         if (count($arr) === 0) {
             return [];
         }
 
-        $tableNameArray = [];
         $tableDefs = [];
         foreach ($arr as $table) {
-            $tableNameArray[] = $table['TABLE_NAME'];
             $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
             $tableDefs[$curTable] = [
                 'name' => $table['TABLE_NAME'],
@@ -204,20 +200,10 @@ class MySQL extends Extractor
             }
         }
 
-        if (!is_null($tables) && count($tables) > 0) {
-            $sql = "SELECT c.*, 
-                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA
-                    FROM INFORMATION_SCHEMA.COLUMNS as c 
-                    LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu
-                    ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME";
-        } else {
-            $sql = "SELECT c.*
-                    FROM INFORMATION_SCHEMA.COLUMNS as c";
-        }
+        ksort($tableDefs);
 
+        $sql = "SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c";
         $sql .= $whereClause;
-
-        $sql .= " ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION";
 
         $res = $this->db->query($sql);
         $rows = $res->fetchAll(PDO::FETCH_ASSOC);
@@ -247,14 +233,6 @@ class MySQL extends Extractor
                 $curColumn['description'] = $column['COLUMN_COMMENT'];
             }
 
-            if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
-                $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
-            }
-            if (array_key_exists('REFERENCED_TABLE_NAME', $column) && !is_null($column['REFERENCED_TABLE_NAME'])) {
-                $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
-                $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
-                $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
-            }
             if ($column['EXTRA']) {
                 $curColumn["extra"] = $column["EXTRA"];
                 if ($column['EXTRA'] === 'auto_increment' && isset($tableDefs[$curTable]['autoIncrement'])) {
@@ -265,6 +243,49 @@ class MySQL extends Extractor
                 }
             }
             $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
+            ksort($tableDefs[$curTable]['columns']);
+        }
+
+        // add additional info
+        if (!is_null($tables) && count($tables) > 0) {
+            $additionalSql = "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
+                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ";
+
+            $res = $this->db->query($additionalSql . $whereClause);
+            $rows = $res->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $column) {
+                $curColumn = [];
+                if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
+                    $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
+                }
+                if (array_key_exists('REFERENCED_TABLE_NAME', $column) && !is_null($column['REFERENCED_TABLE_NAME'])) {
+                    $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
+                    $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
+                    $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
+                }
+                if (count($curColumn) > 0) {
+                    $curTableName = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
+                    $filteredColumns = array_filter(
+                        $tableDefs[$curTableName]['columns'],
+                        function ($existingCol) use ($column) {
+                            return $existingCol['name'] === $column['COLUMN_NAME'];
+                        }
+                    );
+                    if (count($filteredColumns) === 0) {
+                        throw new ApplicationException(
+                            sprintf(
+                                "This should never happen: Could not find reference column [%s] in table definition",
+                                $column['COLUMN_NAME']
+                            )
+                        );
+                    }
+                    $existingColumnKey = array_keys($filteredColumns)[0];
+                    foreach ($curColumn as $key => $value) {
+                        $tableDefs[$curTableName]['columns'][$existingColumnKey][$key] = $value;
+                    }
+                }
+            }
         }
         return array_values($tableDefs);
     }

@@ -832,31 +832,54 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testManifestMetadata(): void
+    /**
+     * @dataProvider configProvider
+     */
+    public function testManifestMetadata(array $config): void
     {
-        $config = $this->getConfig();
+        $isConfigRow = !isset($config['parameters']['tables']);
 
-        // use just the last table from the config
-        unset($config['parameters']['tables'][0]);
-        unset($config['parameters']['tables'][1]);
+        $tableParams = ($isConfigRow) ? $config['parameters'] : $config['parameters']['tables'][0];
+        unset($tableParams['query']);
+        $tableParams['outputTable'] = 'in.c-main.foreignkey';
+        $tableParams['primaryKey'] = ['some_primary_key'];
+        $tableParams['table'] = [
+            'tableName' => 'auto_increment_timestamp_withFK',
+            'schema' => 'test',
+        ];
+        if ($isConfigRow) {
+            $config['parameters'] = $tableParams;
+        } else {
+            $config['parameters']['tables'][0] = $tableParams;
+            unset($config['parameters']['tables'][1]);
+            unset($config['parameters']['tables'][2]);
+        }
+
+        $this->createAutoIncrementAndTimestampTable();
+        $this->createAutoIncrementAndTimestampTableWithFK();
 
         $app = $this->createApplication($config);
 
         $result = $app->run();
 
-        $sanitizedTable = Utils\Strings::webalize($result['imported'][0]['outputTable'], '._');
-        $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest')
+        $importedTable = ($isConfigRow) ? $result['imported']['outputTable'] : $result['imported'][0]['outputTable'];
+
+        $sanitizedTable = Utils\Strings::webalize($importedTable, '._');
+        $outputManifest = json_decode(
+            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest'),
+            true
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
         $this->assertArrayHasKey('incremental', $outputManifest);
         $this->assertArrayHasKey('metadata', $outputManifest);
         $expectedMetadata = [
-            'KBC.name' => 'sales',
+            'KBC.name' => 'auto_increment_timestamp_withFK',
             'KBC.schema' => 'test',
             'KBC.type' => 'BASE TABLE',
-            'KBC.rowCount' => 100,
+            'KBC.rowCount' => 1,
+            'KBC.description' => 'This is a table comment',
+            'KBC.autoIncrement' => '2',
         ];
         $tableMetadata = [];
         foreach ($outputManifest['metadata'] as $i => $metadata) {
@@ -867,25 +890,195 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedMetadata, $tableMetadata);
 
         $this->assertArrayHasKey('column_metadata', $outputManifest);
-        $this->assertCount(4, $outputManifest['column_metadata']);
+        $this->assertCount(3, $outputManifest['column_metadata']);
 
-        $expectedColumnMetadata = [
-            'KBC.sourceName' => 'usergender',
-            'KBC.sanitizedName' => 'usergender',
-            'KBC.datatype.type' => 'text',
-            'KBC.datatype.basetype' => 'STRING',
-            'KBC.datatype.nullable' => true,
-            'KBC.datatype.length' => '65535',
-            'KBC.primaryKey' => false,
-            'KBC.ordinalPosition' => '1',
-        ];
-        $columnMetadata = [];
-        foreach ($outputManifest['column_metadata']['usergender'] as $metadata) {
-            $this->assertArrayHasKey('key', $metadata);
-            $this->assertArrayHasKey('value', $metadata);
-            $columnMetadata[$metadata['key']] = $metadata['value'];
-        }
-        $this->assertEquals($expectedColumnMetadata, $columnMetadata);
+        $expectedColumnMetadata = array (
+            'some_primary_key' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'int',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'INTEGER',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => '10',
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'some_primary_key',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'some_primary_key',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => '1',
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.description',
+                            'value' => 'This is a weird ID',
+                        ),
+                    9 =>
+                        array (
+                            'key' => 'KBC.extra',
+                            'value' => 'auto_increment',
+                        ),
+                    10 =>
+                        array (
+                            'key' => 'KBC.autoIncrement',
+                            'value' => '2',
+                        ),
+                    11 =>
+                        array (
+                            'key' => 'KBC.constraintName',
+                            'value' => 'PRIMARY',
+                        ),
+                ),
+            'random_name' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'varchar',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => '30',
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'pam',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'random_name',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'random_name',
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => '2',
+                        ),
+                    9 =>
+                        array (
+                            'key' => 'KBC.description',
+                            'value' => 'This is a weird name',
+                        ),
+                ),
+            'foreign_key' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'int',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => true,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'INTEGER',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => '10',
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'foreign_key',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'foreign_key',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => false,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => '3',
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.description',
+                            'value' => 'This is a foreign key',
+                        ),
+                    9 =>
+                        array (
+                            'key' => 'KBC.constraintName',
+                            'value' => 'auto_increment_timestamp_withFK_ibfk_1',
+                        ),
+                    10 =>
+                        array (
+                            'key' => 'KBC.foreignKeyRefSchema',
+                            'value' => 'test',
+                        ),
+                    11 =>
+                        array (
+                            'key' => 'KBC.foreignKeyRefTable',
+                            'value' => 'auto_increment_timestamp',
+                        ),
+                    12 =>
+                        array (
+                            'key' => 'KBC.foreignKeyRefColumn',
+                            'value' => '_weird-i-d',
+                        ),
+                ),
+        );
+        $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
     public function testSchemaNotEqualToDatabase(): void
