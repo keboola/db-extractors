@@ -890,7 +890,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals($expectedMetadata, $tableMetadata);
 
         $this->assertArrayHasKey('column_metadata', $outputManifest);
-        $this->assertCount(3, $outputManifest['column_metadata']);
+        $this->assertCount(4, $outputManifest['column_metadata']);
 
         $expectedColumnMetadata = array (
             'some_primary_key' =>
@@ -1009,6 +1009,49 @@ class MySQLTest extends AbstractMySQLTest
                             'value' => 'This is a weird name',
                         ),
                 ),
+            'datetime' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'datetime',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => true,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'TIMESTAMP',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'CURRENT_TIMESTAMP',
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'datetime',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'datetime',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => false,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => '3',
+                        ),
+                ),
             'foreign_key' =>
                 array (
                     0 =>
@@ -1049,7 +1092,7 @@ class MySQLTest extends AbstractMySQLTest
                     7 =>
                         array (
                             'key' => 'KBC.ordinalPosition',
-                            'value' => '3',
+                            'value' => '4',
                         ),
                     8 =>
                         array (
@@ -1173,6 +1216,50 @@ class MySQLTest extends AbstractMySQLTest
         sleep(2);
         //now add a couple rows and run it again.
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
+
+        $newResult = ($this->createApplication($config, $result['state']))->run();
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertGreaterThan(
+            $result['state']['lastFetchedRow'],
+            $newResult['state']['lastFetchedRow']
+        );
+    }
+
+    public function testIncrementalFetchingByDatetime(): void
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingColumn'] = 'datetime';
+        $config['parameters']['table']['tableName'] = 'auto_increment_timestamp_withFK';
+        $this->createAutoIncrementAndTimestampTable();
+        $this->createAutoIncrementAndTimestampTableWithFK();
+
+        $result = ($this->createApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp-with-fk',
+                'rows' => 2,
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertNotEmpty($result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should be empty
+        $emptyResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $emptyResult['imported']['rows']);
+
+        sleep(2);
+        //now add a couple rows and run it again.
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random-name`) VALUES (\'charles\'), (\'william\')');
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
