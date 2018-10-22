@@ -1233,6 +1233,7 @@ class MySQLTest extends AbstractMySQLTest
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['incrementalFetchingColumn'] = 'datetime';
         $config['parameters']['table']['tableName'] = 'auto_increment_timestamp_withFK';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp-with-fk';
         $this->createAutoIncrementAndTimestampTable();
         $this->createAutoIncrementAndTimestampTableWithFK();
 
@@ -1242,7 +1243,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp-with-fk',
-                'rows' => 2,
+                'rows' => 1,
             ],
             $result['imported']
         );
@@ -1259,7 +1260,7 @@ class MySQLTest extends AbstractMySQLTest
 
         sleep(2);
         //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random-name`) VALUES (\'charles\'), (\'william\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`) VALUES (\'charles\'), (\'william\')');
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
