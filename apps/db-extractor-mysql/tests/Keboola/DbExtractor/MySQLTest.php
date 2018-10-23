@@ -1226,6 +1226,7 @@ class MySQLTest extends AbstractMySQLTest
             $result['state']['lastFetchedRow'],
             $newResult['state']['lastFetchedRow']
         );
+        $this->assertEquals(2, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingByDatetime(): void
@@ -1271,6 +1272,7 @@ class MySQLTest extends AbstractMySQLTest
             $result['state']['lastFetchedRow'],
             $newResult['state']['lastFetchedRow']
         );
+        $this->assertEquals(2, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingByAutoIncrement(): void
