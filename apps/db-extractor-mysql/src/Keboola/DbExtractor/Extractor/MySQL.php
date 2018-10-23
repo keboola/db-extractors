@@ -313,7 +313,7 @@ class MySQL extends Extractor
         if ($columns[0]['EXTRA'] === 'auto_increment') {
             $this->incrementalFetching['column'] = $columnName;
             $this->incrementalFetching['type'] = self::TYPE_AUTO_INCREMENT;
-        } else if ($columns[0]['DATA_TYPE'] === 'timestamp') {
+        } else if ($columns[0]['DATA_TYPE'] === 'timestamp' || $columns[0]['DATA_TYPE'] === 'datetime') {
             $this->incrementalFetching['column'] = $columnName;
             $this->incrementalFetching['type'] = self::TYPE_TIMESTAMP;
         } else {
