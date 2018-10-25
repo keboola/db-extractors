@@ -238,9 +238,6 @@ class MySQL extends Extractor
                 if ($column['EXTRA'] === 'auto_increment' && isset($tableDefs[$curTable]['autoIncrement'])) {
                     $curColumn['autoIncrement'] = $tableDefs[$curTable]['autoIncrement'];
                 }
-                if ($column['EXTRA'] === 'on update CURRENT_TIMESTAMP' && $column['COLUMN_DEFAULT'] === 'CURRENT_TIMESTAMP') {
-                    $tableDefs[$curTable]['timestampUpdateColumn'] = $column['COLUMN_NAME'];
-                }
             }
             $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
             ksort($tableDefs[$curTable]['columns']);

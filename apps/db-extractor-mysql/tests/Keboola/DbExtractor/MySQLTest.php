@@ -257,7 +257,6 @@ class MySQLTest extends AbstractMySQLTest
                                     'description' => 'This is a timestamp',
                                 ),
                         ),
-                    'timestampUpdateColumn' => 'timestamp',
                     'description' => 'This is a table comment',
                 ),
             1 =>
@@ -651,7 +650,6 @@ class MySQLTest extends AbstractMySQLTest
                                     'description' => 'This is a timestamp',
                                 ),
                         ),
-                    'timestampUpdateColumn' => 'timestamp',
                     'description' => 'This is a table comment',
                 ),
             2 =>
