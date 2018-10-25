@@ -1430,7 +1430,7 @@ class MySQLTest extends AbstractMySQLTest
             ($this->createApplication($config))->run();
             $this->fail('Should throw a user exception.');
         } catch (UserException $e) {
-            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+            $this->assertStringStartsWith("Invalid Configuration [ext_sales]", $e->getMessage());
         }
     }
 }
