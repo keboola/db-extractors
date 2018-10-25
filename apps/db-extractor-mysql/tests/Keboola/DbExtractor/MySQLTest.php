@@ -1416,4 +1416,21 @@ class MySQLTest extends AbstractMySQLTest
         $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
         return $config;
     }
+
+    public function testDBSchemaMismatchConfigRowWithNoName(): void
+    {
+        $config = $this->getConfigRow(self::DRIVER);
+        // select a table from a different schema
+        unset($config['parameters']['query']);
+        $config['parameters']['table'] = [
+            'tableName' => 'ext_sales',
+            'schema' => 'temp_schema',
+        ];
+        try {
+            ($this->createApplication($config))->run();
+            $this->fail('Should throw a user exception.');
+        } catch (UserException $e) {
+            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+        }
+    }
 }
