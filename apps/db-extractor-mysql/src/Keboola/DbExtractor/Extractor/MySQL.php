@@ -139,8 +139,7 @@ class MySQL extends Extractor
         // if database set make sure the database and selected table schema match
         if (isset($table['table']) && $this->database && $this->database !== $table['table']['schema']) {
             throw new UserException(sprintf(
-                'Invalid Configuration in "%s".  The table schema "%s" is different from the connection database "%s"',
-                $table['name'],
+                'Invalid Configuration.  The table schema "%s" is different from the connection database "%s"',
                 $table['table']['schema'],
                 $this->database
             ));
