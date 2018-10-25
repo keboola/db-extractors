@@ -234,7 +234,6 @@ class MySQL extends Extractor
             }
 
             if ($column['EXTRA']) {
-                $curColumn["extra"] = $column["EXTRA"];
                 if ($column['EXTRA'] === 'auto_increment' && isset($tableDefs[$curTable]['autoIncrement'])) {
                     $curColumn['autoIncrement'] = $tableDefs[$curTable]['autoIncrement'];
                 }
