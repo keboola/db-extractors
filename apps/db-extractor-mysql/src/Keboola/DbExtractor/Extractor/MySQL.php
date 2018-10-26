@@ -334,7 +334,7 @@ class MySQL extends Extractor
                     $incrementalAddon = sprintf(
                         ' WHERE %s > %d',
                         $this->quote($this->incrementalFetching['column']),
-                        (int)$this->state['lastFetchedRow']
+                        (int) $this->state['lastFetchedRow']
                     );
                 } else {
                     if ($this->incrementalFetching['type'] === self::TYPE_TIMESTAMP) {
@@ -355,7 +355,7 @@ class MySQL extends Extractor
         if (count($columns) > 0) {
             $query = sprintf(
                 "SELECT %s FROM %s.%s",
-                implode(', ', array_map(function ($column) {
+                implode(', ', array_map(function ($column): string {
                     return $this->quote($column);
                 }, $columns)),
                 $this->quote($table['schema']),
