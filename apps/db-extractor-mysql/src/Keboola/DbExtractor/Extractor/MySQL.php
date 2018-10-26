@@ -315,7 +315,7 @@ class MySQL extends Extractor
         } else {
             throw new UserException(
                 sprintf(
-                    'Column [%s] specified for incremental fetching is not an auto increment column or an auto update timestamp',
+                    'Column [%s] specified for incremental fetching is not an auto increment column or a timestamp',
                     $columnName
                 )
             );

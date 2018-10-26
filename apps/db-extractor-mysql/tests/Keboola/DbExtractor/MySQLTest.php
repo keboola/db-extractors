@@ -1384,7 +1384,7 @@ class MySQLTest extends AbstractMySQLTest
             ],
             'column exists but is not auto-increment nor updating timestamp so should fail' => [
                 "weird-Name",
-                "Column [weird-Name] specified for incremental fetching is not an identity column or a datetime",
+                "Column [weird-Name] specified for incremental fetching is not an auto increment column or a timestamp",
             ],
         ];
     }
