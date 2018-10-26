@@ -227,7 +227,6 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => null,
                                     'ordinalPosition' => '1',
-                                    'extra' => 'auto_increment',
                                     'autoIncrement' => '3',
                                     'description' => 'This is a weird ID',
                                 ),
@@ -253,11 +252,9 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
-                                    'extra' => 'on update CURRENT_TIMESTAMP',
                                     'description' => 'This is a timestamp',
                                 ),
                         ),
-                    'timestampUpdateColumn' => 'timestamp',
                     'description' => 'This is a table comment',
                 ),
             1 =>
@@ -621,7 +618,6 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => null,
                                     'ordinalPosition' => '1',
-                                    'extra' => 'auto_increment',
                                     'autoIncrement' => '3',
                                     'description' => 'This is a weird ID',
                                 ),
@@ -647,11 +643,9 @@ class MySQLTest extends AbstractMySQLTest
                                     'nullable' => false,
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
-                                    'extra' => 'on update CURRENT_TIMESTAMP',
                                     'description' => 'This is a timestamp',
                                 ),
                         ),
-                    'timestampUpdateColumn' => 'timestamp',
                     'description' => 'This is a table comment',
                 ),
             2 =>
@@ -942,15 +936,10 @@ class MySQLTest extends AbstractMySQLTest
                         ),
                     9 =>
                         array (
-                            'key' => 'KBC.extra',
-                            'value' => 'auto_increment',
-                        ),
-                    10 =>
-                        array (
                             'key' => 'KBC.autoIncrement',
                             'value' => '2',
                         ),
-                    11 =>
+                    10 =>
                         array (
                             'key' => 'KBC.constraintName',
                             'value' => 'PRIMARY',
