@@ -1343,28 +1343,50 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
     }
 
-
-    public function testIncrementalFetchingInvalidColumns(): void
+    public function testIncrementalOrdering(): void
     {
         $this->createAutoIncrementAndTimestampTable();
         $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingColumn'] = 'fakeCol'; // column does not exist
 
-        try {
-            $result = ($this->createApplication($config))->run();
-            $this->fail('specified autoIncrement column does not exist, should fail.');
-        } catch (UserException $e) {
-            $this->assertStringStartsWith("Column [fakeCol]", $e->getMessage());
-        }
+        $result = ($this->createApplication($config))->run();
+        $outputCsvFile = iterator_to_array(
+            new CsvFile(
+                $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
+            )
+        );
 
-        // column exists but is not auto-increment nor updating timestamp so should fail
-        $config['parameters']['incrementalFetchingColumn'] = 'weird-Name';
-        try {
-            $result = ($this->createApplication($config))->run();
-            $this->fail('specified column is not auto increment nor timestamp, should fail.');
-        } catch (UserException $e) {
-            $this->assertStringStartsWith("Column [weird-Name] specified for incremental fetching", $e->getMessage());
+        $previousId = 0;
+        foreach ($outputCsvFile as $key => $row) {
+            $this->assertGreaterThan($previousId, (int) $row[0]);
+            $previousId = (int) $row[0];
         }
+    }
+
+    /**
+     * @dataProvider invalidColumnProvider
+     */
+    public function testIncrementalFetchingInvalidColumns(string $column, string $expectedExceptionMessage): void
+    {
+        $this->createAutoIncrementAndTimestampTable();
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingColumn'] = $column;
+
+        $this->setExpectedException(UserException::class, $expectedExceptionMessage);
+        ($this->createApplication($config))->run();
+    }
+
+    public function invalidColumnProvider(): array
+    {
+        return [
+            'column does not exist' => [
+                "fakeCol",
+                "Column [fakeCol] specified for incremental fetching was not found in the table",
+            ],
+            'column exists but is not auto-increment nor updating timestamp so should fail' => [
+                "weird-Name",
+                "Column [weird-Name] specified for incremental fetching is not an auto increment column or a timestamp",
+            ],
+        ];
     }
 
     public function testIncrementalFetchingInvalidConfig(): void

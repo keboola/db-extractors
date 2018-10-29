@@ -315,7 +315,7 @@ class MySQL extends Extractor
         } else {
             throw new UserException(
                 sprintf(
-                    'Column [%s] specified for incremental fetching is not an auto increment column or an auto update timestamp',
+                    'Column [%s] specified for incremental fetching is not an auto increment column or a timestamp',
                     $columnName
                 )
             );
@@ -328,29 +328,34 @@ class MySQL extends Extractor
     public function simpleQuery(array $table, array $columns = []): string
     {
         $incrementalAddon = null;
-        if ($this->incrementalFetching && isset($this->state['lastFetchedRow'])) {
-            if ($this->incrementalFetching['type'] === self::TYPE_AUTO_INCREMENT) {
-                $incrementalAddon = sprintf(
-                    ' %s > %d',
-                    $this->quote($this->incrementalFetching['column']),
-                    (int) $this->state['lastFetchedRow']
-                );
-            } else if ($this->incrementalFetching['type'] === self::TYPE_TIMESTAMP) {
-                $incrementalAddon = sprintf(
-                    " %s > '%s'",
-                    $this->quote($this->incrementalFetching['column']),
-                    $this->state['lastFetchedRow']
-                );
-            } else {
-                throw new ApplicationException(
-                    sprintf('Unknown incremental fetching column type %s', $this->incrementalFetching['type'])
-                );
+        if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
+            if (isset($this->state['lastFetchedRow'])) {
+                if ($this->incrementalFetching['type'] === self::TYPE_AUTO_INCREMENT) {
+                    $incrementalAddon = sprintf(
+                        ' WHERE %s > %d',
+                        $this->quote($this->incrementalFetching['column']),
+                        (int) $this->state['lastFetchedRow']
+                    );
+                } else {
+                    if ($this->incrementalFetching['type'] === self::TYPE_TIMESTAMP) {
+                        $incrementalAddon = sprintf(
+                            " WHERE %s > '%s'",
+                            $this->quote($this->incrementalFetching['column']),
+                            $this->state['lastFetchedRow']
+                        );
+                    } else {
+                        throw new ApplicationException(
+                            sprintf('Unknown incremental fetching column type %s', $this->incrementalFetching['type'])
+                        );
+                    }
+                }
             }
+            $incrementalAddon .= sprintf(" ORDER BY %s", $this->quote($this->incrementalFetching['column']));
         }
         if (count($columns) > 0) {
             $query = sprintf(
                 "SELECT %s FROM %s.%s",
-                implode(', ', array_map(function ($column) {
+                implode(', ', array_map(function ($column): string {
                     return $this->quote($column);
                 }, $columns)),
                 $this->quote($table['schema']),
@@ -365,11 +370,7 @@ class MySQL extends Extractor
         }
 
         if ($incrementalAddon) {
-            $query .= sprintf(
-                " WHERE %s ORDER BY %s",
-                $incrementalAddon,
-                $this->quote($this->incrementalFetching['column'])
-            );
+            $query .= $incrementalAddon;
         }
         if (isset($this->incrementalFetching['limit'])) {
             $query .= sprintf(
