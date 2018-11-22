@@ -160,9 +160,51 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
 
-        $this->assertCount(1, $result['tables']);
+        $this->assertCount(2, $result['tables']);
 
         $expectedData = array (
+                array (
+                    'name' => 'batch',
+                    'schema' => self::TESTING_SCHEMA_NAME,
+                    'type' => 'BASE TABLE',
+                    'catalog' => $config['parameters']['db']['database'],
+                    'columns' =>
+                        array (
+                            0 =>
+                                array (
+                                    'name' => 'id',
+                                    'type' => 'integer',
+                                    'primaryKey' => true,
+                                    'uniqueKey' => false,
+                                    'length' => 32,
+                                    'nullable' => false,
+                                    'default' => null,
+                                    'ordinalPosition' => 1,
+                                ),
+                            1 =>
+                                array (
+                                    'name' => 'name',
+                                    'type' => 'character varying',
+                                    'primaryKey' => false,
+                                    'uniqueKey' => false,
+                                    'length' => 256,
+                                    'nullable' => false,
+                                    'default' => 'a',
+                                    'ordinalPosition' => 2,
+                                ),
+                            2 =>
+                                array (
+                                    'name' => 'code',
+                                    'type' => 'character varying',
+                                    'primaryKey' => false,
+                                    'uniqueKey' => false,
+                                    'length' => 256,
+                                    'nullable' => false,
+                                    'default' => 'b',
+                                    'ordinalPosition' => 3,
+                                ),
+                        ),
+                ),
                 array (
                     'name' => 'escaping',
                     'schema' => self::TESTING_SCHEMA_NAME,
