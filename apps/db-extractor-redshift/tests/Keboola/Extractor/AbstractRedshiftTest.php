@@ -53,6 +53,8 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".escaping ";
         $qry .= "FROM 's3://{$config["aws"]["bucket"]}/escaping.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
+        $pdo->query($qry);
+
         $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".batch ";
         $qry .= "FROM 's3://{$config["aws"]["bucket"]}/batch.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
         $pdo->query($qry);
