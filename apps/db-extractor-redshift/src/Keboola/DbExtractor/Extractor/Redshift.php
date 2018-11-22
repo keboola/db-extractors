@@ -122,7 +122,7 @@ class Redshift extends Extractor
             $innerStatement = $this->db->prepare(sprintf("FETCH %s FROM %s", self::BATCH_SIZE, $cursorName));
 
             $i = 1;
-            while ($innerStatement->execute() && count($resultRows = $innerStatement->fetchAll(PDO::FETCH_ASSOC)) > 0) {
+            while ($innerStatement->execute() && count($resultRows = $innerStatement->fetchAll(\PDO::FETCH_ASSOC)) > 0) {
                 $this->logger->info("Fetching batch $i");
 
                 foreach ($resultRows as $resultRow) {
