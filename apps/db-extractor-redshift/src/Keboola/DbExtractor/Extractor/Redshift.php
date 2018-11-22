@@ -111,7 +111,7 @@ class Redshift extends Extractor
             // write header and first line
             $resultRow = $innerStatement->fetch(\PDO::FETCH_ASSOC);
             if (!is_array($resultRow) || empty($resultRow)) {
-                $this->logger->warning("Query returned empty result. Nothing was imported");
+                $this->db->rollBack();
                 return false;
             }
 
@@ -136,7 +136,7 @@ class Redshift extends Extractor
             $this->db->exec("CLOSE $cursorName");
             $this->db->commit();
 
-            $this->logger->info("Extraction completed");
+            $this->logger->info("Export completed");
             return true;
         } catch (\PDOException $e) {
             try {
