@@ -92,22 +92,61 @@ class Redshift extends Extractor
 
     protected function executeQuery($query, CsvFile $csv)
     {
-        $statement = $this->db->query($query);
+        $this->logger->info("Fetching data using DB cursor");
 
-        if ($statement === FALSE) {
-            throw new UserException("Failed to execute the provided query.");
-        }
+        $cursorName = 'exdbcursor' . intval(microtime(true));
+        $cursorSql = "DECLARE $cursorName CURSOR FOR $query";
 
-        $i = 0;
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if ($i === 0) {
-                $csv->writeRow(array_keys($row));
+        try {
+            $this->db->beginTransaction(); // cursors require a transaction.
+
+            $stmt = $this->db->prepare($cursorSql);
+            $stmt->execute();
+
+            $innerStatement = $this->db->prepare("FETCH 1 FROM $cursorName");
+            $innerStatement->execute();
+
+            // write header and first line
+            $resultRow = $innerStatement->fetch(\PDO::FETCH_ASSOC);
+            if (!is_array($resultRow) || empty($resultRow)) {
+                $this->logger->warning("Query returned empty result. Nothing was imported");
+                return false;
             }
-            $csv->writeRow($row);
-            $i++;
-        }
 
-        return ($i > 0);
+            $csv->writeRow(array_keys($resultRow));
+            $csv->writeRow($resultRow);
+
+            // write the rest
+            $innerStatement = $this->db->prepare("FETCH 10000 FROM $cursorName");
+
+            $i = 1;
+            while ($innerStatement->execute() && count($resultRows = $innerStatement->fetchAll(PDO::FETCH_ASSOC)) > 0) {
+                $this->logger->info("Fetching batch $i");
+
+                foreach ($resultRows as $resultRow) {
+                    $csv->writeRow($resultRow);
+                }
+
+                $i++;
+            }
+
+            // close the cursor
+            $this->db->exec("CLOSE $cursorName");
+            $this->db->commit();
+
+            $this->logger->info("Extraction completed");
+            return true;
+        } catch (\PDOException $e) {
+            try {
+                $this->db->rollBack();
+            } catch (\Throwable $e2) {
+            }
+
+            $innerStatement = null;
+            $stmt = null;
+
+            throw $e;
+        }
     }
 
     public function testConnection()
