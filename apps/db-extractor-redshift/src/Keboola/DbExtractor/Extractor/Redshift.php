@@ -17,6 +17,8 @@ class Redshift extends Extractor
 {
     private $dbConfig;
 
+    const BATCH_SIZE = 1000;
+
     public function createConnection($dbParams)
     {
         $this->dbConfig = $dbParams;
@@ -117,7 +119,7 @@ class Redshift extends Extractor
             $csv->writeRow($resultRow);
 
             // write the rest
-            $innerStatement = $this->db->prepare("FETCH 10000 FROM $cursorName");
+            $innerStatement = $this->db->prepare(sprintf("FETCH %s FROM %s", self::BATCH_SIZE, $cursorName));
 
             $i = 1;
             while ($innerStatement->execute() && count($resultRows = $innerStatement->fetchAll(PDO::FETCH_ASSOC)) > 0) {
