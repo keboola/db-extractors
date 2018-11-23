@@ -43,11 +43,20 @@ abstract class AbstractRedshiftTest extends ExtractorTest
                       col2 VARCHAR NOT NULL DEFAULT 'b', 
                       col3 VARCHAR NULL,
                       PRIMARY KEY (col1, col2));");
+        $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME . "\".batch 
+                      (id INT NOT NULL, 
+                      name VARCHAR NOT NULL DEFAULT 'a', 
+                      code VARCHAR NOT NULL DEFAULT 'b',
+                      PRIMARY KEY (id));");
 
         $credStr = "aws_access_key_id={$config['aws']['s3key']};aws_secret_access_key={$config['aws']['s3secret']}";
 
         $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".escaping ";
         $qry .= "FROM 's3://{$config["aws"]["bucket"]}/escaping.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
+        $pdo->query($qry);
+
+        $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".batch ";
+        $qry .= "FROM 's3://{$config["aws"]["bucket"]}/batch.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
         $pdo->query($qry);
     }
 
