@@ -9,8 +9,6 @@
 
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Extractor\Redshift;
-use Monolog\Handler\TestHandler;
 use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends AbstractRedshiftTest
@@ -53,96 +51,6 @@ class RedshiftTest extends AbstractRedshiftTest
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
         $this->runApp(new Application($config));
-    }
-
-    public function testExportBatch()
-    {
-        $config = $this->getConfig();
-
-        $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
-
-        $handler = new TestHandler();
-
-        $logger = new Logger();
-        $logger->setHandlers([$handler]);
-
-        $extractor = new Redshift($config['parameters'], $logger);
-
-        $result = $extractor->export([
-            'id' => 0,
-            'name' => 'batch',
-            'query' => 'SELECT id, name, code FROM testing.batch ORDER BY id LIMIT 10000',
-            'outputTable' => 'in.c-main.batch',
-            'incremental' => true,
-            'primaryKey' => ['id'],
-            'enabled' => true,
-        ]);
-
-        $batchCount = 0;
-        foreach ($handler->getRecords() as $record) {
-            if (strpos($record['message'], 'Fetching batch') !== false) {
-                $batchCount++;
-            }
-        }
-
-        $this->assertEquals(3, $batchCount);
-
-        $expectedCsvFile = $this->dataDir .  "/in/tables/batch.csv";
-        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.batch.csv';
-        $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.batch.csv.manifest';
-        $manifest = Yaml::parse(file_get_contents($outputManifestFile));
-
-        $this->assertEquals('in.c-main.batch', $result);
-        $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($outputManifestFile);;
-        $this->assertEquals(file_get_contents($expectedCsvFile), file_get_contents($outputCsvFile));
-        $this->assertEquals('in.c-main.batch', $manifest['destination']);
-        $this->assertEquals(true, $manifest['incremental']);
-        $this->assertEquals('id', $manifest['primary_key'][0]);
-    }
-
-    public function testExportBatchEmptyResult()
-    {
-        $config = $this->getConfig();
-
-        $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
-
-        $handler = new TestHandler();
-
-        $logger = new Logger();
-        $logger->setHandlers([$handler]);
-
-        $extractor = new Redshift($config['parameters'], $logger);
-
-        $result = $extractor->export([
-            'id' => 0,
-            'name' => 'batch',
-            'query' => 'SELECT id, name, code FROM testing.batch ORDER BY id LIMIT 0',
-            'outputTable' => 'in.c-main.batch',
-            'incremental' => true,
-            'primaryKey' => ['id'],
-            'enabled' => true,
-        ]);
-
-        $batchCount = 0;
-        foreach ($handler->getRecords() as $record) {
-            if (strpos($record['message'], 'Fetching batch') !== false) {
-                $batchCount++;
-            }
-        }
-
-        $this->assertEquals(0, $batchCount);
-
-        $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.batch.csv';
-        $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.batch.csv.manifest';
-
-        if (file_exists($outputCsvFile)) {
-            $this->fail('Empty result should create any CSV file');
-        }
-
-        if (file_exists($outputManifestFile)) {
-            $this->fail('Empty result should create any manifest file');
-        }
     }
 
     public function testRunFailure()
@@ -204,51 +112,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
 
-        $this->assertCount(2, $result['tables']);
+        $this->assertCount(1, $result['tables']);
 
         $expectedData = array (
-                array (
-                    'name' => 'batch',
-                    'schema' => self::TESTING_SCHEMA_NAME,
-                    'type' => 'BASE TABLE',
-                    'catalog' => $config['parameters']['db']['database'],
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'id',
-                                    'type' => 'integer',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'length' => 32,
-                                    'nullable' => false,
-                                    'default' => null,
-                                    'ordinalPosition' => 1,
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'name',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 256,
-                                    'nullable' => false,
-                                    'default' => 'a',
-                                    'ordinalPosition' => 2,
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'code',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => 256,
-                                    'nullable' => false,
-                                    'default' => 'b',
-                                    'ordinalPosition' => 3,
-                                ),
-                        ),
-                ),
                 array (
                     'name' => 'escaping',
                     'schema' => self::TESTING_SCHEMA_NAME,
