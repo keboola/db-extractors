@@ -18,7 +18,6 @@ services:
       - AWS_SECRET_KEY
       - AWS_REGION
       - AWS_S3_BUCKET
-      - ROOT_PATH=/code
     links:
       - sshproxy
 
@@ -42,7 +41,6 @@ services:
       - AWS_SECRET_KEY
       - AWS_REGION
       - AWS_S3_BUCKET
-      - ROOT_PATH=/code
     links:
       - sshproxy
 

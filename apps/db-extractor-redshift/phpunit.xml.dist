@@ -7,12 +7,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="true"
-         syntaxCheck="false"
          bootstrap="vendor/autoload.php">
-
-    <php>
-        <const name="ROOT_PATH" value="./"/>
-    </php>
 
     <testsuite name="DB Extractor Redshift Test Suite">
         <directory>tests/Keboola/Extractor</directory>

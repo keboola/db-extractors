@@ -1,13 +1,6 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 10/12/15
- * Time: 14:25
- */
-
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 

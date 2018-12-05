@@ -7,12 +7,9 @@ use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 use Symfony\Component\Yaml\Yaml;
 
-define('APP_NAME', 'ex-db-redshift');
-define('ROOT_PATH', __DIR__);
-
 require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
-$logger = new \Keboola\DbExtractor\Logger(APP_NAME);
+$logger = new \Keboola\DbExtractor\Logger('ex-db-redshift');
 
 try {
     $runAction = true;

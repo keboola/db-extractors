@@ -1,6 +1,6 @@
 <?php
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Process\Process;
@@ -8,6 +8,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class RedshiftApplicationTest extends AbstractRedshiftTest
 {
+    const ROOT_PATH = __DIR__ . '/../../..';
+
     public function testTestConnectionAction()
     {
         $config = $this->getConfig();
@@ -15,7 +17,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -45,7 +47,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertEquals(0, $process->getExitCode());
@@ -60,7 +62,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -101,7 +103,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -150,7 +152,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         // run entrypoint
-        $process = new Process('php ' . ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 

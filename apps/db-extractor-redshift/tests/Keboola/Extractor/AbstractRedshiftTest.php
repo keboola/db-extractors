@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: marc
- * Date: 13/06/2017
- * Time: 19:02
- */
 
-namespace Keboola\DbExtractor;
+namespace Keboola\DbExtractor\Tests;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Keboola\DbExtractor\Test\ExtractorTest;
@@ -14,6 +8,8 @@ use Keboola\DbExtractor\Test\ExtractorTest;
 abstract class AbstractRedshiftTest extends ExtractorTest
 {
     const TESTING_SCHEMA_NAME = 'testing';
+
+    const DRIVER = 'redshift';
 
     public function setUp()
     {
@@ -24,7 +20,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         if (!defined('APP_NAME')) {
             define('APP_NAME', 'ex-db-redshift');
         }
-        $this->initRedshiftData($this->getConfig('redshift'));
+        $this->initRedshiftData($this->getConfig(self::DRIVER));
     }
 
     private function initRedshiftData(array $config)
@@ -51,9 +47,9 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $pdo->query($qry);
     }
 
-    public function getConfig($driver = 'redshift')
+    public function getConfig(string $driver = self::DRIVER, string $congifFormat = self::CONFIG_FORMAT_YAML): array
     {
-        $config = parent::getConfig($driver);
+        $config = parent::getConfig($driver, $congifFormat);
         if (getenv('AWS_ACCESS_KEY')) {
             $config['aws']['s3key'] = getenv('AWS_ACCESS_KEY');
         }
@@ -76,5 +72,4 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         // docker-compose .env file does not support new lines in variables so we have to modify the key https://github.com/moby/moby/issues/12997
         return str_replace('"', '', str_replace('\n', "\n", $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE')));
     }
-
 }
