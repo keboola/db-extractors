@@ -27,7 +27,7 @@ services:
     volumes:
       - .:/code
     tty: true
-    command: vendor/bin/phpunit
+    command: composer ci
     stdin_open: true
     env_file:
       - ssh-keys.env
