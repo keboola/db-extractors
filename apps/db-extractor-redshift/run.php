@@ -22,7 +22,7 @@ try {
     $config['parameters']['data_dir'] = $arguments['data'];
     $config['parameters']['extractor_class'] = 'Redshift';
 
-    $app = new Application($config);
+    $app = new Application($config, $logger);
 
     if ($app['action'] !== 'run') {
         $app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));
