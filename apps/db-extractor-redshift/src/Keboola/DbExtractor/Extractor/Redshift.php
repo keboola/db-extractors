@@ -49,74 +49,13 @@ class Redshift extends Extractor
         }
     }
 
-    public function export(array $table)
-    {
-        $outputTable = $table['outputTable'];
-        $this->logger->info("Exporting to " . $outputTable);
-        if (isset($table['query']) && strlen($table['query']) > 0) {
-            $query = $table['query'];
-        } else {
-            $query = $this->simpleQuery($table['table'], $table['columns']);
-        }
-        $tries = 0;
-        $exception = null;
-        $csvCreated = false;
-        while ($tries < 5) {
-            $exception = null;
-            try {
-                if ($tries > 0) {
-                    $this->restartConnection();
-                }
-                $csvCreated = $this->executeQuery($query, $this->createOutputCsv($outputTable));
-                break;
-            } catch (\PDOException $e) {
-                $this->logger->info(sprintf('%s. Retrying... [%dx]', $e->getMessage(), $tries + 1));
-                $exception = new UserException("DB query [{$table['name']}] failed: " . $e->getMessage(), 0, $e);
-            }
-            sleep(pow($tries, 2));
-            $tries++;
-        }
-        if ($exception) {
-            throw $exception;
-        }
-        if ($csvCreated) {
-            if ($this->createManifest($table) === false) {
-                throw new ApplicationException("Unable to create manifest", 0, null, [
-                    'table' => $table
-                ]);
-            }
-        }
-        return $outputTable;
-
-    }
-
-    protected function executeQuery($query, CsvFile $csv)
-    {
-        $statement = $this->db->query($query);
-
-        if ($statement === FALSE) {
-            throw new UserException("Failed to execute the provided query.");
-        }
-
-        $i = 0;
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if ($i === 0) {
-                $csv->writeRow(array_keys($row));
-            }
-            $csv->writeRow($row);
-            $i++;
-        }
-
-        return ($i > 0);
-    }
-
     public function testConnection()
     {
         $this->db->query("SELECT 1");
     }
 
 
-    public function getTables(array $tables = null)
+    public function getTables(array $tables = null): array
     {
         $sql = "SELECT * FROM information_schema.tables 
                 WHERE table_schema != 'pg_catalog' AND table_schema != 'information_schema'";
@@ -228,13 +167,7 @@ class Redshift extends Extractor
         return array_values($tableDefs);
     }
 
-    public function describeTable(array $table)
-    {
-        // Deprecated
-        return null;
-    }
-
-    public function simpleQuery(array $table, array $columns = array())
+    public function simpleQuery(array $table, array $columns = array()): string
     {
         if (count($columns) > 0) {
             return sprintf("SELECT %s FROM %s.%s",
@@ -253,7 +186,7 @@ class Redshift extends Extractor
         }
     }
 
-    private function quote($obj)
+    private function quote($obj): string
     {
         $q = '"';
         return ($q . str_replace("$q", "$q$q", $obj) . $q);
