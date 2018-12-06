@@ -130,7 +130,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $expectedCsvFile1 = $this->dataDir .  "/in/tables/escaping.csv";
         $expectedCsvFile2 = $this->dataDir .  "/in/tables/tableColumns.csv";
         $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
-        $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.tableColumns.csv';
+        $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
         $outputManifestFile1 = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
         $outputManifestFile2 = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest';
         $manifest1 = Yaml::parse(file_get_contents($outputManifestFile1));
