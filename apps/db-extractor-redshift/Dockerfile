@@ -5,7 +5,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Deps
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends wget curl make git bzip2 zip unzip time libzip-dev openssl libpq-dev \
+RUN apt-get install -y --no-install-recommends wget curl make git zip unzip time ssh libzip-dev openssl libpq-dev \
   && docker-php-ext-install pdo pdo_pgsql
 
 # php settings
