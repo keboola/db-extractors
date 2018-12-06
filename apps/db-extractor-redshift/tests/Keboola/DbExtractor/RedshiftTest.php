@@ -11,8 +11,8 @@ class RedshiftTest extends AbstractRedshiftTest
     {
         $result = $app->run();
         $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
-        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
+        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
         $manifest = Yaml::parse(file_get_contents($outputManifestFile));
 
         $this->assertEquals('success', $result['status']);
@@ -24,7 +24,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('col3', $manifest['primary_key'][0]);
     }
 
-    public function testRun()
+    public function testRunConfig()
     {
         $this->runApp($this->createApplication($this->getConfig()));
     }

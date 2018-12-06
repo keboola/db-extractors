@@ -53,6 +53,10 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
+
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
         $this->assertEquals("", $process->getErrorOutput());
@@ -70,6 +74,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->run();
 
         var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
@@ -109,6 +114,9 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
 
         $this->assertEquals("", $process->getErrorOutput());
         $this->assertEquals(0, $process->getExitCode());
@@ -158,6 +166,9 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
+
+        var_dump($process->getErrorOutput());
+        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
