@@ -21,9 +21,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->setTimeout(300);
         $process->run();
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
-
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
         $this->assertEquals("", $process->getErrorOutput());
@@ -54,9 +51,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->setTimeout(300);
         $process->run();
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
-
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
         $this->assertEquals("", $process->getErrorOutput());
@@ -72,9 +66,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertContains(
@@ -117,9 +108,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
 
         $this->assertContains(
             "Query returned empty result. Nothing was imported to [in.c-main.escapingEmpty]",
@@ -177,9 +165,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
