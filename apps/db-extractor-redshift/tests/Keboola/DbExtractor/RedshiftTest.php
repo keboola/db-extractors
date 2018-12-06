@@ -61,7 +61,7 @@ class RedshiftTest extends AbstractRedshiftTest
             $this->fail("Failing query must raise exception.");
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
             // test that the error message contains the query name
-            $this->assertContains('[bad]', $e->getMessage());
+            $this->assertContains('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
         }
     }
 
@@ -106,6 +106,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
 
+        var_export($result['tables']);
         $this->assertCount(1, $result['tables']);
 
         $expectedData = array (
@@ -168,7 +169,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest')
+            file_get_contents(
+                $this->dataDir . '/out/tables/' . strtolower($result['imported'][0]['outputTable']) . '.csv.manifest'
+            )
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
@@ -202,91 +205,101 @@ class RedshiftTest extends AbstractRedshiftTest
 
         $expectedColumnMetadata = array (
             'col1' =>
-          array (
-              0 =>
-                  array (
-                      'key' => 'KBC.datatype.type',
-                      'value' => 'character varying',
-                  ),
-              1 =>
-                  array (
-                      'key' => 'KBC.datatype.nullable',
-                      'value' => false,
-                  ),
-              2 =>
-                  array (
-                      'key' => 'KBC.datatype.basetype',
-                      'value' => 'STRING',
-                  ),
-              3 =>
-                  array (
-                      'key' => 'KBC.datatype.length',
-                      'value' => 256,
-                  ),
-              4 =>
-                  array (
-                      'key' => 'KBC.datatype.default',
-                      'value' => 'a',
-                  ),
-              5 =>
-                  array (
-                      'key' => 'KBC.primaryKey',
-                      'value' => true,
-                  ),
-              6 =>
-                  array (
-                      'key' => 'KBC.uniqueKey',
-                      'value' => false,
-                  ),
-              7 =>
-                  array (
-                      'key' => 'KBC.ordinalPosition',
-                      'value' => 1,
-                  ),
-          ),
-          'col2' =>
-          array (
-              0 =>
-                  array (
-                      'key' => 'KBC.datatype.type',
-                      'value' => 'character varying',
-                  ),
-              1 =>
-                  array (
-                      'key' => 'KBC.datatype.nullable',
-                      'value' => false,
-                  ),
-              2 =>
-                  array (
-                      'key' => 'KBC.datatype.basetype',
-                      'value' => 'STRING',
-                  ),
-              3 =>
-                  array (
-                      'key' => 'KBC.datatype.length',
-                      'value' => 256,
-                  ),
-              4 =>
-                  array (
-                      'key' => 'KBC.datatype.default',
-                      'value' => 'b',
-                  ),
-              5 =>
-                  array (
-                      'key' => 'KBC.primaryKey',
-                      'value' => true,
-                  ),
-              6 =>
-                  array (
-                      'key' => 'KBC.uniqueKey',
-                      'value' => false,
-                  ),
-              7 =>
-                  array (
-                      'key' => 'KBC.ordinalPosition',
-                      'value' => 2,
-                  ),
-          ),
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'a',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col1',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 1,
+                        ),
+                ),
+            'col2' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'b',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col2',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 2,
+                        ),
+                ),
         );
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
