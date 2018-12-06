@@ -11,6 +11,9 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
     const DRIVER = 'redshift';
 
+    /** @var string  */
+    protected $dataDir = __DIR__ . '/../../data';
+    
     public function setUp()
     {
         $fs = new Filesystem();
