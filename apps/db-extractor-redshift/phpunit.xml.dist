@@ -10,7 +10,7 @@
          bootstrap="vendor/autoload.php">
 
     <testsuite name="DB Extractor Redshift Test Suite">
-        <directory>tests/Keboola/Extractor</directory>
+        <directory>tests/Keboola/DbExtractor</directory>
     </testsuite>
 
 </phpunit>
