@@ -2,6 +2,8 @@
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\DbExtractor\Application;
+use Keboola\DbExtractor\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
@@ -13,7 +15,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
     /** @var string  */
     protected $dataDir = __DIR__ . '/../../data';
-    
+
     public function setUp()
     {
         $fs = new Filesystem();
@@ -68,6 +70,11 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $config['parameters']['extractor_class'] = 'Redshift';
         return $config;
+    }
+
+    public function createApplication(array $config): Application
+    {
+        return new Application($config, new Logger('ex-db-redshift-tests'));
     }
 
     public function getRedshiftPrivateKey()

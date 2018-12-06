@@ -2,6 +2,7 @@
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\DbExtractor\Application;
 use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends AbstractRedshiftTest
@@ -25,7 +26,7 @@ class RedshiftTest extends AbstractRedshiftTest
 
     public function testRun()
     {
-        $this->runApp(new Application($this->getConfig()));
+        $this->runApp($this->createApplication($this->getConfig()));
     }
 
     public function testRunWithSSH()
@@ -43,7 +44,7 @@ class RedshiftTest extends AbstractRedshiftTest
             'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
-        $this->runApp(new Application($config));
+        $this->runApp($this->createApplication($config));
     }
 
     public function testRunFailure()
@@ -56,7 +57,7 @@ class RedshiftTest extends AbstractRedshiftTest
             'outputTable' => 'dummy'
         ];
         try {
-            $this->runApp(new Application($config));
+            $this->runApp($this->createApplication($config));
             $this->fail("Failing query must raise exception.");
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
             // test that the error message contains the query name
@@ -69,7 +70,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
     }
@@ -92,7 +93,7 @@ class RedshiftTest extends AbstractRedshiftTest
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
     }
@@ -100,7 +101,7 @@ class RedshiftTest extends AbstractRedshiftTest
     {
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
@@ -162,7 +163,7 @@ class RedshiftTest extends AbstractRedshiftTest
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
 
