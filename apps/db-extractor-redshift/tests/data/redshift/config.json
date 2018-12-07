@@ -1,0 +1,37 @@
+{
+  "parameters": {
+    "tables": [
+      {
+        "id": 0,
+        "name": "escaping",
+        "query": "SELECT col1, col2, col3 FROM testing.escaping ORDER BY col3",
+        "outputTable": "in.c-main.escaping",
+        "incremental": true,
+        "primaryKey": ["col3"],
+        "enabled": true
+      },
+      {
+        "id": 1,
+        "name": "escapingEmpty",
+        "query": "SELECT col1, col2 FROM testing.escaping LIMIT 0",
+        "outputTable": "in.c-main.escaping",
+        "incremental": false,
+        "primaryKey": [],
+        "enabled": true
+      },
+      {
+        "id": 2,
+        "name": "tableColumns",
+        "table": {
+          "schema": "testing",
+          "tableName": "escaping"
+        },
+        "outputTable": "in.c-main.tableColumns",
+        "incremental": false,
+        "primaryKey": null,
+        "enabled": true,
+        "columns": ["col1", "col2"]
+      }
+    ]
+  }
+}
