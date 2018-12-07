@@ -38,9 +38,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $expectedOutput = iterator_to_array(new CsvFile($this->dataDir .  "/in/tables/escaping.csv"));
         array_shift($expectedOutput);
         $outputArray = iterator_to_array(new CsvFile(
-            $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
+            $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv'
         ));
-        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
+        $outputManifestFile = $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv.manifest';
         $manifest = json_decode(file_get_contents($outputManifestFile), true);
 
         $expectedColumnMetadata = array (
