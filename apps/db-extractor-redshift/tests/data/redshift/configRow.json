@@ -1,0 +1,13 @@
+{
+  "parameters": {
+    "table": {
+      "schema": "testing",
+      "tableName": "escaping"
+    },
+    "outputTable": "in.c-main.tableColumns",
+    "incremental": false,
+    "primaryKey": null,
+    "enabled": true,
+    "columns": ["col1", "col2"]
+  }
+}

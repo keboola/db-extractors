@@ -72,6 +72,26 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         return $config;
     }
 
+    public function getConfigRow(string $driver): array
+    {
+        $config = parent::getConfigRow($driver);
+        if (getenv('AWS_ACCESS_KEY')) {
+            $config['aws']['s3key'] = getenv('AWS_ACCESS_KEY');
+        }
+        if (getenv('AWS_SECRET_KEY')) {
+            $config['aws']['s3secret'] = getenv('AWS_SECRET_KEY');
+        }
+        if (getenv('AWS_REGION')) {
+            $config['aws']['region'] = getenv('AWS_REGION');
+        }
+        if (getenv('AWS_S3_BUCKET')) {
+            $config['aws']['bucket'] = getenv('AWS_S3_BUCKET');
+        }
+
+        $config['parameters']['extractor_class'] = 'Redshift';
+        return $config;
+    }
+
     public function createApplication(array $config): Application
     {
         return new Application($config, new Logger('ex-db-redshift-tests'));
