@@ -77,6 +77,14 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         return new Application($config, new Logger('ex-db-redshift-tests'));
     }
 
+    public function configFormatProvider(): array
+    {
+        return [
+            [self::CONFIG_FORMAT_YAML],
+            [self::CONFIG_FORMAT_JSON],
+        ];
+    }
+
     public function getRedshiftPrivateKey()
     {
         // docker-compose .env file does not support new lines in variables so we have to modify the key https://github.com/moby/moby/issues/12997
