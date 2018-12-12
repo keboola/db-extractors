@@ -191,4 +191,20 @@ abstract class AbstractMySQLTest extends ExtractorTest
             [$this->getConfigRow()],
         ];
     }
+
+    protected function getIncrementalFetchingConfig(): array
+    {
+        $config = $this->getConfigRow(self::DRIVER);
+        unset($config['parameters']['query']);
+        $config['parameters']['table'] = [
+            'tableName' => 'auto_increment_timestamp',
+            'schema' => 'test',
+        ];
+        $config['parameters']['incremental'] = true;
+        $config['parameters']['name'] = 'auto-increment-timestamp';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
+        $config['parameters']['primaryKey'] = ['_weird-I-d'];
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
+        return $config;
+    }
 }
