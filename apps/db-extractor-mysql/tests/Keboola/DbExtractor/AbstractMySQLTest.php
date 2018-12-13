@@ -8,6 +8,7 @@ use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
+use Symfony\Component\Filesystem\Filesystem;
 use PDO;
 
 abstract class AbstractMySQLTest extends ExtractorTest
@@ -20,6 +21,10 @@ abstract class AbstractMySQLTest extends ExtractorTest
     public function setUp(): void
     {
         $this->dataDir = __DIR__ . '/../../data';
+
+        $fs = new Filesystem();
+        $fs->remove($this->dataDir . '/out/tables');
+        $fs->mkdir($this->dataDir . '/out/tables');
 
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
