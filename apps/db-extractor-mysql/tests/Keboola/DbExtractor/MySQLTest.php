@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\UserException;
-use Symfony\Component\Yaml\Yaml;
 use Nette\Utils;
 
 class MySQLTest extends AbstractMySQLTest
@@ -206,7 +204,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertCount(3, $result['tables']);
-
+        
         $expectedData = array (
             0 =>
                 array (
@@ -253,6 +251,40 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
                                     'description' => 'This is a timestamp',
+                                ),
+                            3 =>
+                                array (
+                                    'name' => 'datetime',
+                                    'sanitizedName' => 'datetime',
+                                    'type' => 'datetime',
+                                    'primaryKey' => false,
+                                    'length' => null,
+                                    'nullable' => false,
+                                    'default' => 'CURRENT_TIMESTAMP',
+                                    'ordinalPosition' => '4',
+                                    'description' => 'This is a datetime',
+                                ),
+                            4 =>
+                                array (
+                                    'name' => 'intColumn',
+                                    'sanitizedName' => 'intColumn',
+                                    'type' => 'int',
+                                    'primaryKey' => false,
+                                    'length' => '10',
+                                    'nullable' => true,
+                                    'default' => '1',
+                                    'ordinalPosition' => '5',
+                                ),
+                            5 =>
+                                array (
+                                    'name' => 'decimalColumn',
+                                    'sanitizedName' => 'decimalColumn',
+                                    'type' => 'decimal',
+                                    'primaryKey' => false,
+                                    'length' => '10,2',
+                                    'nullable' => true,
+                                    'default' => '10.20',
+                                    'ordinalPosition' => '6',
                                 ),
                         ),
                     'description' => 'This is a table comment',
@@ -644,6 +676,40 @@ class MySQLTest extends AbstractMySQLTest
                                     'default' => 'CURRENT_TIMESTAMP',
                                     'ordinalPosition' => '3',
                                     'description' => 'This is a timestamp',
+                                ),
+                            3 =>
+                                array (
+                                    'name' => 'datetime',
+                                    'sanitizedName' => 'datetime',
+                                    'type' => 'datetime',
+                                    'primaryKey' => false,
+                                    'length' => null,
+                                    'nullable' => false,
+                                    'default' => 'CURRENT_TIMESTAMP',
+                                    'ordinalPosition' => '4',
+                                    'description' => 'This is a datetime',
+                                ),
+                            4 =>
+                                array (
+                                    'name' => 'intColumn',
+                                    'sanitizedName' => 'intColumn',
+                                    'type' => 'int',
+                                    'primaryKey' => false,
+                                    'length' => '10',
+                                    'nullable' => true,
+                                    'default' => '1',
+                                    'ordinalPosition' => '5',
+                                ),
+                            5 =>
+                                array (
+                                    'name' => 'decimalColumn',
+                                    'sanitizedName' => 'decimalColumn',
+                                    'type' => 'decimal',
+                                    'primaryKey' => false,
+                                    'length' => '10,2',
+                                    'nullable' => true,
+                                    'default' => '10.20',
+                                    'ordinalPosition' => '6',
                                 ),
                         ),
                     'description' => 'This is a table comment',

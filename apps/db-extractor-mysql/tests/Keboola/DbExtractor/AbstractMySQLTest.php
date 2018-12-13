@@ -55,9 +55,12 @@ abstract class AbstractMySQLTest extends ExtractorTest
             `_weird-I-d` INT NOT NULL AUTO_INCREMENT COMMENT \'This is a weird ID\',
             `weird-Name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
             `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'This is a timestamp\',
+            `datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'This is a datetime\',
+            `intColumn` INT DEFAULT 1,
+            `decimalColumn` DECIMAL(10,2) DEFAULT 10.2,
             PRIMARY KEY (`_weird-I-d`)  
         ) COMMENT=\'This is a table comment\'');
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'george\'), (\'henry\')');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `intColumn`, `decimalColumn`) VALUES (\'george\', 2, 20.2), (\'henry\', 3, 30.3)');
     }
 
     protected function createAutoIncrementAndTimestampTableWithFK(): void
