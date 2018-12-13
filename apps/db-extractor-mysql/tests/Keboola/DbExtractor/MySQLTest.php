@@ -204,7 +204,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertCount(3, $result['tables']);
-        
+
         $expectedData = array (
             0 =>
                 array (
@@ -1236,7 +1236,7 @@ class MySQLTest extends AbstractMySQLTest
         );
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
         $manifest = json_decode(file_get_contents($outputManifestFile), true);
-        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp'];
+        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp', 'datetime', 'intColumn', 'decimalColumn'];
         $this->assertEquals($expectedColumns, $manifest['columns']);
         $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
     }
