@@ -31,8 +31,8 @@ class IncrementalFetchingTests extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
+        $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
@@ -77,8 +77,8 @@ class IncrementalFetchingTests extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
+        $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
@@ -120,8 +120,8 @@ class IncrementalFetchingTests extends AbstractMySQLTest
 
         sleep(2);
         // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
+        $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
