@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Exception\UserException;
 
 class IncrementalFetchingTests extends AbstractMySQLTest
 {
@@ -32,7 +35,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
         sleep(2);
         // the next fetch should be empty
         $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
@@ -47,7 +50,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
             $result['state']['lastFetchedRow'],
             $newResult['state']['lastFetchedRow']
         );
-        $this->assertEquals(2, $newResult['imported']['rows']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingByDatetime(): void
@@ -78,7 +81,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
         sleep(2);
         // the next fetch should be empty
         $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
@@ -93,7 +96,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
             $result['state']['lastFetchedRow'],
             $newResult['state']['lastFetchedRow']
         );
-        $this->assertEquals(2, $newResult['imported']['rows']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingByAutoIncrement(): void
@@ -121,7 +124,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
         sleep(2);
         // the next fetch should be empty
         $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $noNewRowsResult['imported']['rows']);
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
         //now add a couple rows and run it again.
@@ -133,7 +136,7 @@ class IncrementalFetchingTests extends AbstractMySQLTest
         $this->assertArrayHasKey('state', $newResult);
         $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
         $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
-        $this->assertEquals(2, $newResult['imported']['rows']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingLimit(): void
