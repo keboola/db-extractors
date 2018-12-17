@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Tests;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 
-class IncrementalFetchingTests extends AbstractMySQLTest
+class IncrementalFetchingTest extends AbstractMySQLTest
 {
 
     public function testIncrementalFetchingByTimestamp(): void
@@ -129,6 +129,86 @@ class IncrementalFetchingTests extends AbstractMySQLTest
         sleep(2);
         //now add a couple rows and run it again.
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
+
+        $newResult = ($this->createApplication($config, $result['state']))->run();
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
+    }
+
+    public function testIncrementalFetchingByInteger(): void
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingColumn'] = 'intColumn';
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = ($this->createApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2,
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should be empty
+        $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
+
+        sleep(2);
+        //now add a couple rows and run it again.
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `integerColumn`) VALUES (\'charles\', 4), (\'william\', 7)');
+
+        $newResult = ($this->createApplication($config, $result['state']))->run();
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
+    }
+
+    public function testIncrementalFetchingByDecimal(): void
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $config['parameters']['incrementalFetchingColumn'] = 'decimalColumn';
+        $this->createAutoIncrementAndTimestampTable();
+
+        $result = ($this->createApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2,
+            ],
+            $result['imported']
+        );
+
+        //check that output state contains expected information
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+
+        sleep(2);
+        // the next fetch should be empty
+        $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
+
+        sleep(2);
+        //now add a couple rows and run it again.
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `decimalColumn`) VALUES (\'charles\', 4.4), (\'william\', 7.4)');
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
