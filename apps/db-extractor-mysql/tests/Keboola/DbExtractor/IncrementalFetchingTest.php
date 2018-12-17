@@ -159,7 +159,7 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+        $this->assertEquals(3, $result['state']['lastFetchedRow']);
 
         sleep(2);
         // the next fetch should be empty
@@ -168,14 +168,14 @@ class IncrementalFetchingTest extends AbstractMySQLTest
 
         sleep(2);
         //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `integerColumn`) VALUES (\'charles\', 4), (\'william\', 7)');
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `intColumn`) VALUES (\'charles\', 4), (\'william\', 7)');
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $newResult);
         $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
-        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(7, $newResult['state']['lastFetchedRow']);
         $this->assertEquals(3, $newResult['imported']['rows']);
     }
 
@@ -199,7 +199,7 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(2, $result['state']['lastFetchedRow']);
+        $this->assertEquals(30.3, $result['state']['lastFetchedRow']);
 
         sleep(2);
         // the next fetch should be empty
@@ -207,16 +207,16 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
         sleep(2);
-        //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `decimalColumn`) VALUES (\'charles\', 4.4), (\'william\', 7.4)');
+        //now add a couple rows and run it again.  Only the one row that has decimal >= to 30.3 should be included
+        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`, `decimalColumn`) VALUES (\'charles\', 4.4), (\'william\', 70.7)');
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
         //check that output state contains expected information
         $this->assertArrayHasKey('state', $newResult);
         $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
-        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
-        $this->assertEquals(3, $newResult['imported']['rows']);
+        $this->assertEquals(70.7, $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(2, $newResult['imported']['rows']);
     }
 
     public function testIncrementalFetchingLimit(): void
@@ -242,12 +242,13 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         $this->assertEquals(1, $result['state']['lastFetchedRow']);
 
         sleep(2);
-        // the next fetch should contain the second row
+        // for the next fetch should contain the second row the limit must be 2 since we are using >=
+        $config['parameters']['incrementalFetchingLimit'] = 2;
         $result = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(
             [
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 1,
+                'rows' => 2,
             ],
             $result['imported']
         );
@@ -299,7 +300,7 @@ class IncrementalFetchingTest extends AbstractMySQLTest
             ],
             'column exists but is not auto-increment nor updating timestamp so should fail' => [
                 "weird-Name",
-                "Column [weird-Name] specified for incremental fetching is not an auto increment column or a timestamp",
+                "Column [weird-Name] specified for incremental fetching is not a numeric or timestamp type column",
             ],
         ];
     }
