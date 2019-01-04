@@ -7,12 +7,9 @@ use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 use Symfony\Component\Yaml\Yaml;
 
-define('APP_NAME', 'ex-db-redshift');
-define('ROOT_PATH', __DIR__);
+require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
-require_once(dirname(__FILE__) . "/vendor/keboola/db-extractor-common/bootstrap.php");
-
-$logger = new \Keboola\DbExtractor\Logger(APP_NAME);
+$logger = new \Keboola\DbExtractor\Logger('ex-db-redshift');
 
 try {
     $runAction = true;
@@ -25,7 +22,7 @@ try {
     $config['parameters']['data_dir'] = $arguments['data'];
     $config['parameters']['extractor_class'] = 'Redshift';
 
-    $app = new Application($config);
+    $app = new Application($config, $logger);
 
     if ($app['action'] !== 'run') {
         $app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));

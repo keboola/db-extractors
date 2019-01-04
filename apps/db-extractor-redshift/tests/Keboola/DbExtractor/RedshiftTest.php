@@ -1,14 +1,8 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: miroslavcillik
- * Date: 10/12/15
- * Time: 14:25
- */
+namespace Keboola\DbExtractor\Tests;
 
-namespace Keboola\DbExtractor;
-
+use Keboola\DbExtractor\Application;
 use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends AbstractRedshiftTest
@@ -17,8 +11,8 @@ class RedshiftTest extends AbstractRedshiftTest
     {
         $result = $app->run();
         $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv';
-        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest';
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
+        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
         $manifest = Yaml::parse(file_get_contents($outputManifestFile));
 
         $this->assertEquals('success', $result['status']);
@@ -30,9 +24,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('col3', $manifest['primary_key'][0]);
     }
 
-    public function testRun()
+    public function testRunConfig()
     {
-        $this->runApp(new Application($this->getConfig()));
+        $this->runApp($this->createApplication($this->getConfig()));
     }
 
     public function testRunWithSSH()
@@ -50,7 +44,7 @@ class RedshiftTest extends AbstractRedshiftTest
             'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
-        $this->runApp(new Application($config));
+        $this->runApp($this->createApplication($config));
     }
 
     public function testRunFailure()
@@ -63,11 +57,11 @@ class RedshiftTest extends AbstractRedshiftTest
             'outputTable' => 'dummy'
         ];
         try {
-            $this->runApp(new Application($config));
+            $this->runApp($this->createApplication($config));
             $this->fail("Failing query must raise exception.");
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
             // test that the error message contains the query name
-            $this->assertContains('[bad]', $e->getMessage());
+            $this->assertContains('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
         }
     }
 
@@ -76,7 +70,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
     }
@@ -99,7 +93,7 @@ class RedshiftTest extends AbstractRedshiftTest
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
     }
@@ -107,11 +101,11 @@ class RedshiftTest extends AbstractRedshiftTest
     {
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new Application($config);
+        $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
-
+        
         $this->assertCount(1, $result['tables']);
 
         $expectedData = array (
@@ -169,12 +163,14 @@ class RedshiftTest extends AbstractRedshiftTest
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
-        $app = new Application($config);
+        $app = $this->createApplication($config);
 
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][0] . '.csv.manifest')
+            file_get_contents(
+                $this->dataDir . '/out/tables/' . strtolower($result['imported'][0]['outputTable']) . '.csv.manifest'
+            )
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
@@ -208,91 +204,101 @@ class RedshiftTest extends AbstractRedshiftTest
 
         $expectedColumnMetadata = array (
             'col1' =>
-          array (
-              0 =>
-                  array (
-                      'key' => 'KBC.datatype.type',
-                      'value' => 'character varying',
-                  ),
-              1 =>
-                  array (
-                      'key' => 'KBC.datatype.nullable',
-                      'value' => false,
-                  ),
-              2 =>
-                  array (
-                      'key' => 'KBC.datatype.basetype',
-                      'value' => 'STRING',
-                  ),
-              3 =>
-                  array (
-                      'key' => 'KBC.datatype.length',
-                      'value' => 256,
-                  ),
-              4 =>
-                  array (
-                      'key' => 'KBC.datatype.default',
-                      'value' => 'a',
-                  ),
-              5 =>
-                  array (
-                      'key' => 'KBC.primaryKey',
-                      'value' => true,
-                  ),
-              6 =>
-                  array (
-                      'key' => 'KBC.uniqueKey',
-                      'value' => false,
-                  ),
-              7 =>
-                  array (
-                      'key' => 'KBC.ordinalPosition',
-                      'value' => 1,
-                  ),
-          ),
-          'col2' =>
-          array (
-              0 =>
-                  array (
-                      'key' => 'KBC.datatype.type',
-                      'value' => 'character varying',
-                  ),
-              1 =>
-                  array (
-                      'key' => 'KBC.datatype.nullable',
-                      'value' => false,
-                  ),
-              2 =>
-                  array (
-                      'key' => 'KBC.datatype.basetype',
-                      'value' => 'STRING',
-                  ),
-              3 =>
-                  array (
-                      'key' => 'KBC.datatype.length',
-                      'value' => 256,
-                  ),
-              4 =>
-                  array (
-                      'key' => 'KBC.datatype.default',
-                      'value' => 'b',
-                  ),
-              5 =>
-                  array (
-                      'key' => 'KBC.primaryKey',
-                      'value' => true,
-                  ),
-              6 =>
-                  array (
-                      'key' => 'KBC.uniqueKey',
-                      'value' => false,
-                  ),
-              7 =>
-                  array (
-                      'key' => 'KBC.ordinalPosition',
-                      'value' => 2,
-                  ),
-          ),
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'a',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col1',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 1,
+                        ),
+                ),
+            'col2' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'b',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col2',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 2,
+                        ),
+                ),
         );
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
