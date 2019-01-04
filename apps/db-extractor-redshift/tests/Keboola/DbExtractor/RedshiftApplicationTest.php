@@ -10,12 +10,28 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
 {
     const ROOT_PATH = __DIR__ . '/../../..';
 
-    public function testTestConnectionAction()
+    private function prepareConfig(array $config, string $format): void
     {
-        $config = $this->getConfig();
-        $config['action'] = 'testConnection';
         @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        @unlink($this->dataDir . '/config.json');
+
+        if ($format === self::CONFIG_FORMAT_JSON) {
+            file_put_contents($this->dataDir . '/config.json', json_encode($config));
+        } else if ($format === self::CONFIG_FORMAT_YAML) {
+            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        } else {
+            throw new \Exception("Invalid test config format: {$format}");
+        }
+    }
+
+    /**
+     * @dataProvider configFormatProvider
+     */
+    public function testTestConnectionAction(string $configFormat)
+    {
+        $config = $this->getConfig(self::DRIVER, $configFormat);
+        $config['action'] = 'testConnection';
+        $this->prepareConfig($config, $configFormat);
 
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -44,8 +60,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
             'remotePort' => $this->getEnv('redshift', 'DB_PORT')
         ];
 
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
 
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -56,11 +71,15 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->assertEquals("", $process->getErrorOutput());
     }
 
-    public function testRunAction()
+    /**
+     * @dataProvider configFormatProvider
+     * @param string $configFormat
+     */
+    public function testRunAction(string $configFormat): void
     {
-        $config = $this->getConfig();
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $config = $this->getConfig(self::DRIVER, $configFormat);
+
+        $this->prepareConfig($config, $configFormat);
 
         // run entrypoint
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
@@ -158,8 +177,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
     {
         $config = $this->getConfig();
         $config['action'] = "getTables";
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+
+        $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
 
         // run entrypoint
         $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);

@@ -18,7 +18,20 @@ try {
     if (!isset($arguments["data"])) {
         throw new UserException('Data folder not set.');
     }
-    $config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
+
+    if (file_exists($arguments["data"] . "/config.yml")) {
+        $config = Yaml::parse(
+            file_get_contents($arguments["data"] . "/config.yml")
+        );
+    } else if (file_exists($arguments["data"] . "/config.json")) {
+        $config = json_decode(
+            file_get_contents($arguments["data"] . '/config.json'),
+            true
+        );
+    } else {
+        throw new UserException('Configuration file not found.');
+    }
+    
     $config['parameters']['data_dir'] = $arguments['data'];
     $config['parameters']['extractor_class'] = 'Redshift';
 

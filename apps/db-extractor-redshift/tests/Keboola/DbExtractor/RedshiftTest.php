@@ -105,7 +105,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $result = $app->run();
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
-        
+
         $this->assertCount(1, $result['tables']);
 
         $expectedData = array (
