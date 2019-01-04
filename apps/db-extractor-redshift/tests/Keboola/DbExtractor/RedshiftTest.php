@@ -2,6 +2,7 @@
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Application;
 use Symfony\Component\Yaml\Yaml;
 
@@ -13,11 +14,11 @@ class RedshiftTest extends AbstractRedshiftTest
         $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
-        $manifest = Yaml::parse(file_get_contents($outputManifestFile));
+        $manifest = json_decode(file_get_contents($outputManifestFile), true);
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($outputManifestFile);;
+        $this->assertFileExists($outputManifestFile);
         $this->assertEquals(file_get_contents($expectedCsvFile), file_get_contents($outputCsvFile));
         $this->assertEquals('in.c-main.escaping', $manifest['destination']);
         $this->assertEquals(true, $manifest['incremental']);
@@ -27,6 +28,126 @@ class RedshiftTest extends AbstractRedshiftTest
     public function testRunConfig()
     {
         $this->runApp($this->createApplication($this->getConfig()));
+    }
+
+    public function testRunConfigRow(): void
+    {
+        $app = $this->createApplication($this->getConfigRow(self::DRIVER));
+
+        $result = $app->run();
+        $expectedOutput = iterator_to_array(new CsvFile($this->dataDir .  "/in/tables/escaping.csv"));
+        array_shift($expectedOutput);
+        $outputArray = iterator_to_array(new CsvFile(
+            $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv'
+        ));
+        $outputManifestFile = $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv.manifest';
+        $manifest = json_decode(file_get_contents($outputManifestFile), true);
+
+        $expectedColumnMetadata = array (
+            'col1' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'a',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col1',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 1,
+                        ),
+                ),
+            'col2' =>
+                array (
+                    0 =>
+                        array (
+                            'key' => 'KBC.datatype.type',
+                            'value' => 'character varying',
+                        ),
+                    1 =>
+                        array (
+                            'key' => 'KBC.datatype.nullable',
+                            'value' => false,
+                        ),
+                    2 =>
+                        array (
+                            'key' => 'KBC.datatype.basetype',
+                            'value' => 'STRING',
+                        ),
+                    3 =>
+                        array (
+                            'key' => 'KBC.datatype.length',
+                            'value' => 256,
+                        ),
+                    4 =>
+                        array (
+                            'key' => 'KBC.datatype.default',
+                            'value' => 'b',
+                        ),
+                    5 =>
+                        array (
+                            'key' => 'KBC.sourceName',
+                            'value' => 'col2',
+                        ),
+                    6 =>
+                        array (
+                            'key' => 'KBC.primaryKey',
+                            'value' => true,
+                        ),
+                    7 =>
+                        array (
+                            'key' => 'KBC.uniqueKey',
+                            'value' => false,
+                        ),
+                    8 =>
+                        array (
+                            'key' => 'KBC.ordinalPosition',
+                            'value' => 2,
+                        ),
+                ),
+        );
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(7, (int) $result['imported']['rows']);
+        $this->assertEquals(ksort($expectedOutput), ksort($outputArray));
+        $this->assertEquals('in.c-main.tableColumns', $manifest['destination']);
+        $this->assertEquals(false, $manifest['incremental']);
+        $this->assertEquals(['col1', 'col2'], $manifest['columns']);
+        $this->assertEquals($expectedColumnMetadata, $manifest['column_metadata']);
     }
 
     public function testRunWithSSH()
