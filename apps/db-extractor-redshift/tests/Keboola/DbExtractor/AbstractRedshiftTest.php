@@ -22,9 +22,6 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $fs->remove($this->dataDir . '/out/tables');
         $fs->mkdir($this->dataDir . '/out/tables');
 
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', 'ex-db-redshift');
-        }
         $this->initRedshiftData($this->getConfig(self::DRIVER));
     }
 
