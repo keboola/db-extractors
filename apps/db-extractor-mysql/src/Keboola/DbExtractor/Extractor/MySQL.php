@@ -339,23 +339,11 @@ class MySQL extends Extractor
         $incrementalAddon = null;
         if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
             if (isset($this->state['lastFetchedRow'])) {
-                if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_TIMESTAMP) {
-                    $incrementalAddon = sprintf(
-                        " WHERE %s >= '%s'",
-                        $this->quote($this->incrementalFetching['column']),
-                        $this->state['lastFetchedRow']
-                    );
-                } else if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
-                    $incrementalAddon = sprintf(
-                        " WHERE %s >= %s",
-                        $this->quote($this->incrementalFetching['column']),
-                        $this->state['lastFetchedRow']
-                    );
-                } else {
-                    throw new ApplicationException(
-                        sprintf('Unknown incremental fetching column type %s', $this->incrementalFetching['type'])
-                    );
-                }
+                $incrementalAddon = sprintf(
+                    " WHERE %s >= %s",
+                    $this->quote($this->incrementalFetching['column']),
+                    $this->db->quote((string) $this->state['lastFetchedRow'])
+                );
             }
             $incrementalAddon .= sprintf(" ORDER BY %s", $this->quote($this->incrementalFetching['column']));
         }
