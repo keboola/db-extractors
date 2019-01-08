@@ -214,7 +214,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         // state file should not be written if state is empty
         $this->assertFileNotExists($outputStateFile);
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
+        $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest');
         $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }

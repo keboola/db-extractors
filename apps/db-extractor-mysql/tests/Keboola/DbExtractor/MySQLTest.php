@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\UserException;
-use Symfony\Component\Yaml\Yaml;
 use Nette\Utils;
 
 class MySQLTest extends AbstractMySQLTest
@@ -19,7 +17,7 @@ class MySQLTest extends AbstractMySQLTest
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
         $config['parameters']['db']['networkCompression'] = true;
-        
+
         $app = $this->createApplication($config);
         $result = $app->run();
 
@@ -206,7 +204,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertCount(3, $result['tables']);
-        
+
         $expectedData = array (
             0 =>
                 array (
@@ -215,46 +213,7 @@ class MySQLTest extends AbstractMySQLTest
                     'type' => 'BASE TABLE',
                     'rowCount' => '2',
                     'autoIncrement' => '3',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => '_weird-I-d',
-                                    'sanitizedName' => 'weird_I_d',
-                                    'type' => 'int',
-                                    'primaryKey' => true,
-                                    'length' => '10',
-                                    'nullable' => false,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                    'autoIncrement' => '3',
-                                    'description' => 'This is a weird ID',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'weird-Name',
-                                    'sanitizedName' => 'weird_Name',
-                                    'type' => 'varchar',
-                                    'primaryKey' => false,
-                                    'length' => '30',
-                                    'nullable' => false,
-                                    'default' => 'pam',
-                                    'ordinalPosition' => '2',
-                                    'description' => 'This is a weird name',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'timestamp',
-                                    'sanitizedName' => 'timestamp',
-                                    'type' => 'timestamp',
-                                    'primaryKey' => false,
-                                    'length' => null,
-                                    'nullable' => false,
-                                    'default' => 'CURRENT_TIMESTAMP',
-                                    'ordinalPosition' => '3',
-                                    'description' => 'This is a timestamp',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'auto_increment_timestamp'),
                     'description' => 'This is a table comment',
                 ),
             1 =>
@@ -263,31 +222,7 @@ class MySQLTest extends AbstractMySQLTest
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
                     'rowCount' => '7',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'col1',
-                                    'sanitizedName' => 'col1',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'col2',
-                                    'sanitizedName' => 'col2',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'escaping'),
                 ),
             2 =>
                 array (
@@ -295,141 +230,7 @@ class MySQLTest extends AbstractMySQLTest
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
                     'rowCount' => '100',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'usergender',
-                                    'sanitizedName' => 'usergender',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'usercity',
-                                    'sanitizedName' => 'usercity',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'usersentiment',
-                                    'sanitizedName' => 'usersentiment',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '3',
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'zipcode',
-                                    'sanitizedName' => 'zipcode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '4',
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'sku',
-                                    'sanitizedName' => 'sku',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '5',
-                                ),
-                            5 =>
-                                array (
-                                    'name' => 'createdat',
-                                    'sanitizedName' => 'createdat',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '6',
-                                ),
-                            6 =>
-                                array (
-                                    'name' => 'category',
-                                    'sanitizedName' => 'category',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '7',
-                                ),
-                            7 =>
-                                array (
-                                    'name' => 'price',
-                                    'sanitizedName' => 'price',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '8',
-                                ),
-                            8 =>
-                                array (
-                                    'name' => 'county',
-                                    'sanitizedName' => 'county',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '9',
-                                ),
-                            9 =>
-                                array (
-                                    'name' => 'countycode',
-                                    'sanitizedName' => 'countycode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '10',
-                                ),
-                            10 =>
-                                array (
-                                    'name' => 'userstate',
-                                    'sanitizedName' => 'userstate',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '11',
-                                ),
-                            11 =>
-                                array (
-                                    'name' => 'categorygroup',
-                                    'sanitizedName' => 'categorygroup',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '12',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'sales'),
                 ),
         );
         $this->assertEquals($expectedData, $result['tables']);
@@ -463,141 +264,7 @@ class MySQLTest extends AbstractMySQLTest
                     'schema' => 'temp_schema',
                     'type' => 'BASE TABLE',
                     'rowCount' => '100',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'usergender',
-                                    'sanitizedName' => 'usergender',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'usercity',
-                                    'sanitizedName' => 'usercity',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'usersentiment',
-                                    'sanitizedName' => 'usersentiment',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '3',
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'zipcode',
-                                    'sanitizedName' => 'zipcode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '4',
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'sku',
-                                    'sanitizedName' => 'sku',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '5',
-                                ),
-                            5 =>
-                                array (
-                                    'name' => 'createdat',
-                                    'sanitizedName' => 'createdat',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '6',
-                                ),
-                            6 =>
-                                array (
-                                    'name' => 'category',
-                                    'sanitizedName' => 'category',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '7',
-                                ),
-                            7 =>
-                                array (
-                                    'name' => 'price',
-                                    'sanitizedName' => 'price',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '8',
-                                ),
-                            8 =>
-                                array (
-                                    'name' => 'county',
-                                    'sanitizedName' => 'county',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '9',
-                                ),
-                            9 =>
-                                array (
-                                    'name' => 'countycode',
-                                    'sanitizedName' => 'countycode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '10',
-                                ),
-                            10 =>
-                                array (
-                                    'name' => 'userstate',
-                                    'sanitizedName' => 'userstate',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '11',
-                                ),
-                            11 =>
-                                array (
-                                    'name' => 'categorygroup',
-                                    'sanitizedName' => 'categorygroup',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '12',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('temp_schema', 'ext_sales'),
                 ),
             1 =>
                 array (
@@ -606,46 +273,7 @@ class MySQLTest extends AbstractMySQLTest
                     'type' => 'BASE TABLE',
                     'rowCount' => '2',
                     'autoIncrement' => '3',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => '_weird-I-d',
-                                    'sanitizedName' => 'weird_I_d',
-                                    'type' => 'int',
-                                    'primaryKey' => true,
-                                    'length' => '10',
-                                    'nullable' => false,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                    'autoIncrement' => '3',
-                                    'description' => 'This is a weird ID',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'weird-Name',
-                                    'sanitizedName' => 'weird_Name',
-                                    'type' => 'varchar',
-                                    'primaryKey' => false,
-                                    'length' => '30',
-                                    'nullable' => false,
-                                    'default' => 'pam',
-                                    'ordinalPosition' => '2',
-                                    'description' => 'This is a weird name',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'timestamp',
-                                    'sanitizedName' => 'timestamp',
-                                    'type' => 'timestamp',
-                                    'primaryKey' => false,
-                                    'length' => null,
-                                    'nullable' => false,
-                                    'default' => 'CURRENT_TIMESTAMP',
-                                    'ordinalPosition' => '3',
-                                    'description' => 'This is a timestamp',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'auto_increment_timestamp'),
                     'description' => 'This is a table comment',
                 ),
             2 =>
@@ -654,31 +282,7 @@ class MySQLTest extends AbstractMySQLTest
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
                     'rowCount' => '7',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'col1',
-                                    'sanitizedName' => 'col1',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'col2',
-                                    'sanitizedName' => 'col2',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'escaping'),
                 ),
             3 =>
                 array (
@@ -686,141 +290,7 @@ class MySQLTest extends AbstractMySQLTest
                     'schema' => 'test',
                     'type' => 'BASE TABLE',
                     'rowCount' => '100',
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'usergender',
-                                    'sanitizedName' => 'usergender',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'usercity',
-                                    'sanitizedName' => 'usercity',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '2',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'usersentiment',
-                                    'sanitizedName' => 'usersentiment',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '3',
-                                ),
-                            3 =>
-                                array (
-                                    'name' => 'zipcode',
-                                    'sanitizedName' => 'zipcode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '4',
-                                ),
-                            4 =>
-                                array (
-                                    'name' => 'sku',
-                                    'sanitizedName' => 'sku',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '5',
-                                ),
-                            5 =>
-                                array (
-                                    'name' => 'createdat',
-                                    'sanitizedName' => 'createdat',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '6',
-                                ),
-                            6 =>
-                                array (
-                                    'name' => 'category',
-                                    'sanitizedName' => 'category',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '7',
-                                ),
-                            7 =>
-                                array (
-                                    'name' => 'price',
-                                    'sanitizedName' => 'price',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '8',
-                                ),
-                            8 =>
-                                array (
-                                    'name' => 'county',
-                                    'sanitizedName' => 'county',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '9',
-                                ),
-                            9 =>
-                                array (
-                                    'name' => 'countycode',
-                                    'sanitizedName' => 'countycode',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '10',
-                                ),
-                            10 =>
-                                array (
-                                    'name' => 'userstate',
-                                    'sanitizedName' => 'userstate',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '11',
-                                ),
-                            11 =>
-                                array (
-                                    'name' => 'categorygroup',
-                                    'sanitizedName' => 'categorygroup',
-                                    'type' => 'text',
-                                    'primaryKey' => false,
-                                    'length' => '65535',
-                                    'nullable' => true,
-                                    'default' => null,
-                                    'ordinalPosition' => '12',
-                                ),
-                        ),
+                    'columns' => $this->expectedTableColumns('test', 'sales'),
                 ),
         );
         $this->assertEquals($expectedTables, $result['tables']);
@@ -1170,238 +640,9 @@ class MySQLTest extends AbstractMySQLTest
         );
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
         $manifest = json_decode(file_get_contents($outputManifestFile), true);
-        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp'];
+        $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp', 'datetime', 'intColumn', 'decimalColumn'];
         $this->assertEquals($expectedColumns, $manifest['columns']);
         $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
-    }
-
-    public function testIncrementalFetchingByTimestamp(): void
-    {
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingColumn'] = 'timestamp';
-        $this->createAutoIncrementAndTimestampTable();
-
-        $result = ($this->createApplication($config))->run();
-
-        $this->assertEquals('success', $result['status']);
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2,
-            ],
-            $result['imported']
-        );
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertNotEmpty($result['state']['lastFetchedRow']);
-
-        sleep(2);
-        // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
-
-        sleep(2);
-        //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
-
-        $newResult = ($this->createApplication($config, $result['state']))->run();
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $newResult);
-        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
-        $this->assertGreaterThan(
-            $result['state']['lastFetchedRow'],
-            $newResult['state']['lastFetchedRow']
-        );
-        $this->assertEquals(2, $newResult['imported']['rows']);
-    }
-
-    public function testIncrementalFetchingByDatetime(): void
-    {
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingColumn'] = 'datetime';
-        $config['parameters']['table']['tableName'] = 'auto_increment_timestamp_withFK';
-        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp-with-fk';
-        $this->createAutoIncrementAndTimestampTable();
-        $this->createAutoIncrementAndTimestampTableWithFK();
-
-        $result = ($this->createApplication($config))->run();
-
-        $this->assertEquals('success', $result['status']);
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp-with-fk',
-                'rows' => 1,
-            ],
-            $result['imported']
-        );
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertNotEmpty($result['state']['lastFetchedRow']);
-
-        sleep(2);
-        // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
-
-        sleep(2);
-        //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`) VALUES (\'charles\'), (\'william\')');
-
-        $newResult = ($this->createApplication($config, $result['state']))->run();
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $newResult);
-        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
-        $this->assertGreaterThan(
-            $result['state']['lastFetchedRow'],
-            $newResult['state']['lastFetchedRow']
-        );
-        $this->assertEquals(2, $newResult['imported']['rows']);
-    }
-
-    public function testIncrementalFetchingByAutoIncrement(): void
-    {
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
-        $this->createAutoIncrementAndTimestampTable();
-
-        $result = ($this->createApplication($config))->run();
-
-        $this->assertEquals('success', $result['status']);
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 2,
-            ],
-            $result['imported']
-        );
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(2, $result['state']['lastFetchedRow']);
-
-        sleep(2);
-        // the next fetch should be empty
-        $emptyResult = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(0, $emptyResult['imported']['rows']);
-
-        sleep(2);
-        //now add a couple rows and run it again.
-        $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
-
-        $newResult = ($this->createApplication($config, $result['state']))->run();
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $newResult);
-        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
-        $this->assertEquals(4, $newResult['state']['lastFetchedRow']);
-        $this->assertEquals(2, $newResult['imported']['rows']);
-    }
-
-    public function testIncrementalFetchingLimit(): void
-    {
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingLimit'] = 1;
-        $this->createAutoIncrementAndTimestampTable();
-
-        $result = ($this->createApplication($config))->run();
-
-        $this->assertEquals('success', $result['status']);
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 1,
-            ],
-            $result['imported']
-        );
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(1, $result['state']['lastFetchedRow']);
-
-        sleep(2);
-        // the next fetch should contain the second row
-        $result = ($this->createApplication($config, $result['state']))->run();
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 1,
-            ],
-            $result['imported']
-        );
-
-        //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(2, $result['state']['lastFetchedRow']);
-    }
-
-    public function testIncrementalOrdering(): void
-    {
-        $this->createAutoIncrementAndTimestampTable();
-        $config = $this->getIncrementalFetchingConfig();
-
-        $result = ($this->createApplication($config))->run();
-        $outputCsvFile = iterator_to_array(
-            new CsvFile(
-                $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
-            )
-        );
-
-        $previousId = 0;
-        foreach ($outputCsvFile as $key => $row) {
-            $this->assertGreaterThan($previousId, (int) $row[0]);
-            $previousId = (int) $row[0];
-        }
-    }
-
-    /**
-     * @dataProvider invalidColumnProvider
-     */
-    public function testIncrementalFetchingInvalidColumns(string $column, string $expectedExceptionMessage): void
-    {
-        $this->createAutoIncrementAndTimestampTable();
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['incrementalFetchingColumn'] = $column;
-
-        $this->setExpectedException(UserException::class, $expectedExceptionMessage);
-        ($this->createApplication($config))->run();
-    }
-
-    public function invalidColumnProvider(): array
-    {
-        return [
-            'column does not exist' => [
-                "fakeCol",
-                "Column [fakeCol] specified for incremental fetching was not found in the table",
-            ],
-            'column exists but is not auto-increment nor updating timestamp so should fail' => [
-                "weird-Name",
-                "Column [weird-Name] specified for incremental fetching is not an auto increment column or a timestamp",
-            ],
-        ];
-    }
-
-    public function testIncrementalFetchingInvalidConfig(): void
-    {
-        $this->createAutoIncrementAndTimestampTable();
-        $config = $this->getIncrementalFetchingConfig();
-        $config['parameters']['query'] = 'SELECT * FROM auto_increment_timestamp';
-        unset($config['parameters']['table']);
-
-        try {
-            $result = ($this->createApplication($config))->run();
-            $this->fail('cannot use incremental fetching with advanced query, should fail.');
-        } catch (UserException $e) {
-            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
-        }
     }
 
     public function testRunWithNetworkCompression(): void
@@ -1421,22 +662,6 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
-    }
-
-    private function getIncrementalFetchingConfig(): array
-    {
-        $config = $this->getConfigRow(self::DRIVER);
-        unset($config['parameters']['query']);
-        $config['parameters']['table'] = [
-            'tableName' => 'auto_increment_timestamp',
-            'schema' => 'test',
-        ];
-        $config['parameters']['incremental'] = true;
-        $config['parameters']['name'] = 'auto-increment-timestamp';
-        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
-        $config['parameters']['primaryKey'] = ['_weird-I-d'];
-        $config['parameters']['incrementalFetchingColumn'] = '_weird-I-d';
-        return $config;
     }
 
     public function testDBSchemaMismatchConfigRowWithNoName(): void
