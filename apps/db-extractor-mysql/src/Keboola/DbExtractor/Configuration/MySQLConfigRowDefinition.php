@@ -93,6 +93,7 @@ class MySQLConfigRowDefinition extends ConfigRowDefinition
                 ->scalarNode('cert')->end()
                 ->scalarNode('key')->end()
                 ->scalarNode('cipher')->end()
+                ->booleanNode('allowInvalidHost')->defaultFalse()->end()
             ->end();
         // @formatter:on
         return $node;

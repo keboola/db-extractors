@@ -58,6 +58,9 @@ class MySQL extends Extractor
             if (!empty($ssl['cipher'])) {
                 $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
             }
+            if ($ssl['allowInvalidHost'] === true) {
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            }
         }
 
         foreach (['host', 'user', '#password'] as $r) {
