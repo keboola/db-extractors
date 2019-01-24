@@ -42,7 +42,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
             'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
             'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
             'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
-            'allowInvalidHost' => true,
+            'verifyServerCert' => false,
         ];
 
         $config['parameters']['tables'] = [];
@@ -50,7 +50,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
         $config['parameters']['db']['host'] = 'mysql-different-cn';
 
         $result = $this->createApplication($config)->run();
-        
+
         $this->assertEquals("success", $result['status']);
     }
 }
