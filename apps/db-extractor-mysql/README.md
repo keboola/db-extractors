@@ -27,6 +27,7 @@ The configuration requires a `db` node with the following properties:
   - cert: string
   - key: string
   - cipher: string
+  - verifyServerCert: boolean (default true)
 - ssh: array (optional, but if present, enabled, keys/public, user, and sshHost are required)
   - enabled: boolean 
   - keys: array 
