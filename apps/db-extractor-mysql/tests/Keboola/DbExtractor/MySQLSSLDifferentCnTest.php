@@ -31,4 +31,26 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $this->createApplication($config)->run();
     }
+
+    public function testAllowInvalidHostOption(): void
+    {
+        $config = $this->getConfig();
+        $config['action'] = 'testConnection';
+
+        $config['parameters']['db']['ssl'] = [
+            'enabled' => true,
+            'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
+            'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
+            'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+            'allowInvalidHost' => true,
+        ];
+
+        $config['parameters']['tables'] = [];
+
+        $config['parameters']['db']['host'] = 'mysql-different-cn';
+
+        $result = $this->createApplication($config)->run();
+        
+        $this->assertEquals("success", $result['status']);
+    }
 }
