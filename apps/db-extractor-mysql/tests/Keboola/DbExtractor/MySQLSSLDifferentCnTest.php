@@ -32,7 +32,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
         $this->createApplication($config)->run();
     }
 
-    public function testAllowInvalidHostOption(): void
+    public function testVerifyServerCertOption(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
