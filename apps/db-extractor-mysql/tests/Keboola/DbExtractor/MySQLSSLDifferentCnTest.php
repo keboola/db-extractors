@@ -31,4 +31,26 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $this->createApplication($config)->run();
     }
+
+    public function testVerifyServerCertOption(): void
+    {
+        $config = $this->getConfig();
+        $config['action'] = 'testConnection';
+
+        $config['parameters']['db']['ssl'] = [
+            'enabled' => true,
+            'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
+            'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
+            'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+            'verifyServerCert' => false,
+        ];
+
+        $config['parameters']['tables'] = [];
+
+        $config['parameters']['db']['host'] = 'mysql-different-cn';
+
+        $result = $this->createApplication($config)->run();
+
+        $this->assertEquals("success", $result['status']);
+    }
 }

@@ -81,6 +81,7 @@ class MySQLConfigDefinition extends ConfigDefinition
                 ->scalarNode('cert')->end()
                 ->scalarNode('key')->end()
                 ->scalarNode('cipher')->end()
+                ->booleanNode('verifyServerCert')->defaultTrue()->end()
             ->end();
         // @formatter:on
         return $node;
