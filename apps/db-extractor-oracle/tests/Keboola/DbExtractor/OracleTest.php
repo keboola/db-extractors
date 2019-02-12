@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Extractor\Oracle;
+use Keboola\DbExtractor\Logger;
 use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest
@@ -180,6 +182,83 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(file_get_contents($escapingCsv->getPathname()), file_get_contents($outputCsvFile));
     }
 
+    public function testExtractorGetTablesWithSchema(): void
+    {
+        $config = $this->getConfig('oracle');
+        $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        $config['parameters']['tables'] = [];
+
+        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
+
+        $this->assertTrue($extractor->testConnection());
+
+        $this->assertGreaterThan(2, $extractor->getTables());
+
+        $tableName = 'REGIONS';
+
+        // get table from HR schema
+        $tables = $extractor->getTables(
+            [
+                [
+                    'tableName' => $tableName,
+                    'schema' => 'HR',
+                ],
+            ]
+        );
+
+        $this->assertCount(1, $tables);
+        $table = $tables[0];
+
+        $this->assertArrayHasKey('name', $table);
+        $this->assertSame($tableName, $table['name']);
+
+        $this->assertArrayHasKey('schema', $table);
+        $this->assertSame('HR', $table['schema']);
+
+        $this->assertArrayHasKey('columns', $table);
+        $this->assertCount(2, $table['columns']);
+
+        // get table from user schema
+        $userSchema = mb_strtoupper($config['parameters']['db']['user']);
+
+        $tables = $extractor->getTables(
+            [
+                [
+                    'tableName' => $tableName,
+                    'schema' => $userSchema,
+                ],
+            ]
+        );
+
+        $this->assertCount(1, $tables);
+        $table = $tables[0];
+
+        $this->assertArrayHasKey('name', $table);
+        $this->assertSame($tableName, $table['name']);
+
+        $this->assertArrayHasKey('schema', $table);
+        $this->assertSame($userSchema, $table['schema']);
+
+        $this->assertArrayHasKey('columns', $table);
+        $this->assertCount(1, $table['columns']);
+
+        // get tables from both schemas
+        $tables = $extractor->getTables(
+            [
+                [
+                    'tableName' => $tableName,
+                    'schema' => 'HR',
+                ],
+                [
+                    'tableName' => $tableName,
+                    'schema' => $userSchema,
+                ],
+            ]
+        );
+
+        $this->assertCount(2, $tables);
+    }
+
     public function testGetTables(): void
     {
         $config = $this->getConfig('oracle');
@@ -198,7 +277,7 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(9, $result['tables']);
+        $this->assertCount(10, $result['tables']);
 
         $expectedTables = array (
             0 =>
@@ -713,6 +792,28 @@ class OracleTest extends OracleBaseTest
                         ),
                 ),
             8 =>
+                array (
+                    'name' => 'REGIONS',
+                    'tablespaceName' => 'USERS',
+                    'schema' => 'TESTER',
+                    'owner' => 'TESTER',
+                    'columns' =>
+                        array (
+                            0 =>
+                                array (
+                                    'name' => 'REGION_ID',
+                                    'sanitizedName' => 'REGION_ID',
+                                    'type' => 'NUMBER',
+                                    'nullable' => false,
+                                    'length' => '22',
+                                    'ordinalPosition' => '1',
+                                    'primaryKey' => true,
+                                    'uniqueKey' => false,
+                                    'primaryKeyName' => 'REG_ID_PK',
+                                ),
+                        ),
+                ),
+            9 =>
                 array (
                     'name' => 'SALES',
                     'tablespaceName' => 'USERS',

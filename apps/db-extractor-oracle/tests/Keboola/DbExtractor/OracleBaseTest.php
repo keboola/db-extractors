@@ -62,6 +62,7 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
         $this->createClobTable();
+        $this->createRegionsTable();
         $this->cleanupOutputDirectory();
     }
 
@@ -159,6 +160,21 @@ EOT;
         $this->executeStatement(
             $this->connection,
             "INSERT INTO CLOB_TEST VALUES ('goodbye', '<test>some test xml </test>')"
+        );
+    }
+
+    protected function createRegionsTable(): void
+    {
+        $this->dropTableIfExists("REGIONS");
+
+        $this->executeStatement(
+            $this->connection,
+            "CREATE TABLE REGIONS AS SELECT * FROM HR.REGIONS"
+        );
+
+        $this->executeStatement(
+            $this->connection,
+            "ALTER TABLE REGIONS DROP COLUMN REGION_NAME"
         );
     }
 
