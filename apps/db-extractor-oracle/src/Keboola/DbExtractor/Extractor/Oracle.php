@@ -232,9 +232,13 @@ SQL;
         $whereClause = "";
         if (!is_null($tables) && count($tables) > 0) {
             $whereClause = sprintf(
-                " WHERE TABS.TABLE_NAME IN ('%s')",
-                implode("','", array_map(function ($table) {
-                    return $table['tableName'];
+                ' WHERE %s',
+                implode(' OR ', array_map(function ($table) {
+                    return sprintf(
+                        "(TABS.TABLE_NAME = '%s' AND TABS.OWNER = '%s')",
+                        $table['tableName'],
+                        $table['schema']
+                    );
                 }, $tables))
             );
         }
