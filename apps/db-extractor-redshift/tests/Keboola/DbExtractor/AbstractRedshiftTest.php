@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Application;
@@ -9,14 +11,14 @@ use Keboola\DbExtractor\Test\ExtractorTest;
 
 abstract class AbstractRedshiftTest extends ExtractorTest
 {
-    const TESTING_SCHEMA_NAME = 'testing';
+    protected const TESTING_SCHEMA_NAME = 'testing';
 
-    const DRIVER = 'redshift';
+    protected const DRIVER = 'redshift';
 
     /** @var string  */
     protected $dataDir = __DIR__ . '/../../data';
 
-    public function setUp()
+    public function setUp(): void
     {
         $fs = new Filesystem();
         $fs->remove($this->dataDir . '/out/tables');
@@ -25,18 +27,24 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $this->initRedshiftData($this->getConfig(self::DRIVER));
     }
 
-    private function initRedshiftData(array $config)
+    private function initRedshiftData(array $config): void
     {
+        $dsn = sprintf(
+            'pgsql:dbname=%s;port=5439;host=%s',
+            $config['parameters']['db']['database'],
+            $config['parameters']['db']['host']
+        );
+
         $pdo = new \PDO(
-            "pgsql:dbname={$config['parameters']['db']['database']};port=5439;host=" . $config['parameters']['db']['host'],
+            $dsn,
             $config['parameters']['db']['user'],
             $config['parameters']['db']['#password']
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $pdo->query(sprintf('DROP SCHEMA IF EXISTS "%s" CASCADE', self::TESTING_SCHEMA_NAME));
-        $pdo->query("CREATE SCHEMA \"" . self::TESTING_SCHEMA_NAME. "\"");
-        $pdo->query("CREATE TABLE IF NOT EXISTS \"" . self::TESTING_SCHEMA_NAME . "\".escaping 
+        $pdo->query('CREATE SCHEMA "' . self::TESTING_SCHEMA_NAME. '"');
+        $pdo->query('CREATE TABLE IF NOT EXISTS "' . self::TESTING_SCHEMA_NAME . "\".escaping 
                       (col1 VARCHAR NOT NULL DEFAULT 'a', 
                       col2 VARCHAR NOT NULL DEFAULT 'b', 
                       col3 VARCHAR NULL,
@@ -44,8 +52,12 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $credStr = "aws_access_key_id={$config['aws']['s3key']};aws_secret_access_key={$config['aws']['s3secret']}";
 
-        $qry = "COPY \"" . self::TESTING_SCHEMA_NAME. "\".escaping ";
-        $qry .= "FROM 's3://{$config["aws"]["bucket"]}/escaping.csv' CREDENTIALS '$credStr' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1";
+        $qry = sprintf('COPY "%s".escaping ', self::TESTING_SCHEMA_NAME);
+        $qry .= sprintf(
+            "FROM 's3://%s/escaping.csv' CREDENTIALS '%s' DELIMITER ',' QUOTE '\"' CSV IGNOREHEADER 1",
+            $config['aws']['bucket'],
+            $credStr
+        );
         $pdo->query($qry);
     }
 
@@ -118,9 +130,10 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         ];
     }
 
-    public function getRedshiftPrivateKey()
+    public function getRedshiftPrivateKey(): string
     {
-        // docker-compose .env file does not support new lines in variables so we have to modify the key https://github.com/moby/moby/issues/12997
+        // docker-compose .env file does not support new lines in variables
+        // we have to modify the key https://github.com/moby/moby/issues/12997
         return str_replace('"', '', str_replace('\n', "\n", $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE')));
     }
 }

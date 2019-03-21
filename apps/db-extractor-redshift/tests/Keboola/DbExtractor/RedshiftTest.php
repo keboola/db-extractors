@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
@@ -8,13 +10,13 @@ use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends AbstractRedshiftTest
 {
-    private function runApp(Application $app)
+    private function runApp(Application $app): void
     {
         $result = $app->run();
-        $expectedCsvFile = $this->dataDir .  "/in/tables/escaping.csv";
+        $expectedCsvFile = $this->dataDir .  '/in/tables/escaping.csv';
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
-        $manifest = json_decode(file_get_contents($outputManifestFile), true);
+        $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
 
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
@@ -25,7 +27,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('col3', $manifest['primary_key'][0]);
     }
 
-    public function testRunConfig()
+    public function testRunConfig(): void
     {
         $this->runApp($this->createApplication($this->getConfig()));
     }
@@ -35,13 +37,18 @@ class RedshiftTest extends AbstractRedshiftTest
         $app = $this->createApplication($this->getConfigRow(self::DRIVER));
 
         $result = $app->run();
-        $expectedOutput = iterator_to_array(new CsvFile($this->dataDir .  "/in/tables/escaping.csv"));
+        $expectedOutput = iterator_to_array(new CsvFile($this->dataDir .  '/in/tables/escaping.csv'));
         array_shift($expectedOutput);
         $outputArray = iterator_to_array(new CsvFile(
-            $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv'
+            sprintf('%s/out/tables/%s.csv', $this->dataDir, strtolower($result['imported']['outputTable']))
         ));
-        $outputManifestFile = $this->dataDir . '/out/tables/' . strtolower($result['imported']['outputTable']) . '.csv.manifest';
-        $manifest = json_decode(file_get_contents($outputManifestFile), true);
+        $outputManifestFile = sprintf(
+            '%s/out/tables/%s.csv.manifest',
+            $this->dataDir,
+            strtolower($result['imported']['outputTable'])
+        );
+
+        $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
 
         $expectedColumnMetadata = array (
             'col1' =>
@@ -150,43 +157,43 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals($expectedColumnMetadata, $manifest['column_metadata']);
     }
 
-    public function testRunWithSSH()
+    public function testRunWithSSH(): void
     {
         $config = $this->getConfig();
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getRedshiftPrivateKey(),
-                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC')
+                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC'),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
             'localPort' => '33306',
             'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
-            'remotePort' => $this->getEnv('redshift', 'DB_PORT')
+            'remotePort' => $this->getEnv('redshift', 'DB_PORT'),
         ];
         $this->runApp($this->createApplication($config));
     }
 
-    public function testRunFailure()
+    public function testRunFailure(): void
     {
         $config = $this->getConfig();
         $config['parameters']['tables'][] = [
             'id' => 10,
             'name' => 'bad',
             'query' => 'SELECT something FROM non_existing_table;',
-            'outputTable' => 'dummy'
+            'outputTable' => 'dummy',
         ];
         try {
             $this->runApp($this->createApplication($config));
-            $this->fail("Failing query must raise exception.");
+            $this->fail('Failing query must raise exception.');
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
             // test that the error message contains the query name
             $this->assertContains('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
         }
     }
 
-    public function testTestConnection()
+    public function testTestConnection(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -196,7 +203,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals('success', $result['status']);
     }
 
-    public function testSSHConnection()
+    public function testSSHConnection(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -205,20 +212,20 @@ class RedshiftTest extends AbstractRedshiftTest
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getRedshiftPrivateKey(),
-                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC')
+                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC'),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
             'localPort' => '33307',
             'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
-            'remotePort' => $this->getEnv('redshift', 'DB_PORT')
+            'remotePort' => $this->getEnv('redshift', 'DB_PORT'),
         ];
 
         $app = $this->createApplication($config);
         $result = $app->run();
         $this->assertEquals('success', $result['status']);
     }
-    public function testGetTables()
+    public function testGetTables(): void
     {
         $config = $this->getConfig();
         $config['action'] = 'getTables';
@@ -267,7 +274,7 @@ class RedshiftTest extends AbstractRedshiftTest
                                     'uniqueKey' => false,
                                     'length' => 256,
                                     'nullable' => true,
-                                    'default' => NULL,
+                                    'default' => null,
                                     'ordinalPosition' => 3,
                                 ),
                         ),
@@ -276,7 +283,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertEquals($expectedData, $result['tables']);
     }
 
-    public function testManifestMetadata()
+    public function testManifestMetadata(): void
     {
         $config = $this->getConfig();
 
@@ -289,7 +296,7 @@ class RedshiftTest extends AbstractRedshiftTest
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents(
+            (string) file_get_contents(
                 $this->dataDir . '/out/tables/' . strtolower($result['imported'][0]['outputTable']) . '.csv.manifest'
             )
         );
