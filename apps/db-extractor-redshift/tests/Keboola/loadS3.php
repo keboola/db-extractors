@@ -1,10 +1,9 @@
 <?php
-/**
- * Loads test fixtures into S3
- */
+
+declare(strict_types=1);
 
 date_default_timezone_set('Europe/Prague');
-ini_set('display_errors', true);
+ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
 $basedir = dirname(__DIR__);
@@ -38,7 +37,7 @@ if ($objects) {
     $client->deleteObjects([
         'Bucket' => $bucket,
         'Delete' => [
-            'Objects' => array_map(function($object) {
+            'Objects' => array_map(function ($object) {
                 return [
                     'Key' => $object['Key'],
                 ];
