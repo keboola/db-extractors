@@ -14,6 +14,8 @@ use Throwable;
 
 class Oracle extends Extractor
 {
+    const TABLELESS_CONFIG_FILE = "tableless.json";
+
     protected $db;
 
     /** @var  array */
@@ -31,6 +33,18 @@ class Oracle extends Extractor
             $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
             $this->writeExportConfig($this->dbParams, $table);
         }
+        $this->writeTablelessConfig($this->dbParams);
+    }
+
+    private function writeTablelessConfig(array $dbParams): void
+    {
+        $dbParams['port'] = (string) $dbParams['port'];
+        $config = [
+            'parameters' => [
+                'db' => $dbParams
+            ]
+        ];
+        file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
     }
 
     private function writeExportConfig(array $dbParams, array $table): void
@@ -170,10 +184,23 @@ class Oracle extends Extractor
 
     public function testConnection(): bool
     {
-        $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-        $success = oci_execute($stmt);
-        oci_free_statement($stmt);
-        return $success;
+        $cmd = [
+            'java',
+            '-jar',
+            '/code/oracle/table-exporter.jar',
+            'testConnection',
+            $this->dataDir . "/" . self::TABLELESS_CONFIG_FILE
+        ];
+
+        $process = new Process($cmd);
+        $process->setTimeout(null);
+        $process->setIdleTimeout(null);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new UserException('Failed connecting to DB: ' . $process->getErrorOutput());
+        }
+        return true;
     }
 
     public function getTables(array $tables = null): array
