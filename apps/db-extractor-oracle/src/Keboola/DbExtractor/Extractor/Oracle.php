@@ -142,6 +142,7 @@ class Oracle extends Extractor
             'java',
             '-jar',
             '/code/oracle/table-exporter.jar',
+            'export',
             $this->exportConfigFiles[$tableName],
             var_export($advancedQuery, true),
         ];
