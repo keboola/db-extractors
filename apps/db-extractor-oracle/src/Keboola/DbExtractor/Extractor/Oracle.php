@@ -65,16 +65,9 @@ class Oracle extends Extractor
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
-    public function createConnection(array $params)
+    public function createConnection(array $params): void
     {
-        $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
-        $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
-
-        if (!$connection) {
-            $error = oci_error();
-            throw new UserException("Error connection to DB: " . $error['message']);
-        }
-        return $connection;
+        // not required
     }
 
     public function createSshTunnel(array $dbConfig): array
@@ -116,16 +109,7 @@ class Oracle extends Extractor
         $tableName = $table['name'];
         try {
             $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
-                try {
-                    return $this->exportTable($tableName, $isAdvancedQuery);
-                } catch (Throwable $e) {
-                    try {
-                        oci_close($this->db);
-                        $this->db = $this->createConnection($this->dbParams);
-                    } catch (Throwable $e) {
-                    };
-                    throw $e;
-                }
+                return $this->exportTable($tableName, $isAdvancedQuery);
             });
         } catch (Throwable $e) {
             throw $this->handleDbError($e, $table, $maxTries);
@@ -255,10 +239,5 @@ class Oracle extends Extractor
     private function quote($obj)
     {
         return "\"{$obj}\"";
-    }
-
-    public function __destruct()
-    {
-        oci_close($this->db);
     }
 }
