@@ -41,7 +41,8 @@ class Oracle extends Extractor
         $dbParams['port'] = (string) $dbParams['port'];
         $config = [
             'parameters' => [
-                'db' => $dbParams
+                'db' => $dbParams,
+                'outputFile' => $this->dataDir . "/" . 'tables.json'
             ]
         ];
         file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
@@ -202,11 +203,15 @@ class Oracle extends Extractor
         $process->setIdleTimeout(null);
         $process->run();
 
+        echo "output: \n" . $process->getOutput();
+        echo "\nerrorOutput: \n" . $process->getErrorOutput();
+
         if (!$process->isSuccessful()) {
             throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
         }
 
-        $tableListing = json_decode(file_get_contents($this->dataDir . "/output/tables.json"), true);
+
+        $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
         return $tableListing;
     }
 
