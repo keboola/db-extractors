@@ -286,6 +286,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 27,
                     'columns' =>
                         array (
                             0 =>
@@ -347,6 +348,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 107,
                     'columns' =>
                         array (
                             0 =>
@@ -489,6 +491,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 19,
                     'columns' =>
                         array (
                             0 =>
@@ -544,6 +547,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 10,
                     'columns' =>
                         array (
                             0 =>
@@ -620,6 +624,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 23,
                     'columns' =>
                         array (
                             0 =>
@@ -700,6 +705,7 @@ class OracleTest extends OracleBaseTest
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
+                    'rowCount' => 4,
                     'columns' =>
                         array (
                             0 =>

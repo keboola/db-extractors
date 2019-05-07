@@ -203,16 +203,22 @@ class Oracle extends Extractor
         $process->setIdleTimeout(null);
         $process->run();
 
-        echo "output: \n" . $process->getOutput();
-        echo "\nerrorOutput: \n" . $process->getErrorOutput();
-
         if (!$process->isSuccessful()) {
             throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
         }
 
-
-        $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
-        return $tableListing;
+        $output = $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
+        if ($tables) {
+            $output = [];
+            foreach ($tables as $table) {
+                foreach ($tableListing as $listedTable) {
+                    if ($table['tableName'] === $listedTable['name'] && $table['schema'] === $listedTable['schema']) {
+                        $output[] = $listedTable;
+                    }
+                }
+            }
+        }
+        return $output;
     }
 
     public function simpleQuery(array $table, array $columns = array()): string
