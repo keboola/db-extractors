@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
@@ -207,7 +208,12 @@ class Oracle extends Extractor
             throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
         }
 
-        $output = $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
+        $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApplicationException(
+                "Cannot parse JSON data of table listing - error: " . json_last_error()
+            );
+        }
         if ($tables) {
             $output = [];
             foreach ($tables as $table) {
@@ -217,6 +223,8 @@ class Oracle extends Extractor
                     }
                 }
             }
+        } else {
+            $output = $tableListing;
         }
         return $output;
     }
