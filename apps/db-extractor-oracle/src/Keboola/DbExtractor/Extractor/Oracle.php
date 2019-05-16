@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
@@ -14,6 +15,8 @@ use Throwable;
 
 class Oracle extends Extractor
 {
+    const TABLELESS_CONFIG_FILE = "tableless.json";
+
     protected $db;
 
     /** @var  array */
@@ -31,6 +34,19 @@ class Oracle extends Extractor
             $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
             $this->writeExportConfig($this->dbParams, $table);
         }
+        $this->writeTablelessConfig($this->dbParams);
+    }
+
+    private function writeTablelessConfig(array $dbParams): void
+    {
+        $dbParams['port'] = (string) $dbParams['port'];
+        $config = [
+            'parameters' => [
+                'db' => $dbParams,
+                'outputFile' => $this->dataDir . "/" . 'tables.json'
+            ]
+        ];
+        file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
     }
 
     private function writeExportConfig(array $dbParams, array $table): void
@@ -51,16 +67,9 @@ class Oracle extends Extractor
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
-    public function createConnection(array $params)
+    public function createConnection(array $params): void
     {
-        $dbString = '//' . $params['host'] . ':' . $params['port'] . '/' . $params['database'];
-        $connection = oci_connect($params['user'], $params['password'], $dbString, 'AL32UTF8');
-
-        if (!$connection) {
-            $error = oci_error();
-            throw new UserException("Error connection to DB: " . $error['message']);
-        }
-        return $connection;
+        // not required
     }
 
     public function createSshTunnel(array $dbConfig): array
@@ -102,16 +111,7 @@ class Oracle extends Extractor
         $tableName = $table['name'];
         try {
             $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
-                try {
-                    return $this->exportTable($tableName, $isAdvancedQuery);
-                } catch (Throwable $e) {
-                    try {
-                        oci_close($this->db);
-                        $this->db = $this->createConnection($this->dbParams);
-                    } catch (Throwable $e) {
-                    };
-                    throw $e;
-                }
+                return $this->exportTable($tableName, $isAdvancedQuery);
             });
         } catch (Throwable $e) {
             throw $this->handleDbError($e, $table, $maxTries);
@@ -142,6 +142,7 @@ class Oracle extends Extractor
             'java',
             '-jar',
             '/code/oracle/table-exporter.jar',
+            'export',
             $this->exportConfigFiles[$tableName],
             var_export($advancedQuery, true),
         ];
@@ -169,157 +170,63 @@ class Oracle extends Extractor
 
     public function testConnection(): bool
     {
-        $stmt = oci_parse($this->db, 'SELECT CURRENT_DATE FROM dual');
-        $success = oci_execute($stmt);
-        oci_free_statement($stmt);
-        return $success;
+        $cmd = [
+            'java',
+            '-jar',
+            '/code/oracle/table-exporter.jar',
+            'testConnection',
+            $this->dataDir . "/" . self::TABLELESS_CONFIG_FILE
+        ];
+
+        $process = new Process($cmd);
+        $process->setTimeout(null);
+        $process->setIdleTimeout(null);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new UserException('Failed connecting to DB: ' . $process->getErrorOutput());
+        }
+        return true;
     }
 
     public function getTables(array $tables = null): array
     {
-        $sql = <<<SQL
-SELECT TABS.TABLE_NAME ,
-    TABS.TABLESPACE_NAME ,
-    TABS.OWNER ,
-    TABS.NUM_ROWS ,
-    COLS.COLUMN_NAME ,
-    COLS.DATA_LENGTH ,
-    COLS.DATA_PRECISION ,
-    COLS.DATA_SCALE ,
-    COLS.COLUMN_ID ,
-    COLS.DATA_TYPE ,
-    COLS.NULLABLE ,
-    REFCOLS.CONSTRAINT_NAME ,
-    REFCOLS.CONSTRAINT_TYPE ,
-    REFCOLS.INDEX_NAME ,
-    REFCOLS.R_CONSTRAINT_NAME,
-    REFCOLS.R_OWNER
-FROM ALL_TAB_COLUMNS COLS
-    JOIN
-    (
-        SELECT 
-        TABLE_NAME , 
-        TABLESPACE_NAME, 
-        OWNER , 
-        NUM_ROWS
-        FROM all_tables
-        WHERE all_tables.TABLESPACE_NAME != 'SYSAUX'
-        AND all_tables.TABLESPACE_NAME != 'SYSTEM'
-        AND all_tables.OWNER != 'SYS'
-        AND all_tables.OWNER != 'SYSTEM'
-    )
-    TABS
-        ON COLS.TABLE_NAME = TABS.TABLE_NAME
-        AND COLS.OWNER = TABS.OWNER
-    LEFT OUTER JOIN
-    (
-        SELECT ACC.COLUMN_NAME ,
-        ACC.TABLE_NAME ,
-        AC.CONSTRAINT_NAME ,
-        AC.R_CONSTRAINT_NAME,
-        AC.INDEX_NAME ,
-        AC.CONSTRAINT_TYPE ,
-        AC.R_OWNER
-        FROM ALL_CONS_COLUMNS ACC
-            JOIN ALL_CONSTRAINTS AC
-                ON ACC.CONSTRAINT_NAME = AC.CONSTRAINT_NAME
-        WHERE AC.CONSTRAINT_TYPE IN ('P', 'U', 'R')
-    )
-    REFCOLS ON COLS.TABLE_NAME = REFCOLS.TABLE_NAME
-        AND COLS.COLUMN_NAME = REFCOLS.COLUMN_NAME
-SQL;
+        $cmd = [
+            'java',
+            '-jar',
+            '/code/oracle/table-exporter.jar',
+            'getTables',
+            $this->dataDir . "/" . self::TABLELESS_CONFIG_FILE
+        ];
 
-        $whereClause = "";
-        if (!is_null($tables) && count($tables) > 0) {
-            $whereClause = sprintf(
-                ' WHERE %s',
-                implode(' OR ', array_map(function ($table) {
-                    return sprintf(
-                        "(TABS.TABLE_NAME = '%s' AND TABS.OWNER = '%s')",
-                        $table['tableName'],
-                        $table['schema']
-                    );
-                }, $tables))
+        $process = new Process($cmd);
+        $process->setTimeout(null);
+        $process->setIdleTimeout(null);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
+        }
+
+        $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new ApplicationException(
+                "Cannot parse JSON data of table listing - error: " . json_last_error()
             );
         }
-
-        // reset the connection because after a long export it may have been dropped
-        if (!is_null($tables)) {
-            @oci_close($this->db);
-            $this->db = $this->createConnection($this->dbParams);
-        }
-
-        $stmt = oci_parse($this->db, $sql . $whereClause);
-
-        $success = oci_execute($stmt);
-        if (!$success) {
-            $error = oci_error($stmt);
-            oci_free_statement($stmt);
-            throw new UserException("Error fetching table listing: " . $error['message']);
-        }
-
-        $numrows = oci_fetch_all($stmt, $desc, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
-        oci_free_statement($stmt);
-        $tableDefs = [];
-        foreach ($desc as $i => $column) {
-            $curTable = $column['OWNER'] . '.' . $column['TABLE_NAME'];
-
-            if (!array_key_exists($curTable, $tableDefs)) {
-                $tableDefs[$curTable] = [
-                    'name' => $column['TABLE_NAME'],
-                    'tablespaceName' => $column['TABLESPACE_NAME'],
-                    'schema' => $column['OWNER'],
-                    'owner' => $column['OWNER']
-                ];
-                if ($column['NUM_ROWS']) {
-                    $tabledefs[$curTable]['rowCount'] = $column['NUM_ROWS'];
+        if ($tables) {
+            $output = [];
+            foreach ($tables as $table) {
+                foreach ($tableListing as $listedTable) {
+                    if ($table['tableName'] === $listedTable['name'] && $table['schema'] === $listedTable['schema']) {
+                        $output[] = $listedTable;
+                    }
                 }
             }
-            if (!array_key_exists('columns', $tableDefs[$curTable])) {
-                $tableDefs[$curTable]['columns'] = [];
-            }
-
-            if (!array_key_exists($column['COLUMN_ID'] - 1, $tableDefs[$curTable]['columns'])) {
-                $length = $column['DATA_LENGTH'];
-                if (!is_null($column['DATA_PRECISION'])  && !is_null($column['DATA_SCALE'])) {
-                    $length = $column['DATA_PRECISION'] . "," . $column['DATA_SCALE'];
-                }
-                $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1] = [
-                    "name" => $column['COLUMN_NAME'],
-                    "sanitizedName" => Utils\sanitizeColumnName($column["COLUMN_NAME"]),
-                    "type" => $column['DATA_TYPE'],
-                    "nullable" => ($column['NULLABLE'] === 'Y') ? true : false,
-                    "length" => $length,
-                    "ordinalPosition" => $column['COLUMN_ID'],
-                    "primaryKey" => false,
-                    "uniqueKey" => false,
-                ];
-            }
-
-
-            if (!is_null($column['CONSTRAINT_TYPE'])) {
-                switch ($column['CONSTRAINT_TYPE']) {
-                    case 'R':
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['foreignKeyName'] = $column['CONSTRAINT_NAME'];
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['foreignKeyRefTable'] = $column['R_OWNER'];
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['foreignKeyRef'] = $column['R_CONSTRAINT_NAME'];
-                        break;
-                    case 'P':
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['primaryKey'] = true;
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['primaryKeyName'] = $column['CONSTRAINT_NAME'];
-                        break;
-                    case 'U':
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['uniqueKey'] = true;
-                        $tableDefs[$curTable]['columns'][$column['COLUMN_ID'] - 1]['uniqueKeyName'] = $column['CONSTRAINT_NAME'];
-                        break;
-                    default:
-                        break;
-                }
-            }
-            ksort($tableDefs[$curTable]['columns']);
+        } else {
+            $output = $tableListing;
         }
-        ksort($tableDefs);
-        return array_values($tableDefs);
+        return $output;
     }
 
     public function simpleQuery(array $table, array $columns = array()): string
@@ -351,10 +258,5 @@ SQL;
     private function quote($obj)
     {
         return "\"{$obj}\"";
-    }
-
-    public function __destruct()
-    {
-        oci_close($this->db);
     }
 }
