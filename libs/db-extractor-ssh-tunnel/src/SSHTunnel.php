@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor;
 
 
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Logger\Logger;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 
@@ -19,7 +20,7 @@ class SSHTunnel
     /** @var Logger */
     protected $logger;
 
-    public function __construct(\Keboola\DbExtractor\Logger $logger)
+    public function __construct(Logger $logger)
     {
         $this->logger = $logger;
     }
