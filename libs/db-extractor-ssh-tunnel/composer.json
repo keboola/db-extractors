@@ -1,0 +1,44 @@
+{
+    "name": "keboola/db-extractor-ssh-tunnel",
+    "description": "Create SSH tunnel for DB Extractors",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "require": {
+        "keboola/ssh-tunnel": "^2.0",
+        "keboola/db-extractor-logger": "^1.0",
+        "keboola/db-extractor-retry-proxy": "^1.0"
+    },
+    "require-dev": {
+        "keboola/coding-standard": "^6.0",
+        "phpunit/phpunit": "^7.0",
+        "phpstan/phpstan": "^0.10.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Keboola\\DbExtractorSSHTunel\\": "src/"
+        }
+    },
+    "scripts": {
+        "tests": "./vendor/bin/phpunit",
+        "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests",
+        "phpcs": "phpcs -n -s --ignore=vendor --extensions=php .",
+        "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
+        "build": [
+            "@phpcs",
+            "@phpstan",
+            "@tests"
+        ],
+        "ci": [
+            "@composer install",
+            "@composer validate --no-check-all --strict",
+            "@tests"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ondra Jodas",
+            "email": "ondra.jodas@gmail.com"
+        }
+    ]
+}
