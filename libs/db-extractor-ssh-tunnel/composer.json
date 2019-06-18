@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Keboola\\DbExtractorSSHTunel\\": "src/"
+            "Keboola\\DbExtractor\\SSHTunel\\": "src/"
         }
     },
     "scripts": {
