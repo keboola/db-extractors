@@ -6,7 +6,7 @@ namespace Keboola\DbExtractor;
 
 
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Logger\Logger;
+use Keboola\DbExtractorLogger\Logger;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 
