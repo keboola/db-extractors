@@ -7,7 +7,7 @@
     "require": {
         "keboola/ssh-tunnel": "^2.0",
         "keboola/db-extractor-logger": "^1.0",
-        "keboola/db-extractor-retry-proxy": "^1.0"
+        "keboola/retry": "^0.3"
     },
     "require-dev": {
         "keboola/coding-standard": "^6.0",

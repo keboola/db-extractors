@@ -7,9 +7,11 @@ namespace Keboola\DbExtractorSSHTunnel;
 
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorLogger\Logger;
-use Keboola\DbExtractorRetryProxy\RetryProxy;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
+use Retry\BackOff\ExponentialBackOffPolicy;
+use Retry\Policy\SimpleRetryPolicy;
+use Retry\RetryProxy;
 
 class SSHTunnel
 {
@@ -17,6 +19,8 @@ class SSHTunnel
     public const DEFAULT_LOCAL_PORT = 33006;
 
     public const DEFAULT_SSH_PORT = 22;
+
+    public const DEFAULT_MAX_TRIES = 5;
 
     /** @var Logger */
     protected $logger;
@@ -60,12 +64,20 @@ class SSHTunnel
             )
         );
         $this->logger->info("Creating SSH tunnel to '" . $tunnelParams['sshHost'] . "'");
-        $proxy = new RetryProxy(
-            $this->logger,
-            RetryProxy::DEFAULT_MAX_TRIES,
-            RetryProxy::DEFAULT_BACKOFF_INTERVAL,
-            ['SSHException', 'Exception']
+
+        $simplyRetryPolicy = new SimpleRetryPolicy(
+            self::DEFAULT_MAX_TRIES,
+            [SSHException::class, \Exception::class]
+
         );
+        $exponentialBackOffPolicy = new ExponentialBackOffPolicy();
+
+        $proxy = new RetryProxy(
+            $simplyRetryPolicy,
+            $exponentialBackOffPolicy,
+            $this->logger
+        );
+
         try {
             $proxy->call(function () use ($tunnelParams):void {
                 $ssh = new SSH();
