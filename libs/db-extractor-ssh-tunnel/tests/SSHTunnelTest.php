@@ -40,7 +40,10 @@ class SSHTunnelTest extends TestCase
 
     public function testMissingMainParameter(): void
     {
-        $dbConfig = [];
+        $dbConfig = [
+            'host' => 'testHost',
+            'port' => 'testPort'
+        ];
 
         $logger = new Logger('test');
         $tunnel = new SSHTunnel($logger);
@@ -56,7 +59,9 @@ class SSHTunnelTest extends TestCase
         $dbConfig = [
             'ssh' => [
                 'keys' => 'anyKey'
-            ]
+            ],
+            'host' => 'testHost',
+            'port' => 'testPort'
         ];
 
         $logger = new Logger('test');

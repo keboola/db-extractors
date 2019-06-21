@@ -33,8 +33,10 @@ class SSHTunnel
     public function createSshTunnel(array $dbConfig): array
     {
         // check main param
-        if (!isset($dbConfig['ssh'])) {
-            throw new UserException("Main parameter 'ssh' is missing.");
+        foreach (['host', 'port', 'ssh'] as $k) {
+            if (empty($dbConfig[$k])) {
+                throw new UserException(sprintf("Main parameter '%s' is missing.", $k));
+            }
         }
 
         $sshConfig = $dbConfig['ssh'];
