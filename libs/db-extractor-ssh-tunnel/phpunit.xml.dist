@@ -6,20 +6,10 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="true"
+         stopOnFailure="false"
          bootstrap="vendor/autoload.php">
 
     <testsuite name="SSH Tunnel Test Suite">
-        <directory>tests/Keboola/SSHTunnel</directory>
+        <directory>tests</directory>
     </testsuite>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src/Keboola/SSHTunnel</directory>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
 </phpunit>

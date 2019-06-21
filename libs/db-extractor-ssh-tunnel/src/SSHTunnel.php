@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Keboola\DbExtractorSSHTunnel;
 
 
-use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 use Retry\BackOff\ExponentialBackOffPolicy;
@@ -32,6 +32,11 @@ class SSHTunnel
 
     public function createSshTunnel(array $dbConfig): array
     {
+        // check main param
+        if (!isset($dbConfig['ssh'])) {
+            throw new UserException("Main parameter 'ssh' is missing.");
+        }
+
         $sshConfig = $dbConfig['ssh'];
         // check params
         foreach (['keys', 'sshHost'] as $k) {
