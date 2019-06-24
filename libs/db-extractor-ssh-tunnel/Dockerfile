@@ -1,4 +1,5 @@
-FROM php:7.2
+FROM db-ex-ssh-tunnel-sshproxy AS sshproxy
+FROM php:7-cli
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
@@ -10,10 +11,18 @@ RUN apt-get update -q \
 RUN curl -sS https://getcomposer.org/installer | php \
   && mv composer.phar /usr/local/bin/composer
 
-COPY . /code
 WORKDIR /code
 
-RUN echo "memory_limit = -1" >> /usr/local/etc/php/php.ini
-RUN composer install --no-interaction
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY composer.* /code/
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+# copy rest of the app
+COPY . /code/
+# run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
+
+COPY --from=sshproxy /root/.ssh /root/.ssh
 
 CMD php ./vendor/bin/phpunit

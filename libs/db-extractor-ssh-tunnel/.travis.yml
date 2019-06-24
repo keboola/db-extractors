@@ -5,8 +5,11 @@ language: bash
 services:
   - docker
 
-install:
-  - docker-compose build
+before_install:
+  - export APP_IMAGE=keboola-db-extractor-logger
+  - docker -v
+  - docker build -t $APP_IMAGE .
+  - docker run $APP_IMAGE composer ci
 
 script:
-  - docker-compose run --rm app
+  - docker-compose run --rm dev

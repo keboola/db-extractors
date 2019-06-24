@@ -6,7 +6,7 @@ namespace Keboola\DbExtractorSSHTunnel;
 
 
 use Keboola\DbExtractorLogger\Logger;
-use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorSSHTunnel\Exception\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
 use Retry\BackOff\ExponentialBackOffPolicy;
@@ -60,8 +60,8 @@ class SSHTunnel
             $sshConfig['sshPort'] = self::DEFAULT_SSH_PORT;
         }
         $sshConfig['privateKey'] = isset($sshConfig['keys']['#private'])
-            ?$sshConfig['keys']['#private']
-            :$sshConfig['keys']['private'];
+            ? $sshConfig['keys']['#private']
+            : $sshConfig['keys']['private'];
         $tunnelParams = array_intersect_key(
             $sshConfig,
             array_flip(
@@ -86,7 +86,7 @@ class SSHTunnel
         );
 
         try {
-            $proxy->call(function () use ($tunnelParams):void {
+            $proxy->call(function () use ($tunnelParams): void {
                 $ssh = new SSH();
                 $ssh->openTunnel($tunnelParams);
             });

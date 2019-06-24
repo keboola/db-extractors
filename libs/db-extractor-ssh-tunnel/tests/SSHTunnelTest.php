@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorSSHTunnel\Test;
 
-use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractorSSHTunnel\Exception\UserException;
 use Keboola\DbExtractorSSHTunnel\SSHTunnel;
 use PHPUnit\Framework\TestCase;
 
@@ -19,10 +19,10 @@ class SSHTunnelTest extends TestCase
                 'sshHost' => 'sshproxy',
                 'sshPort' => '22',
                 'localPort' => '33306',
-                'keys' => ['private' => getenv('SSH_KEY_PRIVATE')],
+                'keys' => ['private' => $this->getPrivateKey()],
             ],
             'host' => 'mysql',
-            'port' => '3306'
+            'port' => '3306',
         ];
 
         $logger = new Logger('test');
@@ -30,11 +30,11 @@ class SSHTunnelTest extends TestCase
         $newDbConfig = $tunnel->createSshTunnel($dbConfig);
 
         $this->assertEquals(
-            $newDbConfig,
             array_merge(
                 $dbConfig,
                 ['host' => '127.0.0.1', 'port' => '33306']
-            )
+            ),
+            $newDbConfig
         );
     }
 
@@ -42,7 +42,7 @@ class SSHTunnelTest extends TestCase
     {
         $dbConfig = [
             'host' => 'testHost',
-            'port' => 'testPort'
+            'port' => 'testPort',
         ];
 
         $logger = new Logger('test');
@@ -58,10 +58,10 @@ class SSHTunnelTest extends TestCase
     {
         $dbConfig = [
             'ssh' => [
-                'keys' => 'anyKey'
+                'keys' => 'anyKey',
             ],
             'host' => 'testHost',
-            'port' => 'testPort'
+            'port' => 'testPort',
         ];
 
         $logger = new Logger('test');
@@ -73,5 +73,15 @@ class SSHTunnelTest extends TestCase
 
         $tunnel->createSshTunnel($dbConfig);
 
+    }
+
+    public function getPrivateKey(): string
+    {
+        return file_get_contents('/root/.ssh/id_rsa');
+    }
+
+    public function getPublicKey(): string
+    {
+        return file_get_contents('/root/.ssh/id_rsa.pub');
     }
 }

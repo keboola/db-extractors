@@ -35,11 +35,5 @@
             "@composer validate --no-check-all --strict",
             "@tests"
         ]
-    },
-    "authors": [
-        {
-            "name": "Ondra Jodas",
-            "email": "ondra.jodas@gmail.com"
-        }
-    ]
+    }
 }
