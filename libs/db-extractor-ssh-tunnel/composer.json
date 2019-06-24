@@ -19,6 +19,11 @@
             "Keboola\\DbExtractorSSHTunnel\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\DbExtractorSSHTunnel\\Exception\\": "src/Exceptions/"
+        }
+    },
     "scripts": {
         "tests": "./vendor/bin/phpunit",
         "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests",
