@@ -8,6 +8,7 @@ services:
 before_install:
   - export APP_IMAGE=keboola-db-extractor-ssh-tunnel
   - docker -v
+  - docker build -t db-ex-ssh-tunnel-sshproxy tests/env/sshproxy
   - docker build -t $APP_IMAGE .
   - docker run $APP_IMAGE composer ci
 
