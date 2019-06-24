@@ -3,7 +3,6 @@
     "description": "Create SSH tunnel for DB Extractors",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "stable",
     "require": {
         "keboola/ssh-tunnel": "^2.0",
         "keboola/db-extractor-logger": "^1.0",
