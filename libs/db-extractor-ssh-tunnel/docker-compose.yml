@@ -6,7 +6,7 @@ services:
       - .:/code
     working_dir: /code
     command: bash -c 'composer install -n && set -a && composer ci'
-    depends_on:
+    links:
       - sshproxy
 
   sshproxy:
