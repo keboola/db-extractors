@@ -17,8 +17,7 @@
     "autoload": {
         "psr-4": {
             "Keboola\\DbExtractorSSHTunnel\\": "src/"
-        },
-        "classmap": ["src"]
+        }
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit",
