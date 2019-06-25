@@ -3,12 +3,6 @@
     "description": "Create SSH tunnel for DB Extractors",
     "type": "library",
     "license": "MIT",
-    "repositories": [
-        {
-            "url": "https://github.com/keboola/db-extractor-logger.git",
-            "type": "vcs"
-        }
-    ],
     "require": {
         "keboola/ssh-tunnel": "^2.0",
         "keboola/db-extractor-logger": "dev-ondra-init-repo",
@@ -40,5 +34,8 @@
             "@tests"
         ]
     },
-    "minimum-stability": "dev"
+    "config": {
+        "sort-packages": true,
+        "github-protocols": ["https"]
+    }
 }
