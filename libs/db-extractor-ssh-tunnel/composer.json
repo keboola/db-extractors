@@ -15,9 +15,9 @@
         "keboola/retry": "^0.3"
     },
     "require-dev": {
-        "keboola/coding-standard": "^6.0",
+        "keboola/coding-standard": "^2.0",
         "phpunit/phpunit": "^7.0",
-        "phpstan/phpstan": "^0.10.6"
+        "phpstan/phpstan": "^0.8"
     },
     "autoload": {
         "psr-4": {
@@ -39,5 +39,6 @@
             "@composer validate --no-check-all --strict",
             "@tests"
         ]
-    }
+    },
+    "minimum-stability": "dev"
 }

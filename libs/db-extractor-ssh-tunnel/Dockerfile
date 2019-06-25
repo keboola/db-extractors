@@ -1,6 +1,7 @@
 FROM db-ex-ssh-tunnel-sshproxy AS sshproxy
 FROM php:7-cli
 
+ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_PROCESS_TIMEOUT 3600
