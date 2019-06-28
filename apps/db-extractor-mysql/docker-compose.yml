@@ -4,8 +4,6 @@ services:
     build: .
     image: keboola/ex-db-mysql
     command: composer ci
-    env_file:
-      - ssh-keys.env
     environment:
       MYSQL_DB_HOST: mysql
       MYSQL_DB_USER: root
@@ -21,8 +19,6 @@ services:
     build: .
     image: keboola/ex-db-mysql
     command: composer ci
-    env_file:
-      - ssh-keys.env
     environment:
       MYSQL_DB_HOST: mysql
       MYSQL_DB_USER: root
@@ -39,8 +35,6 @@ services:
     volumes:
       - .:/code
     command: composer ci
-    env_file:
-      - ssh-keys.env
     environment:
       MYSQL_DB_HOST: mysql
       MYSQL_DB_USER: root
@@ -78,6 +72,7 @@ services:
       - "3307"
 
   sshproxy:
+    image: db-ex-mysql-sshproxy
     build: ./tests/env/sshproxy
     volumes:
         - ./tests/env/sshproxy:/code
@@ -88,6 +83,7 @@ services:
       - mysql
 
   sshproxy8:
+    image: db-ex-mysql-sshproxy
     build: ./tests/env/sshproxy
     volumes:
         - ./tests/env/sshproxy:/code
