@@ -80,8 +80,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getPrivateKey(self::DRIVER),
-                'public' => $this->getPublicKey(self::DRIVER),
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
