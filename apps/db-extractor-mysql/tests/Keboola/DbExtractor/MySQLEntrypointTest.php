@@ -41,7 +41,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
         $this->createTextTable($csv2);
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -64,7 +64,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['action'] = 'testConnection';
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -91,7 +91,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         ];
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -106,7 +106,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -132,7 +132,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -159,7 +159,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         // try exporting before the table exists
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->start();
 
@@ -168,11 +168,12 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $tableCreated = false;
         while ($process->isRunning()) {
-            sleep(5);
+            sleep(1);
             if (!$tableCreated) {
                 $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
                 $this->createTextTable($csv1, $table['tableName']);
                 $tableCreated = true;
+                sleep(2);
             }
         }
 
@@ -204,7 +205,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -252,12 +253,10 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputStateFile);
         $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
@@ -269,12 +268,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         file_put_contents($inputStateFile, file_get_contents($outputStateFile));
 
         // run the config again
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
-
-        var_dump($process->getErrorOutput());
-        var_dump($process->getOutput());
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals(['lastFetchedRow' => '4'], json_decode(file_get_contents($outputStateFile), true));

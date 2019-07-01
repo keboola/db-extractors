@@ -7,6 +7,7 @@ namespace Keboola\DbExtractor;
 use Keboola\DbExtractor\Configuration\MySQLConfigDefinition;
 use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
 use Keboola\DbExtractor\Configuration\MySQLConfigRowActionDefinition;
+use Keboola\DbExtractorLogger\Logger;
 
 class MySQLApplication extends Application
 {

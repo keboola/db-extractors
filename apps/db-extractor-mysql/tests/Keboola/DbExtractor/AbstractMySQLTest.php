@@ -6,7 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Filesystem\Filesystem;
@@ -361,7 +361,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
             } else {
                 throw new UserException(sprintf("Unexpected test table %s in schema %s", $table, $schema));
             }
-        } else if ($schema = "test") {
+        } else if ($schema === "test") {
             switch ($table) {
                 case "sales":
                     return array (
@@ -601,15 +601,5 @@ abstract class AbstractMySQLTest extends ExtractorTest
         } else {
             throw new UserException(sprintf("Unexpected schema %s", $schema));
         }
-    }
-
-    public function getPrivateKey(): string
-    {
-        return (string) file_get_contents('/root/.ssh/id_rsa');
-    }
-
-    public function getPublicKey(): string
-    {
-        return (string) file_get_contents('/root/.ssh/id_rsa.pub');
     }
 }
