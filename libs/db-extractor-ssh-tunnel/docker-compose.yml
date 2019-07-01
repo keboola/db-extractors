@@ -1,13 +1,15 @@
 version: '2'
 services:
-  dev:
+  app: &base
     build: .
-    volumes:
-      - .:/code
     working_dir: /code
     command: bash -c 'composer install -n && set -a && composer ci'
     links:
       - sshproxy
+  dev:
+    <<: *base
+    volumes:
+      - .:/code
 
   sshproxy:
     build: ./tests/env/sshproxy
