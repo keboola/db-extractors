@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "keboola/ssh-tunnel": "^2.0",
+        "keboola/ssh-tunnel": "^1.0|^2.0",
         "keboola/db-extractor-logger": "dev-ondra-init-repo",
         "keboola/retry": "^0.3"
     },
