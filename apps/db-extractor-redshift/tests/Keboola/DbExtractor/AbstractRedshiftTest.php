@@ -130,10 +130,13 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         ];
     }
 
-    public function getRedshiftPrivateKey(): string
+    public function getPrivateKey(): string
     {
-        // docker-compose .env file does not support new lines in variables
-        // we have to modify the key https://github.com/moby/moby/issues/12997
-        return str_replace('"', '', str_replace('\n', "\n", $this->getEnv('redshift', 'DB_SSH_KEY_PRIVATE')));
+        return (string) file_get_contents('/root/.ssh/id_rsa');
+    }
+
+    public function getPublicKey(): string
+    {
+        return (string) file_get_contents('/root/.ssh/id_rsa.pub');
     }
 }

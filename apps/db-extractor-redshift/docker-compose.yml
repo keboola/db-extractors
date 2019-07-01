@@ -5,8 +5,6 @@ services:
     image: keboola/ex-db-redshift
     tty: true
     stdin_open: true
-    env_file:
-      - ssh-keys.env
     environment:
       - REDSHIFT_DB_HOST
       - REDSHIFT_DB_PORT
@@ -29,8 +27,6 @@ services:
     tty: true
     command: composer ci
     stdin_open: true
-    env_file:
-      - ssh-keys.env
     environment:
       - REDSHIFT_DB_HOST
       - REDSHIFT_DB_PORT
@@ -47,6 +43,7 @@ services:
 
 
   sshproxy:
+    image: db-ex-redshift-sshproxy
     build: ./tests/env/sshproxy
     volumes:
         - ./tests/env/sshproxy:/code

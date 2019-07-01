@@ -52,8 +52,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getRedshiftPrivateKey(),
-                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC'),
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -114,8 +114,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getRedshiftPrivateKey(),
-                'public' => $this->getEnv('redshift', 'DB_SSH_KEY_PUBLIC'),
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',

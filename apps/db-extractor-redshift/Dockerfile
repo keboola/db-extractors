@@ -1,3 +1,4 @@
+FROM db-ex-redshift-sshproxy AS sshproxy
 FROM php:7.2
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -22,5 +23,7 @@ WORKDIR /code
 
 ADD . /code
 RUN composer install --no-interaction
+
+COPY --from=sshproxy /root/.ssh /root/.ssh
 
 CMD php ./run.php --data=/data
