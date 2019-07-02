@@ -1,4 +1,3 @@
-FROM db-ex-ssh-tunnel-sshproxy AS sshproxy
 FROM php:7-cli
 
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
@@ -23,7 +22,5 @@ RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
 COPY . /code/
 # run normal composer - all deps are cached already
 RUN composer install $COMPOSER_FLAGS
-
-COPY --from=sshproxy /root/.ssh /root/.ssh
 
 CMD php ./vendor/bin/phpunit
