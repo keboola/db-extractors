@@ -38,12 +38,6 @@ class Oracle extends Extractor
         $this->writeTablelessConfig($this->dbParams);
     }
 
-    public function createSshTunnel(array $dbConfig): array
-    {
-        $this->dbParams = parent::createSshTunnel($dbConfig);
-        return $this->dbParams;
-    }
-
     private function writeTablelessConfig(array $dbParams): void
     {
         $dbParams['port'] = (string) $dbParams['port'];
