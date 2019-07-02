@@ -50,7 +50,7 @@ class Oracle extends Extractor
         file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
     }
 
-    private function prepareTablesConfig(array $tables = null): string
+    private function prepareTablesConfig(array $tables = null): void
     {
         $config = [
             'parameters' => [
@@ -204,7 +204,7 @@ class Oracle extends Extractor
 
     public function getTables(array $tables = null): array
     {
-        $configFile = $this->prepareTablesConfig($tables);
+        $this->prepareTablesConfig($tables);
         $cmd = [
             'java',
             '-jar',
