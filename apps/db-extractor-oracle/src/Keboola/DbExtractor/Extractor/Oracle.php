@@ -16,6 +16,7 @@ use Throwable;
 class Oracle extends Extractor
 {
     const TABLELESS_CONFIG_FILE = "tableless.json";
+    const TABLES_CONFIG_FILE = "getTablesMetadata.json";
 
     protected $db;
 
@@ -47,6 +48,20 @@ class Oracle extends Extractor
             ]
         ];
         file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
+    }
+
+    private function prepareTablesConfig(array $tables = null): void
+    {
+        $dbParams = $this->dbParams;
+        $dbParams['port'] = (string) $this->dbParams['port'];
+        $config = [
+            'parameters' => [
+                'db' => $dbParams,
+                'outputFile' => $this->dataDir . "/" . 'tables.json',
+                'tables' => (!empty($tables)) ? $tables : []
+            ]
+        ];
+        file_put_contents($this->dataDir . "/" . self::TABLES_CONFIG_FILE, json_encode($config));
     }
 
     private function writeExportConfig(array $dbParams, array $table): void
@@ -191,12 +206,13 @@ class Oracle extends Extractor
 
     public function getTables(array $tables = null): array
     {
+        $this->prepareTablesConfig($tables);
         $cmd = [
             'java',
             '-jar',
             '/code/oracle/table-exporter.jar',
             'getTables',
-            $this->dataDir . "/" . self::TABLELESS_CONFIG_FILE
+            $this->dataDir . "/" . self::TABLES_CONFIG_FILE
         ];
 
         $process = new Process($cmd);
@@ -214,19 +230,7 @@ class Oracle extends Extractor
                 "Cannot parse JSON data of table listing - error: " . json_last_error()
             );
         }
-        if ($tables) {
-            $output = [];
-            foreach ($tables as $table) {
-                foreach ($tableListing as $listedTable) {
-                    if ($table['tableName'] === $listedTable['name'] && $table['schema'] === $listedTable['schema']) {
-                        $output[] = $listedTable;
-                    }
-                }
-            }
-        } else {
-            $output = $tableListing;
-        }
-        return $output;
+        return $tableListing;
     }
 
     public function simpleQuery(array $table, array $columns = array()): string
