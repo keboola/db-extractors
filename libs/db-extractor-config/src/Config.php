@@ -63,7 +63,7 @@ class Config
     }
 
 
-    protected function validateParameters(array $parameters): array
+    public function validateParameters(array $parameters): array
     {
         try {
             $processor = new Processor();
