@@ -14,11 +14,11 @@ class Config
     /** @var ConfigurationInterface $configuration */
     private $configuration;
 
-    const CONFIG_DEFINITION = 'configDefinition';
+    public const CONFIG_DEFINITION = 'configDefinition';
 
-    const CONFIG_ROW_DEFINITION = 'configRowDefinition';
+    public const CONFIG_ROW_DEFINITION = 'configRowDefinition';
 
-    const CONFIG_ROW_ACTION_DEFINITION = 'configRowActionDefinition';
+    public const CONFIG_ROW_ACTION_DEFINITION = 'configRowActionDefinition';
 
     public function __construct(ConfigurationInterface $configuration, string $type = self::CONFIG_DEFINITION)
     {
@@ -53,10 +53,10 @@ class Config
                     ->end();
                 break;
             case self::CONFIG_ROW_DEFINITION:
-
+                // @TODO
                 break;
             case self::CONFIG_ROW_ACTION_DEFINITION:
-
+                // @TODO
                 break;
         }
         $this->configuration = $configuration;
