@@ -14,37 +14,51 @@ class Config
     /** @var ConfigurationInterface $configuration */
     private $configuration;
 
-    public function __construct(ConfigurationInterface $configuration)
-    {
-        $configuration
-            ->getConfigTreeBuilder()
-            ->root('parameters')
-            ->validate()
-            ->ifTrue(function ($v) {
-                if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
-                    return true;
-                }
-                return false;
-            })->thenInvalid('Both table and query cannot be set together.')
-            ->end()
-            ->validate()
-            ->ifTrue(function ($v) {
-                if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
-                    return true;
-                }
-                return false;
-            })->thenInvalid('Incremental fetching is not supported for advanced queries.')
-            ->end()
-            ->validate()
-            ->ifTrue(function ($v) {
-                if (!isset($v['table']) && !isset($v['query'])) {
-                    return true;
-                }
-                return false;
-            })->thenInvalid('One of table or query is required')
-            ->end()
-        ;
+    const CONFIG_DEFINITION = 'configDefinition';
 
+    const CONFIG_ROW_DEFINITION = 'configRowDefinition';
+
+    const CONFIG_ROW_ACTION_DEFINITION = 'configRowActionDefinition';
+
+    public function __construct(ConfigurationInterface $configuration, string $type = self::CONFIG_DEFINITION)
+    {
+        switch ($type) {
+            case self::CONFIG_DEFINITION:
+                $configuration
+                    ->getConfigTreeBuilder()
+                    ->root('parameters')
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
+                                return true;
+                            }
+                            return false;
+                        })->thenInvalid('Both table and query cannot be set together.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
+                                return true;
+                            }
+                            return false;
+                        })->thenInvalid('Incremental fetching is not supported for advanced queries.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(function ($v) {
+                            if (!isset($v['table']) && !isset($v['query'])) {
+                                return true;
+                            }
+                            return false;
+                        })->thenInvalid('One of table or query is required')
+                    ->end();
+                break;
+            case self::CONFIG_ROW_DEFINITION:
+
+                break;
+            case self::CONFIG_ROW_ACTION_DEFINITION:
+
+                break;
+        }
         $this->configuration = $configuration;
     }
 
