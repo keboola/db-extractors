@@ -110,7 +110,7 @@ class Config
 
             return $processedParameters;
         } catch (ConfigException $e) {
-            throw new \Keboola\DbExtractor\Exception\UserException($e->getMessage(), 0, $e);
+            throw new UserException($e->getMessage(), 0, $e);
         }
     }
 }
