@@ -85,7 +85,7 @@ class Config
         }
     }
 
-    public function validateParameters(array $parameters): array
+    public function validateParameters(array $parameters, string $action = 'run'): array
     {
         try {
             $processor = new Processor();
@@ -98,7 +98,7 @@ class Config
                 $processedParameters['db']['password'] = $processedParameters['db']['#password'];
             }
 
-            if ('run' === 'run') {
+            if ($action === 'run') {
                 if (isset($processedParameters['tables'])) {
                     foreach ($processedParameters['tables'] as $table) {
                         $this->validateTableParameters($table);
