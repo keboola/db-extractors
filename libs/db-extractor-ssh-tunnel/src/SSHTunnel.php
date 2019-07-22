@@ -58,9 +58,14 @@ class SSHTunnel
         if (empty($sshConfig['sshPort'])) {
             $sshConfig['sshPort'] = self::DEFAULT_SSH_PORT;
         }
-        $sshConfig['privateKey'] = isset($sshConfig['keys']['#private'])
-            ? $sshConfig['keys']['#private']
-            : $sshConfig['keys']['private'];
+
+        if (isset($sshConfig['keys']['#private'])) {
+            $sshConfig['privateKey'] = $sshConfig['keys']['#private'];
+        } else {
+            $sshConfig['privateKey'] = $sshConfig['keys']['private'];
+            $this->logger->warning('Use unencrypted private key!');
+        }
+
         $tunnelParams = array_intersect_key(
             $sshConfig,
             array_flip(
