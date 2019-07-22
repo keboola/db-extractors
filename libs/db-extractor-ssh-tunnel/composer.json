@@ -4,18 +4,23 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "keboola/ssh-tunnel": "^1.0|^2.0",
         "keboola/db-extractor-logger": "dev-ondra-init-repo",
-        "keboola/retry": "^0.3"
+        "keboola/retry": "^0.3",
+        "keboola/ssh-tunnel": "^1.0|^2.0"
     },
     "require-dev": {
-        "keboola/coding-standard": "^2.0",
-        "phpunit/phpunit": "^7.0",
-        "phpstan/phpstan": "^0.8"
+        "keboola/coding-standard": "^8.0",
+        "phpstan/phpstan-shim": "^0.11.12",
+        "phpunit/phpunit": "^8.2"
     },
     "autoload": {
         "psr-4": {
             "Keboola\\DbExtractorSSHTunnel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\DbExtractorSSHTunnel\\Test\\": "tests/"
         }
     },
     "scripts": {
@@ -33,9 +38,5 @@
             "@composer validate --no-check-all --strict",
             "@tests"
         ]
-    },
-    "config": {
-        "sort-packages": true,
-        "github-protocols": ["https"]
     }
 }

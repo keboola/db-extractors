@@ -3,7 +3,6 @@ services:
   app: &base
     build: .
     working_dir: /code
-    command: bash -c 'composer install -n && set -a && composer ci'
     links:
       - sshproxy
   dev:

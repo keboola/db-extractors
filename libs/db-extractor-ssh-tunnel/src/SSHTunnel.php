@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorSSHTunnel;
 
-
 use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractorSSHTunnel\Exception\UserException;
 use Keboola\SSHTunnel\SSH;
@@ -74,11 +73,10 @@ class SSHTunnel
 
         $simplyRetryPolicy = new SimpleRetryPolicy(
             self::DEFAULT_MAX_TRIES,
-            [SSHException::class, \Exception::class]
-
+            [SSHException::class,\Throwable::class]
         );
-        $exponentialBackOffPolicy = new ExponentialBackOffPolicy();
 
+        $exponentialBackOffPolicy = new ExponentialBackOffPolicy();
         $proxy = new RetryProxy(
             $simplyRetryPolicy,
             $exponentialBackOffPolicy,
