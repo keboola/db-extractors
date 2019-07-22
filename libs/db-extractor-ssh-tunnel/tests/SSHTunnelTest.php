@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorSSHTunnel\Test;
 
-use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractorSSHTunnel\Exception\UserException;
 use Keboola\DbExtractorSSHTunnel\SSHTunnel;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 
 class SSHTunnelTest extends TestCase

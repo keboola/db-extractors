@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorSSHTunnel;
 
-use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractorSSHTunnel\Exception\UserException;
 use Keboola\SSHTunnel\SSH;
 use Keboola\SSHTunnel\SSHException;
+use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
@@ -21,10 +21,10 @@ class SSHTunnel
 
     public const DEFAULT_MAX_TRIES = 5;
 
-    /** @var Logger */
+    /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(Logger $logger)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }

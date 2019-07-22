@@ -4,14 +4,15 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "keboola/db-extractor-logger": "dev-ondra-init-repo",
         "keboola/retry": "^0.3",
-        "keboola/ssh-tunnel": "^1.0|^2.0"
+        "keboola/ssh-tunnel": "^1.0|^2.0",
+        "psr/log": "^1.1"
     },
     "require-dev": {
         "keboola/coding-standard": "^8.0",
         "phpstan/phpstan-shim": "^0.11.12",
-        "phpunit/phpunit": "^8.2"
+        "phpunit/phpunit": "^8.2",
+        "monolog/monolog": "^1.24"
     },
     "autoload": {
         "psr-4": {
