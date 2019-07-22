@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fce9df9313a7a42e3ecf5610b19977f0",
+    "content-hash": "86acef3ff70ff3b3f2cefaa2f919f47f",
     "packages": [
         {
             "name": "keboola/csv",
@@ -40,7 +40,7 @@
             ],
             "authors": [
                 {
-                    "name": "Keboola",
+                    "name": "keboola",
                     "email": "devel@keboola.com"
                 }
             ],
@@ -54,38 +54,38 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "9.1.11",
+            "version": "dev-ondra-severance-repository",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "a67d229d9672158ffb349cb3c5f24029e68bc570"
+                "reference": "4dc0fbce6f81054ea2c74dd00aea0eb33e27fe80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/a67d229d9672158ffb349cb3c5f24029e68bc570",
-                "reference": "a67d229d9672158ffb349cb3c5f24029e68bc570",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/4dc0fbce6f81054ea2c74dd00aea0eb33e27fe80",
+                "reference": "4dc0fbce6f81054ea2c74dd00aea0eb33e27fe80",
                 "shasum": ""
             },
             "require": {
+                "ext-pdo": "*",
                 "keboola/csv": "^1.1",
-                "keboola/php-datatypes": "^3.2",
+                "keboola/db-extractor-logger": "dev-ondra-init-repo",
+                "keboola/db-extractor-ssh-tunnel": "dev-ondra-init-repo",
+                "keboola/php-datatypes": "^4.0",
                 "keboola/php-utils": "^2.3",
-                "keboola/ssh-tunnel": "^1.0",
-                "monolog/monolog": "^1.17",
+                "keboola/retry": "^0.3.0",
                 "nette/utils": "^2.4",
                 "php": ">=7.1",
                 "pimple/pimple": "^3.0",
                 "symfony/config": "^3.0",
-                "symfony/process": "^3.0",
                 "symfony/serializer": "^3.1",
-                "symfony/yaml": "^3.0",
-                "vkartaviy/retry": "^0.2"
+                "symfony/yaml": "^3.0"
             },
             "require-dev": {
                 "aws/aws-sdk-php": "^3.67",
                 "keboola/coding-standard": "^2.0",
                 "phpstan/phpstan": "^0.8",
-                "phpunit/phpunit": "^5.0",
+                "phpunit/phpunit": "^7.0",
                 "symfony/finder": "*"
             },
             "type": "library",
@@ -105,20 +105,93 @@
                 }
             ],
             "description": "Common library from Keboola Database Extractors",
-            "time": "2018-09-22T12:54:02+00:00"
+            "time": "2019-07-01T05:51:38+00:00"
         },
         {
-            "name": "keboola/php-datatypes",
-            "version": "3.2.1",
+            "name": "keboola/db-extractor-logger",
+            "version": "dev-ondra-init-repo",
             "source": {
                 "type": "git",
-                "url": "https://github.com/keboola/php-datatypes.git",
-                "reference": "f16967a5da1b67e4a9fb38b07a1b0df3e588abb8"
+                "url": "https://github.com/keboola/db-extractor-logger.git",
+                "reference": "bf37c7856034b1ce0effe168fe25de080a7cf2b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/f16967a5da1b67e4a9fb38b07a1b0df3e588abb8",
-                "reference": "f16967a5da1b67e4a9fb38b07a1b0df3e588abb8",
+                "url": "https://api.github.com/repos/keboola/db-extractor-logger/zipball/bf37c7856034b1ce0effe168fe25de080a7cf2b1",
+                "reference": "bf37c7856034b1ce0effe168fe25de080a7cf2b1",
+                "shasum": ""
+            },
+            "require": {
+                "keboola/csv": "^1.1",
+                "monolog/monolog": "^1.17"
+            },
+            "require-dev": {
+                "keboola/coding-standard": "^2.0",
+                "phpstan/phpstan": "^0.8",
+                "phpunit/phpunit": "^8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Keboola\\DbExtractorLogger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Print info from db-extractor",
+            "time": "2019-07-01T05:56:56+00:00"
+        },
+        {
+            "name": "keboola/db-extractor-ssh-tunnel",
+            "version": "dev-ondra-init-repo",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/db-extractor-ssh-tunnel.git",
+                "reference": "4b06e35dab88faac75789542c893e79abbd2ffb2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/db-extractor-ssh-tunnel/zipball/4b06e35dab88faac75789542c893e79abbd2ffb2",
+                "reference": "4b06e35dab88faac75789542c893e79abbd2ffb2",
+                "shasum": ""
+            },
+            "require": {
+                "keboola/db-extractor-logger": "dev-ondra-init-repo",
+                "keboola/retry": "^0.3",
+                "keboola/ssh-tunnel": "^1.0|^2.0"
+            },
+            "require-dev": {
+                "keboola/coding-standard": "^2.0",
+                "phpstan/phpstan": "^0.8",
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Keboola\\DbExtractorSSHTunnel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Create SSH tunnel for DB Extractors",
+            "time": "2019-07-01T09:53:48+00:00"
+        },
+        {
+            "name": "keboola/php-datatypes",
+            "version": "4.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/php-datatypes.git",
+                "reference": "d7c6cb963d0d9d88372c0e1dd023f1ce1dc5b829"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/d7c6cb963d0d9d88372c0e1dd023f1ce1dc5b829",
+                "reference": "d7c6cb963d0d9d88372c0e1dd023f1ce1dc5b829",
                 "shasum": ""
             },
             "require-dev": {
@@ -140,7 +213,7 @@
                     "email": "ondrej.hlavacek@keboola.com"
                 }
             ],
-            "time": "2018-08-02T15:13:46+00:00"
+            "time": "2019-06-24T11:55:04+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -256,6 +329,54 @@
                 "utility"
             ],
             "time": "2018-04-11T14:40:53+00:00"
+        },
+        {
+            "name": "keboola/retry",
+            "version": "0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/retry.git",
+                "reference": "bd1769bc93e726a912c0a1f434fcde91cf015047"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/retry/zipball/bd1769bc93e726a912c0a1f434fcde91cf015047",
+                "reference": "bd1769bc93e726a912c0a1f434fcde91cf015047",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1",
+                "psr/log": "^1.1"
+            },
+            "require-dev": {
+                "keboola/coding-standard": "^7.0",
+                "phpstan/phpstan-shim": "^0.10",
+                "phpunit/phpunit": "7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Retry\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Keboola Dev",
+                    "email": "devel@keboola.com"
+                }
+            ],
+            "description": "Library for repeatable and retryable operations",
+            "keywords": [
+                "backoff",
+                "proxy",
+                "repeat",
+                "retry"
+            ],
+            "time": "2019-06-20T10:03:15+00:00"
         },
         {
             "name": "keboola/ssh-tunnel",
@@ -436,7 +557,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🛠 Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+            "description": "? Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
             "homepage": "https://nette.org",
             "keywords": [
                 "array",
@@ -557,16 +678,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.0.2",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
                 "shasum": ""
             },
             "require": {
@@ -600,7 +721,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2018-11-20T15:27:04+00:00"
         },
         {
             "name": "seld/jsonlint",
@@ -1009,53 +1130,6 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2018-08-10T07:34:36+00:00"
-        },
-        {
-            "name": "vkartaviy/retry",
-            "version": "v0.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vkartaviy/retry.git",
-                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vkartaviy/retry/zipball/8d726458bec9a773e4ae8baf8afd9666f0d1142d",
-                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Retry": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vladimir Kartaviy",
-                    "email": "vkartaviy@gmail.com",
-                    "homepage": "http://vkartaviy.name"
-                }
-            ],
-            "description": "The library for repeatable and retryable operations",
-            "homepage": "https://github.com/vkartaviy/retry",
-            "keywords": [
-                "backoff",
-                "proxy",
-                "repeat",
-                "retry"
-            ],
-            "time": "2015-05-06T17:39:09+00:00"
         }
     ],
     "packages-dev": [
@@ -1257,7 +1331,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🅱 Nette Bootstrap: the simple way to configure and bootstrap your Nette application.",
+            "description": "? Nette Bootstrap: the simple way to configure and bootstrap your Nette application.",
             "homepage": "https://nette.org",
             "keywords": [
                 "bootstrapping",
@@ -1322,7 +1396,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "💎 Nette Dependency Injection Container: Flexible, compiled and full-featured DIC with perfectly usable autowiring and support for all new PHP 7.1 features.",
+            "description": "? Nette Dependency Injection Container: Flexible, compiled and full-featured DIC with perfectly usable autowiring and support for all new PHP 7.1 features.",
             "homepage": "https://nette.org",
             "keywords": [
                 "compiled",
@@ -1387,7 +1461,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🔍 Nette Finder: find files and directories with an intuitive API.",
+            "description": "? Nette Finder: find files and directories with an intuitive API.",
             "homepage": "https://nette.org",
             "keywords": [
                 "filesystem",
@@ -1447,7 +1521,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🍸 Nette NEON: encodes and decodes NEON file format.",
+            "description": "? Nette NEON: encodes and decodes NEON file format.",
             "homepage": "http://ne-on.org",
             "keywords": [
                 "export",
@@ -1510,7 +1584,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🐘 Nette PHP Generator: generates neat PHP code for you. Supports new PHP 7.2 features.",
+            "description": "? Nette PHP Generator: generates neat PHP code for you. Supports new PHP 7.2 features.",
             "homepage": "https://nette.org",
             "keywords": [
                 "code",
@@ -1574,7 +1648,7 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "🍀 Nette RobotLoader: high performance and comfortable autoloader that will search and autoload classes within your application.",
+            "description": "? Nette RobotLoader: high performance and comfortable autoloader that will search and autoload classes within your application.",
             "homepage": "https://nette.org",
             "keywords": [
                 "autoload",
@@ -2204,16 +2278,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.6.10",
+            "version": "4.8.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "7b5fe98b28302a8b25693b2298bca74463336975"
+                "reference": "46023de9a91eec7dfb06cc56cb4e260017298517"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7b5fe98b28302a8b25693b2298bca74463336975",
-                "reference": "7b5fe98b28302a8b25693b2298bca74463336975",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/46023de9a91eec7dfb06cc56cb4e260017298517",
+                "reference": "46023de9a91eec7dfb06cc56cb4e260017298517",
                 "shasum": ""
             },
             "require": {
@@ -2223,15 +2297,15 @@
                 "ext-reflection": "*",
                 "ext-spl": "*",
                 "php": ">=5.3.3",
-                "phpspec/prophecy": "~1.3,>=1.3.1",
-                "phpunit/php-code-coverage": "~2.0,>=2.0.11",
+                "phpspec/prophecy": "^1.3.1",
+                "phpunit/php-code-coverage": "~2.1",
                 "phpunit/php-file-iterator": "~1.4",
                 "phpunit/php-text-template": "~1.2",
-                "phpunit/php-timer": "~1.0",
+                "phpunit/php-timer": "^1.0.6",
                 "phpunit/phpunit-mock-objects": "~2.3",
-                "sebastian/comparator": "~1.1",
+                "sebastian/comparator": "~1.2.2",
                 "sebastian/diff": "~1.2",
-                "sebastian/environment": "~1.2",
+                "sebastian/environment": "~1.3",
                 "sebastian/exporter": "~1.2",
                 "sebastian/global-state": "~1.0",
                 "sebastian/version": "~1.0",
@@ -2246,7 +2320,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.6.x-dev"
+                    "dev-master": "4.8.x-dev"
                 }
             },
             "autoload": {
@@ -2261,8 +2335,8 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
-                    "role": "lead"
+                    "role": "lead",
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "The PHP Unit Testing framework.",
@@ -2272,7 +2346,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-03T05:03:30+00:00"
+            "time": "2017-06-21T08:07:12+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -2328,6 +2402,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2015-10-02T06:51:40+00:00"
         },
         {
@@ -3027,6 +3102,53 @@
             "time": "2018-08-06T14:22:27+00:00"
         },
         {
+            "name": "vkartaviy/retry",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vkartaviy/retry.git",
+                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vkartaviy/retry/zipball/8d726458bec9a773e4ae8baf8afd9666f0d1142d",
+                "reference": "8d726458bec9a773e4ae8baf8afd9666f0d1142d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Retry": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladimir Kartaviy",
+                    "email": "vkartaviy@gmail.com",
+                    "homepage": "http://vkartaviy.name"
+                }
+            ],
+            "description": "The library for repeatable and retryable operations",
+            "homepage": "https://github.com/vkartaviy/retry",
+            "keywords": [
+                "backoff",
+                "proxy",
+                "repeat",
+                "retry"
+            ],
+            "time": "2015-05-06T17:39:09+00:00"
+        },
+        {
             "name": "webmozart/assert",
             "version": "1.3.0",
             "source": {
@@ -3079,7 +3201,11 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "keboola/db-extractor-common": 20,
+        "keboola/db-extractor-logger": 20,
+        "keboola/db-extractor-ssh-tunnel": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
