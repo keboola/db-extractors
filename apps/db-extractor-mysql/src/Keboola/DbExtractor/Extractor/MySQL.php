@@ -98,8 +98,7 @@ class MySQL extends Extractor
                 }
             };
             $checkCnMismatch($e);
-            $previous = $e->getPrevious();
-            if ($previous !== null) {
+            if (($previous = $e->getPrevious()) !== null) {
                 $checkCnMismatch($previous);
             }
             throw $e;
