@@ -26,10 +26,27 @@ class Oracle extends Extractor
     /** @var  array */
     protected $exportConfigFiles;
 
+    /** @var array */
+    private $tablesToList = [];
+
+    /** @var bool */
+    private $listColumns = true;
+
     public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
         $this->dbParams = $parameters['db'];
         parent::__construct($parameters, $state, $logger);
+
+        // check for special table fetching option
+        if (!empty($parameters['tableListFilter'])) {
+            if (!empty($parameters['tableListFilter']['tablesToList'])) {
+                $this->tablesToList = $parameters['tableListFilter']['tablesToList'];
+            }
+            if (isset($parameters['tableListFilter']['listColumns'])) {
+                $this->listColumns = $parameters['tableListFilter']['listColumns'];
+            }
+        }
+
         // setup the export config files for the export tool
         foreach ($parameters['tables'] as $table) {
             $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
@@ -58,7 +75,8 @@ class Oracle extends Extractor
             'parameters' => [
                 'db' => $dbParams,
                 'outputFile' => $this->dataDir . "/" . 'tables.json',
-                'tables' => (!empty($tables)) ? $tables : []
+                'tables' => (!empty($tables)) ? $tables : [],
+                'includeColumns' => $this->listColumns
             ]
         ];
         file_put_contents($this->dataDir . "/" . self::TABLES_CONFIG_FILE, json_encode($config));
@@ -206,6 +224,13 @@ class Oracle extends Extractor
 
     public function getTables(array $tables = null): array
     {
+        if (!$this->listColumns) {
+            return $this->getOnlyTables($this->tablesToList);
+        }
+        if ($this->tablesToList && !$tables) {
+            $tables = $this->tablesToList;
+        }
+
         $this->prepareTablesConfig($tables);
         $cmd = [
             'java',
