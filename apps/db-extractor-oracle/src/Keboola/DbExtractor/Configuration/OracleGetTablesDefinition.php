@@ -43,7 +43,7 @@ class OracleGetTablesDefinition extends ActionConfigRowDefinition
                 ->end()
                 ->arrayNode('tableListFilter')
                     ->children()
-                        ->booleanNode('listColumns')->end()
+                        ->booleanNode('listColumns')->defaultTrue()->end()
                         ->arrayNode('tablesToList')
                             ->prototype('array')
                                 ->children()
