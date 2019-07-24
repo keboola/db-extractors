@@ -35,6 +35,7 @@ class Oracle extends Extractor
     public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
         $this->dbParams = $parameters['db'];
+
         parent::__construct($parameters, $state, $logger);
 
         // check for special table fetching option
@@ -48,9 +49,11 @@ class Oracle extends Extractor
         }
 
         // setup the export config files for the export tool
-        foreach ($parameters['tables'] as $table) {
-            $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
-            $this->writeExportConfig($this->dbParams, $table);
+        if (array_key_exists('tables', $parameters)) {
+            foreach ($parameters['tables'] as $table) {
+                $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
+                $this->writeExportConfig($this->dbParams, $table);
+            }
         }
         $this->writeTablelessConfig($this->dbParams);
     }
@@ -224,9 +227,6 @@ class Oracle extends Extractor
 
     public function getTables(array $tables = null): array
     {
-        if (!$this->listColumns) {
-            return $this->getOnlyTables($this->tablesToList);
-        }
         if ($this->tablesToList && !$tables) {
             $tables = $this->tablesToList;
         }
