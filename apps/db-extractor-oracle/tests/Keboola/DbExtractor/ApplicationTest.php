@@ -24,7 +24,7 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         $this->putConfig($config, $configType);
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -68,7 +68,7 @@ class ApplicationTest extends OracleBaseTest
 
         $this->setupTestTables();
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
 
@@ -129,7 +129,7 @@ class ApplicationTest extends OracleBaseTest
         $this->putConfig($config, self::CONFIG_FORMAT_JSON);
         $this->setupTestTables();
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
 
@@ -158,7 +158,7 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'getTables';
         $this->putConfig($config, $configType);
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -198,7 +198,7 @@ class ApplicationTest extends OracleBaseTest
         $config['parameters']['tableListFilter'] = [
             'listColumns' => false,
             'tablesToList' => [[
-                'tableName' => 'regions',
+                'tableName' => 'REGIONS',
                 'schema' => 'HR',
             ]],
         ];
@@ -226,7 +226,7 @@ class ApplicationTest extends OracleBaseTest
         $config['parameters']['tables'][3]['query'] = "SELECT SOMETHING ORDER BY INVALID FROM \"invalid\".\"escaping\"";
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
