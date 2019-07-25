@@ -49,7 +49,7 @@
         "primaryKey": null,
         "table": {
           "schema": "HR",
-          "tableName": "Regions"
+          "tableName": "REGIONS"
         }
       }
     ]
