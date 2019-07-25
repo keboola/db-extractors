@@ -70,10 +70,7 @@ class ApplicationTest extends OracleBaseTest
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
-        $process->run();
-        
-        $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $process->mustRun();
 
         $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
         $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
@@ -134,10 +131,7 @@ class ApplicationTest extends OracleBaseTest
 
         $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
-        $process->run();
-
-        $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $process->mustRun();
 
         $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
         $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
