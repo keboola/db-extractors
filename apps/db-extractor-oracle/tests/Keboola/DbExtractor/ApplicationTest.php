@@ -206,10 +206,10 @@ class ApplicationTest extends OracleBaseTest
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
-        
+
         $data = json_decode($process->getOutput(), true);
         self::assertCount(1, $data['tables']);
-        self::assertEquals('types_fk', $data['tables'][0]['name']);
+        self::assertEquals('REGIONS', $data['tables'][0]['name']);
         self::assertArrayNotHasKey('columns', $data['tables'][0]);
         $this->assertEquals(0, $process->getExitCode());
         $this->assertEquals("", $process->getErrorOutput());
