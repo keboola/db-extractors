@@ -24,7 +24,7 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         $this->putConfig($config, $configType);
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -68,7 +68,7 @@ class ApplicationTest extends OracleBaseTest
 
         $this->setupTestTables();
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
         
@@ -132,7 +132,7 @@ class ApplicationTest extends OracleBaseTest
         $this->putConfig($config, self::CONFIG_FORMAT_JSON);
         $this->setupTestTables();
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -164,7 +164,7 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'getTables';
         $this->putConfig($config, $configType);
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -183,14 +183,14 @@ class ApplicationTest extends OracleBaseTest
         $config['parameters']['tables'][3]['query'] = "SELECT SOMETHING ORDER BY INVALID FROM \"invalid\".\"escaping\"";
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
-        $process = new Process('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
         $this->assertEquals(1, $process->getExitCode());
         $this->assertContains("Export process failed:", $process->getErrorOutput());
         // verify that it retries 5 times
-        $this->assertContains("[5x]", $process->getOutput());
+        $this->assertContains("[4x]", $process->getOutput());
     }
 
     private function putConfig(array $config, string $configType)
