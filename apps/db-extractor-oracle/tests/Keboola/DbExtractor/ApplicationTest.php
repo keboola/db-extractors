@@ -206,8 +206,7 @@ class ApplicationTest extends OracleBaseTest
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
-        var_dump($process->getOutput());
-        return;
+        
         $data = json_decode($process->getOutput(), true);
         self::assertCount(1, $data['tables']);
         self::assertEquals('types_fk', $data['tables'][0]['name']);
