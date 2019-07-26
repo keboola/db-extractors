@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\ConfigDefinition;
+use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
 
 class OracleApplication extends Application
 {
@@ -16,5 +17,9 @@ class OracleApplication extends Application
         parent::__construct($config, $logger, $state);
 
         $this->setConfigDefinition(new ConfigDefinition());
+
+        if ($this['action'] === 'getTables') {
+            $this->setConfigDefinition(new OracleGetTablesDefinition());
+        }
     }
 }

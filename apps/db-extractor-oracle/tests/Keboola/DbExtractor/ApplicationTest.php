@@ -70,10 +70,7 @@ class ApplicationTest extends OracleBaseTest
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
-        $process->run();
-        
-        $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $process->mustRun();
 
         $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
         $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
@@ -134,10 +131,7 @@ class ApplicationTest extends OracleBaseTest
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
-        $process->run();
-
-        $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $process->mustRun();
 
         $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
         $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
@@ -173,6 +167,54 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
+    /**
+     * @param $configType
+     * @dataProvider configTypesProvider
+     */
+    public function testGetTablesNoColumns(string $configType): void
+    {
+        $config = $this->getConfig('oracle');
+        $config['action'] = 'getTables';
+        $config['parameters']['tableListFilter'] = [
+            'listColumns' => false,
+        ];
+        $this->putConfig($config, $configType);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->mustRun();
+
+        $data = json_decode($process->getOutput(), true);
+        self::assertCount(10, $data['tables']);
+        self::assertArrayNotHasKey('columns', $data['tables'][0]);
+        self::assertEquals(0, $process->getExitCode());
+        self::assertEquals("", $process->getErrorOutput());
+    }
+
+    public function testGetTablesOneTableNoColumns(): void
+    {
+        $config = $this->getConfig('oracle');
+        $config['action'] = 'getTables';
+        unset($config['parameters']['tables']);
+        $config['parameters']['tableListFilter'] = [
+            'listColumns' => false,
+            'tablesToList' => [[
+                'tableName' => 'REGIONS',
+                'schema' => 'HR',
+            ]],
+        ];
+        $this->putConfig($config, self::CONFIG_FORMAT_JSON);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->mustRun();
+
+        $data = json_decode($process->getOutput(), true);
+        self::assertCount(1, $data['tables']);
+        self::assertEquals('REGIONS', $data['tables'][0]['name']);
+        self::assertArrayNotHasKey('columns', $data['tables'][0]);
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals("", $process->getErrorOutput());
+    }
+
     public function testRunError(): void
     {
         $config = $this->getConfig('oracle');
@@ -195,11 +237,11 @@ class ApplicationTest extends OracleBaseTest
 
     private function putConfig(array $config, string $configType)
     {
+        @unlink($this->dataDir . '/config.yml');
+        @unlink($this->dataDir . '/config.json');
         if ($configType === self::CONFIG_FORMAT_YAML) {
-            @unlink($this->dataDir . '/config.yml');
             file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
         } else if ($configType === self::CONFIG_FORMAT_JSON) {
-            @unlink($this->dataDir . '/config.json');
             file_put_contents($this->dataDir . '/config.json', json_encode($config));
         } else {
             throw new UserException(sprintf("Unsupported configuration type: [%s]", $configType));
