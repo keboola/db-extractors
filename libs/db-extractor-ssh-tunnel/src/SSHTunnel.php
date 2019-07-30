@@ -63,7 +63,7 @@ class SSHTunnel
             $sshConfig['privateKey'] = $sshConfig['keys']['#private'];
         } else {
             $sshConfig['privateKey'] = $sshConfig['keys']['private'];
-            $this->logger->warning('Use unencrypted private key!');
+            $this->logger->warning('Using unecrypted private key');
         }
 
         $tunnelParams = array_intersect_key(
