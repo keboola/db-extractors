@@ -4,6 +4,12 @@ services:
     build: .
     working_dir: /code
     command: bash -c 'composer install -n && set -a && composer ci'
+    environment:
+      CONFIG_DB_USER: TEST_DB_USER
+      CONFIG_DB_PASSWORD: TEST_DB_PASSWORD
+      CONFIG_DB_HOST: TEST_DB_HOST
+      CONFIG_DB_PORT: TEST_DB_PORT
+      CONFIG_DB_DATABASE: TEST_DB_DATABASE
 
   dev:
     <<: *base
