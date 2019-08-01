@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Tests;
-
 
 use Keboola\DbExtractor\Exception\UserException;
 use PHPUnit\Framework\TestCase;

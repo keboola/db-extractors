@@ -81,7 +81,7 @@ class ConfigDefinition implements ConfigurationInterface
         return $node;
     }
 
-    protected function addTablesNode()
+    protected function addTablesNode() :NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder

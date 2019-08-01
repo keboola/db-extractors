@@ -118,5 +118,4 @@ class ConfigTest extends AbstractConfigTest
             $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
         }
     }
-
 }
