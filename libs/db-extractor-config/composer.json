@@ -33,7 +33,6 @@
             "@tests"
         ],
         "ci": [
-            "@composer install",
             "@composer validate --no-check-all --strict",
             "@build"
         ]
