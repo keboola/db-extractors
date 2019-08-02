@@ -29,7 +29,8 @@
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "build": [
             "@phpcs",
-            "@phpstan"
+            "@phpstan",
+            "@tests"
         ],
         "ci": [
             "@composer install",
