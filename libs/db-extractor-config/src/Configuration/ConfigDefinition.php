@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration;
 
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -12,7 +11,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class ConfigDefinition implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder() : \Symfony\Component\Config\Definition\Builder\TreeBuilder
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('parameters');
@@ -81,7 +80,7 @@ class ConfigDefinition implements ConfigurationInterface
         return $node;
     }
 
-    protected function addTablesNode() :NodeDefinition
+    protected function addTablesNode(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder

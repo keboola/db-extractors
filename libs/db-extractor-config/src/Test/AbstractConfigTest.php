@@ -14,7 +14,7 @@ abstract class AbstractConfigTest extends TestCase
     public const CONFIG_FORMAT_JSON = 'json';
 
     /** @var string */
-    protected $dataDir = __DIR__ . "/../../../tests/data";
+    protected $dataDir = __DIR__ . '/../../../tests/data';
 
     protected function getConfigDbNode(string $driver): array
     {
@@ -31,13 +31,13 @@ abstract class AbstractConfigTest extends TestCase
     {
         switch ($format) {
             case self::CONFIG_FORMAT_JSON:
-                $config = json_decode(file_get_contents($this->dataDir . '/' .$driver . '/config.json'), true);
+                $config = json_decode((string) file_get_contents($this->dataDir . '/' .$driver . '/config.json'), true);
                 break;
             case self::CONFIG_FORMAT_YAML:
-                $config = Yaml::parse(file_get_contents($this->dataDir . '/' .$driver . '/config.yml'));
+                $config = Yaml::parse((string) file_get_contents($this->dataDir . '/' .$driver . '/config.yml'));
                 break;
             default:
-                throw new UserException("Unsupported configuration format: " . $format);
+                throw new UserException('Unsupported configuration format: ' . $format);
         }
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);
@@ -48,7 +48,7 @@ abstract class AbstractConfigTest extends TestCase
 
     protected function getConfigRow(string $driver): array
     {
-        $config = json_decode(file_get_contents($this->dataDir . '/' .$driver . '/configRow.json'), true);
+        $config = json_decode((string) file_get_contents($this->dataDir . '/' .$driver . '/configRow.json'), true);
 
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);
@@ -59,7 +59,8 @@ abstract class AbstractConfigTest extends TestCase
 
     protected function getConfigRowForCsvErr(string $driver): array
     {
-        $config = json_decode(file_get_contents($this->dataDir . '/' .$driver . '/configRowCsvErr.json'), true);
+        $filename = $this->dataDir . '/' .$driver . '/configRowCsvErr.json';
+        $config = json_decode((string) file_get_contents($filename), true);
 
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);
@@ -73,9 +74,9 @@ abstract class AbstractConfigTest extends TestCase
         $env = strtoupper($driver) . '_' . $suffix;
         if ($required) {
             if (false === getenv($env)) {
-                throw new \Exception($env . " environment variable must be set.");
+                throw new \Exception($env . ' environment variable must be set.');
             }
         }
-        return getenv($env);
+        return (string) getenv($env);
     }
 }
