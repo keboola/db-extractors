@@ -24,7 +24,7 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['outputTable'] = 'fake.output';
 
         try {
-            $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+            $Config = new Config(new ConfigRowDefinition());
             $Config->validateParameters($config['parameters']);
         } catch (ConfigUserException $e) {
             $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
@@ -40,7 +40,7 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['outputTable'] = 'fake.output';
 
         try {
-            $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+            $Config = new Config(new ConfigRowDefinition());
             $Config->validateParameters($config['parameters']);
         } catch (ConfigUserException $e) {
             $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
@@ -54,7 +54,7 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['outputTable'] = 'fake.output';
 
         try {
-            $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+            $Config = new Config(new ConfigRowDefinition());
             $Config->validateParameters($config['parameters']);
         } catch (ConfigUserException $e) {
             $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
@@ -70,7 +70,7 @@ class ConfigTest extends AbstractConfigTest
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage('Invalid configuration for path "parameters": One of table or query is required');
 
-        $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+        $Config = new Config(new ConfigRowDefinition());
         $Config->validateParameters($config['parameters']);
     }
 
@@ -82,7 +82,7 @@ class ConfigTest extends AbstractConfigTest
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage('The child node "schema" at path "parameters.table" must be configured.');
 
-        $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+        $Config = new Config(new ConfigRowDefinition());
         $Config->validateParameters($config['parameters']);
     }
 
@@ -97,7 +97,7 @@ class ConfigTest extends AbstractConfigTest
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage('Both table and query cannot be set together.');
 
-        $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+        $Config = new Config(new ConfigRowDefinition());
         $Config->validateParameters($config['parameters']);
     }
 
@@ -111,7 +111,7 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['query'] = 'SELECT 1 LIMIT 0';
 
         try {
-            $Config = new Config(new ConfigRowDefinition(), Config::CONFIG_ROW_DEFINITION);
+            $Config = new Config(new ConfigRowDefinition());
             $Config->validateParameters($config['parameters']);
             $this->fail('Incremental fetching is not supported for advanced queries.');
         } catch (ConfigUserException $e) {

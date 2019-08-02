@@ -14,23 +14,8 @@ class Config
     /** @var ConfigurationInterface $configuration */
     private $configuration;
 
-    public const CONFIG_DEFINITION = 'configDefinition';
-
-    public const CONFIG_ROW_DEFINITION = 'configRowDefinition';
-
-    public const CONFIG_ROW_ACTION_DEFINITION = 'configRowActionDefinition';
-
-    public function __construct(ConfigurationInterface $configuration, string $type = self::CONFIG_DEFINITION)
+    public function __construct(ConfigurationInterface $configuration)
     {
-        switch ($type) {
-            case self::CONFIG_ROW_DEFINITION:
-            case self::CONFIG_DEFINITION:
-                // @TODO
-                break;
-            case self::CONFIG_ROW_ACTION_DEFINITION:
-                // @TODO
-                break;
-        }
         $this->configuration = $configuration;
     }
 
