@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Keboola\DbExtractorConfig\Tests;
+namespace Keboola\DbExtractorConfig\Test;
 
-use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Exception\UserException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 

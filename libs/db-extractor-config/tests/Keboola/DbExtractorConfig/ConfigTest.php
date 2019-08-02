@@ -7,6 +7,7 @@ namespace Keboola\DbExtractorConfig\Tests;
 use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
+use Keboola\DbExtractorConfig\Test\AbstractConfigTest;
 
 class ConfigTest extends AbstractConfigTest
 {
