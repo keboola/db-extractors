@@ -19,11 +19,11 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractorConfig\\Tests\\": "tests/Keboola/DbExtractorConfig/"
+            "Keboola\\DbExtractorConfig\\Tests\\": "tests/"
         }
     },
     "scripts": {
-        "tests": "./vendor/bin/phpunit",
+        "tests": "phpunit",
         "phpstan": "phpstan analyse --no-progress --level=max ./src -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
