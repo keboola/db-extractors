@@ -27,23 +27,7 @@ class ActionConfigRowDefinition implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->arrayNode('db')
-                    ->children()
-                        ->scalarNode('driver')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('port')->end()
-                        ->scalarNode('database')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('user')
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('#password')
-                            ->isRequired()
-                        ->end()
-                        ->append($this->addSshNode())
-                    ->end()
-                ->end()
+                ->append($this->addDbNode())
             ->end();
         // @formatter:on
 
@@ -75,6 +59,33 @@ class ActionConfigRowDefinition implements ConfigurationInterface
                 ->scalarNode('remotePort')->end()
                 ->scalarNode('localPort')->end()
                 ->scalarNode('user')->end()
+            ->end();
+        // @formatter:on
+
+        return $node;
+    }
+
+    public function addDbNode(): NodeDefinition
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('db');
+
+        // @formatter:off
+        $node
+            ->children()
+                ->scalarNode('driver')->end()
+                ->scalarNode('host')->end()
+                ->scalarNode('port')->end()
+                ->scalarNode('database')
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('user')
+                    ->isRequired()
+                ->end()
+                ->scalarNode('#password')
+                    ->isRequired()
+                ->end()
+                ->append($this->addSshNode())
             ->end();
         // @formatter:on
 

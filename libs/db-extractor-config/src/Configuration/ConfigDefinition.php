@@ -26,23 +26,7 @@ class ConfigDefinition implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->arrayNode('db')
-                    ->children()
-                        ->scalarNode('driver')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('port')->end()
-                        ->scalarNode('database')
-                            ->isRequired()
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('user')
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('password')->end()
-                        ->scalarNode('#password')->end()
-                        ->append($this->addSshNode())
-                    ->end()
-                ->end()
+                ->append($this->addDbNode())
                 ->append($this->addTablesNode())
             ->end();
         // @formatter:on
@@ -163,5 +147,32 @@ class ConfigDefinition implements ConfigurationInterface
         ;
 
         return $definition;
+    }
+
+    public function addDbNode(): NodeDefinition
+    {
+        $builder = new TreeBuilder();
+        $node = $builder->root('db');
+
+        // @formatter:off
+        $node
+            ->children()
+                ->scalarNode('driver')->end()
+                ->scalarNode('host')->end()
+                ->scalarNode('port')->end()
+                ->scalarNode('database')
+                    ->cannotBeEmpty()
+                ->end()
+                    ->scalarNode('user')
+                    ->isRequired()
+                ->end()
+                    ->scalarNode('#password')
+                    ->isRequired()
+                ->end()
+                ->append($this->addSshNode())
+            ->end();
+        // @formatter:on
+
+        return $node;
     }
 }
