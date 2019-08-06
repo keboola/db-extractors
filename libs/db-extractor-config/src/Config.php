@@ -19,7 +19,7 @@ class Config
         $this->configuration = $configuration;
     }
 
-    public function validateParameters(array $parameters, string $action = 'run'): array
+    public function validateParameters(array $parameters): array
     {
         try {
             $processor = new Processor();
