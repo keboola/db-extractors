@@ -24,12 +24,13 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['query'] = 'select 1 from test';
         $config['parameters']['outputTable'] = 'fake.output';
 
-        try {
-            $Config = new Config(new ConfigRowDefinition());
-            $Config->validateParameters($config['parameters']);
-        } catch (ConfigUserException $e) {
-            $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
-        }
+        $exceptionMessage = 'Invalid configuration for path "parameters": ';
+        $exceptionMessage .= 'Both table and query cannot be set together.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $Config = new Config(new ConfigRowDefinition());
+        $Config->validateParameters($config['parameters']);
     }
 
     public function testInvalidConfigQueryIncremental(): void
@@ -40,12 +41,13 @@ class ConfigTest extends AbstractConfigTest
         $config['parameters']['query'] = 'select 1 from test';
         $config['parameters']['outputTable'] = 'fake.output';
 
-        try {
-            $Config = new Config(new ConfigRowDefinition());
-            $Config->validateParameters($config['parameters']);
-        } catch (ConfigUserException $e) {
-            $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
-        }
+        $exceptionMessage = 'Invalid configuration for path "parameters": ';
+        $exceptionMessage .= 'Incremental fetching is not supported for advanced queries.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $Config = new Config(new ConfigRowDefinition());
+        $Config->validateParameters($config['parameters']);
     }
 
     public function testInvalidConfigTableOrQuery(): void
@@ -54,12 +56,11 @@ class ConfigTest extends AbstractConfigTest
         unset($config['parameters']['tables']);
         $config['parameters']['outputTable'] = 'fake.output';
 
-        try {
-            $Config = new Config(new ConfigRowDefinition());
-            $Config->validateParameters($config['parameters']);
-        } catch (ConfigUserException $e) {
-            $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
-        }
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "parameters": One of table or query is required');
+
+        $Config = new Config(new ConfigRowDefinition());
+        $Config->validateParameters($config['parameters']);
     }
 
     public function testInvalidConfigsNeitherTableNorQueryWithNoName(): void
@@ -111,12 +112,12 @@ class ConfigTest extends AbstractConfigTest
         // we want to test the no results case
         $config['parameters']['query'] = 'SELECT 1 LIMIT 0';
 
-        try {
-            $Config = new Config(new ConfigRowDefinition());
-            $Config->validateParameters($config['parameters']);
-            $this->fail('Incremental fetching is not supported for advanced queries.');
-        } catch (ConfigUserException $e) {
-            $this->assertStringStartsWith('Invalid configuration', $e->getMessage());
-        }
+        $exceptionMessage = 'Invalid configuration for path "parameters": ';
+        $exceptionMessage .= 'Incremental fetching is not supported for advanced queries.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $Config = new Config(new ConfigRowDefinition());
+        $Config->validateParameters($config['parameters']);
     }
 }
