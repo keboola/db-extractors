@@ -12,10 +12,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 abstract class AbstractConfigDefinition implements ConfigurationInterface
 {
 
-    /**
-     * @return ArrayNodeDefinition|NodeDefinition
-     */
-    public function addSshNode()
+    public function addSshNode(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('ssh');
