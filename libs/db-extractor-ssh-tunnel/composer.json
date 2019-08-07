@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "keboola/retry": "^0.3",
+        "keboola/retry": "^0.4",
         "keboola/ssh-tunnel": "^1.0|^2.0",
         "psr/log": "^1.1"
     },
