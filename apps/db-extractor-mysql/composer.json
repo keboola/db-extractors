@@ -10,10 +10,14 @@
         }
     ],
     "require": {
-        "keboola/db-extractor-common": "^9.4.0",
+        "php": "^7.1",
+        "ext-PDO": "^7.1",
+        "keboola/db-extractor-common": "^9.4.1",
         "keboola/db-extractor-logger": "^1.0",
+        "keboola/php-datatypes": "^4.2",
         "keboola/php-temp": "^1.0",
         "keboola/php-utils": "^2.3.1",
+        "symfony/config": "^3.0",
         "symfony/serializer": "^3.1"
     },
     "require-dev": {
