@@ -143,7 +143,8 @@ class Oracle extends Extractor
         }
         $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
 
-        $proxy = new RetryProxy($this->logger, $maxTries);
+        /* set backoff initial interval to 1 second */
+        $proxy = new RetryProxy($this->logger, $maxTries, 1000);
         $tableName = $table['name'];
         try {
             $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
