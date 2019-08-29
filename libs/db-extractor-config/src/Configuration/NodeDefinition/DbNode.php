@@ -13,7 +13,6 @@ class DbNode implements NodeDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('db');
-        $node->ignoreExtraKeys(true);
 
         // @formatter:off
         $node

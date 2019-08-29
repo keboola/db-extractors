@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig;
 
-use Keboola\Component\Config\BaseConfig;
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Exception\UserException;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class Config extends BaseConfig
+class Config
 {
+    /** @var mixed[] */
+    protected $config;
+
     /** @var ConfigurationInterface */
     private $configDefinition;
 
@@ -44,5 +46,10 @@ class Config extends BaseConfig
             $configDefinition = new BaseConfigDefinition();
         }
         $this->configDefinition = $configDefinition;
+    }
+
+    public function getData(): array
+    {
+        return $this->config;
     }
 }
