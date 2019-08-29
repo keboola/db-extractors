@@ -9,7 +9,13 @@ services:
       CONFIG_DB_PORT: TEST_DB_PORT
       CONFIG_DB_DATABASE: TEST_DB_DATABASE
 
-  dev:
+  dev: &dev-config
     <<: *base
+    image: keboola/db-extractor-config-dev
     volumes:
       - .:/code
+
+  dev-xdebug:
+    <<: *dev-config
+    image: keboola/db-extractor-config-dev-xdebug
+    build: docker/xdebug
