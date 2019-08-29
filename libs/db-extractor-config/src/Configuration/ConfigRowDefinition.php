@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration;
 
+use Keboola\Component\Config\BaseConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ConfigRowDefinition extends AbstractConfigDefinition
+class ConfigRowDefinition extends BaseConfigDefinition
 {
-    public function getConfigTreeBuilder(): TreeBuilder
+    protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('parameters');
-        $this->addValidation($rootNode);
+        $parametersNode = $treeBuilder->root('parameters');
+        $this->addValidation($parametersNode);
 
         // @formatter:off
-        $rootNode
+        $parametersNode
             ->children()
                 ->scalarNode('data_dir')
                     ->isRequired()
@@ -25,7 +30,7 @@ class ConfigRowDefinition extends AbstractConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->addDbNode())
+                ->append(DbNode::create())
                 ->integerNode('id')
                     ->min(0)
                 ->end()
@@ -63,6 +68,28 @@ class ConfigRowDefinition extends AbstractConfigDefinition
             ->end();
         // @formatter:on
 
-        return $treeBuilder;
+        return $parametersNode;
+    }
+
+    protected function addValidation(NodeDefinition $definition): NodeDefinition
+    {
+        $definition
+            ->validate()
+            ->always(function ($v) {
+                if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
+                    throw new InvalidConfigurationException('Both table and query cannot be set together.');
+                }
+                if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
+                    throw new InvalidConfigurationException('Incremental fetching is not supported for advanced queries.');
+                }
+                if (!isset($v['table']) && !isset($v['query'])) {
+                    throw new InvalidConfigurationException(
+                        'One of table or query is required');
+                }
+                return $v;
+            })
+            ->end()
+        ;
+        return $definition;
     }
 }

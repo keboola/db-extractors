@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration;
 
+use Keboola\Component\Config\BaseConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\TablesNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class ConfigDefinition extends AbstractConfigDefinition
+class ConfigDefinition extends BaseConfigDefinition
 {
-    public function getConfigTreeBuilder(): TreeBuilder
+    protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('parameters');
+        $parametersNode = $treeBuilder->root('parameters');
         // @formatter:off
-        $rootNode
+        $parametersNode
             ->children()
                 ->scalarNode('data_dir')
                     ->isRequired()
@@ -25,62 +27,10 @@ class ConfigDefinition extends AbstractConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->addDbNode())
-                ->append($this->addTablesNode())
+                ->append(DbNode::create())
+                ->append(TablesNode::create())
             ->end();
         // @formatter:on
-        return $treeBuilder;
-    }
-
-    protected function addTablesNode(): NodeDefinition
-    {
-        $builder = new TreeBuilder();
-        $node = $builder
-            ->root('tables')
-            ->prototype('array')
-        ;
-        $node = $this->addValidation($node);
-
-        // @formatter:off
-        $node
-            ->children()
-                ->integerNode('id')
-                    ->isRequired()
-                    ->min(0)
-                ->end()
-                ->scalarNode('name')
-                    ->isRequired()
-                    ->cannotBeEmpty()
-                ->end()
-                ->scalarNode('query')->end()
-                ->arrayNode('table')
-                    ->children()
-                        ->scalarNode('schema')->end()
-                        ->scalarNode('tableName')->end()
-                    ->end()
-                ->end()
-                ->arrayNode('columns')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->scalarNode('outputTable')
-                    ->isRequired()
-                    ->cannotBeEmpty()
-                ->end()
-                ->booleanNode('incremental')
-                    ->defaultValue(false)
-                ->end()
-                ->booleanNode('enabled')
-                    ->defaultValue(true)
-                ->end()
-                ->arrayNode('primaryKey')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->integerNode('retries')
-                    ->min(0)
-                ->end()
-            ->end()
-        ;
-        // @formatter:on
-        return $node;
+        return $parametersNode;
     }
 }

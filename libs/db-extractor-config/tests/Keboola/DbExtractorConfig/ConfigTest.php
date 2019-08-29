@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Keboola\DbExtractorConfig\Tests;
 
 use Keboola\DbExtractorConfig\Config;
+use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
+use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorConfig\Test\AbstractConfigTest;
@@ -13,111 +15,228 @@ class ConfigTest extends AbstractConfigTest
 {
     public const DRIVER = 'config';
 
-    public function testInvalidConfigTableQuery(): void
+    public function testConfig(): void
     {
-        $config = $this->getConfig(self::DRIVER);
-        unset($config['parameters']['tables']);
-        $config['parameters']['table'] = [
-            'schema' => 'test',
-            'tableName' => 'test',
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'tables' => [
+                    [
+                        'id' => 1,
+                        'name' => 'sales',
+                        'query' => 'SELECT * FROM sales',
+                        'outputTable' => 'in.c-main.sales',
+                        'incremental' => false,
+                        'primaryKey' => [],
+                        'enabled' => true,
+                        'columns' => [],
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'escaping',
+                        'query' => 'SELECT * FROM escaping',
+                        'outputTable' => 'in.c-main.escaping',
+                        'incremental' => false,
+                        'primaryKey' => [
+                            0 => 'orderId',
+                        ],
+                        'enabled' => true,
+                        'columns' => [],
+                    ],
+                    [
+                        'id' => 3,
+                        'enabled' => true,
+                        'name' => 'tableColumns',
+                        'outputTable' => 'in.c-main.tableColumns',
+                        'incremental' => false,
+                        'primaryKey' => [],
+                        'table' => [
+                            'schema' => 'test',
+                            'tableName' => 'sales',
+                        ],
+                        'columns' => [
+                            0 => 'usergender',
+                            1 => 'usercity',
+                            2 => 'usersentiment',
+                            3 => 'zipcode',
+                        ],
+                    ],
+                ],
+            ],
         ];
-        $config['parameters']['query'] = 'select 1 from test';
-        $config['parameters']['outputTable'] = 'fake.output';
 
-        $exceptionMessage = 'Invalid configuration for path "parameters": ';
-        $exceptionMessage .= 'Both table and query cannot be set together.';
-        $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        $config = new Config($configurationArray, new ConfigDefinition());
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testConfigRow(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'incremental' => true,
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'auto_increment_timestamp',
+                    'schema' => 'test',
+                ],
+                'name' => 'auto-increment-timestamp',
+                'incrementalFetchingColumn' => '_weird-I-d',
+                'primaryKey' => [],
+                'columns' => [],
+                'enabled' => true
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testConfigActionRow(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+
+        $this->assertEquals($configurationArray, $config->getData());
     }
 
     public function testInvalidConfigQueryIncremental(): void
     {
-        $config = $this->getConfig(self::DRIVER);
-        unset($config['parameters']['tables']);
-        $config['parameters']['incrementalFetchingColumn'] = 'test';
-        $config['parameters']['query'] = 'select 1 from test';
-        $config['parameters']['outputTable'] = 'fake.output';
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'fake.output',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'query' => 'select 1 from test',
+                'incrementalFetchingColumn' => 'test',
+            ],
+        ];
 
-        $exceptionMessage = 'Invalid configuration for path "parameters": ';
-        $exceptionMessage .= 'Incremental fetching is not supported for advanced queries.';
+        $exceptionMessage = 'Incremental fetching is not supported for advanced queries.';
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 
     public function testInvalidConfigTableOrQuery(): void
     {
-        $config = $this->getConfig(self::DRIVER);
-        unset($config['parameters']['tables']);
-        $config['parameters']['outputTable'] = 'fake.output';
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'fake.output',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+            ],
+        ];
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "parameters": One of table or query is required');
+        $this->expectExceptionMessage('One of table or query is required');
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 
     public function testInvalidConfigsNeitherTableNorQueryWithNoName(): void
     {
-        $config = $this->getConfigRow(self::DRIVER);
-        unset($config['parameters']['query']);
-        unset($config['parameters']['table']);
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'fake.output',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'schema' => 'test',
+                ],
+            ],
+        ];
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('Invalid configuration for path "parameters": One of table or query is required');
+        $this->expectExceptionMessage('The child node "tableName" at path "root.parameters.table" must be configured.');
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 
     public function testInvalidConfigsInvalidTableWithNoName(): void
     {
-        $config = $this->getConfigRow(self::DRIVER);
-        unset($config['parameters']['name'], $config['parameters']['query']);
-        $config['parameters']['table'] = ['tableName' => 'sales'];
-        $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('The child node "schema" at path "parameters.table" must be configured.');
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'auto_increment_timestamp',
+                ],
+            ],
+        ];
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The child node "schema" at path "root.parameters.table" must be configured.');
+
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 
-    public function testInvalidConfigsBothTableAndQueryWithNoName(): void
+    public function testInvalidConfigsBothTableAndQuery(): void
     {
-        $config = $this->getConfigRow(self::DRIVER);
-        $config['parameters']['table'] = ['tableName' => 'sales', 'schema' => 'test'];
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'fake.output',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'test',
+                    'schema' => 'test',
+                ],
+                'query' => 'select 1 from test',
+            ],
+        ];
 
-        // we want to test the no results case
-        $config['parameters']['query'] = 'SELECT 1 LIMIT 0';
+        $exceptionMessage = 'Both table and query cannot be set together.';
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('Both table and query cannot be set together.');
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 
     public function testInvalidConfigsBothIncrFetchAndQueryWithNoName(): void
     {
-        $config = $this->getConfigRow(self::DRIVER);
-        unset($config['parameters']['table']);
-        $config['parameters']['incrementalFetchingColumn'] = 'abc';
+        $configurationArray = [
+            'parameters' => [
+                'outputTable' => 'fake.output',
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'incrementalFetchingColumn' => 'abc',
+                'query' => 'select 1 limit 0',
+            ],
+        ];
 
-        // we want to test the no results case
-        $config['parameters']['query'] = 'SELECT 1 LIMIT 0';
+        $exceptionMessage = 'Incremental fetching is not supported for advanced queries.';
 
-        $exceptionMessage = 'Invalid configuration for path "parameters": ';
-        $exceptionMessage .= 'Incremental fetching is not supported for advanced queries.';
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $Config = new Config(new ConfigRowDefinition());
-        $Config->validateParameters($config['parameters']);
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 }

@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration;
 
+use Keboola\Component\Config\BaseConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class ActionConfigRowDefinition extends AbstractConfigDefinition
+class ActionConfigRowDefinition extends BaseConfigDefinition
 {
-    public function getConfigTreeBuilder(): TreeBuilder
+    protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('parameters');
+        $parametersNode = $treeBuilder->root('parameters');
 
         // @formatter:off
-        $rootNode
+        $parametersNode
             ->children()
                 ->scalarNode('data_dir')
                     ->isRequired()
@@ -27,10 +27,10 @@ class ActionConfigRowDefinition extends AbstractConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->addDbNode())
+                ->append(DbNode::create())
             ->end();
         // @formatter:on
 
-        return $treeBuilder;
+        return $parametersNode;
     }
 }

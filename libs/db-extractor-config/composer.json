@@ -4,8 +4,9 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "symfony/config": "^3.0",
-        "symfony/yaml": "^3.0"
+        "keboola/php-component": "^7.0",
+        "symfony/config": "^4.2",
+        "symfony/yaml": "^4.2"
     },
     "require-dev": {
         "keboola/coding-standard": "^8.0",
