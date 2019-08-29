@@ -94,7 +94,7 @@ class ConfigTest extends AbstractConfigTest
                 'incrementalFetchingColumn' => '_weird-I-d',
                 'primaryKey' => [],
                 'columns' => [],
-                'enabled' => true
+                'enabled' => true,
             ],
         ];
 

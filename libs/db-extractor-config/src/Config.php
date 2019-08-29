@@ -19,8 +19,7 @@ class Config extends BaseConfig
     public function __construct(
         array $config,
         ?ConfigurationInterface $configDefinition = null
-    )
-    {
+    ) {
         $this->setConfigDefinition($configDefinition);
         $this->setConfig($config);
     }

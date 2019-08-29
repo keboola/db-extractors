@@ -80,11 +80,11 @@ class ConfigRowDefinition extends BaseConfigDefinition
                     throw new InvalidConfigurationException('Both table and query cannot be set together.');
                 }
                 if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
-                    throw new InvalidConfigurationException('Incremental fetching is not supported for advanced queries.');
+                    $message = 'Incremental fetching is not supported for advanced queries.';
+                    throw new InvalidConfigurationException($message);
                 }
                 if (!isset($v['table']) && !isset($v['query'])) {
-                    throw new InvalidConfigurationException(
-                        'One of table or query is required');
+                    throw new InvalidConfigurationException('One of table or query is required');
                 }
                 return $v;
             })
