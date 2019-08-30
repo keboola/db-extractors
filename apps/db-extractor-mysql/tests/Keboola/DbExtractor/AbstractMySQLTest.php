@@ -6,9 +6,9 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
+use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 use PDO;
 

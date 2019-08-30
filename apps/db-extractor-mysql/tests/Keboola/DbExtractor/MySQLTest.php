@@ -171,6 +171,7 @@ class MySQLTest extends AbstractMySQLTest
     public function testUserException(): void
     {
         $this->expectException(UserException::class);
+
         $config = $this->getConfig('mysql');
 
         $config['parameters']['db']['host'] = 'nonexistinghost';

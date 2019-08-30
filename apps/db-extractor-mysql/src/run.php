@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Keboola\DbExtractor\MySQLApplication;
-use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Yaml\Yaml;
