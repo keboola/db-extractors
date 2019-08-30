@@ -11,6 +11,8 @@ services:
 
   dev: &dev-config
     <<: *base
+    build:
+      context: .
     image: keboola/db-extractor-config-dev
     volumes:
       - .:/code
