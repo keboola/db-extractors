@@ -8,5 +8,5 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 interface NodeDefinitionInterface
 {
-    public static function create(): NodeDefinition;
+    public function create(): NodeDefinition;
 }

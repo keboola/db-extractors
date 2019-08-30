@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class TablesNode implements NodeDefinitionInterface
 {
-    public static function create(): NodeDefinition
+    public function create(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('tables');

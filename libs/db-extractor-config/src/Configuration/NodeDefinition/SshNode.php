@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class SshNode implements NodeDefinitionInterface
 {
-    public static function create(): NodeDefinition
+    public function create(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('ssh');
@@ -20,7 +20,6 @@ class SshNode implements NodeDefinitionInterface
                 ->booleanNode('enabled')->end()
                 ->arrayNode('keys')
                     ->children()
-                        ->scalarNode('private')->end()
                         ->scalarNode('#private')->end()
                         ->scalarNode('public')->end()
                     ->end()

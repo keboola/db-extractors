@@ -9,7 +9,19 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class DbNode implements NodeDefinitionInterface
 {
-    public static function create(): NodeDefinition
+    /** @var NodeDefinition */
+    private $sshNode;
+
+    public function __construct(?NodeDefinitionInterface $sshNode = null)
+    {
+        if (is_null($sshNode)) {
+            $sshNode = new SshNode();
+        }
+
+        $this->sshNode = $sshNode->create();
+    }
+
+    public function create(): NodeDefinition
     {
         $builder = new TreeBuilder();
         $node = $builder->root('db');
@@ -29,7 +41,7 @@ class DbNode implements NodeDefinitionInterface
                 ->scalarNode('#password')
                     ->isRequired()
                 ->end()
-                ->append(SshNode::create())
+                ->append($this->sshNode)
             ->end()
         ;
         // @formatter:on

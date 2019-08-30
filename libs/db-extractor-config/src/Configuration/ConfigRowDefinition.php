@@ -6,6 +6,7 @@ namespace Keboola\DbExtractorConfig\Configuration;
 
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\NodeDefinitionInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -13,9 +14,24 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigRowDefinition extends BaseConfigDefinition
 {
+    /** @var NodeDefinition */
+    protected $dbNodeDefinition;
+
+    public function __construct(
+        ?NodeDefinitionInterface $dbNode = null,
+        ?NodeDefinitionInterface $sshNode = null
+    ) {
+        if (is_null($dbNode)) {
+            $dbNode = new DbNode($sshNode);
+        }
+        $this->dbNodeDefinition = $dbNode->create();
+    }
+
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder();
+
+        /** @var ArrayNodeDefinition $parametersNode */
         $parametersNode = $treeBuilder->root('parameters');
         $this->addValidation($parametersNode);
 
@@ -30,7 +46,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append(DbNode::create())
+                ->append($this->dbNodeDefinition)
                 ->integerNode('id')
                     ->min(0)
                 ->end()
