@@ -4,30 +4,33 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration\NodeDefinition;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
-class DbNode implements NodeDefinitionInterface
+class DbNode extends ArrayNodeDefinition
 {
-    /** @var NodeDefinition */
-    private $sshNode;
+    public const NODE_NAME = 'db';
 
-    public function __construct(?NodeDefinitionInterface $sshNode = null)
+    /** @var NodeDefinition */
+    protected $sshNode;
+
+    public function __construct(?SshNode $sshNode = null, ?NodeParentInterface $parent = null)
     {
+        parent::__construct(self::NODE_NAME, $parent);
+
         if (is_null($sshNode)) {
             $sshNode = new SshNode();
         }
+        $this->sshNode = $sshNode;
 
-        $this->sshNode = $sshNode->create();
+        $this->init();
     }
 
-    public function create(): NodeDefinition
+    protected function init(): void
     {
-        $builder = new TreeBuilder();
-        $node = $builder->root('db');
-
         // @formatter:off
-        $node
+        $this
             ->children()
                 ->scalarNode('driver')->end()
                 ->scalarNode('host')->end()
@@ -45,7 +48,5 @@ class DbNode implements NodeDefinitionInterface
             ->end()
         ;
         // @formatter:on
-
-        return $node;
     }
 }

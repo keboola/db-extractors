@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration\NodeDefinition;
 
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class TablesNode implements NodeDefinitionInterface
+class TablesNode extends ArrayNodeDefinition
 {
-    public function create(): NodeDefinition
-    {
-        $builder = new TreeBuilder();
-        $node = $builder->root('tables');
+    public const NODE_NAME = 'tables';
 
+    public function __construct(?NodeParentInterface $parent = null)
+    {
+        parent::__construct(self::NODE_NAME, $parent);
+
+        $this->init();
+    }
+
+    protected function init(): void
+    {
         // @formatter:off
-        $node
+        $this
             ->prototype('array')
             ->validate()->always(function ($v) {
                 if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
@@ -31,7 +37,6 @@ class TablesNode implements NodeDefinitionInterface
                 }
                 return $v;
             })->end()
-            ->ignoreExtraKeys(true)
             ->children()
                 ->integerNode('id')
                     ->isRequired()
@@ -70,7 +75,5 @@ class TablesNode implements NodeDefinitionInterface
             ->end()
         ;
         // @formatter:on
-
-        return $node;
     }
 }

@@ -6,7 +6,7 @@ namespace Keboola\DbExtractorConfig\Configuration;
 
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
-use Keboola\DbExtractorConfig\Configuration\NodeDefinition\NodeDefinitionInterface;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SshNode;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -18,13 +18,13 @@ class ConfigRowDefinition extends BaseConfigDefinition
     protected $dbNodeDefinition;
 
     public function __construct(
-        ?NodeDefinitionInterface $dbNode = null,
-        ?NodeDefinitionInterface $sshNode = null
+        ?DbNode $dbNode = null,
+        ?SshNode $sshNode = null
     ) {
         if (is_null($dbNode)) {
             $dbNode = new DbNode($sshNode);
         }
-        $this->dbNodeDefinition = $dbNode->create();
+        $this->dbNodeDefinition = $dbNode;
     }
 
     protected function getParametersDefinition(): ArrayNodeDefinition
