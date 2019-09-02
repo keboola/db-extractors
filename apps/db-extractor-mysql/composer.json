@@ -16,8 +16,8 @@
         "keboola/db-extractor-config": "^1.0",
         "keboola/db-extractor-logger": "^1.0",
         "keboola/php-datatypes": "^4.2",
-        "keboola/php-temp": "^1.0",
-        "keboola/php-utils": "^3.0",
+        "keboola/php-temp": "^2.0",
+        "keboola/php-utils": "^4.0",
         "symfony/config": "^4.3",
         "symfony/serializer": "^4.3"
     },
