@@ -87,7 +87,7 @@ class MySQL extends Extractor
             $this->database = $params['database'];
         }
 
-        $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
+        $this->logger->info('Connecting to DSN \'' . $dsn . '\' ' . ($isSsl ? 'Using SSL' : ''));
 
         try {
             $pdo = new PDO($dsn, $params['user'], $params['#password'], $options);
@@ -108,7 +108,7 @@ class MySQL extends Extractor
         $pdo->exec('SET NAMES utf8;');
 
         if ($isSsl) {
-            $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(PDO::FETCH_ASSOC);
+            $status = $pdo->query('SHOW STATUS LIKE \'Ssl_cipher\';')->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value'])) {
                 throw new UserException(sprintf('Connection is not encrypted'));
@@ -118,7 +118,7 @@ class MySQL extends Extractor
         }
 
         if ($isCompression) {
-            $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(PDO::FETCH_ASSOC);
+            $status = $pdo->query('SHOW SESSION STATUS LIKE \'Compression\';')->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
                 throw new UserException(sprintf('Network communication is not compressed'));

@@ -103,7 +103,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                 [
                     'lastFetchedRow' => 4,
                 ],
-                "SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= '4' ORDER BY `_weird-I-d` LIMIT 10",
+                'SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= \'4\' ORDER BY `_weird-I-d` LIMIT 10',
             ],
             // test simplePDO query timestamp column but no state and no limit
             [
@@ -133,7 +133,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                 [
                     'lastFetchedRow' => 4,
                 ],
-                "SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= '4' ORDER BY `_weird-I-d`",
+                'SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= \'4\' ORDER BY `_weird-I-d`',
             ],
         ];
     }

@@ -10,7 +10,7 @@ class MySQLSSLTest extends AbstractMySQLTest
 {
     public function testSSLEnabled(): void
     {
-        $status = $this->pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(\PDO::FETCH_ASSOC);
+        $status = $this->pdo->query('SHOW STATUS LIKE \'Ssl_cipher\';')->fetch(\PDO::FETCH_ASSOC);
 
         $this->assertArrayHasKey('Value', $status);
         $this->assertNotEmpty($status['Value']);

@@ -618,7 +618,7 @@ class MySQLTest extends AbstractMySQLTest
         $app = $this->createApplication($config);
 
         $result = $app->run();
-        echo "\nThere are " . count($result['tables']) . " tables\n";
+        echo '\nThere are ' . count($result['tables']) . ' tables\n';
     }
 
     public function testWeirdColumnNames(): void
