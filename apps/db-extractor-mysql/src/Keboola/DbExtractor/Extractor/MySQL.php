@@ -41,7 +41,7 @@ class MySQL extends Extractor
         if (!empty($params['ssl']) && !empty($params['ssl']['enabled'])) {
             $ssl = $params['ssl'];
 
-            $temp = new Temp(getenv('APP_NAME') ? getenv('APP_NAME') : 'ex-db-mysql');
+            $temp = new Temp(getenv('APP_NAME') ? (string) getenv('APP_NAME') : 'ex-db-mysql');
 
             if (!empty($ssl['key'])) {
                 $options[PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
