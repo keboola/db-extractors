@@ -115,8 +115,8 @@ class OracleTest extends OracleBaseTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getPrivateKey('oracle'),
-                'public' => $this->getEnv('oracle', 'DB_SSH_KEY_PUBLIC')
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey()
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -141,8 +141,8 @@ class OracleTest extends OracleBaseTest
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
-                '#private' => $this->getPrivateKey('oracle'),
-                'public' => $this->getEnv('oracle', 'DB_SSH_KEY_PUBLIC')
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey()
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
