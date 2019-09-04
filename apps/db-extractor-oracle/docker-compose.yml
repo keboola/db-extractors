@@ -11,8 +11,6 @@ services:
     tty: true
     stdin_open: true
     command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
-    env_file:
-      - ssh-keys.env
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
@@ -30,8 +28,6 @@ services:
     tty: true
     stdin_open: true
     command: ["./wait-for-it.sh", "oracle:8080", "-t", "120", "--", "./vendor/bin/phpunit"]
-    env_file:
-      - ssh-keys.env
     environment:
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
@@ -50,6 +46,7 @@ services:
       - "1521:1521"
 
   sshproxy:
+    image: db-ex-oracle-sshproxy
     build: ./tests/env/sshproxy
     volumes:
         - ./tests/env/sshproxy:/code

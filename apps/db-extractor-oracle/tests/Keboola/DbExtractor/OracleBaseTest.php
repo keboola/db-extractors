@@ -284,4 +284,14 @@ EOT;
             [self::CONFIG_FORMAT_JSON],
         ];
     }
+
+    public function getPrivateKey(): string
+    {
+        return (string) file_get_contents('/root/.ssh/id_rsa');
+    }
+
+    public function getPublicKey(): string
+    {
+        return (string) file_get_contents('/root/.ssh/id_rsa.pub');
+    }
 }

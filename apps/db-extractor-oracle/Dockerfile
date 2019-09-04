@@ -1,3 +1,4 @@
+FROM db-ex-oracle-sshproxy AS sshproxy
 FROM quay.io/keboola/aws-cli
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ACCESS_KEY_ID
@@ -36,7 +37,7 @@ RUN ldconfig
 
 RUN mkdir -p /usr/share/man/man1
 
-COPY --from=0 /tmp/oracle-jdk.tar.gz /tmp/oracle-jdk.tar.gz
+COPY --from=1 /tmp/oracle-jdk.tar.gz /tmp/oracle-jdk.tar.gz
 
 RUN mkdir /usr/lib/jvm/ && tar zxvf /tmp/oracle-jdk.tar.gz -C /usr/lib/jvm/ \
  && update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 4 \
@@ -55,5 +56,7 @@ WORKDIR /code
 # Initialize
 COPY . /code
 RUN composer selfupdate && composer install --no-interaction
+
+COPY --from=sshproxy /root/.ssh /root/.ssh
 
 CMD php ./src/run.php --data=/data
