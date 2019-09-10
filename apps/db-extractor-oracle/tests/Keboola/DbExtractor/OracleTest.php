@@ -66,12 +66,13 @@ class OracleTest extends OracleBaseTest
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
 
         $this->assertFileExists($outputCsvFile);
-        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest';
         $this->assertFileExists(
-            $manifestPath
+            $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'
         );
+
+        $fileNameManifest = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest';
         $manifest = json_decode(
-            (string) file_get_contents($manifestPath),
+            (string) file_get_contents($fileNameManifest),
             true
         );
         $this->assertEquals(['funnY_col', 's_d_col'], $manifest['columns']);
@@ -166,8 +167,8 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
 
         $this->assertFileExists($outputCsvFile);
-        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
-        $this->assertFileExists($manifestPath);
+        $filenameManifest = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
+        $this->assertFileExists($filenameManifest);
         // will check this one line by line because it randomly orders it sometimes
         $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
@@ -1258,8 +1259,9 @@ class OracleTest extends OracleBaseTest
 \"goodbye\",\"<test>some test xml </test>\"\n",
             $output
         );
-        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
-        $this->assertFileExists($manifestPath);
+
+        $filenameManifest = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
+        $this->assertFileExists($filenameManifest);
     }
 
     public function testTrailingSemiColon(): void

@@ -12,10 +12,10 @@ use Keboola\Csv\CsvFile;
 
 abstract class OracleBaseTest extends ExtractorTest
 {
-    /** @var resource */
+    /** @var mixed */
     protected $connection;
 
-    /** @var string */
+    /** @var string  */
     protected $dataDir = __DIR__ . '/../../data';
 
     public const DRIVER = 'oracle';
@@ -66,11 +66,7 @@ abstract class OracleBaseTest extends ExtractorTest
         if ($adminConnection) {
             oci_close($adminConnection);
         }
-        $ociConnect = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
-        if (!is_resource($ociConnect)) {
-            throw new Exception('Cannot connect to database');
-        }
-        $this->connection = $ociConnect;
+        $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
         $this->setupTestTables();
         $this->createClobTable();
         $this->createRegionsTable();
@@ -79,7 +75,7 @@ abstract class OracleBaseTest extends ExtractorTest
 
     public function tearDown(): void
     {
-        if (is_resource($this->connection)) {
+        if ($this->connection) {
             oci_close($this->connection);
         }
         parent::tearDown();
@@ -87,14 +83,12 @@ abstract class OracleBaseTest extends ExtractorTest
 
     private function cleanupOutputDirectory(): void
     {
-        $tablesDir = $this->dataDir . '/out/tables';
-        if (file_exists($tablesDir)) {
-            $dh = opendir($tablesDir);
-            if (!is_resource($dh)) {
-                throw new Exception(sprintf('"%s" is not a directory', $tablesDir));
-            }
-            while (false !== ($file = readdir($dh))) {
-                @unlink($file);
+        if (file_exists($this->dataDir . '/out/tables')) {
+            $dh = opendir($this->dataDir . '/out/tables');
+            if ($dh) {
+                while (false !== ($file = readdir($dh))) {
+                    @unlink($file);
+                }
             }
         }
     }
@@ -110,13 +104,15 @@ abstract class OracleBaseTest extends ExtractorTest
     }
 
     /**
-     * @param resource $connection
+     * @param mixed $connection
+     * @param string $sql
+     * @throws \Throwable
      */
     private function executeStatement($connection, string $sql): void
     {
         $stmt = oci_parse($connection, $sql);
-        if (!is_resource($stmt)) {
-            throw new Exception(sprintf('Cannot parse "%s"', $sql));
+        if (!$stmt) {
+            throw new Exception(sprintf('Can\'t parse sql statement %s', $sql));
         }
         try {
             oci_execute($stmt);
@@ -272,8 +268,8 @@ EOT;
 
         $sql = sprintf('SELECT COUNT(*) AS ITEMSCOUNT FROM %s', $tableName);
         $stmt = oci_parse($this->connection, $sql);
-        if (!is_resource($stmt)) {
-            throw new Exception(sprintf('Cannot parse "%s"', $sql));
+        if (!$stmt) {
+            throw new Exception(sprintf('Can\'t parse sql statement %s', $sql));
         }
         oci_execute($stmt);
         $row = oci_fetch_assoc($stmt);

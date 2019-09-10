@@ -284,10 +284,7 @@ class Oracle extends Extractor
         }
     }
 
-    /**
-     * @param mixed $obj
-     */
-    private function quote($obj): string
+    private function quote(string $obj): string
     {
         return "\"{$obj}\"";
     }
