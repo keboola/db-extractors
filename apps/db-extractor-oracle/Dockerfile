@@ -5,7 +5,7 @@ ARG AWS_ACCESS_KEY_ID
 ARG AWS_SESSION_TOKEN
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u211-linux-x64.tar.gz /tmp/oracle-jdk.tar.gz
 
-FROM php:7.1
+FROM php:7.3-cli-stretch
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV TZ=UTC

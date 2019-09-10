@@ -1,5 +1,8 @@
 {
     "name": "keboola/db-extractor-oracle",
+    "license": "MIT",
+    "type": "Application",
+    "description": "Reads data from Oracle databases for keboola connection",
     "authors": [
         {
             "name": "Keboola",
@@ -12,9 +15,9 @@
         "keboola/php-temp": "~1.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0",
-        "squizlabs/php_codesniffer": "^2.6",
-        "phpstan/phpstan-shim": "^0.8"
+        "keboola/coding-standard": "^8.0",
+        "phpstan/phpstan-shim": "^0.11.15",
+        "phpunit/phpunit": "^8.3"
     },
     "autoload": {
         "psr-4": {
@@ -25,5 +28,22 @@
         "psr-4": {
             "Keboola\\DbExtractor\\Tests\\": "tests/Keboola/DbExtractor"
         }
+    },
+    "scripts": {
+        "tests": "./wait-for-it.sh oracle:8080 -t 120 -- phpunit",
+        "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon",
+        "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
+        "build": [
+            "@phpcs",
+            "@phpstan",
+            "@tests"
+        ],
+        "ci": [
+            "@composer validate --no-check-all --strict",
+            "@build"
+        ]
+    },
+    "config": {
+        "sort-packages": true
     }
 }
