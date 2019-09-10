@@ -15,7 +15,6 @@ class ApplicationTest extends OracleBaseTest
     protected $rootPath = __DIR__ . '/../../..';
 
     /**
-     * @param $configType
      * @dataProvider configTypesProvider
      */
     public function testTestConnectionAction(string $configType): void
@@ -34,7 +33,6 @@ class ApplicationTest extends OracleBaseTest
     }
 
     /**
-     * @param $configType
      * @dataProvider configTypesProvider
      */
     public function testRunAction(string $configType): void
@@ -149,7 +147,6 @@ class ApplicationTest extends OracleBaseTest
     }
 
     /**
-     * @param $configType
      * @dataProvider configTypesProvider
      */
     public function testGetTablesAction(string $configType): void
@@ -168,7 +165,6 @@ class ApplicationTest extends OracleBaseTest
     }
 
     /**
-     * @param $configType
      * @dataProvider configTypesProvider
      */
     public function testGetTablesNoColumns(string $configType): void

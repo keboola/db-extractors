@@ -54,7 +54,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(99, $result['imported'][0]['rows']);
 
         // will check this one line by line because it randomly orders it sometimes
-        $output = file_get_contents($outputCsvFile);
+        $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
@@ -66,11 +66,12 @@ class OracleTest extends OracleBaseTest
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
 
         $this->assertFileExists($outputCsvFile);
+        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest';
         $this->assertFileExists(
-            $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'
+            $manifestPath
         );
         $manifest = json_decode(
-            file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'),
+            (string) file_get_contents($manifestPath),
             true
         );
         $this->assertEquals(['funnY_col', 's_d_col'], $manifest['columns']);
@@ -87,7 +88,7 @@ class OracleTest extends OracleBaseTest
             $outputCsvFile . '.manifest'
         );
         $this->assertEquals(99, $result['imported'][2]['rows']);
-        $output = file_get_contents($outputCsvFile);
+        $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
         foreach ($outputLines as $line) {
@@ -165,9 +166,10 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
 
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
+        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
+        $this->assertFileExists($manifestPath);
         // will check this one line by line because it randomly orders it sometimes
-        $output = file_get_contents($outputCsvFile);
+        $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
@@ -178,7 +180,7 @@ class OracleTest extends OracleBaseTest
 
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
         $this->assertFileExists($outputCsvFile);
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest');
+        $this->assertFileExists($outputCsvFile . '.manifest');
         $this->assertEquals(file_get_contents($escapingCsv->getPathname()), file_get_contents($outputCsvFile));
     }
 
@@ -980,7 +982,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         $outputManifest = Yaml::parse(
-            file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest')
+            (string) file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest')
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
@@ -1256,7 +1258,8 @@ class OracleTest extends OracleBaseTest
 \"goodbye\",\"<test>some test xml </test>\"\n",
             $output
         );
-        $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
+        $manifestPath = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
+        $this->assertFileExists($manifestPath);
     }
 
     public function testTrailingSemiColon(): void

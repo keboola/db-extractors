@@ -9,16 +9,15 @@ use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
 use Keboola\Utils;
+use OutOfBoundsException;
 use Symfony\Component\Process\Process;
 
 use Throwable;
 
 class Oracle extends Extractor
 {
-    const TABLELESS_CONFIG_FILE = 'tableless.json';
-    const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
-
-    protected $db;
+    private const TABLELESS_CONFIG_FILE = 'tableless.json';
+    private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
 
     /** @var  array */
     protected $dbParams;
@@ -196,7 +195,7 @@ class Oracle extends Extractor
         $output = $process->getOutput();
         $this->logger->info($output);
 
-        $fetchedPos = strpos($output, 'Fetched');
+        $fetchedPos = (int) strpos($output, 'Fetched');
         $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
         $linesWritten = (int) filter_var(
             $rowCountStr,
@@ -250,7 +249,7 @@ class Oracle extends Extractor
             throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
         }
 
-        $tableListing = json_decode(file_get_contents($this->dataDir . '/tables.json'), true);
+        $tableListing = json_decode((string) file_get_contents($this->dataDir . '/tables.json'), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
                 'Cannot parse JSON data of table listing - error: ' . json_last_error()
@@ -285,7 +284,10 @@ class Oracle extends Extractor
         }
     }
 
-    private function quote($obj)
+    /**
+     * @param mixed $obj
+     */
+    private function quote($obj): string
     {
         return "\"{$obj}\"";
     }
