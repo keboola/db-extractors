@@ -29,7 +29,7 @@ class ApplicationTest extends OracleBaseTest
         $process->run();
 
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
         $this->assertJson($process->getOutput());
     }
 
@@ -163,7 +163,7 @@ class ApplicationTest extends OracleBaseTest
         $process->run();
 
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
         $this->assertJson($process->getOutput());
     }
 
@@ -187,7 +187,7 @@ class ApplicationTest extends OracleBaseTest
         self::assertCount(10, $data['tables']);
         self::assertArrayNotHasKey('columns', $data['tables'][0]);
         self::assertEquals(0, $process->getExitCode());
-        self::assertEquals("", $process->getErrorOutput());
+        self::assertEquals('', $process->getErrorOutput());
     }
 
     public function testGetTablesOneTableNoColumns(): void
@@ -212,7 +212,7 @@ class ApplicationTest extends OracleBaseTest
         self::assertEquals('REGIONS', $data['tables'][0]['name']);
         self::assertArrayNotHasKey('columns', $data['tables'][0]);
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
     }
 
     public function testRunError(): void
@@ -222,7 +222,7 @@ class ApplicationTest extends OracleBaseTest
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][3]['table']);
-        $config['parameters']['tables'][3]['query'] = "SELECT SOMETHING ORDER BY INVALID FROM \"invalid\".\"escaping\"";
+        $config['parameters']['tables'][3]['query'] = 'SELECT SOMETHING ORDER BY INVALID FROM "invalid"."escaping"';
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
@@ -230,12 +230,12 @@ class ApplicationTest extends OracleBaseTest
         $process->run();
 
         $this->assertEquals(1, $process->getExitCode());
-        $this->assertContains("Export process failed:", $process->getErrorOutput());
+        $this->assertContains('Export process failed:', $process->getErrorOutput());
         // verify that it retries 5 times
-        $this->assertContains("[4x]", $process->getOutput());
+        $this->assertContains('[4x]', $process->getOutput());
     }
 
-    private function putConfig(array $config, string $configType)
+    private function putConfig(array $config, string $configType): void
     {
         @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
@@ -244,7 +244,7 @@ class ApplicationTest extends OracleBaseTest
         } else if ($configType === self::CONFIG_FORMAT_JSON) {
             file_put_contents($this->dataDir . '/config.json', json_encode($config));
         } else {
-            throw new UserException(sprintf("Unsupported configuration type: [%s]", $configType));
+            throw new UserException(sprintf('Unsupported configuration type: [%s]', $configType));
         }
     }
 }

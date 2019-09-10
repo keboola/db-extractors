@@ -58,7 +58,7 @@ class OracleTest extends OracleBaseTest
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
-            if (trim($line) !== "") {
+            if (trim($line) !== '') {
                 $this->assertContains($line, $origContents);
             }
         }
@@ -73,8 +73,8 @@ class OracleTest extends OracleBaseTest
             file_get_contents($this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest'),
             true
         );
-        $this->assertEquals(["funnY_col", "s_d_col"], $manifest['columns']);
-        $this->assertEquals(["funnY_col"], $manifest["primary_key"]);
+        $this->assertEquals(['funnY_col', 's_d_col'], $manifest['columns']);
+        $this->assertEquals(['funnY_col'], $manifest['primary_key']);
         $this->assertEquals(7, $result['imported'][1]['rows']);
         $this->assertEquals(
             file_get_contents($this->dataDir . '/oracle/headerlessEscaping.csv'),
@@ -91,7 +91,7 @@ class OracleTest extends OracleBaseTest
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
         foreach ($outputLines as $line) {
-            if (trim($line) !== "") {
+            if (trim($line) !== '') {
                 $this->assertContains($line, $origContents);
             }
         }
@@ -116,7 +116,7 @@ class OracleTest extends OracleBaseTest
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getPrivateKey(),
-                'public' => $this->getPublicKey()
+                'public' => $this->getPublicKey(),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -142,7 +142,7 @@ class OracleTest extends OracleBaseTest
             'enabled' => true,
             'keys' => [
                 '#private' => $this->getPrivateKey(),
-                'public' => $this->getPublicKey()
+                'public' => $this->getPublicKey(),
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
@@ -171,7 +171,7 @@ class OracleTest extends OracleBaseTest
         $outputLines = explode("\n", $output);
         $origContents = file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
-            if (trim($line) !== "") {
+            if (trim($line) !== '') {
                 $this->assertContains($line, $origContents);
             }
         }
@@ -965,7 +965,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals($expectedTables, $result['tables']);
     }
 
-    public function testMetadataManifest():void
+    public function testMetadataManifest(): void
     {
         $config = $this->getConfig('oracle');
 
@@ -1223,10 +1223,9 @@ class OracleTest extends OracleBaseTest
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][3]['table']);
-        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5";
+        $config['parameters']['tables'][3]['query'] = 'SELECT * FROM HR.REGIONS WHERE REGION_ID > 5';
 
         $result = ($this->createApplication($config)->run());
-
 
         $this->assertArrayHasKey('status', $result);
         $this->assertEquals('success', $result['status']);
@@ -1272,7 +1271,7 @@ class OracleTest extends OracleBaseTest
         unset($config['parameters']['tables'][1]);
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][3]['table']);
-        $config['parameters']['tables'][3]['query'] = "SELECT * FROM HR.REGIONS;";
+        $config['parameters']['tables'][3]['query'] = 'SELECT * FROM HR.REGIONS;';
 
         $result = ($this->createApplication($config))->run();
         $this->assertEquals('success', $result['status']);

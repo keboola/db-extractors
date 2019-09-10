@@ -28,29 +28,29 @@ abstract class OracleBaseTest extends ExtractorTest
         $adminConnection = @oci_connect('system', 'oracle', $dbString, 'AL32UTF8');
         if (!$adminConnection) {
             $error = oci_error();
-            echo "ADMIN CONNECTION ERROR: " . $error['message'];
+            echo 'ADMIN CONNECTION ERROR: ' . $error['message'];
         } else {
             try {
                 // create test user
                 $this->executeStatement(
                     $adminConnection,
-                    sprintf("CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users", $dbConfig['user'], $dbConfig['#password'])
+                    sprintf('CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users', $dbConfig['user'], $dbConfig['#password'])
                 );
 
                 // provide roles
                 $this->executeStatement(
                     $adminConnection,
-                    sprintf("GRANT CONNECT,RESOURCE,DBA TO %s", $dbConfig['user'])
+                    sprintf('GRANT CONNECT,RESOURCE,DBA TO %s', $dbConfig['user'])
                 );
 
                 // grant privileges
                 $this->executeStatement(
                     $adminConnection,
-                    sprintf("GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s", $dbConfig['user'])
+                    sprintf('GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s', $dbConfig['user'])
                 );
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // make sure this is the case that TESTER already exists
-                if (!strstr($e->getMessage(), "ORA-01920")) {
+                if (!strstr($e->getMessage(), 'ORA-01920')) {
                     echo "\nCreate test user error: " . $e->getMessage() . "\n";
                     echo "\nError code: " . $e->getCode() . "\n";
                 }
@@ -99,7 +99,7 @@ abstract class OracleBaseTest extends ExtractorTest
         $stmt = oci_parse($connection, $sql);
         try {
             oci_execute($stmt);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw $e;
         } finally {
             oci_free_statement($stmt);
@@ -142,12 +142,12 @@ EOT;
     protected function createClobTable(): void
     {
         // drop the
-        $this->dropTableIfExists("CLOB_TEST");
+        $this->dropTableIfExists('CLOB_TEST');
 
         // create the clob table
         $this->executeStatement(
             $this->connection,
-            "CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users"
+            'CREATE TABLE CLOB_TEST (id VARCHAR(25), clob_col CLOB) tablespace users'
         );
         $this->executeStatement(
             $this->connection,
@@ -165,16 +165,16 @@ EOT;
 
     protected function createRegionsTable(): void
     {
-        $this->dropTableIfExists("REGIONS");
+        $this->dropTableIfExists('REGIONS');
 
         $this->executeStatement(
             $this->connection,
-            "CREATE TABLE REGIONS AS SELECT * FROM HR.REGIONS"
+            'CREATE TABLE REGIONS AS SELECT * FROM HR.REGIONS'
         );
 
         $this->executeStatement(
             $this->connection,
-            "ALTER TABLE REGIONS DROP COLUMN REGION_NAME"
+            'ALTER TABLE REGIONS DROP COLUMN REGION_NAME'
         );
     }
 
@@ -201,7 +201,7 @@ EOT;
                 }, $header)
             )
         );
-        
+
         $this->executeStatement(
             $this->connection,
             $createTableStatement
@@ -212,7 +212,7 @@ EOT;
             foreach ($primaryKey as $pk) {
                 $this->executeStatement(
                     $this->connection,
-                    sprintf("ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL", $tableName, $pk)
+                    sprintf('ALTER TABLE %s MODIFY %s NVARCHAR2(64) NOT NULL', $tableName, $pk)
                 );
             }
             $this->executeStatement(
@@ -231,7 +231,7 @@ EOT;
         $columnsCount = count($file->current());
         $rowsPerInsert = intval((1000 / $columnsCount) - 1);
 
-        while ($file->current() != false) {
+        while ($file->current() !== false) {
             for ($i=0; $i<$rowsPerInsert && $file->current() !== false; $i++) {
                 $cols = [];
                 foreach ($file->current() as $col) {
