@@ -59,7 +59,7 @@ class OracleTest extends OracleBaseTest
         $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
-                $this->assertContains($line, $origContents);
+                $this->assertStringContainsString($line, $origContents);
             }
         }
 
@@ -94,7 +94,7 @@ class OracleTest extends OracleBaseTest
         $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
-                $this->assertContains($line, $origContents);
+                $this->assertStringContainsString($line, $origContents);
             }
         }
 
@@ -175,7 +175,7 @@ class OracleTest extends OracleBaseTest
         $origContents = file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
-                $this->assertContains($line, $origContents);
+                $this->assertStringContainsString($line, $origContents);
             }
         }
 

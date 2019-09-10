@@ -226,9 +226,9 @@ class ApplicationTest extends OracleBaseTest
         $process->run();
 
         $this->assertEquals(1, $process->getExitCode());
-        $this->assertContains('Export process failed:', $process->getErrorOutput());
+        $this->assertStringContainsString('Export process failed:', $process->getErrorOutput());
         // verify that it retries 5 times
-        $this->assertContains('[4x]', $process->getOutput());
+        $this->assertStringContainsString('[4x]', $process->getOutput());
     }
 
     private function putConfig(array $config, string $configType): void
