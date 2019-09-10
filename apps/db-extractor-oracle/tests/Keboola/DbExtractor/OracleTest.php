@@ -56,7 +56,7 @@ class OracleTest extends OracleBaseTest
         // will check this one line by line because it randomly orders it sometimes
         $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($this->dataDir . '/oracle/sales.csv');
+        $origContents = (string) file_get_contents($this->dataDir . '/oracle/sales.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
                 $this->assertStringContainsString($line, $origContents);
@@ -91,7 +91,7 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(99, $result['imported'][2]['rows']);
         $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
+        $origContents = (string) file_get_contents($this->dataDir . '/oracle/tableColumns.csv');
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
                 $this->assertStringContainsString($line, $origContents);
@@ -172,7 +172,7 @@ class OracleTest extends OracleBaseTest
         // will check this one line by line because it randomly orders it sometimes
         $output = (string) file_get_contents($outputCsvFile);
         $outputLines = explode("\n", $output);
-        $origContents = file_get_contents($salesCsv->getPathname());
+        $origContents = (string) file_get_contents($salesCsv->getPathname());
         foreach ($outputLines as $line) {
             if (trim($line) !== '') {
                 $this->assertStringContainsString($line, $origContents);
