@@ -8,8 +8,6 @@ use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
-use Keboola\Utils;
-use OutOfBoundsException;
 use Symfony\Component\Process\Process;
 
 use Throwable;
