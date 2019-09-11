@@ -8,17 +8,14 @@ use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Logger;
 use Keboola\DbExtractor\RetryProxy;
-use Keboola\Utils;
 use Symfony\Component\Process\Process;
 
 use Throwable;
 
 class Oracle extends Extractor
 {
-    const TABLELESS_CONFIG_FILE = "tableless.json";
-    const TABLES_CONFIG_FILE = "getTablesMetadata.json";
-
-    protected $db;
+    private const TABLELESS_CONFIG_FILE = 'tableless.json';
+    private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
 
     /** @var  array */
     protected $dbParams;
@@ -51,7 +48,7 @@ class Oracle extends Extractor
         // setup the export config files for the export tool
         if (array_key_exists('tables', $parameters)) {
             foreach ($parameters['tables'] as $table) {
-                $this->exportConfigFiles[$table['name']] = $this->dataDir . "/" . $table['id'] . ".json";
+                $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
                 $this->writeExportConfig($this->dbParams, $table);
             }
         }
@@ -64,25 +61,25 @@ class Oracle extends Extractor
         $config = [
             'parameters' => [
                 'db' => $dbParams,
-                'outputFile' => $this->dataDir . "/" . 'tables.json'
-            ]
+                'outputFile' => $this->dataDir . '/' . 'tables.json',
+            ],
         ];
-        file_put_contents($this->dataDir . "/" . self::TABLELESS_CONFIG_FILE, json_encode($config));
+        file_put_contents($this->dataDir . '/' . self::TABLELESS_CONFIG_FILE, json_encode($config));
     }
 
-    private function prepareTablesConfig(array $tables = null): void
+    private function prepareTablesConfig(?array $tables = null): void
     {
         $dbParams = $this->dbParams;
         $dbParams['port'] = (string) $this->dbParams['port'];
         $config = [
             'parameters' => [
                 'db' => $dbParams,
-                'outputFile' => $this->dataDir . "/" . 'tables.json',
+                'outputFile' => $this->dataDir . '/' . 'tables.json',
                 'tables' => (!empty($tables)) ? $tables : [],
-                'includeColumns' => $this->listColumns
-            ]
+                'includeColumns' => $this->listColumns,
+            ],
         ];
-        file_put_contents($this->dataDir . "/" . self::TABLES_CONFIG_FILE, json_encode($config));
+        file_put_contents($this->dataDir . '/' . self::TABLES_CONFIG_FILE, json_encode($config));
     }
 
     private function writeExportConfig(array $dbParams, array $table): void
@@ -90,7 +87,7 @@ class Oracle extends Extractor
         if (!isset($table['query'])) {
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
         } else {
-            $table['query'] = rtrim($table['query'], " ;");
+            $table['query'] = rtrim($table['query'], ' ;');
         }
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
         $dbParams['port'] = (string) $dbParams['port'];
@@ -116,9 +113,9 @@ class Oracle extends Extractor
 
     protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
     {
-        $message = "";
+        $message = '';
         if ($table) {
-            $message = sprintf("[%s]: ", $table['name']);
+            $message = sprintf('[%s]: ', $table['name']);
         }
         $message .= sprintf('DB query failed: %s', $e->getMessage());
         if ($counter) {
@@ -132,7 +129,7 @@ class Oracle extends Extractor
         $outputTable = $table['outputTable'];
         $csv = $this->createOutputCsv($outputTable);
 
-        $this->logger->info("Exporting to " . $outputTable);
+        $this->logger->info('Exporting to ' . $outputTable);
 
         $isAdvancedQuery = true;
         if (array_key_exists('table', $table) && !array_key_exists('query', $table)) {
@@ -160,15 +157,15 @@ class Oracle extends Extractor
             @unlink($csv->getPathname());
             $this->logger->warn(
                 sprintf(
-                    "Query returned empty result. Nothing was imported for table [%s]",
+                    'Query returned empty result. Nothing was imported for table [%s]',
                     $table['name']
                 )
             );
         }
 
         $output = [
-            "outputTable"=> $outputTable,
-            "rows" => $rowCount,
+            'outputTable'=> $outputTable,
+            'rows' => $rowCount,
         ];
         return $output;
     }
@@ -196,8 +193,8 @@ class Oracle extends Extractor
         $output = $process->getOutput();
         $this->logger->info($output);
 
-        $fetchedPos = strpos($output, "Fetched");
-        $rowCountStr = substr($output, $fetchedPos, strpos($output, "rows in") - $fetchedPos);
+        $fetchedPos = (int) strpos($output, 'Fetched');
+        $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
         $linesWritten = (int) filter_var(
             $rowCountStr,
             FILTER_SANITIZE_NUMBER_INT
@@ -212,7 +209,7 @@ class Oracle extends Extractor
             '-jar',
             '/code/oracle/table-exporter.jar',
             'testConnection',
-            $this->dataDir . "/" . self::TABLELESS_CONFIG_FILE
+            $this->dataDir . '/' . self::TABLELESS_CONFIG_FILE,
         ];
 
         $process = new Process($cmd);
@@ -226,7 +223,7 @@ class Oracle extends Extractor
         return true;
     }
 
-    public function getTables(array $tables = null): array
+    public function getTables(?array $tables = null): array
     {
         if ($this->tablesToList && !$tables) {
             $tables = $this->tablesToList;
@@ -238,7 +235,7 @@ class Oracle extends Extractor
             '-jar',
             '/code/oracle/table-exporter.jar',
             'getTables',
-            $this->dataDir . "/" . self::TABLES_CONFIG_FILE
+            $this->dataDir . '/' . self::TABLES_CONFIG_FILE,
         ];
 
         $process = new Process($cmd);
@@ -250,10 +247,10 @@ class Oracle extends Extractor
             throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
         }
 
-        $tableListing = json_decode(file_get_contents($this->dataDir . "/tables.json"), true);
+        $tableListing = json_decode((string) file_get_contents($this->dataDir . '/tables.json'), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
-                "Cannot parse JSON data of table listing - error: " . json_last_error()
+                'Cannot parse JSON data of table listing - error: ' . json_last_error()
             );
         }
         return $tableListing;
@@ -263,7 +260,7 @@ class Oracle extends Extractor
     {
         if (count($columns) > 0) {
             return sprintf(
-                "SELECT %s FROM %s.%s",
+                'SELECT %s FROM %s.%s',
                 implode(
                     ', ',
                     array_map(
@@ -278,14 +275,14 @@ class Oracle extends Extractor
             );
         } else {
             return sprintf(
-                "SELECT * FROM %s.%s",
+                'SELECT * FROM %s.%s',
                 $this->quote($table['schema']),
                 $this->quote($table['tableName'])
             );
         }
     }
 
-    private function quote($obj)
+    private function quote(string $obj): string
     {
         return "\"{$obj}\"";
     }

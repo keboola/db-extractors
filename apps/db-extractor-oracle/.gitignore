@@ -10,3 +10,4 @@ runtests.sh
 test.php
 /tmp/
 dockerize-linux-amd64*
+.phpunit.result.cache
