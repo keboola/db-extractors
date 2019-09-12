@@ -168,12 +168,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $tableCreated = false;
         while ($process->isRunning()) {
-            sleep(1);
+            sleep(5);
             if (!$tableCreated) {
                 $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
                 $this->createTextTable($csv1, $table['tableName']);
                 $tableCreated = true;
-                sleep(2);
             }
         }
 
