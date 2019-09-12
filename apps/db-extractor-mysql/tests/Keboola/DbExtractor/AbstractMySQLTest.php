@@ -40,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $dbConfig = $config['parameters']['db'];
 
         $dsn = sprintf(
-            "mysql:host=%s;port=%s;dbname=%s;charset=utf8",
+            'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
             $dbConfig['host'],
             $dbConfig['port'],
             $dbConfig['database']
@@ -49,7 +49,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['#password'], $options);
 
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
-        $this->pdo->exec("SET NAMES utf8;");
+        $this->pdo->exec('SET NAMES utf8;');
     }
 
     protected function createAutoIncrementAndTimestampTable(): void
@@ -118,9 +118,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
         }
 
         if (!$schemaName) {
-            $schemaName = "test";
+            $schemaName = 'test';
         } else {
-            $this->pdo->exec(sprintf("CREATE DATABASE IF NOT EXISTS %s", $schemaName));
+            $this->pdo->exec(sprintf('CREATE DATABASE IF NOT EXISTS %s', $schemaName));
         }
 
         $this->pdo->exec(sprintf(
@@ -222,8 +222,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     public function expectedTableColumns(string $schema, string $table): array
     {
-        if ($schema === "temp_schema") {
-            if ($table === "ext_sales") {
+        if ($schema === 'temp_schema') {
+            if ($table === 'ext_sales') {
                 return array (
                     0 =>
                         array (
@@ -359,11 +359,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
                         ),
                 );
             } else {
-                throw new UserException(sprintf("Unexpected test table %s in schema %s", $table, $schema));
+                throw new UserException(sprintf('Unexpected test table %s in schema %s', $table, $schema));
             }
-        } else if ($schema === "test") {
+        } else if ($schema === 'test') {
             switch ($table) {
-                case "sales":
+                case 'sales':
                     return array (
                         0 =>
                             array (
@@ -498,7 +498,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'ordinalPosition' => '12',
                             ),
                     );
-                case "escaping":
+                case 'escaping':
                     return array (
                         0 =>
                             array (
@@ -523,7 +523,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'ordinalPosition' => '2',
                             ),
                     );
-                case "auto_increment_timestamp":
+                case 'auto_increment_timestamp':
                     return array (
                         0 =>
                             array (
@@ -599,7 +599,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
                     );
             }
         } else {
-            throw new UserException(sprintf("Unexpected schema %s", $schema));
+            throw new UserException(sprintf('Unexpected schema %s', $schema));
         }
     }
 }

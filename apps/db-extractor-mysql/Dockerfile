@@ -1,5 +1,5 @@
 FROM db-ex-mysql-sshproxy AS sshproxy
-FROM php:7.1
+FROM php:7.3-cli-stretch
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 

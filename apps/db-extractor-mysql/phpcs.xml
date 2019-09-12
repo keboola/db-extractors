@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
 <ruleset name="Project">
     <rule ref="vendor/keboola/coding-standard/src/ruleset.xml"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="absoluteLineLimit" value="150"/>
+        </properties>
+    </rule>
 </ruleset>

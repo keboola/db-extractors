@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Monolog\Handler\NullHandler;
 
-require_once(dirname(__FILE__) . "/../vendor/autoload.php");
+require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
 $logger = new Logger('ex-db-mysql');
 
@@ -20,18 +20,19 @@ $runAction = true;
 try {
     $jsonDecode = new JsonDecode(true);
 
-    $arguments = getopt("d::", ["data::"]);
-    if (!isset($arguments["data"])) {
+    $arguments = getopt('d::', ['data::']);
+    if (!isset($arguments['data']) || !is_string($arguments['data'])) {
         throw new UserException('Data folder not set.');
     }
+    $dataFolder = $arguments['data'];
 
-    if (file_exists($arguments["data"] . "/config.yml")) {
+    if (file_exists($dataFolder . '/config.yml')) {
         $config = Yaml::parse(
-            file_get_contents($arguments["data"] . "/config.yml")
+            (string) file_get_contents($dataFolder . '/config.yml')
         );
-    } else if (file_exists($arguments["data"] . "/config.json")) {
+    } else if (file_exists($dataFolder . '/config.json')) {
         $config = $jsonDecode->decode(
-            file_get_contents($arguments["data"] . '/config.json'),
+            (string) file_get_contents($dataFolder . '/config.json'),
             JsonEncoder::FORMAT
         );
     } else {
@@ -43,7 +44,7 @@ try {
     $inputStateFile = $arguments['data'] . '/in/state.json';
     if (file_exists($inputStateFile)) {
         $inputState = $jsonDecode->decode(
-            file_get_contents($inputStateFile),
+            (string) file_get_contents($inputStateFile),
             JsonEncoder::FORMAT
         );
     }
@@ -52,7 +53,7 @@ try {
         $config,
         $logger,
         $inputState,
-        $arguments["data"]
+        $dataFolder
     );
 
     if ($app['action'] !== 'run') {
@@ -72,7 +73,7 @@ try {
             file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
         }
     }
-    $app['logger']->log('info', "Extractor finished successfully.");
+    $app['logger']->log('info', 'Extractor finished successfully.');
     exit(0);
 } catch (UserException $e) {
     $logger->log('error', $e->getMessage());
@@ -88,7 +89,7 @@ try {
             'errLine' => $e->getLine(),
             'errCode' => $e->getCode(),
             'errTrace' => $e->getTraceAsString(),
-            'errPrevious' => $e->getPrevious() ? get_class($e->getPrevious()) : '',
+            'errPrevious' => is_object($e->getPrevious()) ? get_class($e->getPrevious()) : '',
         ]
     );
     exit(2);

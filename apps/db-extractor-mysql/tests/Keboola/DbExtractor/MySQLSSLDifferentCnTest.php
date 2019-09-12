@@ -10,10 +10,8 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 {
     public function testCredentials(): void
     {
-        $this->setExpectedException(
-            UserException::class,
-            'Peer certificate CN=`mysql\' did not match expected CN=`mysql-different-cn'
-        );
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Peer certificate CN=`mysql\' did not match expected CN=`mysql-different-cn');
 
         $config = $this->getConfig();
         $config['action'] = 'testConnection';
@@ -53,7 +51,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $result = $this->createApplication($config)->run();
 
-        $this->assertEquals("success", $result['status']);
+        $this->assertEquals('success', $result['status']);
     }
 
     public function testVerifyServerCertOption(): void
@@ -75,6 +73,6 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $result = $this->createApplication($config)->run();
 
-        $this->assertEquals("success", $result['status']);
+        $this->assertEquals('success', $result['status']);
     }
 }
