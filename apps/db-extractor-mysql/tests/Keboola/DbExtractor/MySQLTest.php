@@ -171,7 +171,6 @@ class MySQLTest extends AbstractMySQLTest
     public function testUserException(): void
     {
         $this->expectException(UserException::class);
-
         $config = $this->getConfig('mysql');
 
         $config['parameters']['db']['host'] = 'nonexistinghost';
@@ -618,7 +617,7 @@ class MySQLTest extends AbstractMySQLTest
         $app = $this->createApplication($config);
 
         $result = $app->run();
-        echo '\nThere are ' . count($result['tables']) . ' tables\n';
+        echo "\nThere are " . count($result['tables']) . " tables\n";
     }
 
     public function testWeirdColumnNames(): void
