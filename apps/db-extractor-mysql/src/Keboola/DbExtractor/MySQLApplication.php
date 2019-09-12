@@ -21,6 +21,7 @@ class MySQLApplication extends Application
 
         parent::__construct($config, ($logger) ? $logger : new Logger('ex-db-mysql'), $state);
     }
+
     protected function buildConfig(array $config): void
     {
         $dbNode = new MysqlDbNode();

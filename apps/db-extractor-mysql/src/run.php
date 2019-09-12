@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Keboola\DbExtractor\MySQLApplication;
-use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Yaml\Yaml;
@@ -41,7 +40,7 @@ try {
 
     // get the state
     $inputState = [];
-    $inputStateFile = $arguments['data'] . '/in/state.json';
+    $inputStateFile = $dataFolder . '/in/state.json';
     if (file_exists($inputStateFile)) {
         $inputState = $jsonDecode->decode(
             (string) file_get_contents($inputStateFile),
@@ -68,7 +67,7 @@ try {
     } else {
         if (!empty($result['state'])) {
             // write state
-            $outputStateFile = $arguments['data'] . '/out/state.json';
+            $outputStateFile = $dataFolder . '/out/state.json';
             $jsonEncode = new \Symfony\Component\Serializer\Encoder\JsonEncode();
             file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
         }
