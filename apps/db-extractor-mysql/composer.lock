@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "040dd80f67c19835c213b3cda46acdae",
+    "content-hash": "c511bc2a74621b7515f0bbcb8fda4a8e",
     "packages": [
         {
             "name": "keboola/csv",
@@ -315,30 +315,33 @@
         },
         {
             "name": "keboola/php-temp",
-            "version": "1.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-temp.git",
-                "reference": "2e3c2fc4cce8536a84cbad2a1586eb2eaebe5d3b"
+                "reference": "cbdb4dd0dfe548d7bffd74a0e66294981aea49ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-temp/zipball/2e3c2fc4cce8536a84cbad2a1586eb2eaebe5d3b",
-                "reference": "2e3c2fc4cce8536a84cbad2a1586eb2eaebe5d3b",
+                "url": "https://api.github.com/repos/keboola/php-temp/zipball/cbdb4dd0dfe548d7bffd74a0e66294981aea49ce",
+                "reference": "cbdb4dd0dfe548d7bffd74a0e66294981aea49ce",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
-                "symfony/filesystem": ">2.1.0"
+                "php": ">=7.1",
+                "symfony/filesystem": ">2.8"
             },
             "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "phpunit/phpunit": "^5.2"
+                "infection/infection": "^0.12",
+                "jakub-onderka/php-parallel-lint": "^1.0",
+                "keboola/coding-standard": "^8.0",
+                "phpstan/phpstan-shim": "^0.11",
+                "phpunit/phpunit": "^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Keboola\\Temp": "src/"
+                "psr-4": {
+                    "Keboola\\Temp\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -347,37 +350,33 @@
             ],
             "authors": [
                 {
-                    "name": "Miro Cillik",
-                    "email": "miro@keboola.cz"
-                },
-                {
-                    "name": "Ondrej Vana",
-                    "email": "kachna@keboola.cz"
+                    "name": "Keboola",
+                    "email": "devel@keboola.com"
                 }
             ],
-            "description": "Temp service - handles application's temporary files",
+            "description": "Temp library handles application temporary files",
             "keywords": [
                 "filesystem",
                 "temp"
             ],
-            "time": "2017-11-13T13:02:19+00:00"
+            "time": "2019-04-26T07:18:24+00:00"
         },
         {
             "name": "keboola/php-utils",
-            "version": "2.3.1",
+            "version": "4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-utils.git",
-                "reference": "ec4d582994f2961bd16a6f6be40d3e8608ef5ec3"
+                "reference": "59b15ad7ec5a9a774ab31bef7939eddad016c3aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-utils/zipball/ec4d582994f2961bd16a6f6be40d3e8608ef5ec3",
-                "reference": "ec4d582994f2961bd16a6f6be40d3e8608ef5ec3",
+                "url": "https://api.github.com/repos/keboola/php-utils/zipball/59b15ad7ec5a9a774ab31bef7939eddad016c3aa",
+                "reference": "59b15ad7ec5a9a774ab31bef7939eddad016c3aa",
                 "shasum": ""
             },
             "require": {
-                "keboola/php-temp": "^1.0",
+                "keboola/sanitizer": "^0.1",
                 "php": ">=5.6.0",
                 "seld/jsonlint": "^1.4"
             },
@@ -426,27 +425,27 @@
             "keywords": [
                 "utility"
             ],
-            "time": "2018-04-11T14:40:53+00:00"
+            "time": "2019-09-02T10:42:41+00:00"
         },
         {
             "name": "keboola/retry",
-            "version": "0.4.0",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/retry.git",
-                "reference": "18dfd7eea32722cf3f421d86d0030844fd6aef67"
+                "reference": "6a090d625f01b06ba91242832cdb575f7a5a28af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/retry/zipball/18dfd7eea32722cf3f421d86d0030844fd6aef67",
-                "reference": "18dfd7eea32722cf3f421d86d0030844fd6aef67",
+                "url": "https://api.github.com/repos/keboola/retry/zipball/6a090d625f01b06ba91242832cdb575f7a5a28af",
+                "reference": "6a090d625f01b06ba91242832cdb575f7a5a28af",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1",
                 "psr/log": "^1.1"
             },
-            "conflict": {
+            "replace": {
                 "vkartaviy/retry": "*"
             },
             "require-dev": {
@@ -477,27 +476,70 @@
                 "repeat",
                 "retry"
             ],
-            "time": "2019-08-07T16:10:48+00:00"
+            "time": "2019-08-19T13:47:21+00:00"
         },
         {
-            "name": "keboola/ssh-tunnel",
-            "version": "1.0.3",
+            "name": "keboola/sanitizer",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/keboola/ssh-tunnel.git",
-                "reference": "10f5cf523a47e1067a2f20dcac9090cf2f67a839"
+                "url": "https://github.com/keboola/sanitizer.git",
+                "reference": "6edda00cd177409a33f180b8f12bdad89bf893c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/ssh-tunnel/zipball/10f5cf523a47e1067a2f20dcac9090cf2f67a839",
-                "reference": "10f5cf523a47e1067a2f20dcac9090cf2f67a839",
+                "url": "https://api.github.com/repos/keboola/sanitizer/zipball/6edda00cd177409a33f180b8f12bdad89bf893c5",
+                "reference": "6edda00cd177409a33f180b8f12bdad89bf893c5",
                 "shasum": ""
             },
             "require": {
-                "symfony/process": "^3.1"
+                "php": ">=5.6"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.5"
+                "jakub-onderka/php-parallel-lint": "^1.0",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^3.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Keboola\\Utils\\Sanitizer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Keboola",
+                    "email": "devel@keboola.com"
+                }
+            ],
+            "description": "Column name sanitizer",
+            "time": "2019-01-11T10:21:17+00:00"
+        },
+        {
+            "name": "keboola/ssh-tunnel",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/keboola/ssh-tunnel.git",
+                "reference": "1fef2ccc9614d50fdb5f14ba5a7b5345d89114ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/keboola/ssh-tunnel/zipball/1fef2ccc9614d50fdb5f14ba5a7b5345d89114ae",
+                "reference": "1fef2ccc9614d50fdb5f14ba5a7b5345d89114ae",
+                "shasum": ""
+            },
+            "require": {
+                "symfony/process": "^4.2"
+            },
+            "require-dev": {
+                "keboola/coding-standard": "^6.0",
+                "phpstan/phpstan": "^0.10.6",
+                "phpunit/phpunit": "^7.0"
             },
             "type": "library",
             "autoload": {
@@ -511,25 +553,25 @@
             ],
             "authors": [
                 {
-                    "name": "Miroslav Cillik",
-                    "email": "miro@keboola.com"
+                    "name": "Keboola",
+                    "email": "devel@keboola.com"
                 }
             ],
-            "description": "Simple class for SSH tunneling",
-            "time": "2017-06-07T05:37:12+00:00"
+            "description": "Simple library for SSH tunneling",
+            "time": "2018-12-06T14:51:03+00:00"
         },
         {
             "name": "monolog/monolog",
-            "version": "1.23.0",
+            "version": "1.25.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4"
+                "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
-                "reference": "fd8c787753b3a2ad11bc60c063cff1358a32a3b4",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
+                "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
                 "shasum": ""
             },
             "require": {
@@ -594,7 +636,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2017-06-19T01:22:40+00:00"
+            "time": "2019-09-06T13:49:17+00:00"
         },
         {
             "name": "nette/utils",
@@ -1096,25 +1138,25 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.4.15",
+            "version": "v4.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "4d6b125d5293cbceedc2aa10f2c71617e76262e7"
+                "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/4d6b125d5293cbceedc2aa10f2c71617e76262e7",
-                "reference": "4d6b125d5293cbceedc2aa10f2c71617e76262e7",
+                "url": "https://api.github.com/repos/symfony/process/zipball/e89969c00d762349f078db1128506f7f3dcc0d4a",
+                "reference": "e89969c00d762349f078db1128506f7f3dcc0d4a",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5.9|>=7.0.8"
+                "php": "^7.1.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.4-dev"
+                    "dev-master": "4.3-dev"
                 }
             },
             "autoload": {
@@ -1141,7 +1183,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2018-08-03T10:42:44+00:00"
+            "time": "2019-08-26T08:26:39+00:00"
         },
         {
             "name": "symfony/serializer",
