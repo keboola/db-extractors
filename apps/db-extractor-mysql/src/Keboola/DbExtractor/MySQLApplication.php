@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Configuration\MySQLConfigDefinition;
-use Keboola\DbExtractor\Configuration\MySQLConfigRowDefinition;
-use Keboola\DbExtractor\Configuration\MySQLConfigRowActionDefinition;
+use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
+use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlTablesNode;
+use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
+use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractorConfig\Config;
 
 class MySQLApplication extends Application
 {
@@ -17,14 +20,17 @@ class MySQLApplication extends Application
         $config['parameters']['extractor_class'] = 'MySQL';
 
         parent::__construct($config, ($logger) ? $logger : new Logger('ex-db-mysql'), $state);
-
-        if (isset($this['parameters']['tables'])) {
-            $this->setConfigDefinition(new MySQLConfigDefinition());
+    }
+    protected function buildConfig(array $config): void
+    {
+        $dbNode = new MysqlDbNode();
+        if (isset($config['parameters']['tables'])) {
+            $this->config = new Config($config, new ConfigDefinition($dbNode, null, new MysqlTablesNode()));
         } else {
             if ($this['action'] === 'run') {
-                $this->setConfigDefinition(new MySQLConfigRowDefinition());
+                $this->config = new Config($config, new ConfigRowDefinition($dbNode));
             } else {
-                $this->setConfigDefinition(new MySQLConfigRowActionDefinition());
+                $this->config = new Config($config, new ActionConfigRowDefinition($dbNode));
             }
         }
     }

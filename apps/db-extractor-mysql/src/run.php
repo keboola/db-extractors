@@ -18,7 +18,7 @@ $logger = new Logger('ex-db-mysql');
 $runAction = true;
 
 try {
-    $jsonDecode = new JsonDecode(true);
+    $jsonDecode = new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
 
     $arguments = getopt('d::', ['data::']);
     if (!isset($arguments['data']) || !is_string($arguments['data'])) {
