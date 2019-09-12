@@ -172,8 +172,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testUserException(): void
     {
-        $this->setExpectedException('Keboola\DbExtractor\Exception\UserException');
-
+        $this->expectException(UserException::class);
         $config = $this->getConfig('mysql');
 
         $config['parameters']['db']['host'] = 'nonexistinghost';

@@ -7,3 +7,4 @@ vendor/
 .idea/
 composer.phar
 tests.sh
+.phpunit.result.cache

@@ -178,7 +178,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         }
 
         // check that it had to retry at least 2x
-        $this->assertContains('[2x]', $process->getOutput());
+        $this->assertStringContainsString('[2x]', $process->getOutput());
 
         $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
 

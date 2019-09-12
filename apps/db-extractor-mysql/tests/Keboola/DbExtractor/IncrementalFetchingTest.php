@@ -286,7 +286,8 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['incrementalFetchingColumn'] = $column;
 
-        $this->setExpectedException(UserException::class, $expectedExceptionMessage);
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         ($this->createApplication($config))->run();
     }
 
