@@ -24,7 +24,7 @@ try {
     if (!isset($arguments['data']) || !is_string($arguments['data'])) {
         throw new UserException('Data folder not set.');
     }
-    $dataFolder = (string) $arguments['data'];
+    $dataFolder = $arguments['data'];
 
     if (file_exists($dataFolder . '/config.yml')) {
         $config = Yaml::parse(
