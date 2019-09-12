@@ -259,7 +259,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputStateFile);
-        $this->assertEquals(['lastFetchedRow' => '2'], json_decode(file_get_contents($outputStateFile), true));
+        $this->assertEquals(['lastFetchedRow' => '2'], json_decode((string) file_get_contents($outputStateFile), true));
 
         // add a couple rows
         $this->pdo->exec('INSERT INTO auto_increment_timestamp (`weird-Name`) VALUES (\'charles\'), (\'william\')');
@@ -273,6 +273,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->run();
 
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals(['lastFetchedRow' => '4'], json_decode(file_get_contents($outputStateFile), true));
+        $this->assertEquals(['lastFetchedRow' => '4'], json_decode((string) file_get_contents($outputStateFile), true));
     }
 }

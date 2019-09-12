@@ -24,7 +24,7 @@ class MySQL extends Extractor
     {
         $filename = $temp->createTmpFile('ssl');
         file_put_contents((string) $filename, $sslCa);
-        return realpath((string) $filename);
+        return (string) realpath((string) $filename);
     }
 
     public function createConnection(array $params): PDO
@@ -196,6 +196,7 @@ class MySQL extends Extractor
                 'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
                 'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
                 'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
+                'columns' => [],
             ];
             if ($table["TABLE_COMMENT"]) {
                 $tableDefs[$curTable]['description'] = $table['TABLE_COMMENT'];

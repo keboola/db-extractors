@@ -53,7 +53,6 @@ class MySQLTest extends AbstractMySQLTest
     }
 
     /**
-     * @param $configType
      * @dataProvider configTypesProvider
      */
     public function testRunMain(string $configType): void
@@ -329,7 +328,7 @@ class MySQLTest extends AbstractMySQLTest
 
         $sanitizedTable = Utils\Strings::webalize($importedTable, '._');
         $outputManifest = json_decode(
-            file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest'),
+            (string) file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest'),
             true
         );
 
@@ -638,7 +637,7 @@ class MySQLTest extends AbstractMySQLTest
             $result['imported']
         );
         $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
-        $manifest = json_decode(file_get_contents($outputManifestFile), true);
+        $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
         $expectedColumns = ['weird_I_d', 'weird_Name', 'timestamp', 'datetime', 'intColumn', 'decimalColumn'];
         $this->assertEquals($expectedColumns, $manifest['columns']);
         $this->assertEquals(['weird_I_d'], $manifest['primary_key']);
