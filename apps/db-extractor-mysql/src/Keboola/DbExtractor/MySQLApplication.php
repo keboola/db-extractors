@@ -16,7 +16,7 @@ class MySQLApplication extends Application
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
 
-        parent::__construct($config, ($logger) ? $logger : new Logger("ex-db-mysql"), $state);
+        parent::__construct($config, ($logger) ? $logger : new Logger('ex-db-mysql'), $state);
 
         if (isset($this['parameters']['tables'])) {
             $this->setConfigDefinition(new MySQLConfigDefinition());

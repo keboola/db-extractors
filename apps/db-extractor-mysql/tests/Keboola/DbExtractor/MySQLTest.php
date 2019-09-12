@@ -75,7 +75,6 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertFileExists($this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest');
         $this->assertFileEquals((string) $csv1, $outputCsvFile);
 
-
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv';
 
         $this->assertEquals('success', $result['status']);
@@ -91,8 +90,8 @@ class MySQLTest extends AbstractMySQLTest
         unset($config['parameters']['db']['database']);
 
         // Add schema to db query
-        $config['parameters']['tables'][0]['query'] = "SELECT * FROM test.sales";
-        $config['parameters']['tables'][1]['query'] = "SELECT * FROM test.escaping";
+        $config['parameters']['tables'][0]['query'] = 'SELECT * FROM test.sales';
+        $config['parameters']['tables'][1]['query'] = 'SELECT * FROM test.escaping';
 
         $app = $this->createApplication($config);
         $result = $app->run();
@@ -187,8 +186,8 @@ class MySQLTest extends AbstractMySQLTest
         // add a table to a different schema (should not be fetched)
         $this->createTextTable(
             new CsvFile($this->dataDir . '/mysql/sales.csv'),
-            "ext_sales",
-            "temp_schema"
+            'ext_sales',
+            'temp_schema'
         );
 
         $config = $this->getConfig();
@@ -241,8 +240,8 @@ class MySQLTest extends AbstractMySQLTest
         // add a table to a different schema
         $this->createTextTable(
             new CsvFile($this->dataDir . '/mysql/sales.csv'),
-            "ext_sales",
-            "temp_schema"
+            'ext_sales',
+            'temp_schema'
         );
 
         $config = $this->getConfig();
@@ -585,8 +584,8 @@ class MySQLTest extends AbstractMySQLTest
     {
         $this->createTextTable(
             new CsvFile($this->dataDir . '/mysql/sales.csv'),
-            "ext_sales",
-            "temp_schema"
+            'ext_sales',
+            'temp_schema'
         );
 
         $config = $this->getConfig();
@@ -600,17 +599,17 @@ class MySQLTest extends AbstractMySQLTest
             $app->run();
             $this->fail('table schema and database mismatch');
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
-            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+            $this->assertStringStartsWith('Invalid Configuration', $e->getMessage());
         }
     }
 
     public function testThousandsOfTables(): void
     {
-        $this->markTestSkipped("No need to run this test every time.");
+        $this->markTestSkipped('No need to run this test every time.');
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
 
         for ($i = 0; $i < 3500; $i++) {
-            $this->createTextTable($csv1, "sales_" . $i);
+            $this->createTextTable($csv1, 'sales_' . $i);
         }
 
         $config = $this->getConfig();
@@ -675,7 +674,7 @@ class MySQLTest extends AbstractMySQLTest
             ($this->createApplication($config))->run();
             $this->fail('Should throw a user exception.');
         } catch (UserException $e) {
-            $this->assertStringStartsWith("Invalid Configuration [ext_sales]", $e->getMessage());
+            $this->assertStringStartsWith('Invalid Configuration [ext_sales]', $e->getMessage());
         }
     }
 }

@@ -65,21 +65,21 @@ class MySQL extends Extractor
 
         foreach (['host', 'user', '#password'] as $r) {
             if (!array_key_exists($r, $params)) {
-                throw new UserException(sprintf("Parameter %s is missing.", $r));
+                throw new UserException(sprintf('Parameter %s is missing.', $r));
             }
         }
 
         $port = !empty($params['port']) ? $params['port'] : '3306';
 
         $dsn = sprintf(
-            "mysql:host=%s;port=%s;charset=utf8",
+            'mysql:host=%s;port=%s;charset=utf8',
             $params['host'],
             $port
         );
 
         if (isset($params['database'])) {
             $dsn = sprintf(
-                "mysql:host=%s;port=%s;dbname=%s;charset=utf8",
+                'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
                 $params['host'],
                 $port,
                 $params['database']
@@ -98,21 +98,22 @@ class MySQL extends Extractor
                 }
             };
             $checkCnMismatch($e);
-            if (($previous = $e->getPrevious()) !== null) {
+            $previous = $e->getPrevious();
+            if ($previous !== null) {
                 $checkCnMismatch($previous);
             }
             throw $e;
         }
         $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        $pdo->exec("SET NAMES utf8;");
+        $pdo->exec('SET NAMES utf8;');
 
         if ($isSsl) {
             $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value'])) {
-                throw new UserException(sprintf("Connection is not encrypted"));
+                throw new UserException(sprintf('Connection is not encrypted'));
             } else {
-                $this->logger->info("Using SSL cipher: " . $status['Value']);
+                $this->logger->info('Using SSL cipher: ' . $status['Value']);
             }
         }
 
@@ -120,9 +121,9 @@ class MySQL extends Extractor
             $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(PDO::FETCH_ASSOC);
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
-                throw new UserException(sprintf("Network communication is not compressed"));
+                throw new UserException(sprintf('Network communication is not compressed'));
             } else {
-                $this->logger->info("Using network communication compression");
+                $this->logger->info('Using network communication compression');
             }
         }
 
@@ -157,7 +158,7 @@ class MySQL extends Extractor
     public function getTables(?array $tables = null): array
     {
 
-        $sql = "SELECT * FROM INFORMATION_SCHEMA.TABLES as c";
+        $sql = 'SELECT * FROM INFORMATION_SCHEMA.TABLES as c';
 
         $whereClause = " WHERE c.TABLE_SCHEMA != 'performance_schema' 
                           AND c.TABLE_SCHEMA != 'mysql'
@@ -165,12 +166,12 @@ class MySQL extends Extractor
                           AND c.TABLE_SCHEMA != 'sys'";
 
         if ($this->database) {
-            $whereClause = sprintf(" WHERE c.TABLE_SCHEMA = %s", $this->db->quote($this->database));
+            $whereClause = sprintf(' WHERE c.TABLE_SCHEMA = %s', $this->db->quote($this->database));
         }
 
         if (!is_null($tables) && count($tables) > 0) {
             $whereClause .= sprintf(
-                " AND c.TABLE_NAME IN (%s) AND c.TABLE_SCHEMA IN (%s)",
+                ' AND c.TABLE_NAME IN (%s) AND c.TABLE_SCHEMA IN (%s)',
                 implode(',', array_map(function ($table) {
                     return $this->db->quote($table['tableName']);
                 }, $tables)),
@@ -198,17 +199,17 @@ class MySQL extends Extractor
                 'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
                 'columns' => [],
             ];
-            if ($table["TABLE_COMMENT"]) {
+            if ($table['TABLE_COMMENT']) {
                 $tableDefs[$curTable]['description'] = $table['TABLE_COMMENT'];
             }
-            if ($table["AUTO_INCREMENT"]) {
+            if ($table['AUTO_INCREMENT']) {
                 $tableDefs[$curTable]['autoIncrement'] = $table['AUTO_INCREMENT'];
             }
         }
 
         ksort($tableDefs);
 
-        $sql = "SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c";
+        $sql = 'SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c';
         $sql .= $whereClause;
 
         $res = $this->db->query($sql);
@@ -219,20 +220,20 @@ class MySQL extends Extractor
             $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
             if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
                 if ($column['NUMERIC_SCALE'] > 0) {
-                    $length = $column['NUMERIC_PRECISION'] . "," . $column['NUMERIC_SCALE'];
+                    $length = $column['NUMERIC_PRECISION'] . ',' . $column['NUMERIC_SCALE'];
                 } else {
                     $length = $column['NUMERIC_PRECISION'];
                 }
             }
             $curColumn = [
-                "name" => $column['COLUMN_NAME'],
-                "sanitizedName" => \Keboola\Utils\sanitizeColumnName($column['COLUMN_NAME']),
-                "type" => $column['DATA_TYPE'],
-                "primaryKey" => ($column['COLUMN_KEY'] === "PRI") ? true : false,
-                "length" => $length,
-                "nullable" => ($column['IS_NULLABLE'] === "NO") ? false : true,
-                "default" => $column['COLUMN_DEFAULT'],
-                "ordinalPosition" => $column['ORDINAL_POSITION'],
+                'name' => $column['COLUMN_NAME'],
+                'sanitizedName' => \Keboola\Utils\sanitizeColumnName($column['COLUMN_NAME']),
+                'type' => $column['DATA_TYPE'],
+                'primaryKey' => ($column['COLUMN_KEY'] === 'PRI') ? true : false,
+                'length' => $length,
+                'nullable' => ($column['IS_NULLABLE'] === 'NO') ? false : true,
+                'default' => $column['COLUMN_DEFAULT'],
+                'ordinalPosition' => $column['ORDINAL_POSITION'],
             ];
 
             if ($column['COLUMN_COMMENT']) {
@@ -250,9 +251,9 @@ class MySQL extends Extractor
 
         // add additional info
         if (!is_null($tables) && count($tables) > 0) {
-            $additionalSql = "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+            $additionalSql = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
                     CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
-                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ";
+                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ';
 
             $res = $this->db->query($additionalSql . $whereClause);
             $rows = $res->fetchAll(PDO::FETCH_ASSOC);
@@ -277,7 +278,7 @@ class MySQL extends Extractor
                     if (count($filteredColumns) === 0) {
                         throw new ApplicationException(
                             sprintf(
-                                "This should never happen: Could not find reference column [%s] in table definition",
+                                'This should never happen: Could not find reference column [%s] in table definition',
                                 $column['COLUMN_NAME']
                             )
                         );
@@ -344,16 +345,16 @@ class MySQL extends Extractor
         if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
             if (isset($this->state['lastFetchedRow'])) {
                 $incrementalAddon = sprintf(
-                    " WHERE %s >= %s",
+                    ' WHERE %s >= %s',
                     $this->quote($this->incrementalFetching['column']),
                     $this->db->quote((string) $this->state['lastFetchedRow'])
                 );
             }
-            $incrementalAddon .= sprintf(" ORDER BY %s", $this->quote($this->incrementalFetching['column']));
+            $incrementalAddon .= sprintf(' ORDER BY %s', $this->quote($this->incrementalFetching['column']));
         }
         if (count($columns) > 0) {
             $query = sprintf(
-                "SELECT %s FROM %s.%s",
+                'SELECT %s FROM %s.%s',
                 implode(', ', array_map(function ($column): string {
                     return $this->quote($column);
                 }, $columns)),
@@ -362,7 +363,7 @@ class MySQL extends Extractor
             );
         } else {
             $query = sprintf(
-                "SELECT * FROM %s.%s",
+                'SELECT * FROM %s.%s',
                 $this->quote($table['schema']),
                 $this->quote($table['tableName'])
             );
@@ -373,7 +374,7 @@ class MySQL extends Extractor
         }
         if (isset($this->incrementalFetching['limit'])) {
             $query .= sprintf(
-                " LIMIT %d",
+                ' LIMIT %d',
                 $this->incrementalFetching['limit']
             );
         }

@@ -69,7 +69,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->run();
         $this->assertJson($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
     }
 
     public function testTestConnectionActionWithSSH(): void
@@ -96,13 +96,13 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->run();
         $this->assertJson($process->getOutput());
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
     }
 
     public function testGetTablesAction(): void
     {
         $config = $this->getConfig();
-        $config['action'] = "getTables";
+        $config['action'] = 'getTables';
         @unlink($this->dataDir . '/config.yml');
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
@@ -112,7 +112,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertJson($process->getOutput());
-        $this->assertEquals("", $process->getErrorOutput());
+        $this->assertEquals('', $process->getErrorOutput());
     }
 
     public function testTableColumnsQuery(): void
@@ -164,7 +164,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $process->start();
 
         // Drop the table if it exists
-        $this->pdo->exec(sprintf("DROP TABLE IF EXISTS `%s`.`%s`", $table['schema'], $table['tableName']));
+        $this->pdo->exec(sprintf('DROP TABLE IF EXISTS `%s`.`%s`', $table['schema'], $table['tableName']));
 
         $tableCreated = false;
         while ($process->isRunning()) {

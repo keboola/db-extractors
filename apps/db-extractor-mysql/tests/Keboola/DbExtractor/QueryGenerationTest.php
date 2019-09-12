@@ -25,7 +25,7 @@ class QueryGenerationTest extends AbstractMySQLTest
     {
         $extractor = new MySQL($this->config['parameters'], $state, new Logger('mssql-extractor-test'));
 
-        if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== "") {
+        if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
             $extractor->validateIncrementalFetching(
                 $params['table'],
                 $params['incrementalFetchingColumn'],
@@ -49,7 +49,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'columns' => [],
                 ],
                 [],
-                "SELECT * FROM `testSchema`.`test`",
+                'SELECT * FROM `testSchema`.`test`',
             ],
             // simple table select with all columns (columns as null)
             [
@@ -61,7 +61,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'columns' => [],
                 ],
                 [],
-                "SELECT * FROM `testSchema`.`test`",
+                'SELECT * FROM `testSchema`.`test`',
             ],
             // simple table with 2 columns selected
             [
@@ -70,10 +70,10 @@ class QueryGenerationTest extends AbstractMySQLTest
                         'tableName' => 'test',
                         'schema' => 'testSchema',
                     ],
-                    'columns' => ["col1", "col2"],
+                    'columns' => ['col1', 'col2'],
                 ],
                 [],
-                "SELECT `col1`, `col2` FROM `testSchema`.`test`",
+                'SELECT `col1`, `col2` FROM `testSchema`.`test`',
             ],
             // test simplePDO query with limit and timestamp column but no state
             [
@@ -87,7 +87,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'incrementalFetchingColumn' => 'timestamp',
                 ],
                 [],
-                "SELECT * FROM `test`.`auto_increment_timestamp` ORDER BY `timestamp` LIMIT 10",
+                'SELECT * FROM `test`.`auto_increment_timestamp` ORDER BY `timestamp` LIMIT 10',
             ],
             // test simplePDO query with limit and idp column and previos state
             [
@@ -101,7 +101,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'incrementalFetchingColumn' => '_weird-I-d',
                 ],
                 [
-                    "lastFetchedRow" => 4,
+                    'lastFetchedRow' => 4,
                 ],
                 "SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= '4' ORDER BY `_weird-I-d` LIMIT 10",
             ],
@@ -117,7 +117,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'incrementalFetchingColumn' => 'timestamp',
                 ],
                 [],
-                "SELECT * FROM `test`.`auto_increment_timestamp` ORDER BY `timestamp`",
+                'SELECT * FROM `test`.`auto_increment_timestamp` ORDER BY `timestamp`',
             ],
             // test simplePDO query id column and previos state and no limit
             [
@@ -131,7 +131,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                     'incrementalFetchingColumn' => '_weird-I-d',
                 ],
                 [
-                    "lastFetchedRow" => 4,
+                    'lastFetchedRow' => 4,
                 ],
                 "SELECT * FROM `test`.`auto_increment_timestamp` WHERE `_weird-I-d` >= '4' ORDER BY `_weird-I-d`",
             ],

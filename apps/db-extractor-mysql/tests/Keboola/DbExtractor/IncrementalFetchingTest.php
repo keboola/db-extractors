@@ -295,12 +295,12 @@ class IncrementalFetchingTest extends AbstractMySQLTest
     {
         return [
             'column does not exist' => [
-                "fakeCol",
-                "Column [fakeCol] specified for incremental fetching was not found in the table",
+                'fakeCol',
+                'Column [fakeCol] specified for incremental fetching was not found in the table',
             ],
             'column exists but is not auto-increment nor updating timestamp so should fail' => [
-                "weird-Name",
-                "Column [weird-Name] specified for incremental fetching is not a numeric or timestamp type column",
+                'weird-Name',
+                'Column [weird-Name] specified for incremental fetching is not a numeric or timestamp type column',
             ],
         ];
     }
@@ -316,7 +316,7 @@ class IncrementalFetchingTest extends AbstractMySQLTest
             $result = ($this->createApplication($config))->run();
             $this->fail('cannot use incremental fetching with advanced query, should fail.');
         } catch (UserException $e) {
-            $this->assertStringStartsWith("Invalid Configuration", $e->getMessage());
+            $this->assertStringStartsWith('Invalid Configuration', $e->getMessage());
         }
     }
 }

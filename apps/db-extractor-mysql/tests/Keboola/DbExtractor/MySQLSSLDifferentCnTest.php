@@ -51,7 +51,7 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $result = $this->createApplication($config)->run();
 
-        $this->assertEquals("success", $result['status']);
+        $this->assertEquals('success', $result['status']);
     }
 
     public function testVerifyServerCertOption(): void
@@ -73,6 +73,6 @@ class MySQLSSLDifferentCnTest extends AbstractMySQLTest
 
         $result = $this->createApplication($config)->run();
 
-        $this->assertEquals("success", $result['status']);
+        $this->assertEquals('success', $result['status']);
     }
 }
