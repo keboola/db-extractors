@@ -89,7 +89,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->run();
 
         $this->assertEquals(0, $process->getExitCode());
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Query returned empty result. Nothing was imported to [in.c-main.escapingEmpty]',
             $process->getErrorOutput()
         );
@@ -131,7 +131,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->setTimeout(300);
         $process->run();
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Query returned empty result. Nothing was imported to [in.c-main.escapingEmpty]',
             $process->getErrorOutput()
         );

@@ -189,7 +189,7 @@ class RedshiftTest extends AbstractRedshiftTest
             $this->fail('Failing query must raise exception.');
         } catch (\Keboola\DbExtractor\Exception\UserException $e) {
             // test that the error message contains the query name
-            $this->assertContains('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
+            $this->assertStringContainsString('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
         }
     }
 
