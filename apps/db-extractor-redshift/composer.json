@@ -13,12 +13,11 @@
         "keboola/db-extractor-common": "^9.2"
     },
     "require-dev": {
-        "ext-pdo_pgsql": "*",
-        "aws/aws-sdk-php": "^3.18",
+        "aws/aws-sdk-php": "^3.112",
         "jakub-onderka/php-parallel-lint": "^1.0",
         "keboola/coding-standard": ">=8.0",
-        "phpstan/phpstan-shim": "^0.11.4",
-        "phpunit/phpunit": "^7.0"
+        "phpstan/phpstan-shim": "^0.11.15",
+        "phpunit/phpunit": "^8.3"
     },
     "autoload": {
         "psr-4": {
