@@ -1,5 +1,5 @@
 FROM db-ex-redshift-sshproxy AS sshproxy
-FROM php:7.2
+FROM php:7.3-cli-stretch
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER=1
