@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "578f28b6084ad6fa50975b74621a0f1d",
+    "content-hash": "fe711c1f8cc287966cbe7439132a09b5",
     "packages": [
         {
             "name": "keboola/csv",
@@ -1062,23 +1062,22 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.80.3",
+            "version": "3.112.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "f1f724c48a49350250950d80d16b348e5e748e3c"
+                "reference": "1e21446c6780a3b9b5e4315bd6d4347d2c3381eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/f1f724c48a49350250950d80d16b348e5e748e3c",
-                "reference": "f1f724c48a49350250950d80d16b348e5e748e3c",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/1e21446c6780a3b9b5e4315bd6d4347d2c3381eb",
+                "reference": "1e21446c6780a3b9b5e4315bd6d4347d2c3381eb",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-simplexml": "*",
-                "ext-spl": "*",
                 "guzzlehttp/guzzle": "^5.3.3|^6.2.1",
                 "guzzlehttp/promises": "~1.0",
                 "guzzlehttp/psr7": "^1.4.1",
@@ -1096,7 +1095,8 @@
                 "ext-sockets": "*",
                 "nette/neon": "^2.3",
                 "phpunit/phpunit": "^4.8.35|^5.4.3",
-                "psr/cache": "^1.0"
+                "psr/cache": "^1.0",
+                "psr/simple-cache": "^1.0"
             },
             "suggest": {
                 "aws/aws-php-sns-message-validator": "To validate incoming SNS notifications",
@@ -1141,7 +1141,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2018-12-04T20:31:51+00:00"
+            "time": "2019-09-12T18:09:53+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -1876,16 +1876,16 @@
         },
         {
             "name": "phpstan/phpstan-shim",
-            "version": "0.11.4",
+            "version": "0.11.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-shim.git",
-                "reference": "70e1a346907142449ac085745f158aa715b4e0b8"
+                "reference": "7e0e5fe3a112ac2ed7557a9bb285b913bb65bb15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-shim/zipball/70e1a346907142449ac085745f158aa715b4e0b8",
-                "reference": "70e1a346907142449ac085745f158aa715b4e0b8",
+                "url": "https://api.github.com/repos/phpstan/phpstan-shim/zipball/7e0e5fe3a112ac2ed7557a9bb285b913bb65bb15",
+                "reference": "7e0e5fe3a112ac2ed7557a9bb285b913bb65bb15",
                 "shasum": ""
             },
             "require": {
@@ -1893,7 +1893,7 @@
             },
             "replace": {
                 "nikic/php-parser": "^4.0.2",
-                "phpstan/phpdoc-parser": "^0.3",
+                "phpstan/phpdoc-parser": "^0.3.3",
                 "phpstan/phpstan": "self.version"
             },
             "bin": [
@@ -1916,7 +1916,7 @@
                 "MIT"
             ],
             "description": "PHPStan Phar distribution",
-            "time": "2019-03-14T15:24:47+00:00"
+            "time": "2019-08-18T21:05:03+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3094,7 +3094,5 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": {
-        "ext-pdo_pgsql": "*"
-    }
+    "platform-dev": []
 }
