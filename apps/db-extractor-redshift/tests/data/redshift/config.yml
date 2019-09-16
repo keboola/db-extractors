@@ -4,7 +4,7 @@ parameters:
         port: 5439
         database: xxxxx
         user: xxxxx
-        password: xxxxx
+        #password: xxxxx
 
     tables:
         -
