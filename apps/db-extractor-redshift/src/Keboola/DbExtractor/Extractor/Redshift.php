@@ -14,7 +14,7 @@ class Redshift extends Extractor
     public function createConnection(array $dbParams): \PDO
     {
         // check params
-        foreach (['host', 'database', 'user', 'password'] as $r) {
+        foreach (['host', 'database', 'user', '#password'] as $r) {
             if (!isset($dbParams[$r])) {
                 throw new UserException(sprintf('Parameter %s is missing.', $r));
             }
@@ -25,7 +25,7 @@ class Redshift extends Extractor
         $pdo = new \PDO(
             "pgsql:dbname={$dbParams['database']};port={$port};host=" . $dbParams['host'],
             $dbParams['user'],
-            $dbParams['password']
+            $dbParams['#password']
         );
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $pdo;
