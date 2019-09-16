@@ -9,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
-$logger = new \Keboola\DbExtractor\Logger('ex-db-redshift');
+$logger = new \Keboola\DbExtractorLogger\Logger('ex-db-redshift');
 
 try {
     $runAction = true;
