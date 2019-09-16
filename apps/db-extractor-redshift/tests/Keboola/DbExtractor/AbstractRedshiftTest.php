@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Application;
-use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 use Keboola\DbExtractor\Test\ExtractorTest;
 
