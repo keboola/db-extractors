@@ -35,7 +35,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $config['action'] = 'testConnection';
         $this->prepareConfig($config, $configFormat);
 
-        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -64,7 +64,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
 
         $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
 
-        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -84,7 +84,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->prepareConfig($config, $configFormat);
 
         // run entrypoint
-        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -127,7 +127,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
 
         // run entrypoint
-        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
@@ -184,7 +184,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
 
         // run entrypoint
-        $process = new Process('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->run();
 
