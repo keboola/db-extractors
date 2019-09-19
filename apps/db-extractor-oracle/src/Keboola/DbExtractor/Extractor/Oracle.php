@@ -52,9 +52,11 @@ class Oracle extends Extractor
 
     private function writeTablelessConfig(): void
     {
+        $dbParams = $this->getDbParameters();
+        $dbParams['port'] = (string) $dbParams['port'];
         $config = [
             'parameters' => [
-                'db' => $this->getDbParameters(),
+                'db' => $dbParams,
                 'outputFile' => $this->dataDir . '/' . 'tables.json',
             ],
         ];
@@ -63,9 +65,11 @@ class Oracle extends Extractor
 
     private function prepareTablesConfig(?array $tables = null): void
     {
+        $dbParams = $this->getDbParameters();
+        $dbParams['port'] = (string) $dbParams['port'];
         $config = [
             'parameters' => [
-                'db' => $this->getDbParameters(),
+                'db' => $dbParams,
                 'outputFile' => $this->dataDir . '/' . 'tables.json',
                 'tables' => (!empty($tables)) ? $tables : [],
                 'includeColumns' => $this->listColumns,
@@ -82,8 +86,10 @@ class Oracle extends Extractor
             $table['query'] = rtrim($table['query'], ' ;');
         }
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
+        $dbParams = $this->getDbParameters();
+        $dbParams['port'] = (string) $dbParams['port'];
         $parameters = array(
-            'db' => $this->getDbParameters()
+            'db' => $dbParams
         );
         $config = array(
             'parameters' => array_merge($parameters, $table)
