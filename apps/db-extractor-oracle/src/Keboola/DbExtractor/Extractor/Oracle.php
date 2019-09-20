@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Logger;
-use Keboola\DbExtractor\RetryProxy;
+use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Process\Process;
 
 use Throwable;
@@ -16,9 +16,6 @@ class Oracle extends Extractor
 {
     private const TABLELESS_CONFIG_FILE = 'tableless.json';
     private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
-
-    /** @var  array */
-    protected $dbParams;
 
     /** @var  array */
     protected $exportConfigFiles;
@@ -31,8 +28,6 @@ class Oracle extends Extractor
 
     public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
-        $this->dbParams = $parameters['db'];
-
         parent::__construct($parameters, $state, $logger);
 
         // check for special table fetching option
@@ -49,14 +44,15 @@ class Oracle extends Extractor
         if (array_key_exists('tables', $parameters)) {
             foreach ($parameters['tables'] as $table) {
                 $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
-                $this->writeExportConfig($this->dbParams, $table);
+                $this->writeExportConfig($table);
             }
         }
-        $this->writeTablelessConfig($this->dbParams);
+        $this->writeTablelessConfig();
     }
 
-    private function writeTablelessConfig(array $dbParams): void
+    private function writeTablelessConfig(): void
     {
+        $dbParams = $this->getDbParameters();
         $dbParams['port'] = (string) $dbParams['port'];
         $config = [
             'parameters' => [
@@ -69,8 +65,8 @@ class Oracle extends Extractor
 
     private function prepareTablesConfig(?array $tables = null): void
     {
-        $dbParams = $this->dbParams;
-        $dbParams['port'] = (string) $this->dbParams['port'];
+        $dbParams = $this->getDbParameters();
+        $dbParams['port'] = (string) $dbParams['port'];
         $config = [
             'parameters' => [
                 'db' => $dbParams,
@@ -82,7 +78,7 @@ class Oracle extends Extractor
         file_put_contents($this->dataDir . '/' . self::TABLES_CONFIG_FILE, json_encode($config));
     }
 
-    private function writeExportConfig(array $dbParams, array $table): void
+    private function writeExportConfig(array $table): void
     {
         if (!isset($table['query'])) {
             $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
@@ -90,6 +86,7 @@ class Oracle extends Extractor
             $table['query'] = rtrim($table['query'], ' ;');
         }
         $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
+        $dbParams = $this->getDbParameters();
         $dbParams['port'] = (string) $dbParams['port'];
         $parameters = array(
             'db' => $dbParams
@@ -103,12 +100,6 @@ class Oracle extends Extractor
     public function createConnection(array $params): void
     {
         // not required
-    }
-
-    public function createSshTunnel(array $dbConfig): array
-    {
-        $this->dbParams = parent::createSshTunnel($dbConfig);
-        return $this->dbParams;
     }
 
     protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
@@ -141,7 +132,7 @@ class Oracle extends Extractor
         $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
 
         /* set backoff initial interval to 1 second */
-        $proxy = new RetryProxy($this->logger, $maxTries, 1000);
+        $proxy = new DbRetryProxy($this->logger, $maxTries);
         $tableName = $table['name'];
         try {
             $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {

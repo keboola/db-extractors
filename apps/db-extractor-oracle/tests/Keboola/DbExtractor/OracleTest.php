@@ -6,7 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Extractor\Oracle;
-use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest

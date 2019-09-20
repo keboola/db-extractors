@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Exception;
-use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;

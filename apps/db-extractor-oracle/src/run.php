@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\Logger;
+use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
+use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Yaml\Yaml;
 use Monolog\Handler\NullHandler;
 
@@ -49,7 +50,7 @@ try {
 
     $app['logger']->log('info', 'Extractor finished successfully.');
     exit(0);
-} catch (UserException $e) {
+} catch (UserException|ConfigUserException $e) {
     $logger->log('error', $e->getMessage());
     if (!$runAction) {
         echo $e->getMessage();

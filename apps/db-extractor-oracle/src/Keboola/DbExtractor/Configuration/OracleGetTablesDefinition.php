@@ -4,14 +4,34 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Configuration;
 
+use Keboola\Component\Config\BaseConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SshNode;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class OracleGetTablesDefinition extends ActionConfigRowDefinition
+class OracleGetTablesDefinition extends BaseConfigDefinition
 {
-    public function getConfigTreeBuilder(): TreeBuilder
+    /** @var NodeDefinition */
+    protected $dbNodeDefinition;
+
+    public function __construct(
+        ?DbNode $dbNode = null,
+        ?SshNode $sshNode = null
+    ) {
+        if (is_null($dbNode)) {
+            $dbNode = new DbNode($sshNode);
+        }
+        $this->dbNodeDefinition = $dbNode;
+    }
+
+    protected function getParametersDefinition(): ArrayNodeDefinition
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('parameters');
+        $treeBuilder = new TreeBuilder('parameters');
+
+        /** @var ArrayNodeDefinition $rootNode */
+        $rootNode = $treeBuilder->getRootNode();
         // @formatter:off
         $rootNode
             ->ignoreExtraKeys(true)
@@ -24,23 +44,7 @@ class OracleGetTablesDefinition extends ActionConfigRowDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->arrayNode('db')
-                    ->children()
-                        ->scalarNode('driver')->end()
-                        ->scalarNode('host')->end()
-                        ->scalarNode('port')->end()
-                        ->scalarNode('database')
-                            ->cannotBeEmpty()
-                        ->end()
-                        ->scalarNode('user')
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('#password')
-                            ->isRequired()
-                        ->end()
-                        ->append($this->addSshNode())
-                    ->end()
-                ->end()
+                ->append($this->dbNodeDefinition)
                 ->arrayNode('tableListFilter')
                     ->children()
                         ->booleanNode('listColumns')->defaultTrue()->end()
@@ -56,6 +60,6 @@ class OracleGetTablesDefinition extends ActionConfigRowDefinition
                 ->end()
             ->end();
         // @formatter:on
-        return $treeBuilder;
+        return $rootNode;
     }
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Configuration\ConfigDefinition;
 use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
+use Keboola\DbExtractorConfig\Config;
+use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
+use Keboola\DbExtractorLogger\Logger;
 
 class OracleApplication extends Application
 {
@@ -15,11 +17,14 @@ class OracleApplication extends Application
         $config['parameters']['extractor_class'] = 'Oracle';
 
         parent::__construct($config, $logger, $state);
+    }
 
-        $this->setConfigDefinition(new ConfigDefinition());
-
+    public function buildConfig(array $config): void
+    {
         if ($this['action'] === 'getTables') {
-            $this->setConfigDefinition(new OracleGetTablesDefinition());
+            $this->config = new Config($config, new OracleGetTablesDefinition());
+        } else {
+            $this->config = new Config($config, new ConfigDefinition());
         }
     }
 }
