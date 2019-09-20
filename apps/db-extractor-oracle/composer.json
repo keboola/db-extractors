@@ -10,10 +10,15 @@
         }
     ],
     "require": {
-        "php": "~7.3",
+        "php": "^7.3",
+        "ext-filter": "*",
+        "ext-json": "*",
         "keboola/db-extractor-common": "^10.0",
         "keboola/db-extractor-config": "^1.0",
-        "keboola/php-temp": "~1.0.0"
+        "keboola/db-extractor-logger": "^1.0",
+        "keboola/php-component": "^7.0",
+        "symfony/config": "^4.3",
+        "symfony/process": "^4.3"
     },
     "require-dev": {
         "keboola/coding-standard": "^8.0",
