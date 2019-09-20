@@ -3,6 +3,7 @@
 use Keboola\DbExtractor\Application;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
 use Symfony\Component\Yaml\Yaml;
@@ -46,7 +47,7 @@ try {
         echo json_encode($result);
     }
 
-} catch(UserException $e) {
+} catch(UserException|ConfigUserException $e) {
     $logger->log('error', $e->getMessage(), (array) $e->getData());
     exit(1);
 } catch(ApplicationException $e) {
