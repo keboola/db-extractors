@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -74,7 +75,7 @@ try {
     }
     $app['logger']->log('info', 'Extractor finished successfully.');
     exit(0);
-} catch (UserException $e) {
+} catch (UserException|ConfigUserException $e) {
     $logger->log('error', $e->getMessage());
     if (!$runAction) {
         echo $e->getMessage();
