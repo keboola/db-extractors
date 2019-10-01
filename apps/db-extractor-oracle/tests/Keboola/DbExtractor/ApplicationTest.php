@@ -139,10 +139,7 @@ class ApplicationTest extends OracleBaseTest
         $this->assertFileExists($manifestFile3);
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testGetTablesAction(string $configType): void
+    public function testGetTablesAction(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
@@ -157,10 +154,7 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testGetTablesNoColumns(string $configType): void
+    public function testGetTablesNoColumns(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
