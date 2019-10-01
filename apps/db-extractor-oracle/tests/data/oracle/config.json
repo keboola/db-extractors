@@ -20,7 +20,9 @@
         },
         "outputTable": "in.c-main.escaping",
         "incremental": false,
-        "primaryKey": null
+        "primaryKey": [
+          "_funnY#-col"
+        ]
       },
       {
         "id": 3,
