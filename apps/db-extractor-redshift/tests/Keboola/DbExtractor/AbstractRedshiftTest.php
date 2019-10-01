@@ -61,9 +61,9 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $pdo->query($qry);
     }
 
-    public function getConfig(string $driver = self::DRIVER, string $congifFormat = self::CONFIG_FORMAT_YAML): array
+    public function getConfig(string $driver = self::DRIVER): array
     {
-        $config = parent::getConfig($driver, $congifFormat);
+        $config = parent::getConfig($driver);
         if (getenv('AWS_ACCESS_KEY')) {
             $config['aws']['s3key'] = getenv('AWS_ACCESS_KEY');
         }
@@ -106,23 +106,12 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         return new Application($config, new Logger('ex-db-redshift-tests'));
     }
 
-    public function configFormatProvider(): array
-    {
-        return [
-            [self::CONFIG_FORMAT_YAML],
-            [self::CONFIG_FORMAT_JSON],
-        ];
-    }
-
     public function configProvider(): array
     {
         $this->dataDir = __DIR__ . '/../../data';
         return [
             [
-                $this->getConfig(self::DRIVER, ExtractorTest::CONFIG_FORMAT_YAML),
-            ],
-            [
-                $this->getConfig(self::DRIVER, ExtractorTest::CONFIG_FORMAT_JSON),
+                $this->getConfig(self::DRIVER),
             ],
             [
                 $this->getConfigRow(self::DRIVER),
