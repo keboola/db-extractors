@@ -7,7 +7,6 @@ namespace Keboola\DbExtractor\Tests;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Extractor\Oracle;
 use Keboola\DbExtractorLogger\Logger;
-use Symfony\Component\Yaml\Yaml;
 
 class OracleTest extends OracleBaseTest
 {
@@ -982,8 +981,9 @@ class OracleTest extends OracleBaseTest
 
         $result = $app->run();
 
-        $outputManifest = Yaml::parse(
-            (string) file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest')
+        $outputManifest = json_decode(
+            (string) file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest'),
+            true
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);
