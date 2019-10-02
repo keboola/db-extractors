@@ -239,4 +239,74 @@ class ConfigTest extends AbstractConfigTest
 
         new Config($configurationArray, new ConfigRowDefinition());
     }
+
+    public function testTestConfigWithExtraKeysConfigDefinition(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'tables' => [],
+                'advancedMode' => true,
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ConfigDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testTestConfigWithExtraKeysConfigRowDefinition(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'query' => 'SELECT 1 FROM test',
+                'outputTable' => 'testOutput',
+                'columns' => [],
+                'incremental' => false,
+                'enabled' => true,
+                'primaryKey' => [],
+                'advancedMode' => true,
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testTestConfigWithExtraKeysActionConfigRowDefinition(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'advancedMode' => true,
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
 }
