@@ -28,13 +28,14 @@ class ActionConfigRowDefinition extends BaseConfigDefinition
 
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder('parameters');
 
         /** @var ArrayNodeDefinition $parametersNode */
-        $parametersNode = $treeBuilder->root('parameters');
+        $parametersNode = $treeBuilder->getRootNode();
 
         // @formatter:off
         $parametersNode
+            ->ignoreExtraKeys(false)
             ->children()
                 ->scalarNode('data_dir')
                     ->isRequired()
