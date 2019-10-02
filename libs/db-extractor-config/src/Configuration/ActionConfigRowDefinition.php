@@ -35,6 +35,7 @@ class ActionConfigRowDefinition extends BaseConfigDefinition
 
         // @formatter:off
         $parametersNode
+            ->ignoreExtraKeys(false)
             ->children()
                 ->scalarNode('data_dir')
                     ->isRequired()
