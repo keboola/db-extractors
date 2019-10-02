@@ -74,7 +74,12 @@ class SSHTunnel
                 ]
             )
         );
-        $this->logger->info("Creating SSH tunnel to '" . $tunnelParams['sshHost'] . "'");
+        $this->logger->info(
+            sprintf(
+                "Creating SSH tunnel to '%s' on local port '%s'",
+                $tunnelParams['sshHost'],
+                $tunnelParams['localPort'])
+        );
 
         $simplyRetryPolicy = new SimpleRetryPolicy(
             self::DEFAULT_MAX_TRIES,
