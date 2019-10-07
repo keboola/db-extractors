@@ -677,4 +677,14 @@ class MySQLTest extends AbstractMySQLTest
             $this->assertStringStartsWith('Invalid Configuration [ext_sales]', $e->getMessage());
         }
     }
+
+    public function testTestIgnoringExtraKeys(): void
+    {
+        $configurationArray = $this->getConfigRow(self::DRIVER);
+        $configurationArray['parameters']['someExtraKey'] = 'test';
+        $app = $this->createApplication($configurationArray);
+        $result = $app->run();
+
+        $this->assertEquals('success', $result['status']);
+    }
 }

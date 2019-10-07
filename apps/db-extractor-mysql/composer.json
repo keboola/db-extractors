@@ -13,7 +13,7 @@
         "php": "^7.3",
         "ext-PDO": "*",
         "keboola/db-extractor-common": "^10.0",
-        "keboola/db-extractor-config": "^1.0",
+        "keboola/db-extractor-config": "^1.2",
         "keboola/db-extractor-logger": "^1.0",
         "keboola/php-datatypes": "^4.2",
         "keboola/php-temp": "^2.0",

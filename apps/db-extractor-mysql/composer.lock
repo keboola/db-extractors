@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c511bc2a74621b7515f0bbcb8fda4a8e",
+    "content-hash": "f3013cc24f3386fcaa082a45205d0e2a",
     "packages": [
         {
             "name": "keboola/csv",
@@ -114,22 +114,21 @@
         },
         {
             "name": "keboola/db-extractor-config",
-            "version": "1.0.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-config.git",
-                "reference": "041742b0c9f57a4fcd05305f5d0d6f3d12f8e9fb"
+                "reference": "768ce2728b71a72e4b5bb13ef95d5a2fa58aaad1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-config/zipball/041742b0c9f57a4fcd05305f5d0d6f3d12f8e9fb",
-                "reference": "041742b0c9f57a4fcd05305f5d0d6f3d12f8e9fb",
+                "url": "https://api.github.com/repos/keboola/db-extractor-config/zipball/768ce2728b71a72e4b5bb13ef95d5a2fa58aaad1",
+                "reference": "768ce2728b71a72e4b5bb13ef95d5a2fa58aaad1",
                 "shasum": ""
             },
             "require": {
                 "keboola/php-component": "^7.0",
-                "symfony/config": "^4.2",
-                "symfony/yaml": "^4.2"
+                "symfony/config": "^4.2"
             },
             "require-dev": {
                 "keboola/coding-standard": "^8.0",
@@ -147,7 +146,7 @@
                 "MIT"
             ],
             "description": "Config definition for database extractor",
-            "time": "2019-08-30T14:12:37+00:00"
+            "time": "2019-10-02T07:21:39+00:00"
         },
         {
             "name": "keboola/db-extractor-logger",
