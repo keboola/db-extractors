@@ -71,8 +71,6 @@ class MySQLEntrypointTest extends AbstractMySQLTest
             ],
             'user' => 'root',
             'sshHost' => 'sshproxy',
-            'remoteHost' => self::DRIVER,
-            'remotePort' => $this->getEnv('mysql', 'DB_PORT'),
             'localPort' => '1234',
         ];
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
