@@ -57,8 +57,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
             'user' => 'root',
             'sshHost' => 'sshproxy',
             'localPort' => '33308',
-            'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
-            'remotePort' => $this->getEnv('redshift', 'DB_PORT'),
         ];
 
         $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
