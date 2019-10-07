@@ -21,12 +21,13 @@ class Redshift extends Extractor
         }
 
         $port = isset($dbParams['port']) ? $dbParams['port'] : '5439';
-
+        $dsn = "pgsql:dbname={$dbParams['database']};port={$port};host=" . $dbParams['host'];
         $pdo = new \PDO(
-            "pgsql:dbname={$dbParams['database']};port={$port};host=" . $dbParams['host'],
+            $dsn,
             $dbParams['user'],
             $dbParams['#password']
         );
+        $this->logger->info(sprintf('Connecting to %s', $dsn));
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $pdo;
     }
