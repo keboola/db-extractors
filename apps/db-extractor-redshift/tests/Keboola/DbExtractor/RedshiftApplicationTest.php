@@ -48,7 +48,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
     {
         $config = $this->getConfig();
 
-        $config['action'] = 'testConnection';
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -68,14 +67,12 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $process->setTimeout(300);
         $process->run();
 
+        $this->assertEquals(0, $process->getExitCode());
         $this->assertStringContainsString(
             'Creating SSH tunnel to \'sshproxy\' on local port \'33308\'',
             $process->getOutput()
         );
         $this->assertStringContainsString('port=33308;host=127.0.0.1', $process->getOutput());
-        $this->assertEquals(0, $process->getExitCode());
-        $this->assertJson($process->getOutput());
-        $this->assertEquals('', $process->getErrorOutput());
     }
 
     /**
