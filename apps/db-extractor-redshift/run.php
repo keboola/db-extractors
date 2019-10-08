@@ -6,7 +6,6 @@ use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
-use Symfony\Component\Yaml\Yaml;
 
 require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
@@ -20,11 +19,7 @@ try {
         throw new UserException('Data folder not set.');
     }
 
-    if (file_exists($arguments["data"] . "/config.yml")) {
-        $config = Yaml::parse(
-            file_get_contents($arguments["data"] . "/config.yml")
-        );
-    } else if (file_exists($arguments["data"] . "/config.json")) {
+    if (file_exists($arguments["data"] . "/config.json")) {
         $config = json_decode(
             file_get_contents($arguments["data"] . '/config.json'),
             true

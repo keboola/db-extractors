@@ -6,7 +6,6 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Application;
-use Symfony\Component\Yaml\Yaml;
 
 class RedshiftTest extends AbstractRedshiftTest
 {
@@ -295,10 +294,11 @@ class RedshiftTest extends AbstractRedshiftTest
 
         $result = $app->run();
 
-        $outputManifest = Yaml::parse(
+        $outputManifest = json_decode(
             (string) file_get_contents(
                 $this->dataDir . '/out/tables/' . strtolower($result['imported'][0]['outputTable']) . '.csv.manifest'
-            )
+            ),
+            true
         );
 
         $this->assertArrayHasKey('destination', $outputManifest);

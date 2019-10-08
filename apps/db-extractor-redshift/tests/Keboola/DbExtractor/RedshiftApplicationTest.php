@@ -6,34 +6,22 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Yaml\Yaml;
 
 class RedshiftApplicationTest extends AbstractRedshiftTest
 {
     protected const ROOT_PATH = __DIR__ . '/../../..';
 
-    private function prepareConfig(array $config, string $format): void
+    private function prepareConfig(array $config): void
     {
-        @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
-
-        if ($format === self::CONFIG_FORMAT_JSON) {
-            file_put_contents($this->dataDir . '/config.json', json_encode($config));
-        } elseif ($format === self::CONFIG_FORMAT_YAML) {
-            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
-        } else {
-            throw new \Exception("Invalid test config format: {$format}");
-        }
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
     }
 
-    /**
-     * @dataProvider configFormatProvider
-     */
-    public function testTestConnectionAction(string $configFormat): void
+    public function testTestConnectionAction(): void
     {
-        $config = $this->getConfig(self::DRIVER, $configFormat);
+        $config = $this->getConfig(self::DRIVER);
         $config['action'] = 'testConnection';
-        $this->prepareConfig($config, $configFormat);
+        $this->prepareConfig($config);
 
         $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -59,7 +47,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
             'localPort' => '33308',
         ];
 
-        $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
+        $this->prepareConfig($config);
 
         $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -73,15 +61,11 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->assertStringContainsString('port=33308;host=127.0.0.1', $process->getOutput());
     }
 
-    /**
-     * @dataProvider configFormatProvider
-     * @param string $configFormat
-     */
-    public function testRunAction(string $configFormat): void
+    public function testRunAction(): void
     {
-        $config = $this->getConfig(self::DRIVER, $configFormat);
+        $config = $this->getConfig(self::DRIVER);
 
-        $this->prepareConfig($config, $configFormat);
+        $this->prepareConfig($config);
 
         // run entrypoint
         $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
@@ -97,7 +81,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $expectedCsvFile = $this->dataDir .  '/in/tables/escaping.csv';
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
         $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
-        $manifest = Yaml::parse((string) file_get_contents($outputManifestFile));
+        $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($outputManifestFile);
@@ -123,8 +107,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
             'remoteHost' => $this->getEnv('redshift', 'DB_HOST'),
             'remotePort' => $this->getEnv('redshift', 'DB_PORT'),
         ];
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $this->prepareConfig($config);
 
         // run entrypoint
         $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
@@ -143,8 +126,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv';
         $outputManifestFile1 = $this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest';
         $outputManifestFile2 = $this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest';
-        $manifest1 = Yaml::parse((string) file_get_contents($outputManifestFile1));
-        $manifest2 = Yaml::parse((string) file_get_contents($outputManifestFile2));
+        $manifest1 = json_decode((string) file_get_contents($outputManifestFile1), true);
+        $manifest2 = json_decode((string) file_get_contents($outputManifestFile2), true);
 
         $this->assertFileExists($outputCsvFile1);
         $this->assertFileExists($outputCsvFile2);
@@ -181,7 +164,7 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $config = $this->getConfig();
         $config['action'] = 'getTables';
 
-        $this->prepareConfig($config, self::CONFIG_FORMAT_JSON);
+        $this->prepareConfig($config);
 
         // run entrypoint
         $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
