@@ -298,14 +298,6 @@ EOT;
         return $linesCount;
     }
 
-    public function configTypesProvider(): array
-    {
-        return [
-            [self::CONFIG_FORMAT_YAML],
-            [self::CONFIG_FORMAT_JSON],
-        ];
-    }
-
     public function getPrivateKey(): string
     {
         return (string) file_get_contents('/root/.ssh/id_rsa');

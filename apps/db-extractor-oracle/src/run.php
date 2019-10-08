@@ -6,7 +6,6 @@ use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorLogger\Logger;
-use Symfony\Component\Yaml\Yaml;
 use Monolog\Handler\NullHandler;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
@@ -22,11 +21,7 @@ try {
     }
     $dataFolder = (string) $arguments['data'];
 
-    if (file_exists($dataFolder . '/config.yml')) {
-        $config = Yaml::parse(
-            (string) file_get_contents($dataFolder . '/config.yml')
-        );
-    } else if (file_exists($dataFolder . '/config.json')) {
+    if (file_exists($dataFolder . '/config.json')) {
         $config = json_decode(
             (string) file_get_contents($dataFolder . '/config.json'),
             true

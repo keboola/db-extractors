@@ -7,21 +7,17 @@ namespace Keboola\DbExtractor\Tests;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Yaml\Yaml;
 
 class ApplicationTest extends OracleBaseTest
 {
     /** @var string */
     protected $rootPath = __DIR__ . '/../../..';
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testTestConnectionAction(string $configType): void
+    public function testTestConnectionAction(): void
     {
-        $config = $this->getConfig('oracle', $configType);
+        $config = $this->getConfig('oracle');
         $config['action'] = 'testConnection';
-        $this->putConfig($config, $configType);
+        $this->putConfig($config);
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -32,10 +28,7 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testRunAction(string $configType): void
+    public function testRunAction(): void
     {
         $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -61,8 +54,8 @@ class ApplicationTest extends OracleBaseTest
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
-        $config = $this->getConfig('oracle', $configType);
-        $this->putConfig($config, $configType);
+        $config = $this->getConfig('oracle');
+        $this->putConfig($config);
 
         $this->setupTestTables();
 
@@ -111,7 +104,7 @@ class ApplicationTest extends OracleBaseTest
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
-        $config = $this->getConfig('oracle', self::CONFIG_FORMAT_JSON);
+        $config = $this->getConfig('oracle');
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -124,7 +117,7 @@ class ApplicationTest extends OracleBaseTest
             'remotePort' => $config['parameters']['db']['port'],
             'localPort' => '15213',
         ];
-        $this->putConfig($config, self::CONFIG_FORMAT_JSON);
+        $this->putConfig($config);
         $this->setupTestTables();
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
@@ -146,14 +139,11 @@ class ApplicationTest extends OracleBaseTest
         $this->assertFileExists($manifestFile3);
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testGetTablesAction(string $configType): void
+    public function testGetTablesAction(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
-        $this->putConfig($config, $configType);
+        $this->putConfig($config);
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -164,17 +154,14 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testGetTablesNoColumns(string $configType): void
+    public function testGetTablesNoColumns(): void
     {
         $config = $this->getConfig('oracle');
         $config['action'] = 'getTables';
         $config['parameters']['tableListFilter'] = [
             'listColumns' => false,
         ];
-        $this->putConfig($config, $configType);
+        $this->putConfig($config);
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
@@ -198,7 +185,7 @@ class ApplicationTest extends OracleBaseTest
                 'schema' => 'HR',
             ]],
         ];
-        $this->putConfig($config, self::CONFIG_FORMAT_JSON);
+        $this->putConfig($config);
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
         $process->mustRun();
@@ -219,7 +206,7 @@ class ApplicationTest extends OracleBaseTest
         unset($config['parameters']['tables'][2]);
         unset($config['parameters']['tables'][3]['table']);
         $config['parameters']['tables'][3]['query'] = 'SELECT SOMETHING ORDER BY INVALID FROM "invalid"."escaping"';
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        $this->putConfig($config);
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -231,16 +218,9 @@ class ApplicationTest extends OracleBaseTest
         $this->assertStringContainsString('[4x]', $process->getOutput());
     }
 
-    private function putConfig(array $config, string $configType): void
+    private function putConfig(array $config): void
     {
-        @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
-        if ($configType === self::CONFIG_FORMAT_YAML) {
-            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
-        } else if ($configType === self::CONFIG_FORMAT_JSON) {
-            file_put_contents($this->dataDir . '/config.json', json_encode($config));
-        } else {
-            throw new UserException(sprintf('Unsupported configuration type: [%s]', $configType));
-        }
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
     }
 }
