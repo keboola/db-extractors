@@ -57,6 +57,33 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $this->assertFileEquals((string) $csv2, $outputCsvFile2);
     }
 
+    public function testRunActionSshTunnel(): void
+    {
+
+        @unlink($this->dataDir . '/config.json');
+        @unlink($this->dataDir . '/config.yml');
+        $config = $this->getConfig(self::DRIVER);
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'localPort' => '1234',
+        ];
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
+
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertStringContainsString('Creating SSH tunnel to \'sshproxy\' on local port \'1234\'', $process->getOutput());
+        $this->assertStringContainsString('host=127.0.0.1;port=1234;dbname=test;', $process->getOutput());
+    }
+
     public function testTestConnectionAction(): void
     {
         $config = $this->getConfig();
