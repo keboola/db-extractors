@@ -52,12 +52,9 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertEquals('success', $result['status']);
     }
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testRunMain(string $configType): void
+    public function testRunMain(): void
     {
-        $config = $this->getConfig(self::DRIVER, $configType);
+        $config = $this->getConfig();
         $app = $this->createApplication($config);
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');

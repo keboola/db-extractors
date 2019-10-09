@@ -7,17 +7,13 @@ namespace Keboola\DbExtractor\Tests;
 use Keboola\Csv\CsvFile;
 use Symfony\Component\Filesystem;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Yaml\Yaml;
 
 class MySQLEntrypointTest extends AbstractMySQLTest
 {
     /** @var string */
     protected $rootPath = __DIR__ . '/../../..';
 
-    /**
-     * @dataProvider configTypesProvider
-     */
-    public function testRunAction(string $configType): void
+    public function testRunAction(): void
     {
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.sales.csv';
         $outputCsvFile2 = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
@@ -26,14 +22,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($outputCsvFile2);
 
         @unlink($this->dataDir . '/config.json');
-        @unlink($this->dataDir . '/config.yml');
 
-        $config = $this->getConfig(self::DRIVER, $configType);
-        if ($configType === 'json') {
-            file_put_contents($this->dataDir . '/config.json', json_encode($config));
-        } else {
-            file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
-        }
+        $config = $this->getConfig();
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
@@ -61,8 +52,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     {
 
         @unlink($this->dataDir . '/config.json');
-        @unlink($this->dataDir . '/config.yml');
-        $config = $this->getConfig(self::DRIVER);
+        $config = $this->getConfig();
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
             'keys' => [
@@ -87,9 +77,9 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     public function testTestConnectionAction(): void
     {
         $config = $this->getConfig();
-        @unlink($this->dataDir . '/config.yml');
+        @unlink($this->dataDir . '/config.json');
         $config['action'] = 'testConnection';
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -102,7 +92,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     public function testTestConnectionActionWithSSH(): void
     {
         $config = $this->getConfig();
-        @unlink($this->dataDir . '/config.yml');
+        @unlink($this->dataDir . '/config.json');
         $config['action'] = 'testConnection';
         $config['parameters']['db']['ssh'] = [
             'enabled' => true,
@@ -116,7 +106,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
             'remotePort' => $this->getEnv('mysql', 'DB_PORT'),
             'localPort' => '15211',
         ];
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -130,8 +120,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     {
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        @unlink($this->dataDir . '/config.json');
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
         $process->setTimeout(300);
@@ -151,8 +141,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config = $this->getConfig();
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        @unlink($this->dataDir . '/config.json');
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
@@ -181,8 +171,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
-        @unlink($this->dataDir . '/config.yml');
-        file_put_contents($this->dataDir . '/config.yml', Yaml::dump($config));
+        @unlink($this->dataDir . '/config.json');
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
         // try exporting before the table exists
 
@@ -224,9 +214,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         // unset the state file
         @unlink($outputStateFile);
 
-        $config = $this->getConfigRow(self::DRIVER);
+        $config = $this->getConfigRow();
 
-        @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
@@ -249,9 +238,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
     public function testRunIncrementalFetching(): void
     {
         $this->createAutoIncrementAndTimestampTable();
-        $config = $this->getConfigRow(self::DRIVER);
+        $config = $this->getConfigRow();
 
-        @unlink($this->dataDir . '/config.yml');
         @unlink($this->dataDir . '/config.json');
 
         $inputStateFile = $this->dataDir . '/in/state.json';

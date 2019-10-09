@@ -87,9 +87,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`, `foreign_key`) VALUES (\'sue\',1)');
     }
 
-    public function getConfig(string $driver = self::DRIVER, string $format = self::CONFIG_FORMAT_YAML): array
+    public function getConfig(string $driver = self::DRIVER): array
     {
-        $config = parent::getConfig($driver, $format);
+        $config = parent::getConfig($driver);
         $config['parameters']['extractor_class'] = 'MySQL';
         return $config;
     }
@@ -186,20 +186,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $app;
     }
 
-    public function configTypesProvider(): array
-    {
-        return [
-            [self::CONFIG_FORMAT_YAML],
-            [self::CONFIG_FORMAT_JSON],
-        ];
-    }
-
     public function configProvider(): array
     {
         $this->dataDir = __DIR__ . '/../../data';
         return [
-            [$this->getConfig(self::DRIVER, self::CONFIG_FORMAT_YAML)],
-            [$this->getConfig(self::DRIVER, self::CONFIG_FORMAT_JSON)],
+            [$this->getConfig(self::DRIVER)],
             [$this->getConfigRow()],
         ];
     }
