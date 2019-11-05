@@ -3,7 +3,7 @@ FROM quay.io/keboola/aws-cli
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SESSION_TOKEN
-RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u211-linux-x64.tar.gz /tmp/oracle-jdk.tar.gz
+RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u231-linux-x64.tar.gz /tmp/oracle-jdk.tar.gz
 
 FROM php:7.3-cli-stretch
 
@@ -40,12 +40,12 @@ RUN mkdir -p /usr/share/man/man1
 COPY --from=1 /tmp/oracle-jdk.tar.gz /tmp/oracle-jdk.tar.gz
 
 RUN mkdir /usr/lib/jvm/ && tar zxvf /tmp/oracle-jdk.tar.gz -C /usr/lib/jvm/ \
- && update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_211/bin/java 4 \
- &&  update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk1.8.0_211/bin/javac 4 \
+ && update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_231/bin/java 4 \
+ &&  update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk1.8.0_231/bin/javac 4 \
  && update-alternatives --config java \
  && rm /tmp/oracle-jdk.tar.gz
 
-ENV JAVA_HOME /usr/lib/jvm/jdk1.8.0_211
+ENV JAVA_HOME /usr/lib/jvm/jdk1.8.0_231
 
 WORKDIR /root
 RUN curl -sS https://getcomposer.org/installer | php \
@@ -55,7 +55,7 @@ WORKDIR /code
 
 # Initialize
 COPY . /code
-RUN composer selfupdate && composer install --no-interaction
+RUN composer self-update && composer install --no-interaction
 
 COPY --from=sshproxy /root/.ssh /root/.ssh
 
