@@ -1,7 +1,7 @@
 {
     "name": "keboola/db-extractor-oracle",
     "license": "MIT",
-    "type": "Application",
+    "type": "project",
     "description": "Reads data from Oracle databases for keboola connection",
     "authors": [
         {
