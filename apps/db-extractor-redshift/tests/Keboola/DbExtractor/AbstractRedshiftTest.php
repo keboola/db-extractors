@@ -29,17 +29,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
     private function initRedshiftData(array $config): void
     {
-        $dsn = sprintf(
-            'pgsql:dbname=%s;port=5439;host=%s',
-            $config['parameters']['db']['database'],
-            $config['parameters']['db']['host']
-        );
-
-        $pdo = new \PDO(
-            $dsn,
-            $config['parameters']['db']['user'],
-            $config['parameters']['db']['#password']
-        );
+        $pdo = $this->getPdoConnection($config);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $pdo->query(sprintf('DROP SCHEMA IF EXISTS "%s" CASCADE', self::TESTING_SCHEMA_NAME));
@@ -81,7 +71,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         return $config;
     }
 
-    public function getConfigRow(string $driver): array
+    public function getConfigRow(string $driver = self::DRIVER): array
     {
         $config = parent::getConfigRow($driver);
         if (getenv('AWS_ACCESS_KEY')) {
@@ -101,9 +91,9 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         return $config;
     }
 
-    public function createApplication(array $config): Application
+    public function createApplication(array $config, array $state = []): Application
     {
-        return new Application($config, new Logger('ex-db-redshift-tests'));
+        return new Application($config, new Logger('ex-db-redshift-tests'), $state);
     }
 
     public function configProvider(): array
@@ -128,4 +118,67 @@ abstract class AbstractRedshiftTest extends ExtractorTest
     {
         return (string) file_get_contents('/root/.ssh/id_rsa.pub');
     }
+
+    protected function createAutoIncrementAndTimestampTable(array $config): void
+    {
+        $pdo = $this->getPdoConnection($config);
+
+        $pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
+        $pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp_pkey');
+
+        $query = sprintf('CREATE TABLE %s.%s (
+            "_weird-I-d" INT NOT NULL identity(1, 1),
+            "weird-Name" VARCHAR(30) NOT NULL DEFAULT \'pam\',
+            "timestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            "datetime" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            "intColumn" INT DEFAULT 1,
+            "decimalColumn" DECIMAL(10,2) DEFAULT 10.2,
+            PRIMARY KEY ("_weird-I-d")  
+        )', $config['parameters']['table']['schema'], $config['parameters']['table']['tableName']);
+
+        $pdo->exec($query);
+        $this->insertRowToTable($config, [
+            "weird-Name" => 'george',
+            "intColumn" => 2,
+            "decimalColumn" => 20.2
+        ]);
+
+        // Stagger the new column input timestamps
+        sleep(1);
+        $this->insertRowToTable($config, [
+            "weird-Name" => 'henry',
+            "intColumn" => 3,
+            "decimalColumn" => 30.3
+        ]);
+    }
+
+    protected function insertRowToTable(array $config, array $columns): void
+    {
+        $pdo = $this->getPdoConnection($config);
+
+        $query = sprintf(
+            'INSERT INTO %s.%s (%s) VALUES (%s)',
+            $config['parameters']['table']['schema'],
+            $config['parameters']['table']['tableName'],
+            '"' . implode('", "', array_keys($columns)) . '"',
+            "'" . implode("', '", $columns) . "'"
+        );
+        $pdo->exec($query);
+    }
+
+    private function getPdoConnection(array $config): \PDO
+    {
+        $dsn = sprintf(
+            'pgsql:dbname=%s;port=5439;host=%s',
+            $config['parameters']['db']['database'],
+            $config['parameters']['db']['host']
+        );
+
+        return new \PDO(
+            $dsn,
+            $config['parameters']['db']['user'],
+            $config['parameters']['db']['#password']
+        );
+    }
+
 }
