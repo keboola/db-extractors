@@ -310,8 +310,8 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $config['parameters']['outputTable'] = 'in.c-main.auto-increment-autoincrement';
         $config['parameters']['columns'] = [];
         $config['parameters']['query'] = 'SELECT * FROM auto_increment_timestamp';
-        unset($config['parameters']['table']);
         $this->createAutoIncrementAndTimestampTable($config);
+        unset($config['parameters']['table']);
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage('Incremental fetching is not supported for advanced queries.');
