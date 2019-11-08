@@ -12,7 +12,12 @@ class Redshift extends Extractor
     public const INCREMENT_TYPE_NUMERIC = 'numeric';
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
-    public const TIMESTAMP_BASE_TYPES = ['TIMESTAMP', 'TIMESTAMP WITHOUT TIME ZONE', 'TIMESTAMPTZ', 'TIMESTAMP WITH TIME ZONE'];
+    public const TIMESTAMP_BASE_TYPES = [
+        'TIMESTAMP',
+        'TIMESTAMP WITHOUT TIME ZONE',
+        'TIMESTAMPTZ',
+        'TIMESTAMP WITH TIME ZONE',
+    ];
 
     public function createConnection(array $dbParams): \PDO
     {

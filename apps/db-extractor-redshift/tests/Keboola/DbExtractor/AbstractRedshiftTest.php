@@ -138,17 +138,17 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
         $pdo->exec($query);
         $this->insertRowToTable($config, [
-            "weird-Name" => 'george',
-            "intColumn" => 2,
-            "decimalColumn" => 20.2
+            'weird-Name' => 'george',
+            'intColumn' => 2,
+            'decimalColumn' => 20.2,
         ]);
 
         // Stagger the new column input timestamps
         sleep(1);
         $this->insertRowToTable($config, [
-            "weird-Name" => 'henry',
-            "intColumn" => 3,
-            "decimalColumn" => 30.3
+            'weird-Name' => 'henry',
+            'intColumn' => 3,
+            'decimalColumn' => 30.3,
         ]);
     }
 
@@ -180,5 +180,4 @@ abstract class AbstractRedshiftTest extends ExtractorTest
             $config['parameters']['db']['#password']
         );
     }
-
 }

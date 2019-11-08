@@ -40,8 +40,8 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
-        $this->insertRowToTable($config, ["weird-Name" => 'charles']);
-        $this->insertRowToTable($config, ["weird-Name" => 'william']);
+        $this->insertRowToTable($config, ['weird-Name' => 'charles']);
+        $this->insertRowToTable($config, ['weird-Name' => 'william']);
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
@@ -85,8 +85,8 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $noNewRowsResult = ($this->createApplication($config, $result['state']))->run();
         $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
 
-        $this->insertRowToTable($config, ["weird-Name" => 'charles']);
-        $this->insertRowToTable($config, ["weird-Name" => 'william']);
+        $this->insertRowToTable($config, ['weird-Name' => 'charles']);
+        $this->insertRowToTable($config, ['weird-Name' => 'william']);
 
         $newResult = ($this->createApplication($config, $result['state']))->run();
 
