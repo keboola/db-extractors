@@ -302,7 +302,7 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
             ],
             'column exists but is not auto-increment nor updating timestamp so should fail' => [
                 'weird-name',
-                'Column [weird-name] specified for incremental fetching is not a numeric or timestamp type column'
+                'Column [weird-name] specified for incremental fetching is not a numeric or timestamp type column',
             ],
         ];
     }
