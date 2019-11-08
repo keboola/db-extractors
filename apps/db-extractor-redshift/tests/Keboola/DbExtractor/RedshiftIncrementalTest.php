@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 
@@ -274,6 +275,30 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
+    }
+
+    public function testIncrementalOrdering(): void
+    {
+        $config = $this->getConfigRow();
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-i-d';
+        $config['parameters']['incrementalFetchingLimit'] = 1;
+        $config['parameters']['table']['tableName'] = 'auto_increment_autoincrement';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-autoincrement';
+        $config['parameters']['columns'] = [];
+        $this->createAutoIncrementAndTimestampTable($config);
+
+        $result = ($this->createApplication($config))->run();
+        $outputCsvFile = iterator_to_array(
+            new CsvFile(
+                $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
+            )
+        );
+
+        $previousId = 0;
+        foreach ($outputCsvFile as $key => $row) {
+            $this->assertGreaterThan($previousId, (int) $row[0]);
+            $previousId = (int) $row[0];
+        }
     }
 
     public function testIncrementalFetchingInvalidConfig(): void
