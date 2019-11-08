@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 
 class RedshiftIncrementalTest extends AbstractRedshiftTest
 {
@@ -273,6 +274,23 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
+    }
+
+    public function testIncrementalFetchingInvalidConfig(): void
+    {
+        $config = $this->getConfigRow();
+        $config['parameters']['incrementalFetchingColumn'] = '_weird-i-d';
+        $config['parameters']['incrementalFetchingLimit'] = 1;
+        $config['parameters']['table']['tableName'] = 'auto_increment_autoincrement';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-autoincrement';
+        $config['parameters']['columns'] = [];
+        $config['parameters']['query'] = 'SELECT * FROM auto_increment_timestamp';
+        unset($config['parameters']['table']);
+        $this->createAutoIncrementAndTimestampTable($config);
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('Incremental fetching is not supported for advanced queries.');
+        $this->createApplication($config);
     }
 
     /**
