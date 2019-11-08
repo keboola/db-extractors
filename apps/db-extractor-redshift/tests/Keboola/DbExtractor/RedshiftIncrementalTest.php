@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Application;
+use Keboola\DbExtractor\Exception\UserException;
 
 class RedshiftIncrementalTest extends AbstractRedshiftTest
 {
@@ -274,5 +273,37 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('state', $result);
         $this->assertArrayHasKey('lastFetchedRow', $result['state']);
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
+    }
+
+    /**
+     * @dataProvider invalidColumnProvider
+     */
+    public function testIncrementalFetchingInvalidColumns(string $column, string $expectedExceptionMessage): void
+    {
+        $config = $this->getConfigRow();
+        $config['parameters']['incrementalFetchingColumn'] = $column;
+        $config['parameters']['table']['tableName'] = 'auto_increment_autoincrement';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-autoincrement';
+        $config['parameters']['columns'] = [];
+        $this->createAutoIncrementAndTimestampTable($config);
+        $app = $this->createApplication($config);
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $app->run();
+    }
+
+    public function invalidColumnProvider(): array
+    {
+        return [
+            'column does not exist' => [
+                'fakeCol',
+                'Column [fakeCol] specified for incremental fetching was not found in the table',
+            ],
+            'column exists but is not auto-increment nor updating timestamp so should fail' => [
+                'weird-name',
+                'Column [weird-name] specified for incremental fetching is not a numeric or timestamp type column'
+            ],
+        ];
     }
 }
