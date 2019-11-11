@@ -63,7 +63,6 @@ RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
 COPY . /code/
 # run normal composer - all deps are cached already
 RUN composer install $COMPOSER_FLAGS
-# Initialize
 
 COPY --from=sshproxy /root/.ssh /root/.ssh
 
