@@ -4,6 +4,9 @@ ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SESSION_TOKEN
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u231-linux-x64.tar.gz /tmp/oracle-jdk.tar.gz
+RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/instantclient-basiclite.zip
+RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/instantclient-sdk.zip
+RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/instantclient-sqlplus.zip
 
 FROM php:7.3-cli-stretch
 
@@ -17,13 +20,13 @@ RUN apt-get update -q \
   && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr --no-install-recommends
 
 # Oracle instantclient
-ADD oracle/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/
-ADD oracle/instantclient-sdk-linux.x64-12.2.0.1.0.zip /tmp/
-ADD oracle/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/
+COPY --from=1 /tmp/instantclient-basiclite.zip /tmp/instantclient-basiclite.zip
+COPY --from=1 /tmp/instantclient-sdk.zip /tmp/instantclient-sdk.zip
+COPY --from=1 /tmp/instantclient-sqlplus.zip /tmp/instantclient-sqlplus.zip
 
-RUN unzip /tmp/instantclient-basiclite-linux.x64-12.2.0.1.0.zip -d /usr/local/
-RUN unzip /tmp/instantclient-sdk-linux.x64-12.2.0.1.0.zip -d /usr/local/
-RUN unzip /tmp/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip -d /usr/local/
+RUN unzip /tmp/instantclient-basiclite.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sdk.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sqlplus.zip -d /usr/local/
 
 RUN ln -s /usr/local/instantclient_12_2 /usr/local/instantclient
 RUN ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
