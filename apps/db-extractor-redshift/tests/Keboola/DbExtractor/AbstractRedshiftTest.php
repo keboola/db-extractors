@@ -30,7 +30,6 @@ abstract class AbstractRedshiftTest extends ExtractorTest
     private function initRedshiftData(array $config): void
     {
         $pdo = $this->getPdoConnection($config);
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $pdo->query(sprintf('DROP SCHEMA IF EXISTS "%s" CASCADE', self::TESTING_SCHEMA_NAME));
         $pdo->query('CREATE SCHEMA "' . self::TESTING_SCHEMA_NAME. '"');
@@ -174,10 +173,12 @@ abstract class AbstractRedshiftTest extends ExtractorTest
             $config['parameters']['db']['host']
         );
 
-        return new \PDO(
+        $pdo = new \PDO(
             $dsn,
             $config['parameters']['db']['user'],
             $config['parameters']['db']['#password']
         );
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        return $pdo;
     }
 }
