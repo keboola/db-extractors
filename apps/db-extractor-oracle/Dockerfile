@@ -7,6 +7,7 @@ RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u231-linux-x64.tar.
 
 FROM php:7.3-cli-stretch
 
+ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV TZ=UTC
 
@@ -53,9 +54,16 @@ RUN curl -sS https://getcomposer.org/installer | php \
 
 WORKDIR /code
 
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY composer.* /code/
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+# copy rest of the app
+COPY . /code/
+# run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
 # Initialize
-COPY . /code
-RUN composer self-update && composer install --no-interaction
 
 COPY --from=sshproxy /root/.ssh /root/.ssh
 
