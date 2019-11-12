@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
-use Keboola\Csv\CsvFile;
-use Keboola\Csv\Exception;
-use Keboola\DbExtractor\Exception\ApplicationException;
+use Keboola\Datatype\Definition\Redshift as RedshiftDatatype;
 use Keboola\DbExtractor\Exception\UserException;
 
 class Redshift extends Extractor
 {
+    public const INCREMENT_TYPE_NUMERIC = 'numeric';
+    public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
+    public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
+    public const TIMESTAMP_BASE_TYPES = [
+        'DATE',
+        'TIMESTAMP',
+        'TIMESTAMP WITHOUT TIME ZONE',
+        'TIMESTAMPTZ',
+        'TIMESTAMP WITH TIME ZONE',
+    ];
+
     public function createConnection(array $dbParams): \PDO
     {
         // check params
@@ -151,10 +160,73 @@ class Redshift extends Extractor
         return array_values($tableDefs);
     }
 
+
+    public function validateIncrementalFetching(array $table, string $columnName, ?int $limit = null): void
+    {
+        $query = sprintf(
+            'SELECT * FROM information_schema.columns 
+                            WHERE table_schema = %s AND table_name = %s AND column_name = %s',
+            $this->db->quote($table['schema']),
+            $this->db->quote($table['tableName']),
+            $this->db->quote($columnName)
+        );
+        $res = $this->db->query($query);
+        $columns = $res->fetchAll();
+        if (count($columns) === 0) {
+            throw new UserException(
+                sprintf(
+                    'Column [%s] specified for incremental fetching was not found in the table',
+                    $columnName
+                )
+            );
+        }
+
+        try {
+            $datatype = new RedshiftDatatype(strtoupper($columns[0]['data_type']));
+            if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_NUMERIC;
+            } elseif (in_array($datatype->getBasetype(), self::TIMESTAMP_BASE_TYPES)) {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_TIMESTAMP;
+            } else {
+                throw new UserException('invalid incremental fetching column type');
+            }
+        } catch (\Keboola\Datatype\Definition\Exception\InvalidLengthException | UserException $exception) {
+            throw new UserException(
+                sprintf(
+                    'Column [%s] specified for incremental fetching is not a numeric or timestamp type column',
+                    $columnName
+                )
+            );
+        }
+
+        if ($limit) {
+            $this->incrementalFetching['limit'] = $limit;
+        }
+    }
+
+
     public function simpleQuery(array $table, array $columns = array()): string
     {
+        $incrementalAddon = null;
+        if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
+            if (isset($this->state['lastFetchedRow'])) {
+                if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
+                    $lastFetchedRow = $this->state['lastFetchedRow'];
+                } else {
+                    $lastFetchedRow = $this->db->quote((string) $this->state['lastFetchedRow']);
+                }
+                $incrementalAddon = sprintf(
+                    ' WHERE %s >= %s',
+                    $this->quote($this->incrementalFetching['column']),
+                    $lastFetchedRow
+                );
+            }
+            $incrementalAddon .= sprintf(' ORDER BY %s', $this->quote($this->incrementalFetching['column']));
+        }
         if (count($columns) > 0) {
-            return sprintf(
+            $query = sprintf(
                 'SELECT %s FROM %s.%s',
                 implode(', ', array_map(function ($column) {
                     return $this->quote($column);
@@ -163,12 +235,22 @@ class Redshift extends Extractor
                 $this->quote($table['tableName'])
             );
         } else {
-            return sprintf(
+            $query = sprintf(
                 'SELECT * FROM %s.%s',
                 $this->quote($table['schema']),
                 $this->quote($table['tableName'])
             );
         }
+        if ($incrementalAddon) {
+            $query .= $incrementalAddon;
+        }
+        if (isset($this->incrementalFetching['limit'])) {
+            $query .= sprintf(
+                ' LIMIT %d',
+                $this->incrementalFetching['limit']
+            );
+        }
+        return $query;
     }
 
     private function quote(string $obj): string
