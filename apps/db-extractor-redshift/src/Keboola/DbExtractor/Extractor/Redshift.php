@@ -13,6 +13,7 @@ class Redshift extends Extractor
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
     public const TIMESTAMP_BASE_TYPES = [
+        'DATE',
         'TIMESTAMP',
         'TIMESTAMP WITHOUT TIME ZONE',
         'TIMESTAMPTZ',
