@@ -211,10 +211,15 @@ class Redshift extends Extractor
         $incrementalAddon = null;
         if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
             if (isset($this->state['lastFetchedRow'])) {
+                if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
+                    $lastFetchedRow = $this->state['lastFetchedRow'];
+                } else {
+                    $lastFetchedRow = $this->db->quote((string) $this->state['lastFetchedRow']);
+                }
                 $incrementalAddon = sprintf(
                     ' WHERE %s >= %s',
                     $this->quote($this->incrementalFetching['column']),
-                    $this->db->quote((string) $this->state['lastFetchedRow'])
+                    $lastFetchedRow
                 );
             }
             $incrementalAddon .= sprintf(' ORDER BY %s', $this->quote($this->incrementalFetching['column']));
