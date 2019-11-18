@@ -131,7 +131,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
             "timestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             "datetime" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             "intColumn" INT DEFAULT 1,
-            "decimalColumn" DECIMAL(10,2) DEFAULT 10.2,
+            "decimalColumn" DECIMAL(10,8) DEFAULT 10.2,
             PRIMARY KEY ("_weird-I-d")  
         )', $config['parameters']['table']['schema'], $config['parameters']['table']['tableName']);
 

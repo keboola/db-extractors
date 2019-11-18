@@ -265,7 +265,7 @@ class Redshift extends Extractor
         );
         $result = $this->db->query($fullsql)->fetchAll();
         if (count($result) > 0) {
-            return $result[0][$this->incrementalFetching['column']];
+            return (string) $result[0][$this->incrementalFetching['column']];
         }
         return null;
     }

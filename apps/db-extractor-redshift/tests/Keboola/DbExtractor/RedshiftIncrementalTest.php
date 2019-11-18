@@ -336,6 +336,37 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         $app->run();
     }
 
+    public function testIncrementalMaxNumberValue(): void
+    {
+        $config = $this->getConfigRow();
+        $config['parameters']['incrementalFetchingColumn'] = 'decimalcolumn';
+        $config['parameters']['table']['tableName'] = 'auto_increment_autoincrement';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-autoincrement';
+        $config['parameters']['columns'] = [];
+        $this->createAutoIncrementAndTimestampTable($config);
+
+        $result = ($this->createApplication($config))->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-autoincrement',
+                'rows' => 2,
+            ],
+            $result['imported']
+        );
+
+        $this->insertRowToTable($config, ['weird-Name' => 'charles', 'decimalColumn' => 40.23486237]);
+        $this->insertRowToTable($config, ['weird-Name' => 'william', 'decimalColumn' => 41.28637632]);
+
+        $newResult = ($this->createApplication($config, $result['state']))->run();
+
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertEquals('41.28637632', $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
+    }
+
     public function invalidColumnProvider(): array
     {
         return [
