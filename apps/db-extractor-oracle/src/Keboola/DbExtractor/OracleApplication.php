@@ -25,14 +25,14 @@ class OracleApplication extends Application
     {
         if ($this['action'] === 'getTables') {
             $this->config = new Config($config, new OracleGetTablesDefinition());
-        } elseif (isset($config['parameters']['tables'])) {
-            $this->config = new Config($config, new ConfigDefinition());
-        } else {
+        } elseif (isset($config['parameters']['table']) || isset($config['parameters']['query'])) {
             if ($this['action'] === 'run') {
                 $this->config = new Config($config, new ConfigRowDefinition());
             } else {
                 $this->config = new Config($config, new ActionConfigRowDefinition());
             }
+        } else {
+            $this->config = new Config($config, new ConfigDefinition());
         }
     }
 }
