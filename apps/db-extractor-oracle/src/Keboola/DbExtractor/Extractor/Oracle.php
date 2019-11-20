@@ -46,6 +46,9 @@ class Oracle extends Extractor
                 $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
                 $this->writeExportConfig($table);
             }
+        } elseif (isset($parameters['id'])) {
+            $this->exportConfigFiles[$parameters['name']] = $this->dataDir . '/' . $parameters['id'] . '.json';
+            $this->writeExportConfig($parameters);
         }
         $this->writeTablelessConfig();
     }
