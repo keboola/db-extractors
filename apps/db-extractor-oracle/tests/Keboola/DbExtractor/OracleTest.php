@@ -36,6 +36,33 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals('success', $result['status']);
     }
 
+    public function testRunRowConfig(): void
+    {
+        $config = $this->getConfigRow('oracle');
+        $app = $this->createApplication($config);
+        $this->setupTestRowTable();
+
+        $result = $app->run();
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv';
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertFileExists($outputCsvFile);
+        $this->assertFileExists(
+            $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest'
+        );
+        $this->assertEquals(99, $result['imported']['rows']);
+
+        // will check this one line by line because it randomly orders it sometimes
+        $output = (string) file_get_contents($outputCsvFile);
+        $outputLines = explode("\n", $output);
+        $origContents = (string) file_get_contents($this->dataDir . '/oracle/sales.csv');
+        foreach ($outputLines as $line) {
+            if (trim($line) !== '') {
+                $this->assertStringContainsString($line, $origContents);
+            }
+        }
+    }
+
     public function testRunConfig(): void
     {
         $config = $this->getConfig('oracle');

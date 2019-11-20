@@ -1,0 +1,11 @@
+{
+  "parameters": {
+  "id": 11,
+  "name": "sales",
+  "query": "SELECT * FROM sales",
+  "outputTable": "in.c-main.sales",
+  "incremental": false,
+  "primaryKey": null,
+  "enabled": true
+  }
+}
