@@ -239,7 +239,7 @@ class Oracle extends Extractor
             ->setIdleTimeout(null)
             ->run()
         ;
-        return json_decode(file_get_contents($this->getOutputFilename($table['outputTable'])));
+        return json_decode((string) file_get_contents($this->getOutputFilename($table['outputTable'])));
     }
 
     protected function exportTable(string $tableName, bool $advancedQuery): int
@@ -354,8 +354,11 @@ class Oracle extends Extractor
         }
     }
 
-    private function simplyQueryWithIncrementalAddon(array $table, array $columns = array(), bool $onlyLastRow = false): string
-    {
+    private function simplyQueryWithIncrementalAddon(
+        array $table,
+        array $columns = array(),
+        bool $onlyLastRow = false
+    ): string {
         $incrementalAddon = null;
         if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
             if (isset($this->state['lastFetchedRow'])) {
