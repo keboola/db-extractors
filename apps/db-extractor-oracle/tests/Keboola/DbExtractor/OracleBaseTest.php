@@ -108,7 +108,7 @@ abstract class OracleBaseTest extends ExtractorTest
      * @param string $sql
      * @throws \Throwable
      */
-    private function executeStatement($connection, string $sql): void
+    protected function executeStatement($connection, string $sql): void
     {
         $stmt = oci_parse($connection, $sql);
         if (!$stmt) {
@@ -162,6 +162,59 @@ EOT;
         );
     }
 
+    private function dropSequenceIfExists(string $sequenceName): void
+    {
+        $sql = <<<EOT
+BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE %s';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -2289 THEN
+         RAISE;
+      END IF;
+END;
+EOT;
+        $this->executeStatement(
+            $this->connection,
+            sprintf($sql, $sequenceName)
+        );
+    }
+
+    private function createAutoIncrement(string $tableName, string $incrementColumn): void
+    {
+        $lowerTableName = strtolower($tableName);
+        $sequenceName = $lowerTableName . '_seq';
+        $this->dropSequenceIfExists($sequenceName);
+
+        $sqlSequence = 'CREATE SEQUENCE %s START WITH 1';
+
+        $sqlTrigger = <<<EOT
+CREATE OR REPLACE TRIGGER %s_on_insert
+BEFORE INSERT ON "%s"
+FOR EACH ROW
+BEGIN
+  SELECT %s_seq.NEXTVAL
+  INTO   :new."%s"
+  FROM   dual;
+END;
+EOT;
+        $this->executeStatement(
+            $this->connection,
+            sprintf($sqlSequence, $sequenceName)
+        );
+
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                $sqlTrigger,
+                substr($lowerTableName, 0, 20),
+                $tableName,
+                $lowerTableName,
+                $incrementColumn
+            )
+        );
+    }
+
     protected function createClobTable(): void
     {
         // drop the
@@ -198,6 +251,46 @@ EOT;
         $this->executeStatement(
             $this->connection,
             'ALTER TABLE REGIONS DROP COLUMN REGION_NAME'
+        );
+    }
+
+    public function createIncrementalFetchingTable(array $config): void
+    {
+        $this->dropTableIfExists($config['parameters']['table']['tableName']);
+
+        $createTableQuery =
+            'CREATE TABLE %s (' .
+            '"id" INT NOT NULL PRIMARY KEY,' .
+            '"name" NVARCHAR2(400),' .
+            '"decimal" DECIMAL(10,8),' .
+            '"timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP' .
+            ') tablespace users'
+        ;
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                $createTableQuery,
+                $config['parameters']['table']['tableName']
+            )
+        );
+
+        $this->createAutoIncrement($config['parameters']['table']['tableName'], 'id');
+
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'INSERT INTO %s ("name", "decimal") VALUES (\'william\', 10.7)',
+                $config['parameters']['table']['tableName']
+            )
+        );
+
+        sleep(1);
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'INSERT INTO %s ("name", "decimal") VALUES (\'charles\', 38.9827423)',
+                $config['parameters']['table']['tableName']
+            )
         );
     }
 
