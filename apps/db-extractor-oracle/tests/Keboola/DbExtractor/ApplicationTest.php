@@ -28,6 +28,21 @@ class ApplicationTest extends OracleBaseTest
         $this->assertJson($process->getOutput());
     }
 
+    public function testTestConnectionRowAction(): void
+    {
+        $config = $this->getConfigRow('oracle');
+        $config['action'] = 'testConnection';
+        $this->putConfig($config);
+
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals('', $process->getErrorOutput());
+        $this->assertJson($process->getOutput());
+    }
+
     public function testRunAction(): void
     {
         $outputCsvFile1 = $this->dataDir . '/out/tables/in.c-main.sales.csv';

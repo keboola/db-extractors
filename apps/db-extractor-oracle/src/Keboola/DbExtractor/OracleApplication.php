@@ -6,7 +6,9 @@ namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
 use Keboola\DbExtractorConfig\Config;
+use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
+use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use Keboola\DbExtractorLogger\Logger;
 
 class OracleApplication extends Application
@@ -23,6 +25,12 @@ class OracleApplication extends Application
     {
         if ($this['action'] === 'getTables') {
             $this->config = new Config($config, new OracleGetTablesDefinition());
+        } elseif (isset($config['parameters']['table']) || isset($config['parameters']['query'])) {
+            if ($this['action'] === 'run') {
+                $this->config = new Config($config, new ConfigRowDefinition());
+            } else {
+                $this->config = new Config($config, new ActionConfigRowDefinition());
+            }
         } else {
             $this->config = new Config($config, new ConfigDefinition());
         }

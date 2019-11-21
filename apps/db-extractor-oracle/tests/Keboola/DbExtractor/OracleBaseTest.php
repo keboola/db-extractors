@@ -132,6 +132,12 @@ abstract class OracleBaseTest extends ExtractorTest
         $this->createTextTable($csv2);
     }
 
+    protected function setupTestRowTable(): void
+    {
+        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $this->createTextTable($csv1, ['CREATEDAT']);
+    }
+
     protected function generateTableName(CsvFile $file): string
     {
         $tableName = $file->getBasename('.' . $file->getExtension());
