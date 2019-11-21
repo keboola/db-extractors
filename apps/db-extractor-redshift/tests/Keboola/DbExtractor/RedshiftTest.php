@@ -6,6 +6,8 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Application;
+use Keboola\DbExtractor\Extractor\Redshift;
+use Keboola\DbExtractorLogger\Logger;
 
 class RedshiftTest extends AbstractRedshiftTest
 {
@@ -429,5 +431,184 @@ class RedshiftTest extends AbstractRedshiftTest
                 ),
         );
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
+    }
+
+    /**
+     * @dataProvider simpleTableColumnsDataProvider
+     */
+    public function testGetSimplifiedPdoQuery(array $params, array $state, string $expected): void
+    {
+        if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
+            $config = $this->getConfigRow();
+            $config['parameters']['incrementalFetchingColumn'] = '_weird-i-d';
+            $config['parameters']['table']['tableName'] = 'auto_increment_timestamp';
+            $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
+            $config['parameters']['columns'] = [];
+            $this->createAutoIncrementAndTimestampTable($config);
+            $extractor = new Redshift($config['parameters'], $state, new Logger('mssql-extractor-test'));
+            $extractor->validateIncrementalFetching(
+                $params['table'],
+                $params['incrementalFetchingColumn'],
+                isset($params['incrementalFetchingLimit']) ? $params['incrementalFetchingLimit'] : null
+            );
+        } else {
+            $config = $this->getConfig();
+            $extractor = new Redshift($config['parameters'], $state, new Logger('mssql-extractor-test'));
+        }
+        $query = $extractor->simpleQuery($params['table'], $params['columns']);
+        $this->assertEquals($expected, $query);
+
+        $config = $this->getConfig();
+        $extractor = new Redshift($config['parameters'], $state, new Logger('redshift-extractor-test'));
+        if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
+            $extractor->validateIncrementalFetching(
+                $params['table'],
+                $params['incrementalFetchingColumn'],
+                isset($params['incrementalFetchingLimit']) ? $params['incrementalFetchingLimit'] : null
+            );
+        }
+        $query = $extractor->simpleQuery($params['table'], $params['columns']);
+        $this->assertEquals($expected, $query);
+    }
+
+    public function simpleTableColumnsDataProvider(): array
+    {
+        return [
+            'simple table select with no column metadata' => [
+                [
+                    'table' => [
+                        'tableName' => 'test',
+                        'schema' => 'testSchema',
+                    ],
+                    'columns' => [],
+                ],
+                [],
+                'SELECT * FROM "testSchema"."test"',
+            ],
+            'simple table with 2 columns selected' => [
+                [
+                    'table' => [
+                        'tableName' => 'test',
+                        'schema' => 'testSchema',
+                    ],
+                    'columns' => [
+                        'col1',
+                        'col2',
+                    ],
+                ],
+                [],
+                'SELECT "col1", "col2" FROM "testSchema"."test"',
+            ],
+            'test simplePDO query with limit and datetime column but no state' => [
+                [
+                    'table' => [
+                        'tableName' => 'auto_increment_timestamp',
+                        'schema' => 'testing',
+                    ],
+                    'columns' => [
+                        '_weird-i-d',
+                        'weird-name',
+                        'decimalcolumn',
+                        'timestamp',
+                    ],
+                    'incrementalFetchingLimit' => 10,
+                    'incrementalFetchingColumn' => 'timestamp',
+                ],
+                [],
+                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
+                ' FROM "testing"."auto_increment_timestamp"' .
+                ' ORDER BY "timestamp" LIMIT 10',
+            ],
+            'test simplePDO query with limit and idp column and previos state' => [
+                [
+                    'table' => [
+                        'tableName' => 'auto_increment_timestamp',
+                        'schema' => 'testing',
+                    ],
+                    'columns' => [
+                        '_weird-i-d',
+                        'weird-name',
+                        'decimalcolumn',
+                        'timestamp',
+                    ],
+                    'incrementalFetchingLimit' => 10,
+                    'incrementalFetchingColumn' => '_weird-i-d',
+                ],
+                [
+                    'lastFetchedRow' => 4,
+                ],
+                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
+                ' FROM "testing"."auto_increment_timestamp"' .
+                ' WHERE "_weird-i-d" >= 4' .
+                ' ORDER BY "_weird-i-d" LIMIT 10',
+            ],
+            'test simplePDO query datetime column but no state and no limit' => [
+                [
+                    'table' => [
+                        'tableName' => 'auto_increment_timestamp',
+                        'schema' => 'testing',
+                    ],
+                    'columns' => [
+                        '_weird-i-d',
+                        'weird-name',
+                        'decimalcolumn',
+                        'timestamp',
+                    ],
+                    'incrementalFetchingLimit' => null,
+                    'incrementalFetchingColumn' => 'timestamp',
+                ],
+                [],
+                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
+                ' FROM "testing"."auto_increment_timestamp"' .
+                ' ORDER BY "timestamp"',
+            ],
+            'test simplePDO query id column and previos state and no limit' => [
+                [
+                    'table' => [
+                        'tableName' => 'auto_increment_timestamp',
+                        'schema' => 'testing',
+                    ],
+                    'columns' => [
+                        '_weird-i-d',
+                        'weird-name',
+                        'decimalcolumn',
+                        'timestamp',
+                    ],
+                    'incrementalFetchingLimit' => 0,
+                    'incrementalFetchingColumn' => '_weird-i-d',
+                ],
+                [
+                    'lastFetchedRow' => 4,
+                ],
+                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
+                ' FROM "testing"."auto_increment_timestamp"' .
+                ' WHERE "_weird-i-d" >= 4' .
+                ' ORDER BY "_weird-i-d"',
+            ],
+            'test simplePDO query datetime column and previos state and limit' => [
+                [
+                    'table' => [
+                        'tableName' => 'auto_increment_timestamp',
+                        'schema' => 'testing',
+                    ],
+                    'columns' => [
+                        '_weird-i-d',
+                        'weird-name',
+                        'decimalcolumn',
+                        'timestamp',
+                    ],
+                    'incrementalFetchingLimit' => 1000,
+                    'incrementalFetchingColumn' => 'timestamp',
+                ],
+                [
+                    'lastFetchedRow' => '2018-10-26 10:52:32',
+                ],
+                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
+                ' FROM "testing"."auto_increment_timestamp"' .
+                ' WHERE "timestamp" >= \'2018-10-26 10:52:32\'' .
+                ' ORDER BY "timestamp"' .
+                ' LIMIT 1000',
+            ],
+        ];
     }
 }
