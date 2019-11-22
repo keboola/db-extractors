@@ -212,13 +212,14 @@ class OracleIncrementalTest extends OracleBaseTest
         return $config;
     }
 
-    private function generateRandomString(): string
+    private function generateRandomString(int $length = 10): string
     {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $randstring = '';
-        for ($i = 0; $i < 10; $i++) {
-            $randstring .= $characters[rand(0, strlen($characters))];
+        $includeChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charLength = strlen($includeChars);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $includeChars [rand(0, $charLength - 1)];
         }
-        return $randstring;
+        return $randomString;
     }
 }
