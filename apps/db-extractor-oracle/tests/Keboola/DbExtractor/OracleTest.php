@@ -306,20 +306,19 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(10, $result['tables']);
+        $this->assertCount(11, $result['tables']);
 
-        $expectedTables = array (
-            0 =>
-                array (
+        $expectedTables = [
+            0 => [
                     'name' => 'DEPARTMENTS',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 27,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'DEPARTMENT_ID',
                                     'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
@@ -329,9 +328,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'DEPT_ID_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'DEPARTMENT_NAME',
                                     'sanitizedName' => 'DEPARTMENT_NAME',
                                     'type' => 'VARCHAR2',
@@ -340,9 +339,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'MANAGER_ID',
                                     'sanitizedName' => 'MANAGER_ID',
                                     'type' => 'NUMBER',
@@ -354,9 +353,9 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'DEPT_MGR_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'LOCATION_ID',
                                     'sanitizedName' => 'LOCATION_ID',
                                     'type' => 'NUMBER',
@@ -368,20 +367,19 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'DEPT_LOC_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'LOC_ID_PK',
-                                ),
-                        ),
-                ),
-            1 =>
-                array (
+                                ],
+                        ],
+                ],
+            1 => [
                     'name' => 'EMPLOYEES',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 107,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'EMPLOYEE_ID',
                                     'sanitizedName' => 'EMPLOYEE_ID',
                                     'type' => 'NUMBER',
@@ -391,9 +389,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'EMP_EMP_ID_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'FIRST_NAME',
                                     'sanitizedName' => 'FIRST_NAME',
                                     'type' => 'VARCHAR2',
@@ -402,9 +400,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'LAST_NAME',
                                     'sanitizedName' => 'LAST_NAME',
                                     'type' => 'VARCHAR2',
@@ -413,9 +411,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '3',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'EMAIL',
                                     'sanitizedName' => 'EMAIL',
                                     'type' => 'VARCHAR2',
@@ -425,9 +423,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => false,
                                     'uniqueKey' => true,
                                     'uniqueKeyName' => 'EMP_EMAIL_UK',
-                                ),
+                                ],
                             4 =>
-                                array (
+                                [
                                     'name' => 'PHONE_NUMBER',
                                     'sanitizedName' => 'PHONE_NUMBER',
                                     'type' => 'VARCHAR2',
@@ -436,9 +434,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '5',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             5 =>
-                                array (
+                                [
                                     'name' => 'HIRE_DATE',
                                     'sanitizedName' => 'HIRE_DATE',
                                     'type' => 'DATE',
@@ -447,9 +445,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '6',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             6 =>
-                                array (
+                                [
                                     'name' => 'JOB_ID',
                                     'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
@@ -461,9 +459,9 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'EMP_JOB_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'JOB_ID_PK',
-                                ),
+                                ],
                             7 =>
-                                array (
+                                [
                                     'name' => 'SALARY',
                                     'sanitizedName' => 'SALARY',
                                     'type' => 'NUMBER',
@@ -472,9 +470,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '8',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             8 =>
-                                array (
+                                [
                                     'name' => 'COMMISSION_PCT',
                                     'sanitizedName' => 'COMMISSION_PCT',
                                     'type' => 'NUMBER',
@@ -483,9 +481,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '9',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             9 =>
-                                array (
+                                [
                                     'name' => 'MANAGER_ID',
                                     'sanitizedName' => 'MANAGER_ID',
                                     'type' => 'NUMBER',
@@ -497,9 +495,9 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'EMP_MANAGER_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ),
+                                ],
                             10 =>
-                                array (
+                                [
                                     'name' => 'DEPARTMENT_ID',
                                     'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
@@ -511,20 +509,19 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'EMP_DEPT_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'DEPT_ID_PK',
-                                ),
-                        ),
-                ),
-            2 =>
-                array (
+                                ],
+                        ],
+                ],
+            2 => [
                     'name' => 'JOBS',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 19,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'JOB_ID',
                                     'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
@@ -534,9 +531,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'JOB_ID_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'JOB_TITLE',
                                     'sanitizedName' => 'JOB_TITLE',
                                     'type' => 'VARCHAR2',
@@ -545,9 +542,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '2',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'MIN_SALARY',
                                     'sanitizedName' => 'MIN_SALARY',
                                     'type' => 'NUMBER',
@@ -556,9 +553,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '3',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'MAX_SALARY',
                                     'sanitizedName' => 'MAX_SALARY',
                                     'type' => 'NUMBER',
@@ -567,20 +564,19 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => '4',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-            3 =>
-                array (
+                                ],
+                        ],
+                ],
+            3 => [
                     'name' => 'JOB_HISTORY',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 10,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'EMPLOYEE_ID',
                                     'sanitizedName' => 'EMPLOYEE_ID',
                                     'type' => 'NUMBER',
@@ -593,9 +589,9 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'EMP_EMP_ID_PK',
                                     'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'START_DATE',
                                     'sanitizedName' => 'START_DATE',
                                     'type' => 'DATE',
@@ -605,9 +601,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'END_DATE',
                                     'sanitizedName' => 'END_DATE',
                                     'type' => 'DATE',
@@ -616,9 +612,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 3,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'JOB_ID',
                                     'sanitizedName' => 'JOB_ID',
                                     'type' => 'VARCHAR2',
@@ -630,9 +626,9 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'JHIST_JOB_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'JOB_ID_PK',
-                                ),
+                                ],
                             4 =>
-                                array (
+                                [
                                     'name' => 'DEPARTMENT_ID',
                                     'sanitizedName' => 'DEPARTMENT_ID',
                                     'type' => 'NUMBER',
@@ -644,20 +640,19 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'JHIST_DEPT_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'DEPT_ID_PK',
-                                ),
-                        ),
-                ),
-            4 =>
-                array (
+                                ],
+                        ],
+                ],
+            4 => [
                     'name' => 'LOCATIONS',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 23,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'LOCATION_ID',
                                     'sanitizedName' => 'LOCATION_ID',
                                     'type' => 'NUMBER',
@@ -667,9 +662,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'LOC_ID_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'STREET_ADDRESS',
                                     'sanitizedName' => 'STREET_ADDRESS',
                                     'type' => 'VARCHAR2',
@@ -678,9 +673,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 2,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'POSTAL_CODE',
                                     'sanitizedName' => 'POSTAL_CODE',
                                     'type' => 'VARCHAR2',
@@ -689,9 +684,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 3,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'CITY',
                                     'sanitizedName' => 'CITY',
                                     'type' => 'VARCHAR2',
@@ -700,9 +695,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 4,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             4 =>
-                                array (
+                                [
                                     'name' => 'STATE_PROVINCE',
                                     'sanitizedName' => 'STATE_PROVINCE',
                                     'type' => 'VARCHAR2',
@@ -711,9 +706,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 5,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             5 =>
-                                array (
+                                [
                                     'name' => 'COUNTRY_ID',
                                     'sanitizedName' => 'COUNTRY_ID',
                                     'type' => 'CHAR',
@@ -725,20 +720,19 @@ class OracleTest extends OracleBaseTest
                                     'foreignKeyName' => 'LOC_C_ID_FK',
                                     'foreignKeyRefTable' => 'HR',
                                     'foreignKeyRef' => 'COUNTRY_C_ID_PK',
-                                ),
-                        ),
-                ),
-            5 =>
-                array (
+                                ],
+                        ],
+                ],
+            5 => [
                     'name' => 'REGIONS',
                     'tablespaceName' => 'USERS',
                     'schema' => 'HR',
                     'owner' => 'HR',
                     'rowCount' => 4,
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'REGION_ID',
                                     'sanitizedName' => 'REGION_ID',
                                     'type' => 'NUMBER',
@@ -748,9 +742,9 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'REG_ID_PK',
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'REGION_NAME',
                                     'sanitizedName' => 'REGION_NAME',
                                     'type' => 'VARCHAR2',
@@ -759,19 +753,67 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 2,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-            6 =>
-                array (
+                                ],
+                        ],
+                ],
+            6 => [
+                'name' => 'AUTO_INCREMENT_TIMESTAMP',
+                'tablespaceName' => 'USERS',
+                'schema' => 'TESTER',
+                'owner' => 'TESTER',
+                'columns' => [
+                    0 => [
+                        'name' => 'id',
+                        'sanitizedName' => 'id',
+                        'type' => 'NUMBER',
+                        'nullable' => false,
+                        'length' => null,
+                        'ordinalPosition' => 1,
+                        'primaryKey' => true,
+                        'uniqueKey' => false,
+                        'primaryKeyName' => 'PK',
+                    ],
+                    1 => [
+                        'name' => 'name',
+                        'sanitizedName' => 'name',
+                        'type' => 'NVARCHAR2',
+                        'nullable' => true,
+                        'length' => '400',
+                        'ordinalPosition' => 2,
+                        'primaryKey' => false,
+                        'uniqueKey' => false,
+                    ],
+                    2 => [
+                        'name' => 'decimal',
+                        'sanitizedName' => 'decimal',
+                        'type' => 'NUMBER',
+                        'nullable' => true,
+                        'length' => '10,8',
+                        'ordinalPosition' => 3,
+                        'primaryKey' => false,
+                        'uniqueKey' => false,
+                    ],
+                    3 => [
+                        'name' => 'timestamp',
+                        'sanitizedName' => 'timestamp',
+                        'type' => 'TIMESTAMP(6)',
+                        'nullable' => true,
+                        'length' => null,
+                        'ordinalPosition' => 4,
+                        'primaryKey' => false,
+                        'uniqueKey' => false,
+                    ],
+                ],
+            ],
+            7 => [
                     'name' => 'CLOB_TEST',
                     'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'ID',
                                     'sanitizedName' => 'ID',
                                     'type' => 'VARCHAR2',
@@ -780,9 +822,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 1,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'CLOB_COL',
                                     'sanitizedName' => 'CLOB_COL',
                                     'type' => 'CLOB',
@@ -791,19 +833,18 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 2,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-            7 =>
-                array (
+                                ],
+                        ],
+                ],
+            8 => [
                     'name' => 'ESCAPING',
                     'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => '_funnY#-col',
                                     'sanitizedName' => 'funnY_col',
                                     'type' => 'NVARCHAR2',
@@ -812,9 +853,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 1,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => '_s%d-col',
                                     'sanitizedName' => 's_d_col',
                                     'type' => 'NVARCHAR2',
@@ -823,19 +864,18 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 2,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-            8 =>
-                array (
+                                ],
+                        ],
+                ],
+            9 => [
                     'name' => 'REGIONS',
                     'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'REGION_ID',
                                     'sanitizedName' => 'REGION_ID',
                                     'type' => 'NUMBER',
@@ -845,19 +885,18 @@ class OracleTest extends OracleBaseTest
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
                                     'primaryKeyName' => 'REG_ID_PK',
-                                ),
-                        ),
-                ),
-            9 =>
-                array (
+                                ],
+                        ],
+                ],
+            10 => [
                     'name' => 'SALES',
                     'tablespaceName' => 'USERS',
                     'schema' => 'TESTER',
                     'owner' => 'TESTER',
                     'columns' =>
-                        array (
+                        [
                             0 =>
-                                array (
+                                [
                                     'name' => 'USERGENDER',
                                     'sanitizedName' => 'USERGENDER',
                                     'type' => 'NVARCHAR2',
@@ -866,9 +905,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 1,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             1 =>
-                                array (
+                                [
                                     'name' => 'USERCITY',
                                     'sanitizedName' => 'USERCITY',
                                     'type' => 'NVARCHAR2',
@@ -877,9 +916,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 2,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             2 =>
-                                array (
+                                [
                                     'name' => 'USERSENTIMENT',
                                     'sanitizedName' => 'USERSENTIMENT',
                                     'type' => 'NVARCHAR2',
@@ -888,9 +927,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 3,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             3 =>
-                                array (
+                                [
                                     'name' => 'ZIPCODE',
                                     'sanitizedName' => 'ZIPCODE',
                                     'type' => 'NVARCHAR2',
@@ -899,9 +938,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 4,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             4 =>
-                                array (
+                                [
                                     'name' => 'SKU',
                                     'sanitizedName' => 'SKU',
                                     'type' => 'NVARCHAR2',
@@ -910,9 +949,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 5,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             5 =>
-                                array (
+                                [
                                     'name' => 'CREATEDAT',
                                     'sanitizedName' => 'CREATEDAT',
                                     'type' => 'NVARCHAR2',
@@ -921,9 +960,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 6,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             6 =>
-                                array (
+                                [
                                     'name' => 'CATEGORY',
                                     'sanitizedName' => 'CATEGORY',
                                     'type' => 'NVARCHAR2',
@@ -932,9 +971,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 7,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             7 =>
-                                array (
+                                [
                                     'name' => 'PRICE',
                                     'sanitizedName' => 'PRICE',
                                     'type' => 'NVARCHAR2',
@@ -943,9 +982,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 8,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             8 =>
-                                array (
+                                [
                                     'name' => 'COUNTY',
                                     'sanitizedName' => 'COUNTY',
                                     'type' => 'NVARCHAR2',
@@ -954,9 +993,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 9,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             9 =>
-                                array (
+                                [
                                     'name' => 'COUNTYCODE',
                                     'sanitizedName' => 'COUNTYCODE',
                                     'type' => 'NVARCHAR2',
@@ -965,9 +1004,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 10,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             10 =>
-                                array (
+                                [
                                     'name' => 'USERSTATE',
                                     'sanitizedName' => 'USERSTATE',
                                     'type' => 'NVARCHAR2',
@@ -976,9 +1015,9 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 11,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
+                                ],
                             11 =>
-                                array (
+                                [
                                     'name' => 'CATEGORYGROUP',
                                     'sanitizedName' => 'CATEGORYGROUP',
                                     'type' => 'NVARCHAR2',
@@ -987,10 +1026,10 @@ class OracleTest extends OracleBaseTest
                                     'ordinalPosition' => 12,
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                ),
-                        ),
-                ),
-        );
+                                ],
+                        ],
+                ],
+        ];
         $this->assertEquals($expectedTables, $result['tables']);
     }
 

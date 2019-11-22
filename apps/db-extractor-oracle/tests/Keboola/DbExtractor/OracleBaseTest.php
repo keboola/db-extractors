@@ -260,10 +260,11 @@ EOT;
 
         $createTableQuery =
             'CREATE TABLE %s (' .
-            '"id" INT NOT NULL PRIMARY KEY,' .
+            '"id" INT NOT NULL,' .
             '"name" NVARCHAR2(400),' .
             '"decimal" DECIMAL(10,8),' .
-            '"timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP' .
+            '"timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,' .
+            'CONSTRAINT pk PRIMARY KEY ("id")' .
             ') tablespace users'
         ;
         $this->executeStatement(
