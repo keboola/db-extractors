@@ -390,18 +390,25 @@ class Oracle extends Extractor
         }
 
         if ($onlyLastRow) {
-            $query = sprintf(
-                'SELECT "%s" FROM (%s) ORDER BY "%s" DESC',
-                $this->incrementalFetching['column'],
-                $query,
-                $this->incrementalFetching['column']
-            );
-            $query = sprintf(
-                'SELECT "%s" FROM (%s) WHERE ROWNUM = 1',
-                $this->incrementalFetching['column'],
-                $query
-            );
+            $query = $this->getLastRowQuery($query);
         }
+        return $query;
+    }
+
+    private function getLastRowQuery(string $query): string
+    {
+        $query = sprintf(
+            'SELECT "%s" FROM (%s) ORDER BY "%s" DESC',
+            $this->incrementalFetching['column'],
+            $query,
+            $this->incrementalFetching['column']
+        );
+        $query = sprintf(
+            'SELECT "%s" FROM (%s) WHERE ROWNUM = 1',
+            $this->incrementalFetching['column'],
+            $query
+        );
+
         return $query;
     }
 
