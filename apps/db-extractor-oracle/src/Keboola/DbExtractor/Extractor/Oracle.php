@@ -359,43 +359,47 @@ class Oracle extends Extractor
         array $columns = array(),
         bool $onlyLastRow = false
     ): string {
-        $incrementalAddon = null;
-        if ($this->incrementalFetching && isset($this->incrementalFetching['column'])) {
-            if (isset($this->state['lastFetchedRow'])) {
+        $incrementalAddonOrder = null;
+        $incrementalAddonConditions = [];
+        if ($this->incrementalFetching) {
+            if (isset($this->incrementalFetching['column']) && isset($this->state['lastFetchedRow'])) {
                 if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
                     $lastFetchedRow = $this->state['lastFetchedRow'];
                 } else {
                     $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
                 }
-                $incrementalAddon = sprintf(
-                    ' WHERE %s >= %s',
+                $incrementalAddonConditions[] = sprintf(
+                    '%s >= %s',
                     $this->quote($this->incrementalFetching['column']),
                     $lastFetchedRow
                 );
             }
-            if ($onlyLastRow) {
-                $orderFormat = ' ORDER BY %s DESC';
-            } else {
-                $orderFormat = ' ORDER BY %s';
+
+            if (isset($this->incrementalFetching['limit'])) {
+                $incrementalAddonConditions[] = sprintf(
+                    'ROWNUM <= %d',
+                    $this->incrementalFetching['limit']
+                );
             }
-            $incrementalAddon .= sprintf(
-                $orderFormat,
-                $this->quote($this->incrementalFetching['column'])
-            );
         }
 
         $query = $this->simpleQuery($table, $columns);
 
-        if ($incrementalAddon) {
-            $query .= $incrementalAddon;
+        if (!empty($incrementalAddonConditions)) {
+            $query .= ' WHERE ' . implode(' AND ', $incrementalAddonConditions);
         }
+
         if ($onlyLastRow) {
-            $query = sprintf('SELECT * FROM (%s) WHERE ROWNUM = 1', $query);
-        } elseif (isset($this->incrementalFetching['limit'])) {
             $query = sprintf(
-                'SELECT * FROM (%s) WHERE ROWNUM <= %d',
+                'SELECT "%s" FROM (%s) ORDER BY "%s" DESC',
+                $this->incrementalFetching['column'],
                 $query,
-                $this->incrementalFetching['limit']
+                $this->incrementalFetching['column']
+            );
+            $query = sprintf(
+                'SELECT "%s" FROM (%s) WHERE ROWNUM = 1',
+                $this->incrementalFetching['column'],
+                $query
             );
         }
         return $query;
