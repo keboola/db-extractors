@@ -127,14 +127,16 @@ class OracleIncrementalTest extends OracleBaseTest
         $this->executeStatement(
             $this->connection,
             sprintf(
-                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'leo\', 50.89247299, TO_DATE(\'2019-11-23\', \'yyyy-mm-dd\'))',
+                'INSERT INTO %s ("name", "decimal", "date")' .
+                ' VALUES (\'leo\', 50.89247299, TO_DATE(\'2019-11-23\', \'yyyy-mm-dd\'))',
                 $config['parameters']['table']['tableName']
             )
         );
         $this->executeStatement(
             $this->connection,
             sprintf(
-                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'beat\', 78.34567789, TO_DATE(\'2019-11-25\', \'yyyy-mm-dd\'))',
+                'INSERT INTO %s ("name", "decimal", "date")' .
+                ' VALUES (\'beat\', 78.34567789, TO_DATE(\'2019-11-25\', \'yyyy-mm-dd\'))',
                 $config['parameters']['table']['tableName']
             )
         );
