@@ -13,11 +13,13 @@ use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Process\Process;
 
 use Throwable;
+use function Keboola\Utils\formatDateTime;
 
 class Oracle extends Extractor
 {
     public const INCREMENT_TYPE_NUMERIC = 'numeric';
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
+    public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
     private const TABLELESS_CONFIG_FILE = 'tableless.json';
     private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
@@ -190,13 +192,14 @@ class Oracle extends Extractor
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
                 $this->incrementalFetching['column'] = $columnName;
                 $this->incrementalFetching['type'] = self::INCREMENT_TYPE_NUMERIC;
+            } elseif ($datatype->getBasetype() === 'TIMESTAMP') {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_TIMESTAMP;
+            } elseif ($datatype->getBasetype() === 'DATE') {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_DATE;
             } else {
-                if ($datatype->getBasetype() === 'TIMESTAMP') {
-                    $this->incrementalFetching['column'] = $columnName;
-                    $this->incrementalFetching['type'] = self::INCREMENT_TYPE_TIMESTAMP;
-                } else {
-                    throw new UserException('invalid incremental fetching column type');
-                }
+                throw new UserException('invalid incremental fetching column type');
             }
         } catch (InvalidLengthException | UserException $exception) {
             throw new UserException(
@@ -365,6 +368,11 @@ class Oracle extends Extractor
             if (isset($this->incrementalFetching['column']) && isset($this->state['lastFetchedRow'])) {
                 if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
                     $lastFetchedRow = $this->state['lastFetchedRow'];
+                } elseif ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_DATE) {
+                    $lastFetchedRow = sprintf(
+                        'DATE \'%s\'',
+                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
+                    );
                 } else {
                     $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
                 }
