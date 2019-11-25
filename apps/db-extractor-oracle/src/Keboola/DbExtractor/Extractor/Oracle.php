@@ -172,14 +172,7 @@ class Oracle extends Extractor
             var_export($advancedQuery, true),
         ];
 
-        $process = new Process($cmd);
-        $process->setTimeout(null);
-        $process->setIdleTimeout(null);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new \ErrorException('Export process failed: ' . $process->getErrorOutput());
-        }
+        $process = $this->runRetriableCommand($cmd);
         // log the process output
         $output = $process->getOutput();
         $this->logger->info($output);
@@ -193,6 +186,29 @@ class Oracle extends Extractor
         return $linesWritten;
     }
 
+    private function runRetriableCommand(array $cmd): Process
+    {
+        $retryProxy = new DbRetryProxy(
+            $this->logger,
+            DbRetryProxy::DEFAULT_MAX_TRIES,
+            [\ErrorException::class]
+        );
+        return $retryProxy->call(function () use ($cmd): Process {
+            try {
+                $process = new Process($cmd);
+                $process->setTimeout(null);
+                $process->setIdleTimeout(null);
+                $process->run();
+                if (!$process->isSuccessful()) {
+                    throw new \ErrorException('Export process failed: ' . $process->getErrorOutput());
+                }
+                return $process;
+            } catch (\Throwable $exception) {
+                throw $exception;
+            }
+        });
+    }
+
     public function testConnection(): bool
     {
         $cmd = [
@@ -203,14 +219,7 @@ class Oracle extends Extractor
             $this->dataDir . '/' . self::TABLELESS_CONFIG_FILE,
         ];
 
-        $process = new Process($cmd);
-        $process->setTimeout(null);
-        $process->setIdleTimeout(null);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new UserException('Failed connecting to DB: ' . $process->getErrorOutput());
-        }
+        $this->runRetriableCommand($cmd);
         return true;
     }
 
@@ -229,15 +238,7 @@ class Oracle extends Extractor
             $this->dataDir . '/' . self::TABLES_CONFIG_FILE,
         ];
 
-        $process = new Process($cmd);
-        $process->setTimeout(null);
-        $process->setIdleTimeout(null);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new UserException('Error fetching table listing: ' . $process->getErrorOutput());
-        }
-
+        $this->runRetriableCommand($cmd);
         $tableListing = json_decode((string) file_get_contents($this->dataDir . '/tables.json'), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
