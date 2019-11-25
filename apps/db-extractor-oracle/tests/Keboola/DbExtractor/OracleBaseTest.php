@@ -263,6 +263,7 @@ EOT;
             '"id" INT NOT NULL,' .
             '"name" NVARCHAR2(400),' .
             '"decimal" DECIMAL(10,8),' .
+            '"date" DATE,' .
             '"timestamp" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,' .
             'CONSTRAINT pk PRIMARY KEY ("id")' .
             ') tablespace users'
@@ -280,7 +281,7 @@ EOT;
         $this->executeStatement(
             $this->connection,
             sprintf(
-                'INSERT INTO %s ("name", "decimal") VALUES (\'william\', 10.7)',
+                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'william\', 10.7, TO_DATE(\'2019-11-20\', \'yyyy-mm-dd\'))',
                 $config['parameters']['table']['tableName']
             )
         );
@@ -289,7 +290,7 @@ EOT;
         $this->executeStatement(
             $this->connection,
             sprintf(
-                'INSERT INTO %s ("name", "decimal") VALUES (\'charles\', 38.9827423)',
+                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'charles\', 38.9827423, TO_DATE(\'2019-11-21\', \'yyyy-mm-dd\'))',
                 $config['parameters']['table']['tableName']
             )
         );

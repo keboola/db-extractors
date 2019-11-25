@@ -99,6 +99,53 @@ class OracleIncrementalTest extends OracleBaseTest
         $this->assertEquals(3, $newResult['imported']['rows']);
     }
 
+    public function testIncrementalFetchingByDate(): void
+    {
+        $config = $this->getIncrementalFetchingConfig(self::DRIVER);
+        $config['parameters']['incrementalFetchingColumn'] = 'date';
+        $this->createIncrementalFetchingTable($config);
+
+        $result = $this->createApplication($config)->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals(
+            [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'rows' => 2,
+            ],
+            $result['imported']
+        );
+
+        $this->assertArrayHasKey('state', $result);
+        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
+        $this->assertEquals('2019-11-21 00:00:00.0', $result['state']['lastFetchedRow']);
+
+        $noNewRowsResult = $this->createApplication($config, $result['state'])->run();
+        $this->assertEquals(1, $noNewRowsResult['imported']['rows']);
+        $this->assertEquals($result['state'], $noNewRowsResult['state']);
+
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'leo\', 50.89247299, TO_DATE(\'2019-11-23\', \'yyyy-mm-dd\'))',
+                $config['parameters']['table']['tableName']
+            )
+        );
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'INSERT INTO %s ("name", "decimal", "date") VALUES (\'beat\', 78.34567789, TO_DATE(\'2019-11-25\', \'yyyy-mm-dd\'))',
+                $config['parameters']['table']['tableName']
+            )
+        );
+
+        $newResult = $this->createApplication($config, $noNewRowsResult['state'])->run();
+        $this->assertArrayHasKey('state', $newResult);
+        $this->assertArrayHasKey('lastFetchedRow', $newResult['state']);
+        $this->assertEquals('2019-11-25 00:00:00.0', $newResult['state']['lastFetchedRow']);
+        $this->assertEquals(3, $newResult['imported']['rows']);
+    }
+
     public function testIncrementalFetchingByTimestamp(): void
     {
         $config = $this->getIncrementalFetchingConfig(self::DRIVER);
