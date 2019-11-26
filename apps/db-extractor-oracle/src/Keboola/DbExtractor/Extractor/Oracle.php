@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\Datatype\Definition\Exception\InvalidLengthException;
+use Keboola\Datatype\Definition\GenericStorage;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
@@ -11,9 +13,14 @@ use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Process\Process;
 
 use Throwable;
+use function Keboola\Utils\formatDateTime;
 
 class Oracle extends Extractor
 {
+    public const INCREMENT_TYPE_NUMERIC = 'numeric';
+    public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
+    public const INCREMENT_TYPE_DATE = 'date';
+    public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
     private const TABLELESS_CONFIG_FILE = 'tableless.json';
     private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
 
@@ -43,11 +50,9 @@ class Oracle extends Extractor
         // setup the export config files for the export tool
         if (array_key_exists('tables', $parameters)) {
             foreach ($parameters['tables'] as $table) {
-                $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
                 $this->writeExportConfig($table);
             }
         } elseif (isset($parameters['id'])) {
-            $this->exportConfigFiles[$parameters['name']] = $this->dataDir . '/' . $parameters['id'] . '.json';
             $this->writeExportConfig($parameters);
         }
         $this->writeTablelessConfig();
@@ -83,8 +88,13 @@ class Oracle extends Extractor
 
     private function writeExportConfig(array $table): void
     {
+        $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
         if (!isset($table['query'])) {
-            $table['query'] = $this->simpleQuery($table['table'], $table['columns']);
+            $table['query'] = $this->simplyQueryWithIncrementalAddon(
+                $table['table'],
+                isset($table['columns']) ? $table['columns'] : []
+            );
+            unset($table['table']);
         } else {
             $table['query'] = rtrim($table['query'], ' ;');
         }
@@ -126,11 +136,12 @@ class Oracle extends Extractor
         $this->logger->info('Exporting to ' . $outputTable);
 
         $isAdvancedQuery = true;
-        if (array_key_exists('table', $table) && !array_key_exists('query', $table)) {
+        $maxValue = null;
+        if (array_key_exists('table', $table)) {
             $isAdvancedQuery = false;
-            $query = $this->simpleQuery($table['table'], $table['columns']);
-        } else {
-            $query = $table['query'];
+            if ($this->incrementalFetching) {
+                $maxValue = $this->getMaxOfIncrementalFetchingColumn($table);
+            }
         }
         $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
 
@@ -161,7 +172,77 @@ class Oracle extends Extractor
             'outputTable'=> $outputTable,
             'rows' => $rowCount,
         ];
+
+        // output state
+        if ($maxValue) {
+            $output['state']['lastFetchedRow'] = $maxValue;
+        }
         return $output;
+    }
+
+    public function validateIncrementalFetching(array $table, string $columnName, ?int $limit = null): void
+    {
+        $table = current($this->getTables([$table]));
+        $columns = array_values(array_filter($table['columns'], function ($item) use ($columnName) {
+            return $item['name'] === $columnName;
+        }));
+
+        try {
+            $datatype = new GenericStorage($columns[0]['type']);
+            if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_NUMERIC;
+            } elseif ($datatype->getBasetype() === 'TIMESTAMP') {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_TIMESTAMP;
+            } elseif ($datatype->getBasetype() === 'DATE') {
+                $this->incrementalFetching['column'] = $columnName;
+                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_DATE;
+            } else {
+                throw new UserException('invalid incremental fetching column type');
+            }
+        } catch (InvalidLengthException | UserException $exception) {
+            throw new UserException(
+                sprintf(
+                    'Column [%s] specified for incremental fetching is not a numeric or timestamp type column',
+                    $columnName
+                )
+            );
+        }
+
+        if ($limit) {
+            $this->incrementalFetching['limit'] = $limit;
+        }
+    }
+
+    public function getMaxOfIncrementalFetchingColumn(array $table): ?string
+    {
+        $table['id'] .= 'LastRow';
+        $table['name'] .= 'LastRow';
+        $table['outputTable'] .= 'LastRow';
+        $simplyQuery = $this->simplyQueryWithIncrementalAddon(
+            $table['table'],
+            [$this->incrementalFetching['column']]
+        );
+        $table['query'] = $this->getLastRowQuery($simplyQuery);
+        unset($table['table']);
+        $this->writeExportConfig($table);
+        $cmd = [
+            'java',
+            '-jar',
+            '/code/table-exporter.jar',
+            'export',
+            $this->exportConfigFiles[$table['name']],
+            var_export(false, true),
+        ];
+        $processLastRowValue = new Process($cmd);
+
+        $processLastRowValue
+            ->setTimeout(null)
+            ->setIdleTimeout(null)
+            ->run()
+        ;
+        return json_decode((string) file_get_contents($this->getOutputFilename($table['outputTable'])));
     }
 
     protected function exportTable(string $tableName, bool $advancedQuery): int
@@ -274,6 +355,65 @@ class Oracle extends Extractor
                 $this->quote($table['tableName'])
             );
         }
+    }
+
+    private function simplyQueryWithIncrementalAddon(
+        array $table,
+        array $columns = array()
+    ): string {
+        $incrementalAddonOrder = null;
+        $incrementalAddonConditions = [];
+        if ($this->incrementalFetching) {
+            if (isset($this->incrementalFetching['column']) && isset($this->state['lastFetchedRow'])) {
+                if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
+                    $lastFetchedRow = $this->state['lastFetchedRow'];
+                } elseif ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_DATE) {
+                    $lastFetchedRow = sprintf(
+                        'DATE \'%s\'',
+                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
+                    );
+                } else {
+                    $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
+                }
+                $incrementalAddonConditions[] = sprintf(
+                    '%s >= %s',
+                    $this->quote($this->incrementalFetching['column']),
+                    $lastFetchedRow
+                );
+            }
+
+            if (isset($this->incrementalFetching['limit'])) {
+                $incrementalAddonConditions[] = sprintf(
+                    'ROWNUM <= %d',
+                    $this->incrementalFetching['limit']
+                );
+            }
+        }
+
+        $query = $this->simpleQuery($table, $columns);
+
+        if (!empty($incrementalAddonConditions)) {
+            $query .= ' WHERE ' . implode(' AND ', $incrementalAddonConditions);
+        }
+
+        return $query;
+    }
+
+    private function getLastRowQuery(string $query): string
+    {
+        $query = sprintf(
+            'SELECT "%s" FROM (%s) ORDER BY "%s" DESC',
+            $this->incrementalFetching['column'],
+            $query,
+            $this->incrementalFetching['column']
+        );
+        $query = sprintf(
+            'SELECT "%s" FROM (%s) WHERE ROWNUM = 1',
+            $this->incrementalFetching['column'],
+            $query
+        );
+
+        return $query;
     }
 
     private function quote(string $obj): string
