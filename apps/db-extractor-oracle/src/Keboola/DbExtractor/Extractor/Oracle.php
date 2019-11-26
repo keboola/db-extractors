@@ -172,7 +172,7 @@ class Oracle extends Extractor
             var_export($advancedQuery, true),
         ];
 
-        $process = $this->runRetriableCommand($cmd);
+        $process = $this->runRetriableCommand($cmd, 'Export process failed');
         // log the process output
         $output = $process->getOutput();
         $this->logger->info($output);
