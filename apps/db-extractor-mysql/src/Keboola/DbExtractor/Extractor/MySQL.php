@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
+use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
+use Keboola\DbExtractor\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\Temp\Temp;
 use PDO;
@@ -182,9 +184,7 @@ class MySQL extends Extractor
         }
 
         $sql .= $whereClause;
-
-        $res = $this->db->query($sql);
-        $arr = $res->fetchAll(PDO::FETCH_ASSOC);
+        $arr = $this->runRetriableQuery($sql);
         if (count($arr) === 0) {
             return [];
         }
@@ -212,8 +212,7 @@ class MySQL extends Extractor
         $sql = 'SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c';
         $sql .= $whereClause;
 
-        $res = $this->db->query($sql);
-        $rows = $res->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $this->runRetriableQuery($sql);
 
         foreach ($rows as $i => $column) {
             $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
@@ -255,8 +254,7 @@ class MySQL extends Extractor
                     CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
                     REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ';
 
-            $res = $this->db->query($additionalSql . $whereClause);
-            $rows = $res->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $this->runRetriableQuery($additionalSql . $whereClause);
             foreach ($rows as $column) {
                 $curColumn = [];
                 if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
@@ -295,16 +293,14 @@ class MySQL extends Extractor
 
     public function validateIncrementalFetching(array $table, string $columnName, ?int $limit = null): void
     {
-        $res = $this->db->query(
-            sprintf(
-                'SELECT * FROM INFORMATION_SCHEMA.COLUMNS as cols 
-                            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
-                $this->db->quote($table['schema']),
-                $this->db->quote($table['tableName']),
-                $this->db->quote($columnName)
-            )
+        $query = sprintf(
+            'SELECT * FROM INFORMATION_SCHEMA.COLUMNS as cols 
+                        WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+            $this->db->quote($table['schema']),
+            $this->db->quote($table['tableName']),
+            $this->db->quote($columnName)
         );
-        $columns = $res->fetchAll();
+        $columns = $this->runRetriableQuery($query);
         if (count($columns) === 0) {
             throw new UserException(
                 sprintf(
@@ -384,5 +380,40 @@ class MySQL extends Extractor
     private function quote(string $obj): string
     {
         return "`{$obj}`";
+    }
+
+    private function runRetriableQuery(string $query, array $values = []): array
+    {
+        $retryProxy = new DbRetryProxy($this->logger);
+        return $retryProxy->call(function () use ($query, $values) {
+            try {
+                $stmt = $this->db->prepare($query);
+                $stmt->execute($values);
+                return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            } catch (\Throwable $exception) {
+                $this->tryReconnect();
+                throw $exception;
+            }
+        });
+    }
+
+    private function tryReconnect(): void
+    {
+        try {
+            $this->isAlive();
+        } catch (DeadConnectionException $deadConnectionException) {
+            $reconnectionRetryProxy = new DbRetryProxy($this->logger, self::DEFAULT_MAX_TRIES, null, 1000);
+            try {
+                $this->db = $reconnectionRetryProxy->call(function () {
+                    return $this->createConnection($this->getDbParameters());
+                });
+            } catch (\Throwable $reconnectException) {
+                throw new UserException(
+                    'Unable to reconnect to the database: ' . $reconnectException->getMessage(),
+                    $reconnectException->getCode(),
+                    $reconnectException
+                );
+            }
+        }
     }
 }
