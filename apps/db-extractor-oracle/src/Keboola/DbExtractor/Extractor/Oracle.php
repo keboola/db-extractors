@@ -186,21 +186,25 @@ class Oracle extends Extractor
         return $linesWritten;
     }
 
-    private function runRetriableCommand(array $cmd): Process
+    private function runRetriableCommand(array $cmd, string $errorMessage): Process
     {
         $retryProxy = new DbRetryProxy(
             $this->logger,
             DbRetryProxy::DEFAULT_MAX_TRIES,
             [\ErrorException::class]
         );
-        return $retryProxy->call(function () use ($cmd): Process {
+        return $retryProxy->call(function () use ($cmd, $errorMessage): Process {
             try {
                 $process = new Process($cmd);
                 $process->setTimeout(null);
                 $process->setIdleTimeout(null);
                 $process->run();
                 if (!$process->isSuccessful()) {
-                    throw new \ErrorException('Export process failed: ' . $process->getErrorOutput());
+                    throw new \ErrorException(sprintf(
+                        '%s: %s',
+                        $errorMessage,
+                        $process->getErrorOutput()
+                    ));
                 }
                 return $process;
             } catch (\Throwable $exception) {
@@ -219,7 +223,7 @@ class Oracle extends Extractor
             $this->dataDir . '/' . self::TABLELESS_CONFIG_FILE,
         ];
 
-        $this->runRetriableCommand($cmd);
+        $this->runRetriableCommand($cmd, 'Failed connecting to DB');
         return true;
     }
 
@@ -238,7 +242,7 @@ class Oracle extends Extractor
             $this->dataDir . '/' . self::TABLES_CONFIG_FILE,
         ];
 
-        $this->runRetriableCommand($cmd);
+        $this->runRetriableCommand($cmd, 'Error fetching table listing');
         $tableListing = json_decode((string) file_get_contents($this->dataDir . '/tables.json'), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
