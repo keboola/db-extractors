@@ -220,11 +220,11 @@ class Oracle extends Extractor
         $table['id'] .= 'LastRow';
         $table['name'] .= 'LastRow';
         $table['outputTable'] .= 'LastRow';
-        $table['query'] = $this->simplyQueryWithIncrementalAddon(
+        $simplyQuery = $this->simplyQueryWithIncrementalAddon(
             $table['table'],
-            [$this->incrementalFetching['column']],
-            true
+            [$this->incrementalFetching['column']]
         );
+        $table['query'] = $this->getLastRowQuery($simplyQuery);
         unset($table['table']);
         $this->writeExportConfig($table);
         $cmd = [
@@ -359,8 +359,7 @@ class Oracle extends Extractor
 
     private function simplyQueryWithIncrementalAddon(
         array $table,
-        array $columns = array(),
-        bool $onlyLastRow = false
+        array $columns = array()
     ): string {
         $incrementalAddonOrder = null;
         $incrementalAddonConditions = [];
@@ -397,9 +396,6 @@ class Oracle extends Extractor
             $query .= ' WHERE ' . implode(' AND ', $incrementalAddonConditions);
         }
 
-        if ($onlyLastRow) {
-            $query = $this->getLastRowQuery($query);
-        }
         return $query;
     }
 
