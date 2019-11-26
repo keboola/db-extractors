@@ -194,22 +194,18 @@ class Oracle extends Extractor
             [\ErrorException::class]
         );
         return $retryProxy->call(function () use ($cmd, $errorMessage): Process {
-            try {
-                $process = new Process($cmd);
-                $process->setTimeout(null);
-                $process->setIdleTimeout(null);
-                $process->run();
-                if (!$process->isSuccessful()) {
-                    throw new \ErrorException(sprintf(
-                        '%s: %s',
-                        $errorMessage,
-                        $process->getErrorOutput()
-                    ));
-                }
-                return $process;
-            } catch (\Throwable $exception) {
-                throw $exception;
+            $process = new Process($cmd);
+            $process->setTimeout(null);
+            $process->setIdleTimeout(null);
+            $process->run();
+            if (!$process->isSuccessful()) {
+                throw new \ErrorException(sprintf(
+                    '%s: %s',
+                    $errorMessage,
+                    $process->getErrorOutput()
+                ));
             }
+            return $process;
         });
     }
 
