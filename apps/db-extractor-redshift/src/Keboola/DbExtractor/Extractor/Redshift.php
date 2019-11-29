@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Datatype\Definition\Redshift as RedshiftDatatype;
-use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\UserException;
 
 class Redshift extends Extractor
@@ -67,7 +66,8 @@ class Redshift extends Extractor
 
         $sql .= ' ORDER BY table_schema, table_name';
 
-        $arr = $this->runRetriableQueries($sql);
+        $res = $this->db->query($sql);
+        $arr = $res->fetchAll();
 
         if (count($arr) === 0) {
             return [];
@@ -124,7 +124,8 @@ class Redshift extends Extractor
                 return $this->db->quote($tableName);
             }, $tableNameArray))
         );
-        $rows = $this->runRetriableQueries($sql, \PDO::FETCH_ASSOC);
+        $res = $this->db->query($sql);
+        $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
 
         $columns = [];
         foreach ($rows as $i => $column) {
@@ -169,7 +170,8 @@ class Redshift extends Extractor
             $this->db->quote($table['tableName']),
             $this->db->quote($columnName)
         );
-        $columns = $this->runRetriableQueries($query);
+        $res = $this->db->query($query);
+        $columns = $res->fetchAll();
         if (count($columns) === 0) {
             throw new UserException(
                 sprintf(
@@ -261,7 +263,7 @@ class Redshift extends Extractor
             $this->quote($table['schema']),
             $this->quote($table['tableName'])
         );
-        $result = $this->runRetriableQueries($fullsql);
+        $result = $this->db->query($fullsql)->fetchAll();
         if (count($result) > 0) {
             return (string) $result[0][$this->incrementalFetching['column']];
         }
@@ -272,21 +274,5 @@ class Redshift extends Extractor
     {
         $q = '"';
         return ($q . str_replace("$q", "$q$q", $obj) . $q);
-    }
-
-    private function runRetriableQueries(string $query, ?int $fetchStyle = null): array
-    {
-        $retryProxy = new DbRetryProxy(
-            $this->logger,
-            DbRetryProxy::DEFAULT_MAX_TRIES
-        );
-        return $retryProxy->call(function () use ($query, $fetchStyle): array {
-            try {
-                $res = $this->db->query($query);
-                return $res->fetchAll($fetchStyle);
-            } catch (\Throwable $e) {
-                throw new UserException($e->getMessage(), 0, $e);
-            }
-        });
     }
 }
