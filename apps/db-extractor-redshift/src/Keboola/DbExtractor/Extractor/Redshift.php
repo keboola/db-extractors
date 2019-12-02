@@ -67,7 +67,7 @@ class Redshift extends Extractor
 
         $sql .= ' ORDER BY table_schema, table_name';
 
-        $arr = $this->runRetriableQueries($sql);
+        $arr = $this->runRetriableQuery($sql);
 
         if (count($arr) === 0) {
             return [];
@@ -124,7 +124,7 @@ class Redshift extends Extractor
                 return $this->db->quote($tableName);
             }, $tableNameArray))
         );
-        $rows = $this->runRetriableQueries($sql, \PDO::FETCH_ASSOC);
+        $rows = $this->runRetriableQuery($sql, \PDO::FETCH_ASSOC);
 
         $columns = [];
         foreach ($rows as $i => $column) {
@@ -169,7 +169,7 @@ class Redshift extends Extractor
             $this->db->quote($table['tableName']),
             $this->db->quote($columnName)
         );
-        $columns = $this->runRetriableQueries($query);
+        $columns = $this->runRetriableQuery($query);
         if (count($columns) === 0) {
             throw new UserException(
                 sprintf(
@@ -261,7 +261,7 @@ class Redshift extends Extractor
             $this->quote($table['schema']),
             $this->quote($table['tableName'])
         );
-        $result = $this->runRetriableQueries($fullsql);
+        $result = $this->runRetriableQuery($fullsql);
         if (count($result) > 0) {
             return (string) $result[0][$this->incrementalFetching['column']];
         }
@@ -274,7 +274,7 @@ class Redshift extends Extractor
         return ($q . str_replace("$q", "$q$q", $obj) . $q);
     }
 
-    private function runRetriableQueries(string $query, ?int $fetchStyle = null): array
+    private function runRetriableQuery(string $query, ?int $fetchStyle = null): array
     {
         $retryProxy = new DbRetryProxy(
             $this->logger,
