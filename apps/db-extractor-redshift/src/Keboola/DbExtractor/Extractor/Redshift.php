@@ -67,7 +67,7 @@ class Redshift extends Extractor
 
         $sql .= ' ORDER BY table_schema, table_name';
 
-        $arr = $this->runRetriableQuery($sql);
+        $arr = $this->runRetriableQuery($sql, 'Fetching tables information error');
 
         if (count($arr) === 0) {
             return [];
@@ -124,7 +124,11 @@ class Redshift extends Extractor
                 return $this->db->quote($tableName);
             }, $tableNameArray))
         );
-        $rows = $this->runRetriableQuery($sql, \PDO::FETCH_ASSOC);
+        $rows = $this->runRetriableQuery(
+            $sql,
+            'Error fetching columns information',
+            \PDO::FETCH_ASSOC
+        );
 
         $columns = [];
         foreach ($rows as $i => $column) {
@@ -169,7 +173,7 @@ class Redshift extends Extractor
             $this->db->quote($table['tableName']),
             $this->db->quote($columnName)
         );
-        $columns = $this->runRetriableQuery($query);
+        $columns = $this->runRetriableQuery($query, 'Error get column info');
         if (count($columns) === 0) {
             throw new UserException(
                 sprintf(
@@ -261,7 +265,7 @@ class Redshift extends Extractor
             $this->quote($table['schema']),
             $this->quote($table['tableName'])
         );
-        $result = $this->runRetriableQuery($fullsql);
+        $result = $this->runRetriableQuery($fullsql, 'Error fetching maximum value');
         if (count($result) > 0) {
             return (string) $result[0][$this->incrementalFetching['column']];
         }
@@ -274,13 +278,13 @@ class Redshift extends Extractor
         return ($q . str_replace("$q", "$q$q", $obj) . $q);
     }
 
-    private function runRetriableQuery(string $query, ?int $fetchStyle = null): array
+    private function runRetriableQuery(string $query, string $errorMessage = '', ?int $fetchStyle = null): array
     {
         $retryProxy = new DbRetryProxy(
             $this->logger,
             DbRetryProxy::DEFAULT_MAX_TRIES
         );
-        return $retryProxy->call(function () use ($query, $fetchStyle): array {
+        return $retryProxy->call(function () use ($query, $fetchStyle, $errorMessage): array {
             try {
                 $res = $this->db->query($query);
                 if (!is_null($fetchStyle)) {
@@ -289,7 +293,11 @@ class Redshift extends Extractor
                     return $res->fetchAll();
                 }
             } catch (\Throwable $e) {
-                throw new UserException($e->getMessage(), 0, $e);
+                throw new UserException(
+                    $errorMessage . ': ' . $e->getMessage(),
+                    0,
+                    $e
+                );
             }
         });
     }
