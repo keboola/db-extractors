@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Datatype\Definition\Redshift as RedshiftDatatype;
+use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\UserException;
 
 class Redshift extends Extractor
@@ -66,8 +67,7 @@ class Redshift extends Extractor
 
         $sql .= ' ORDER BY table_schema, table_name';
 
-        $res = $this->db->query($sql);
-        $arr = $res->fetchAll();
+        $arr = $this->runRetriableQuery($sql, 'Fetching tables information error');
 
         if (count($arr) === 0) {
             return [];
@@ -124,8 +124,11 @@ class Redshift extends Extractor
                 return $this->db->quote($tableName);
             }, $tableNameArray))
         );
-        $res = $this->db->query($sql);
-        $rows = $res->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $this->runRetriableQuery(
+            $sql,
+            'Error fetching columns information',
+            \PDO::FETCH_ASSOC
+        );
 
         $columns = [];
         foreach ($rows as $i => $column) {
@@ -170,8 +173,7 @@ class Redshift extends Extractor
             $this->db->quote($table['tableName']),
             $this->db->quote($columnName)
         );
-        $res = $this->db->query($query);
-        $columns = $res->fetchAll();
+        $columns = $this->runRetriableQuery($query, 'Error get column info');
         if (count($columns) === 0) {
             throw new UserException(
                 sprintf(
@@ -263,7 +265,7 @@ class Redshift extends Extractor
             $this->quote($table['schema']),
             $this->quote($table['tableName'])
         );
-        $result = $this->db->query($fullsql)->fetchAll();
+        $result = $this->runRetriableQuery($fullsql, 'Error fetching maximum value');
         if (count($result) > 0) {
             return (string) $result[0][$this->incrementalFetching['column']];
         }
@@ -274,5 +276,29 @@ class Redshift extends Extractor
     {
         $q = '"';
         return ($q . str_replace("$q", "$q$q", $obj) . $q);
+    }
+
+    private function runRetriableQuery(string $query, string $errorMessage = '', ?int $fetchStyle = null): array
+    {
+        $retryProxy = new DbRetryProxy(
+            $this->logger,
+            DbRetryProxy::DEFAULT_MAX_TRIES
+        );
+        return $retryProxy->call(function () use ($query, $fetchStyle, $errorMessage): array {
+            try {
+                $res = $this->db->query($query);
+                if (!is_null($fetchStyle)) {
+                    return $res->fetchAll($fetchStyle);
+                } else {
+                    return $res->fetchAll();
+                }
+            } catch (\Throwable $e) {
+                throw new UserException(
+                    $errorMessage . ': ' . $e->getMessage(),
+                    0,
+                    $e
+                );
+            }
+        });
     }
 }
