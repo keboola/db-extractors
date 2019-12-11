@@ -25,7 +25,7 @@ class OracleApplication extends Application
     {
         if ($this['action'] === 'getTables') {
             $this->config = new Config($config, new OracleGetTablesDefinition());
-        } elseif (isset($config['parameters']['table']) || isset($config['parameters']['query'])) {
+        } elseif ($this->isRowConfiguration($config)) {
             if ($this['action'] === 'run') {
                 $this->config = new Config($config, new ConfigRowDefinition());
             } else {
