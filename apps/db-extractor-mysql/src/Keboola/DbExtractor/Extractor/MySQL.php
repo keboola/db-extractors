@@ -345,7 +345,7 @@ class MySQL extends Extractor
             $this->quote($table['schema']),
             $this->quote($table['tableName'])
         );
-        $result = $this->db->query($fullsql)->fetchAll();
+        $result = $this->runRetriableQuery($fullsql);
         if (count($result) > 0) {
             return $result[0][$this->incrementalFetching['column']];
         }
