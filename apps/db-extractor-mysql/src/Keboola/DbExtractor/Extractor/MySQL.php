@@ -335,6 +335,23 @@ class MySQL extends Extractor
         }
     }
 
+    public function getMaxOfIncrementalFetchingColumn(array $table): ?string
+    {
+        $sql = 'SELECT MAX(%s) as %s FROM %s.%s';
+        $fullsql = sprintf(
+            $sql,
+            $this->quote($this->incrementalFetching['column']),
+            $this->quote($this->incrementalFetching['column']),
+            $this->quote($table['schema']),
+            $this->quote($table['tableName'])
+        );
+        $result = $this->db->query($fullsql)->fetchAll();
+        if (count($result) > 0) {
+            return $result[0][$this->incrementalFetching['column']];
+        }
+        return null;
+    }
+
     public function simpleQuery(array $table, array $columns = []): string
     {
         $incrementalAddon = null;
