@@ -25,14 +25,14 @@ class MySQLApplication extends Application
     protected function buildConfig(array $config): void
     {
         $dbNode = new MysqlDbNode();
-        if (isset($config['parameters']['tables'])) {
-            $this->config = new Config($config, new ConfigDefinition($dbNode, null, new MysqlTablesNode()));
-        } else {
+        if ($this->isRowConfiguration($config)) {
             if ($this['action'] === 'run') {
                 $this->config = new Config($config, new ConfigRowDefinition($dbNode));
             } else {
                 $this->config = new Config($config, new ActionConfigRowDefinition($dbNode));
             }
+        } else {
+            $this->config = new Config($config, new ConfigDefinition($dbNode, null, new MysqlTablesNode()));
         }
     }
 }
