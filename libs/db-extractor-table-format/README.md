@@ -1,5 +1,6 @@
-# db-extractor-table.format
+# DB Extractor result table format
 Simply PHP class for formating extractor table result
+
 ## Usage
 Require with composer:
 
