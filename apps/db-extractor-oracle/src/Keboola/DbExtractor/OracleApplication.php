@@ -35,4 +35,13 @@ class OracleApplication extends Application
             $this->config = new Config($config, new ConfigDefinition());
         }
     }
+
+    protected function isRowConfiguration(array $config): bool
+    {
+        if (isset($config['parameters']['table']) || isset($config['parameters']['query'])) {
+            return true;
+        }
+
+        return false;
+    }
 }
