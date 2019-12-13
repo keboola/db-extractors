@@ -41,8 +41,6 @@ class TableResultFormatTest extends TestCase
                     'type' => 'varchar',
                     'primaryKey' => false,
                     'uniqueKey' => false,
-                    'nullable' => false,
-                    'autoIncrement' => false,
                 ],
             ],
         ], $table->getOutput());
