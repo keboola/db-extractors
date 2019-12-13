@@ -106,10 +106,10 @@ class TableColumn
     {
         $ret = [];
         foreach (get_class_vars(self::class) as $property => $propertyValue) {
-            $propertyValue = $this->{$property} ?? null;
             if ($property === 'requiredParams') {
                 continue;
             }
+            $propertyValue = $this->{$property} ?? null;
             if (in_array($property, $this->requiredParams) && is_null($propertyValue)) {
                 throw new UserException(sprintf(
                     'Parameter \'%s\' is required',
