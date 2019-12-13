@@ -19,14 +19,12 @@ class TableResultFormatTest extends TestCase
             ->setCatalog('catalog')
             ->setSchema('schema')
             ->setType('view')
-            ->setRowCount(22)
-        ;
+            ->setRowCount(22);
 
         $column = new TableColumn();
         $column
             ->setName('Asdno osdn')
-            ->setType('varchar')
-        ;
+            ->setType('varchar');
 
         $table->addColumn($column);
 
@@ -43,6 +41,8 @@ class TableResultFormatTest extends TestCase
                     'type' => 'varchar',
                     'primaryKey' => false,
                     'uniqueKey' => false,
+                    'nullable' => false,
+                    'autoIncrement' => false,
                 ],
             ],
         ], $table->getOutput());

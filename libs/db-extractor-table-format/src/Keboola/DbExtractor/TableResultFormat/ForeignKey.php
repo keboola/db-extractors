@@ -46,6 +46,7 @@ class ForeignKey
     {
         $ret = [];
         foreach (get_class_vars(self::class) as $property => $propertyValue) {
+            $propertyValue = $this->{$property} ?? null;
             if ($property === 'requiredParams') {
                 continue;
             }
