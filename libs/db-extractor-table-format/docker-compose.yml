@@ -1,0 +1,10 @@
+version: '2'
+services:
+  app: &base
+    build: .
+    working_dir: /code
+
+  dev:
+    <<: *base
+    volumes:
+      - .:/code
