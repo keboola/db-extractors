@@ -1,0 +1,11 @@
+version: '2'
+services:
+  app: &base
+    build: .
+    command: composer ci
+    working_dir: /code
+
+  dev:
+    <<: *base
+    volumes:
+      - .:/code
