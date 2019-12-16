@@ -107,4 +107,26 @@ class TableResultFormatTest extends TestCase
         $this->expectExceptionMessage('Parameter \'name\' is required');
         $table->getOutput();
     }
+
+    public function testInvalidTableColumn(): void
+    {
+        $table = new Table();
+        $table
+            ->setName('testInvalitTableColumn')
+            ->setCatalog('catalog');
+
+        $columns = [
+            [
+                'name' => 'Asdno osdn',
+                'sanitizedName' => 'Asdno_osdn',
+                'type' => 'varchar',
+                'primaryKey' => false,
+                'uniqueKey' => false,
+            ],
+        ];
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('Column is not instance \Keboola\DbExtractor\TableResultFormat\TableColumn');
+        $table->setColumns($columns);
+    }
 }
