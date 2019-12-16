@@ -31,6 +31,8 @@ services:
       - sshproxy8:sshproxy
 
   dev:
+    build:
+      context: .
     image: keboola/ex-db-mysql
     volumes:
       - .:/code
@@ -72,22 +74,14 @@ services:
       - "3307"
 
   sshproxy:
-    image: db-ex-mysql-sshproxy
-    build: ./tests/env/sshproxy
-    volumes:
-        - ./tests/env/sshproxy:/code
-    working_dir: /code
+    image: keboola/db-component-ssh-proxy:latest
     ports:
       - "2222:22"
     links:
       - mysql
 
   sshproxy8:
-    image: db-ex-mysql-sshproxy
-    build: ./tests/env/sshproxy
-    volumes:
-        - ./tests/env/sshproxy:/code
-    working_dir: /code
+    image: keboola/db-component-ssh-proxy:latest
     ports:
       - "2222:22"
     links:
