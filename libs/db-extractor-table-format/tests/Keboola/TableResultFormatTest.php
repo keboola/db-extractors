@@ -108,7 +108,7 @@ class TableResultFormatTest extends TestCase
         $table->getOutput();
     }
 
-    public function testInvalidTableColumn()
+    public function testInvalidTableColumn(): void
     {
         $table = new Table();
         $table
@@ -122,7 +122,7 @@ class TableResultFormatTest extends TestCase
                 'type' => 'varchar',
                 'primaryKey' => false,
                 'uniqueKey' => false,
-            ]
+            ],
         ];
 
         $this->expectException(UserException::class);

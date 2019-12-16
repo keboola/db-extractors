@@ -61,7 +61,7 @@ class Table
 
     public function setColumns(array $columns): self
     {
-        array_walk($columns, function ($item) {
+        array_walk($columns, function ($item): void {
             if (!($item instanceof TableColumn)) {
                 throw new UserException(
                     'Column is not instance \Keboola\DbExtractor\TableResultFormat\TableColumn'
