@@ -10,13 +10,13 @@ class Table
 {
     private string $name;
 
-    private string $catalog;
-
     private string $schema;
 
-    private string $type;
+    private ?string $catalog;
 
-    private int $rowCount;
+    private ?string $type;
+
+    private ?int $rowCount;
 
     /** @var TableColumn[] $columns */
     private array $columns = [];
@@ -29,25 +29,25 @@ class Table
         return $this;
     }
 
-    public function setCatalog(string $catalog): self
-    {
-        $this->catalog = $catalog;
-        return $this;
-    }
-
     public function setSchema(string $schema): self
     {
         $this->schema = $schema;
         return $this;
     }
 
-    public function setType(string $type): self
+    public function setCatalog(?string $catalog): self
+    {
+        $this->catalog = $catalog;
+        return $this;
+    }
+
+    public function setType(?string $type): self
     {
         $this->type = $type;
         return $this;
     }
 
-    public function setRowCount(int $rowCount): self
+    public function setRowCount(?int $rowCount): self
     {
         $this->rowCount = $rowCount;
         return $this;
