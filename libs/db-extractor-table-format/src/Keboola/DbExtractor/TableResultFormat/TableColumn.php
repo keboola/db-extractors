@@ -19,19 +19,19 @@ class TableColumn
 
     private bool $uniqueKey = false;
 
-    private string $length;
+    private ?string $length;
 
     private bool $nullable;
 
-    private string $default;
+    private ?string $default;
 
-    private int $ordinalPosition;
+    private ?int $ordinalPosition;
 
-    private string $description;
+    private ?string $description;
 
     private bool $autoIncrement;
 
-    private ForeignKey $foreignKey;
+    private ?ForeignKey $foreignKey;
 
     private array $requiredParams = ['name', 'type'];
 
@@ -60,7 +60,7 @@ class TableColumn
         return $this;
     }
 
-    public function setLength(string $length): self
+    public function setLength(?string $length): self
     {
         $this->length = $length;
         return $this;
@@ -72,19 +72,19 @@ class TableColumn
         return $this;
     }
 
-    public function setDefault(string $default): self
+    public function setDefault(?string $default): self
     {
         $this->default = $default;
         return $this;
     }
 
-    public function setOrdinalPosition(int $ordinalPosition): self
+    public function setOrdinalPosition(?int $ordinalPosition): self
     {
         $this->ordinalPosition = $ordinalPosition;
         return $this;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -96,7 +96,7 @@ class TableColumn
         return $this;
     }
 
-    public function setForeignKey(ForeignKey $foreignKey): self
+    public function setForeignKey(?ForeignKey $foreignKey): self
     {
         $this->foreignKey = $foreignKey;
         return $this;
