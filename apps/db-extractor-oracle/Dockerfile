@@ -1,4 +1,4 @@
-FROM db-ex-oracle-sshproxy AS sshproxy
+FROM keboola/db-component-ssh-proxy:latest AS sshproxy
 FROM quay.io/keboola/aws-cli
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ACCESS_KEY_ID
