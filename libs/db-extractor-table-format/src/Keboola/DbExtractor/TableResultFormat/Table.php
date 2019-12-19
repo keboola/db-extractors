@@ -29,6 +29,9 @@ class Table
     /** @var array  */
     private $requiredParams = ['name', 'schema'];
 
+    /** @var string */
+    private $description;
+
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -75,6 +78,12 @@ class Table
             }
         });
         $this->columns = $columns;
+        return $this;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 
