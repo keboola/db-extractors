@@ -42,6 +42,9 @@ class TableColumn
     /** @var bool  */
     private $autoIncrement;
 
+    /** @var int */
+    private $autoIncrementValue;
+
     /** @var ForeignKey|null  */
     private $foreignKey;
 
@@ -106,6 +109,12 @@ class TableColumn
     public function setAutoIncrement(bool $autoIncrement): self
     {
         $this->autoIncrement = $autoIncrement;
+        return $this;
+    }
+
+    public function setAutoIncrementValue(int $autoIncrementValue): self
+    {
+        $this->autoIncrementValue = $autoIncrementValue;
         return $this;
     }
 
