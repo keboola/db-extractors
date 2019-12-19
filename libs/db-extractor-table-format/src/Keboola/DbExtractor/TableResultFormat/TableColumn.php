@@ -9,31 +9,44 @@ use Keboola\Utils;
 
 class TableColumn
 {
-    private string $name;
+    /** @var string  */
+    private $name;
 
-    private string $sanitizedName;
+    /** @var string  */
+    private $sanitizedName;
 
-    private string $type;
+    /** @var string  */
+    private $type;
 
-    private bool $primaryKey = false;
+    /** @var bool  */
+    private $primaryKey = false;
 
-    private bool $uniqueKey = false;
+    /** @var bool  */
+    private $uniqueKey = false;
 
-    private ?string $length;
+    /** @var string|null  */
+    private $length;
 
-    private bool $nullable;
+    /** @var bool  */
+    private $nullable;
 
-    private ?string $default;
+    /** @var string|null  */
+    private $default;
 
-    private ?int $ordinalPosition;
+    /** @var int|null  */
+    private $ordinalPosition;
 
-    private ?string $description;
+    /** @var string|null  */
+    private $description;
 
-    private bool $autoIncrement;
+    /** @var bool  */
+    private $autoIncrement;
 
-    private ?ForeignKey $foreignKey;
+    /** @var ForeignKey|null  */
+    private $foreignKey;
 
-    private array $requiredParams = ['name', 'type'];
+    /** @var array $requiredParams */
+    private $requiredParams = ['name', 'type'];
 
     public function setName(string $name): self
     {

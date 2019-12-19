@@ -8,15 +8,20 @@ use Keboola\DbExtractor\Exception\UserException;
 
 class ForeignKey
 {
-    private string $name;
+    /** @var string  */
+    private $name;
 
-    private string $refSchema;
+    /** @var string  */
+    private $refSchema;
 
-    private string $refTable;
+    /** @var string  */
+    private $refTable;
 
-    private string $refColumn;
+    /** @var string  */
+    private $refColumn;
 
-    private array $requiredParams = ['name', 'refSchema', 'refTable', 'refColumn'];
+    /** @var array  */
+    private $requiredParams = ['name', 'refSchema', 'refTable', 'refColumn'];
 
     public function setName(string $name): self
     {

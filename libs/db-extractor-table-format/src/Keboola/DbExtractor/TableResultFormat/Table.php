@@ -8,20 +8,26 @@ use Keboola\DbExtractor\Exception\UserException;
 
 class Table
 {
-    private string $name;
+    /** @var string  */
+    private $name;
 
-    private string $schema;
+    /** @var string  */
+    private $schema;
 
-    private ?string $catalog;
+    /** @var string|null  */
+    private $catalog;
 
-    private ?string $type;
+    /** @var string|null  */
+    private $type;
 
-    private ?int $rowCount;
+    /** @var int|null  */
+    private $rowCount;
 
     /** @var TableColumn[] $columns */
-    private array $columns = [];
+    private $columns = [];
 
-    private array $requiredParams = ['name', 'schema'];
+    /** @var array  */
+    private $requiredParams = ['name', 'schema'];
 
     public function setName(string $name): self
     {
