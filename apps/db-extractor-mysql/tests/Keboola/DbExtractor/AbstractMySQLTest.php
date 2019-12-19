@@ -224,8 +224,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '1',
+                            'ordinalPosition' => 1,
+                            'uniqueKey' => false,
                         ),
                     1 =>
                         array (
@@ -235,8 +235,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '2',
+                            'ordinalPosition' => 2,
+                            'uniqueKey' => false,
                         ),
                     2 =>
                         array (
@@ -246,8 +246,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '3',
+                            'ordinalPosition' => 3,
+                            'uniqueKey' => false,
                         ),
                     3 =>
                         array (
@@ -257,8 +257,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '4',
+                            'ordinalPosition' => 4,
+                            'uniqueKey' => false,
                         ),
                     4 =>
                         array (
@@ -268,8 +268,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '5',
+                            'ordinalPosition' => 5,
+                            'uniqueKey' => false,
                         ),
                     5 =>
                         array (
@@ -279,8 +279,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '6',
+                            'ordinalPosition' => 6,
+                            'uniqueKey' => false,
                         ),
                     6 =>
                         array (
@@ -290,8 +290,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '7',
+                            'ordinalPosition' => 7,
+                            'uniqueKey' => false,
                         ),
                     7 =>
                         array (
@@ -301,8 +301,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '8',
+                            'ordinalPosition' => 8,
+                            'uniqueKey' => false,
                         ),
                     8 =>
                         array (
@@ -312,8 +312,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '9',
+                            'ordinalPosition' => 9,
+                            'uniqueKey' => false,
                         ),
                     9 =>
                         array (
@@ -323,8 +323,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '10',
+                            'ordinalPosition' => 10,
+                            'uniqueKey' => false,
                         ),
                     10 =>
                         array (
@@ -334,8 +334,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '11',
+                            'ordinalPosition' => 11,
+                            'uniqueKey' => false,
                         ),
                     11 =>
                         array (
@@ -345,8 +345,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                             'primaryKey' => false,
                             'length' => '65535',
                             'nullable' => true,
-                            'default' => null,
-                            'ordinalPosition' => '12',
+                            'ordinalPosition' => 12,
+                            'uniqueKey' => false,
                         ),
                 );
             } else {
@@ -364,8 +364,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '1',
+                                'ordinalPosition' => 1,
+                                'uniqueKey' => false,
                             ),
                         1 =>
                             array (
@@ -375,8 +375,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '2',
+                                'ordinalPosition' => 2,
+                                'uniqueKey' => false,
                             ),
                         2 =>
                             array (
@@ -386,8 +386,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '3',
+                                'ordinalPosition' => 3,
+                                'uniqueKey' => false,
                             ),
                         3 =>
                             array (
@@ -397,8 +397,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '4',
+                                'ordinalPosition' => 4,
+                                'uniqueKey' => false,
                             ),
                         4 =>
                             array (
@@ -408,8 +408,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '5',
+                                'ordinalPosition' => 5,
+                                'uniqueKey' => false,
                             ),
                         5 =>
                             array (
@@ -419,8 +419,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '6',
+                                'ordinalPosition' => 6,
+                                'uniqueKey' => false,
                             ),
                         6 =>
                             array (
@@ -430,8 +430,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '7',
+                                'ordinalPosition' => 7,
+                                'uniqueKey' => false,
                             ),
                         7 =>
                             array (
@@ -441,8 +441,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '8',
+                                'ordinalPosition' => 8,
+                                'uniqueKey' => false,
                             ),
                         8 =>
                             array (
@@ -452,8 +452,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '9',
+                                'ordinalPosition' => 9,
+                                'uniqueKey' => false,
                             ),
                         9 =>
                             array (
@@ -463,8 +463,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '10',
+                                'ordinalPosition' => 10,
+                                'uniqueKey' => false,
                             ),
                         10 =>
                             array (
@@ -474,8 +474,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '11',
+                                'ordinalPosition' => 11,
+                                'uniqueKey' => false,
                             ),
                         11 =>
                             array (
@@ -485,8 +485,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '12',
+                                'ordinalPosition' => 12,
+                                'uniqueKey' => false,
                             ),
                     );
                 case 'escaping':
@@ -499,8 +499,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '1',
+                                'ordinalPosition' => 1,
+                                'uniqueKey' => false,
                             ),
                         1 =>
                             array (
@@ -510,8 +510,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => false,
                                 'length' => '65535',
                                 'nullable' => true,
-                                'default' => null,
-                                'ordinalPosition' => '2',
+                                'ordinalPosition' => 2,
+                                'uniqueKey' => false,
                             ),
                     );
                 case 'auto_increment_timestamp':
@@ -524,10 +524,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'primaryKey' => true,
                                 'length' => '10',
                                 'nullable' => false,
-                                'default' => null,
-                                'ordinalPosition' => '1',
-                                'autoIncrement' => '3',
+                                'ordinalPosition' => 1,
+                                'autoIncrement' => true,
                                 'description' => 'This is a weird ID',
+                                'uniqueKey' => false,
+                                'autoIncrementValue' => 3,
                             ),
                         1 =>
                             array (
@@ -538,8 +539,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'length' => '30',
                                 'nullable' => false,
                                 'default' => 'pam',
-                                'ordinalPosition' => '2',
+                                'ordinalPosition' => 2,
                                 'description' => 'This is a weird name',
+                                'uniqueKey' => false,
                             ),
                         2 =>
                             array (
@@ -547,11 +549,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'sanitizedName' => 'timestamp',
                                 'type' => 'timestamp',
                                 'primaryKey' => false,
-                                'length' => null,
                                 'nullable' => false,
                                 'default' => 'CURRENT_TIMESTAMP',
-                                'ordinalPosition' => '3',
+                                'ordinalPosition' => 3,
                                 'description' => 'This is a timestamp',
+                                'uniqueKey' => false,
                             ),
                         3 =>
                             array (
@@ -559,11 +561,11 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'sanitizedName' => 'datetime',
                                 'type' => 'datetime',
                                 'primaryKey' => false,
-                                'length' => null,
                                 'nullable' => false,
                                 'default' => 'CURRENT_TIMESTAMP',
-                                'ordinalPosition' => '4',
+                                'ordinalPosition' => 4,
                                 'description' => 'This is a datetime',
+                                'uniqueKey' => false,
                             ),
                         4 =>
                             array (
@@ -574,7 +576,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'length' => '10',
                                 'nullable' => true,
                                 'default' => '1',
-                                'ordinalPosition' => '5',
+                                'ordinalPosition' => 5,
+                                'uniqueKey' => false,
                             ),
                         5 =>
                             array (
@@ -585,7 +588,8 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'length' => '10,2',
                                 'nullable' => true,
                                 'default' => '10.20',
-                                'ordinalPosition' => '6',
+                                'ordinalPosition' => 6,
+                                'uniqueKey' => false,
                             ),
                     );
             }
