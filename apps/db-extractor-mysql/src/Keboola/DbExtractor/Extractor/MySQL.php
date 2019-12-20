@@ -201,13 +201,13 @@ class MySQL extends Extractor
                 ->setName($table['TABLE_NAME'])
                 ->setSchema((isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '')
                 ->setType((isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '')
-                ->setRowCount((isset($table['TABLE_ROWS'])) ? (int) $table['TABLE_ROWS'] : 0);
+                ->setRowCount((isset($table['TABLE_ROWS'])) ? (int) $table['TABLE_ROWS'] : null);
 
-            if ($table['TABLE_COMMENT']) {
+            if (!empty($table['TABLE_COMMENT'])) {
                 $tableFormat->setDescription($table['TABLE_COMMENT']);
             }
 
-            if ($table['AUTO_INCREMENT']) {
+            if (!empty($table['AUTO_INCREMENT'])) {
                 $autoIncrements[$curTable] = (int) $table['AUTO_INCREMENT'];
             }
 
