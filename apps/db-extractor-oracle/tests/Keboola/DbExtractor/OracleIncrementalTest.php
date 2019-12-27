@@ -244,23 +244,6 @@ class OracleIncrementalTest extends OracleBaseTest
         $this->assertEquals(2, $result['state']['lastFetchedRow']);
     }
 
-    private function getIncrementalFetchingConfig(string $driver = self::DRIVER): array
-    {
-        $config = $this->getConfigRow($driver);
-        unset($config['parameters']['query']);
-        $config['parameters']['table'] = [
-            'tableName' => 'AUTO_INCREMENT_TIMESTAMP',
-            'schema' => 'TESTER',
-        ];
-        $config['parameters']['incremental'] = true;
-        $config['parameters']['name'] = 'auto-increment-timestamp';
-        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
-        $config['parameters']['primaryKey'] = ['id'];
-        $config['parameters']['incrementalFetchingColumn'] = 'id';
-
-        return $config;
-    }
-
     private function generateRandomString(int $length = 10): string
     {
         $includeChars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

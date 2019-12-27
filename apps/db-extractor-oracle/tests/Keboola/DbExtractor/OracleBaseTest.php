@@ -401,6 +401,23 @@ EOT;
         return $linesCount;
     }
 
+    protected function getIncrementalFetchingConfig(string $driver = self::DRIVER): array
+    {
+        $config = $this->getConfigRow($driver);
+        unset($config['parameters']['query']);
+        $config['parameters']['table'] = [
+            'tableName' => 'AUTO_INCREMENT_TIMESTAMP',
+            'schema' => 'TESTER',
+        ];
+        $config['parameters']['incremental'] = true;
+        $config['parameters']['name'] = 'auto-increment-timestamp';
+        $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
+        $config['parameters']['primaryKey'] = ['id'];
+        $config['parameters']['incrementalFetchingColumn'] = 'id';
+
+        return $config;
+    }
+
     public function getPrivateKey(): string
     {
         return (string) file_get_contents('/root/.ssh/id_rsa');

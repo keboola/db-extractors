@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Exception\UserException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class ApplicationTest extends OracleBaseTest
@@ -231,6 +232,56 @@ class ApplicationTest extends OracleBaseTest
         $this->assertStringContainsString('Export process failed:', $process->getErrorOutput());
         // verify that it retries 5 times
         $this->assertStringContainsString('[4x]', $process->getOutput());
+    }
+
+    public function testRunIncrementalFetching(): void
+    {
+        $config = $this->getIncrementalFetchingConfig();
+        $this->createIncrementalFetchingTable($config);
+
+        @unlink($this->dataDir . '/config.json');
+
+        $inputStateFile = $this->dataDir . '/in/state.json';
+
+        $fs = new Filesystem();
+        if (!$fs->exists($inputStateFile)) {
+            $fs->mkdir($this->dataDir . '/in');
+            $fs->touch($inputStateFile);
+        }
+        $outputStateFile = $this->dataDir . '/out/state.json';
+        // unset the state file
+        @unlink($outputStateFile);
+        @unlink($inputStateFile);
+
+        file_put_contents($this->dataDir . '/config.json', json_encode($config));
+
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertFileExists($outputStateFile);
+        $this->assertEquals(['lastFetchedRow' => '2'], json_decode((string) file_get_contents($outputStateFile), true));
+
+        // add a couple rows
+        $this->executeStatement(
+            $this->connection,
+            sprintf(
+                'INSERT INTO %s ("name", "decimal") VALUES (\'beat\', 78.34567789)',
+                $config['parameters']['table']['tableName']
+            )
+        );
+
+        // copy state to input state file
+        file_put_contents($inputStateFile, file_get_contents($outputStateFile));
+
+        // run the config again
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process->setTimeout(300);
+        $process->run();
+
+        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals(['lastFetchedRow' => '3'], json_decode((string) file_get_contents($outputStateFile), true));
     }
 
     private function putConfig(array $config): void
