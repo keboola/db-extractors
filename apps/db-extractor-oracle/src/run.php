@@ -37,9 +37,9 @@ try {
     $inputState = [];
     $inputStateFile = $arguments['data'] . '/in/state.json';
     if (file_exists($inputStateFile)) {
-        $jsonDecode = new JsonDecode(true);
+        $jsonDecode = new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
         $inputState = $jsonDecode->decode(
-            file_get_contents($inputStateFile),
+            (string) file_get_contents($inputStateFile),
             JsonEncoder::FORMAT
         );
     }
