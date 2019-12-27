@@ -6,6 +6,9 @@ use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 
 require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
@@ -31,7 +34,18 @@ try {
     $config['parameters']['data_dir'] = $arguments['data'];
     $config['parameters']['extractor_class'] = 'Redshift';
 
-    $app = new Application($config, $logger);
+    // get the state
+    $inputState = [];
+    $inputStateFile = $arguments['data'] . '/in/state.json';
+    if (file_exists($inputStateFile)) {
+        $jsonDecode = new JsonDecode(true);
+        $inputState = $jsonDecode->decode(
+            file_get_contents($inputStateFile),
+            JsonEncoder::FORMAT
+        );
+    }
+
+    $app = new Application($config, $logger, $inputState);
 
     if ($app['action'] !== 'run') {
         $app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));
@@ -40,6 +54,13 @@ try {
     $result = $app->run();
     if (!$runAction) {
         echo json_encode($result);
+    } else {
+        if (!empty($result['state'])) {
+            // write state
+            $outputStateFile = $arguments['data'] . '/out/state.json';
+            $jsonEncode = new JsonEncode();
+            file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
+        }
     }
 
 } catch(UserException|ConfigUserException $e) {
