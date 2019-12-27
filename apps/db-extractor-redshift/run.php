@@ -6,6 +6,8 @@ use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Monolog\Handler\NullHandler;
 use Monolog\Logger;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 require_once(dirname(__FILE__) . "/vendor/autoload.php");
 
@@ -40,6 +42,13 @@ try {
     $result = $app->run();
     if (!$runAction) {
         echo json_encode($result);
+    } else {
+        if (!empty($result['state'])) {
+            // write state
+            $outputStateFile = $arguments['data'] . '/out/state.json';
+            $jsonEncode = new JsonEncode();
+            file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
+        }
     }
 
 } catch(UserException|ConfigUserException $e) {
