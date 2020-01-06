@@ -7,6 +7,8 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Datatype\Definition\Redshift as RedshiftDatatype;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\TableResultFormat\Table;
+use Keboola\DbExtractor\TableResultFormat\TableColumn;
 
 class Redshift extends Extractor
 {
@@ -51,7 +53,9 @@ class Redshift extends Extractor
     public function getTables(?array $tables = null): array
     {
         $sql = "SELECT * FROM information_schema.tables 
-                WHERE table_schema != 'pg_catalog' AND table_schema != 'information_schema'";
+                WHERE table_schema != 'pg_catalog' 
+                    AND table_schema != 'information_schema' 
+                    AND table_schema != 'pg_internal'";
 
         if (!is_null($tables) && count($tables) > 0) {
             $sql .= sprintf(
@@ -74,15 +78,18 @@ class Redshift extends Extractor
         }
 
         $tableNameArray = [];
+        /** @var Table[] $tableDefs */
         $tableDefs = [];
         foreach ($arr as $table) {
             $tableNameArray[] = $table['table_name'];
-            $tableDefs[$table['table_schema'] . '.' . $table['table_name']] = [
-                'name' => $table['table_name'],
-                'schema' => (isset($table['table_schema'])) ? $table['table_schema'] : null,
-                'type' => (isset($table['table_type'])) ? $table['table_type'] : null,
-                'catalog' => (isset($table['table_catalog'])) ? $table['table_catalog'] : null,
-            ];
+            $tableFormat = new Table();
+            $tableFormat
+                ->setName($table['table_name'])
+                ->setSchema($table['table_schema'])
+                ->setCatalog((isset($table['table_catalog'])) ? $table['table_catalog'] : null)
+                ->setType((isset($table['table_type'])) ? $table['table_type'] : null);
+
+            $tableDefs[$table['table_schema'] . '.' . $table['table_name']] = $tableFormat;
         }
 
         $sql = sprintf(
@@ -145,21 +152,23 @@ class Redshift extends Extractor
             if (!is_null($column['column_default'])) {
                 $default = str_replace("'", '', explode('::', $column['column_default'])[0]);
             }
-            $curColumn = [
-                'name' => $column['column_name'],
-                'type' => $column['data_type'],
-                'primaryKey' => ($column['contype'] === 'p') ? true : false,
-                'uniqueKey' => ($column['contype'] === 'u') ? true : false,
-                'length' => $length,
-                'nullable' => ($column['is_nullable'] === 'NO') ? false : true,
-                'default' => $default,
-                'ordinalPosition' => $column['ordinal_position'],
-            ];
-            if (!array_key_exists('columns', $tableDefs[$curTable])) {
-                $tableDefs[$curTable]['columns'] = [];
-            }
-            $tableDefs[$curTable]['columns'][] = $curColumn;
+
+            $columnFormat = new TableColumn();
+            $columnFormat
+                ->setName($column['column_name'])
+                ->setType($column['data_type'])
+                ->setPrimaryKey(($column['contype'] === 'p') ? true : false)
+                ->setUniqueKey(($column['contype'] === 'u') ? true : false)
+                ->setLength((string) $length)
+                ->setNullable(($column['is_nullable'] === 'NO') ? false : true)
+                ->setDefault($default)
+                ->setOrdinalPosition((int) $column['ordinal_position']);
+
+            $tableDefs[$curTable]->addColumn($columnFormat);
         }
+        array_walk($tableDefs, function (Table &$item): void {
+            $item = $item->getOutput();
+        });
         return array_values($tableDefs);
     }
 

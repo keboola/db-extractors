@@ -86,15 +86,20 @@ class RedshiftTest extends AbstractRedshiftTest
                         ),
                     6 =>
                         array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'col1',
+                        ),
+                    7 =>
+                        array (
                             'key' => 'KBC.primaryKey',
                             'value' => true,
                         ),
-                    7 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    8 =>
+                    9 =>
                         array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => 1,
@@ -134,15 +139,20 @@ class RedshiftTest extends AbstractRedshiftTest
                         ),
                     6 =>
                         array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'col2',
+                        ),
+                    7 =>
+                        array (
                             'key' => 'KBC.primaryKey',
                             'value' => true,
                         ),
-                    7 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    8 =>
+                    9 =>
                         array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => 2,
@@ -251,10 +261,11 @@ class RedshiftTest extends AbstractRedshiftTest
                                     'type' => 'character varying',
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
-                                    'length' => 256,
+                                    'length' => '256',
                                     'nullable' => false,
                                     'default' => 'a',
                                     'ordinalPosition' => 1,
+                                    'sanitizedName' => 'col1',
                                 ),
                             1 =>
                                 array (
@@ -262,10 +273,11 @@ class RedshiftTest extends AbstractRedshiftTest
                                     'type' => 'character varying',
                                     'primaryKey' => true,
                                     'uniqueKey' => false,
-                                    'length' => 256,
+                                    'length' => '256',
                                     'nullable' => false,
                                     'default' => 'b',
                                     'ordinalPosition' => 2,
+                                    'sanitizedName' => 'col2',
                                 ),
                             2 =>
                                 array (
@@ -273,10 +285,10 @@ class RedshiftTest extends AbstractRedshiftTest
                                     'type' => 'character varying',
                                     'primaryKey' => false,
                                     'uniqueKey' => false,
-                                    'length' => 256,
+                                    'length' => '256',
                                     'nullable' => true,
-                                    'default' => null,
                                     'ordinalPosition' => 3,
+                                    'sanitizedName' => 'col3',
                                 ),
                         ),
                 ),
@@ -320,13 +332,13 @@ class RedshiftTest extends AbstractRedshiftTest
                 ),
             2 =>
                 array (
-                    'key' => 'KBC.type',
-                    'value' => 'BASE TABLE',
+                    'key' => 'KBC.catalog',
+                    'value' => $config['parameters']['db']['database'],
                 ),
             3 =>
                 array (
-                    'key' => 'KBC.catalog',
-                    'value' => $config['parameters']['db']['database'],
+                    'key' => 'KBC.type',
+                    'value' => 'BASE TABLE',
                 ),
         );
 
@@ -367,15 +379,20 @@ class RedshiftTest extends AbstractRedshiftTest
                         ),
                     6 =>
                         array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'col1',
+                        ),
+                    7 =>
+                        array (
                             'key' => 'KBC.primaryKey',
                             'value' => true,
                         ),
-                    7 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    8 =>
+                    9 =>
                         array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => 1,
@@ -415,15 +432,20 @@ class RedshiftTest extends AbstractRedshiftTest
                         ),
                     6 =>
                         array (
+                            'key' => 'KBC.sanitizedName',
+                            'value' => 'col2',
+                        ),
+                    7 =>
+                        array (
                             'key' => 'KBC.primaryKey',
                             'value' => true,
                         ),
-                    7 =>
+                    8 =>
                         array (
                             'key' => 'KBC.uniqueKey',
                             'value' => false,
                         ),
-                    8 =>
+                    9 =>
                         array (
                             'key' => 'KBC.ordinalPosition',
                             'value' => 2,
