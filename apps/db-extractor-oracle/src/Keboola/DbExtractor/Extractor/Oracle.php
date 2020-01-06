@@ -9,6 +9,8 @@ use Keboola\Datatype\Definition\GenericStorage;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\TableResultFormat\Table;
+use Keboola\DbExtractor\TableResultFormat\TableColumn;
 use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Process\Process;
 
@@ -329,6 +331,35 @@ class Oracle extends Extractor
                 'Cannot parse JSON data of table listing - error: ' . json_last_error()
             );
         }
+        /** @var Table[] $tableDefs */
+        $tableDefs = [];
+        foreach ($tableListing as $table) {
+            $tableFormat = new Table();
+            $tableFormat
+                ->setName($table['name'])
+                ->setSchema($table['schema'])
+                ->setCatalog($table['tablespaceName']);
+
+            if (isset($table['columns'])) {
+                foreach ($table['columns'] as $column) {
+                    $columnFormat = new TableColumn();
+                    $columnFormat
+                        ->setName($column['name'])
+                        ->setType($column['type'])
+                        ->setNullable($column['nullable'])
+                        ->setLength($column['length'])
+                        ->setOrdinalPosition($column['ordinalPosition'])
+                        ->setPrimaryKey($column['primaryKey'])
+                        ->setUniqueKey($column['uniqueKey']);
+
+                    $tableFormat->addColumn($columnFormat);
+                }
+            }
+            $tableDefs[] = $tableFormat;
+        }
+        array_walk($tableDefs, function (Table &$item): void {
+            $item = $item->getOutput();
+        });
         return $tableListing;
     }
 
