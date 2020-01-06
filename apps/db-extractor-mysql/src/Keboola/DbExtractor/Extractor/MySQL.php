@@ -6,9 +6,11 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
 use Keboola\DbExtractor\DbRetryProxy;
-use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\TableResultFormat\ForeignKey;
+use Keboola\DbExtractor\TableResultFormat\Table;
+use Keboola\DbExtractor\TableResultFormat\TableColumn;
 use Keboola\Temp\Temp;
 use PDO;
 use PDOException;
@@ -189,33 +191,61 @@ class MySQL extends Extractor
             return [];
         }
 
+        /** @var Table[] $tableDefs */
         $tableDefs = [];
+        $autoIncrements = [];
         foreach ($arr as $table) {
             $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
-            $tableDefs[$curTable] = [
-                'name' => $table['TABLE_NAME'],
-                'schema' => (isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '',
-                'type' => (isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '',
-                'rowCount' => (isset($table['TABLE_ROWS'])) ? $table['TABLE_ROWS'] : '',
-                'columns' => [],
-            ];
-            if ($table['TABLE_COMMENT']) {
-                $tableDefs[$curTable]['description'] = $table['TABLE_COMMENT'];
+            $tableFormat = new Table();
+            $tableFormat
+                ->setName($table['TABLE_NAME'])
+                ->setSchema((isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '')
+                ->setType((isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '')
+                ->setRowCount((isset($table['TABLE_ROWS'])) ? (int) $table['TABLE_ROWS'] : null);
+
+            if (!empty($table['TABLE_COMMENT'])) {
+                $tableFormat->setDescription($table['TABLE_COMMENT']);
             }
-            if ($table['AUTO_INCREMENT']) {
-                $tableDefs[$curTable]['autoIncrement'] = $table['AUTO_INCREMENT'];
+
+            if (!empty($table['AUTO_INCREMENT'])) {
+                $autoIncrements[$curTable] = (int) $table['AUTO_INCREMENT'];
+            }
+
+            $tableDefs[$curTable] = $tableFormat;
+        }
+        ksort($tableDefs);
+
+        // add additional info
+        $foreignKeys = [];
+        if (!is_null($tables) && count($tables) > 0) {
+            $additionalSql = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
+                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ';
+
+            $rows = $this->runRetriableQuery($additionalSql . $whereClause);
+            foreach ($rows as $column) {
+                $foreignKey = new ForeignKey();
+                if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
+                    $foreignKey->setName($column['CONSTRAINT_NAME']);
+                }
+                if (!array_key_exists('REFERENCED_TABLE_NAME', $column) || is_null($column['REFERENCED_TABLE_NAME'])) {
+                    continue;
+                }
+                $foreignKey
+                    ->setRefSchema($column['REFERENCED_TABLE_SCHEMA'])
+                    ->setRefTable($column['REFERENCED_TABLE_NAME'])
+                    ->setRefColumn($column['REFERENCED_COLUMN_NAME']);
+                $curTableName = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'] . '.' . $column['COLUMN_NAME'];
+                $foreignKeys[$curTableName] = $foreignKey;
             }
         }
 
-        ksort($tableDefs);
-
         $sql = 'SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c';
         $sql .= $whereClause;
-
         $rows = $this->runRetriableQuery($sql);
-
         foreach ($rows as $i => $column) {
             $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
+            $curColumn = $curTable . '.' . $column['COLUMN_NAME'];
             $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
             if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
                 if ($column['NUMERIC_SCALE'] > 0) {
@@ -224,70 +254,41 @@ class MySQL extends Extractor
                     $length = $column['NUMERIC_PRECISION'];
                 }
             }
-            $curColumn = [
-                'name' => $column['COLUMN_NAME'],
-                'sanitizedName' => \Keboola\Utils\sanitizeColumnName($column['COLUMN_NAME']),
-                'type' => $column['DATA_TYPE'],
-                'primaryKey' => ($column['COLUMN_KEY'] === 'PRI') ? true : false,
-                'length' => $length,
-                'nullable' => ($column['IS_NULLABLE'] === 'NO') ? false : true,
-                'default' => $column['COLUMN_DEFAULT'],
-                'ordinalPosition' => $column['ORDINAL_POSITION'],
-            ];
+
+            $columnFormat = new TableColumn();
+            $columnFormat
+                ->setName($column['COLUMN_NAME'])
+                ->setType($column['DATA_TYPE'])
+                ->setPrimaryKey(($column['COLUMN_KEY'] === 'PRI') ? true : false)
+                ->setLength($length)
+                ->setNullable(($column['IS_NULLABLE'] === 'NO') ? false : true)
+                ->setDefault($column['COLUMN_DEFAULT'])
+                ->setOrdinalPosition((int) $column['ORDINAL_POSITION']);
 
             if ($column['COLUMN_COMMENT']) {
-                $curColumn['description'] = $column['COLUMN_COMMENT'];
+                $columnFormat->setDescription($column['COLUMN_COMMENT']);
             }
 
             if ($column['EXTRA']) {
-                if ($column['EXTRA'] === 'auto_increment' && isset($tableDefs[$curTable]['autoIncrement'])) {
-                    $curColumn['autoIncrement'] = $tableDefs[$curTable]['autoIncrement'];
-                }
-            }
-            $tableDefs[$curTable]['columns'][$column['ORDINAL_POSITION'] - 1] = $curColumn;
-            ksort($tableDefs[$curTable]['columns']);
-        }
-
-        // add additional info
-        if (!is_null($tables) && count($tables) > 0) {
-            $additionalSql = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
-                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
-                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ';
-
-            $rows = $this->runRetriableQuery($additionalSql . $whereClause);
-            foreach ($rows as $column) {
-                $curColumn = [];
-                if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
-                    $curColumn['constraintName'] = $column['CONSTRAINT_NAME'];
-                }
-                if (array_key_exists('REFERENCED_TABLE_NAME', $column) && !is_null($column['REFERENCED_TABLE_NAME'])) {
-                    $curColumn['foreignKeyRefSchema'] = $column['REFERENCED_TABLE_SCHEMA'];
-                    $curColumn['foreignKeyRefTable'] = $column['REFERENCED_TABLE_NAME'];
-                    $curColumn['foreignKeyRefColumn'] = $column['REFERENCED_COLUMN_NAME'];
-                }
-                if (count($curColumn) > 0) {
-                    $curTableName = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
-                    $filteredColumns = array_filter(
-                        $tableDefs[$curTableName]['columns'],
-                        function ($existingCol) use ($column) {
-                            return $existingCol['name'] === $column['COLUMN_NAME'];
-                        }
-                    );
-                    if (count($filteredColumns) === 0) {
-                        throw new ApplicationException(
-                            sprintf(
-                                'This should never happen: Could not find reference column [%s] in table definition',
-                                $column['COLUMN_NAME']
-                            )
-                        );
-                    }
-                    $existingColumnKey = array_keys($filteredColumns)[0];
-                    foreach ($curColumn as $key => $value) {
-                        $tableDefs[$curTableName]['columns'][$existingColumnKey][$key] = $value;
+                if ($column['EXTRA'] === 'auto_increment') {
+                    $columnFormat->setAutoIncrement(true);
+                    if (isset($autoIncrements[$curTable])) {
+                        $columnFormat->setAutoIncrementValue($autoIncrements[$curTable]);
                     }
                 }
             }
+            if (isset($foreignKeys[$curColumn])) {
+                $columnFormat->setForeignKey($foreignKeys[$curColumn]);
+            }
+            $tableDefs[$curTable]->addColumn($columnFormat);
         }
+        array_walk($tableDefs, function (Table &$item): void {
+            $item = $item->getOutput();
+            usort($item['columns'], function ($a, $b) {
+                return (int) ($a['ordinalPosition'] > $b['ordinalPosition']);
+            });
+        });
+
         return array_values($tableDefs);
     }
 
