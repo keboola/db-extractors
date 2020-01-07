@@ -64,7 +64,7 @@ class Table
 
     public function addColumn(TableColumn $column): self
     {
-        $this->columns[] = $column;
+        $this->columns[$column->getSanitizedName()] = $column;
         return $this;
     }
 
@@ -76,8 +76,8 @@ class Table
                     'Column is not instance \Keboola\DbExtractor\TableResultFormat\TableColumn'
                 );
             }
+            $this->addColumn($item);
         });
-        $this->columns = $columns;
         return $this;
     }
 

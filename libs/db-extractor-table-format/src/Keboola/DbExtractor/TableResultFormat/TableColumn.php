@@ -58,6 +58,11 @@ class TableColumn
         return $this;
     }
 
+    public function getSanitizedName(): string
+    {
+        return $this->sanitizedName;
+    }
+
     public function setType(string $type): self
     {
         $this->type = $type;
