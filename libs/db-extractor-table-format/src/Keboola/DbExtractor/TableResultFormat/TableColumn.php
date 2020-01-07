@@ -75,6 +75,11 @@ class TableColumn
         return $this;
     }
 
+    public function isPrimaryKey(): bool
+    {
+        return $this->primaryKey;
+    }
+
     public function setUniqueKey(bool $uniqueKey): self
     {
         $this->uniqueKey = $uniqueKey;

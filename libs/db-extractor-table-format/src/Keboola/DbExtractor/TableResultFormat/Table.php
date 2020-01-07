@@ -65,6 +65,12 @@ class Table
     public function addColumn(TableColumn $column): self
     {
         $columnKey = $column->getOrdinalPosition() ?: $column->getSanitizedName();
+        if (isset($this->columns[$columnKey])) {
+            $oldColumn = $this->columns[$columnKey];
+            if ($oldColumn->isPrimaryKey()) {
+                $column->setPrimaryKey(true);
+            }
+        }
         $this->columns[$columnKey] = $column;
         return $this;
     }
