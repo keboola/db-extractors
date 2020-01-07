@@ -59,7 +59,7 @@ class TableResultFormatTest extends TestCase
         $column = new TableColumn();
         $column
             ->setName('Asdno osdn')
-            ->setType('varchar');
+            ->setType('int');
 
         $table->addColumn($column);
 
