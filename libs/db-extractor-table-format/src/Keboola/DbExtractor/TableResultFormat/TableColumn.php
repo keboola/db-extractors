@@ -105,6 +105,11 @@ class TableColumn
         return $this;
     }
 
+    public function getOrdinalPosition(): ?int
+    {
+        return $this->ordinalPosition;
+    }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;

@@ -64,7 +64,8 @@ class Table
 
     public function addColumn(TableColumn $column): self
     {
-        $this->columns[$column->getSanitizedName()] = $column;
+        $columnKey = $column->getOrdinalPosition() ?: $column->getSanitizedName();
+        $this->columns[$columnKey] = $column;
         return $this;
     }
 
