@@ -46,6 +46,47 @@ class TableResultFormatTest extends TestCase
             ],
         ], $table->getOutput());
     }
+    public function testDuplicatedTableColumn(): void
+    {
+        $table = new Table();
+        $table
+            ->setName('testName')
+            ->setCatalog('catalog')
+            ->setSchema('schema')
+            ->setType('view')
+            ->setRowCount(22);
+
+        $column = new TableColumn();
+        $column
+            ->setName('Asdno osdn')
+            ->setType('varchar');
+
+        $table->addColumn($column);
+
+        $column = new TableColumn();
+        $column
+            ->setName('Asdno osdn')
+            ->setType('varchar');
+
+        $table->addColumn($column);
+
+        $this->assertEquals([
+            'name' => 'testName',
+            'catalog' => 'catalog',
+            'schema' => 'schema',
+            'type' => 'view',
+            'rowCount' => 22,
+            'columns' => [
+                0 => [
+                    'name' => 'Asdno osdn',
+                    'sanitizedName' => 'Asdno_osdn',
+                    'type' => 'varchar',
+                    'primaryKey' => false,
+                    'uniqueKey' => false,
+                ],
+            ],
+        ], $table->getOutput());
+    }
 
     public function testTableFormatWithForeignKey(): void
     {
