@@ -337,8 +337,11 @@ class Oracle extends Extractor
             $tableFormat = new Table();
             $tableFormat
                 ->setName($table['name'])
-                ->setSchema($table['schema'])
-                ->setCatalog($table['tablespaceName']);
+                ->setSchema($table['schema']);
+
+            if (isset($table['tablespaceName'])) {
+                $tableFormat->setCatalog($table['tablespaceName']);
+            }
 
             if (isset($table['columns'])) {
                 foreach ($table['columns'] as $column) {
