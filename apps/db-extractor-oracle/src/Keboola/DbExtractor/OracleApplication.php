@@ -27,6 +27,7 @@ class OracleApplication extends Application
             $this->config = new Config($config, new OracleGetTablesDefinition());
         } elseif ($this->isRowConfiguration($config)) {
             if ($this['action'] === 'run') {
+                $config['parameters']['id'] = 1;
                 $config['parameters']['name'] = $config['parameters']['outputTable'];
                 $this->config = new Config($config, new ConfigRowDefinition());
             } else {
