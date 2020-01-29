@@ -13,7 +13,7 @@
         "php": "^7.3",
         "ext-filter": "*",
         "ext-json": "*",
-        "keboola/db-extractor-common": "^12.1",
+        "keboola/db-extractor-common": "^12.2",
         "keboola/db-extractor-config": "^1.2",
         "keboola/db-extractor-logger": "^1.0",
         "keboola/db-extractor-table-format": "^1.3",
