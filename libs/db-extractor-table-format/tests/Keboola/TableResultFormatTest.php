@@ -86,12 +86,11 @@ class TableResultFormatTest extends TestCase
                     'type' => 'varchar',
                     'primaryKey' => false,
                     'uniqueKey' => false,
-                    'foreignKey' => [
-                        'name' => 'testForeignKey',
-                        'refSchema' => 'refSchema',
-                        'refTable' => 'refTable',
-                        'refColumn' => 'refColumn',
-                    ],
+                    'foreignKey' => true,
+                    'foreignKeyName' => 'testForeignKey',
+                    'foreignKeyRefSchema' => 'refSchema',
+                    'foreignKeyRefTable' => 'refTable',
+                    'foreignKeyRefColumn' => 'refColumn',
                 ],
             ],
         ], $table->getOutput());

@@ -47,6 +47,26 @@ class ForeignKey
         return $this;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getRefSchema(): string
+    {
+        return $this->refSchema;
+    }
+
+    public function getRefTable(): string
+    {
+        return $this->refTable;
+    }
+
+    public function getRefColumn(): string
+    {
+        return $this->refColumn;
+    }
+
     public function getOutput(): array
     {
         $ret = [];
