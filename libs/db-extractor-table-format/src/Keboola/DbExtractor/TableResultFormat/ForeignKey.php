@@ -20,9 +20,6 @@ class ForeignKey
     /** @var string  */
     private $refColumn;
 
-    /** @var array  */
-    private $requiredParams = ['name', 'refSchema', 'refTable', 'refColumn'];
-
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -47,25 +44,23 @@ class ForeignKey
         return $this;
     }
 
-    public function getOutput(): array
+    public function getName(): string
     {
-        $ret = [];
-        foreach (get_class_vars(self::class) as $property => $propertyValue) {
-            if ($property === 'requiredParams') {
-                continue;
-            }
-            $propertyValue = $this->{$property} ?? null;
-            if (in_array($property, $this->requiredParams) && is_null($propertyValue)) {
-                throw new UserException(sprintf(
-                    'Parameter \'%s\' is required',
-                    $property
-                ));
-            }
+        return $this->name;
+    }
 
-            if (!is_null($propertyValue)) {
-                $ret[$property] = $this->{$property};
-            }
-        }
-        return $ret;
+    public function getRefSchema(): string
+    {
+        return $this->refSchema;
+    }
+
+    public function getRefTable(): string
+    {
+        return $this->refTable;
+    }
+
+    public function getRefColumn(): string
+    {
+        return $this->refColumn;
     }
 }

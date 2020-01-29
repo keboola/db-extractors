@@ -139,8 +139,12 @@ class TableColumn
                 ));
             }
 
-            if (is_object($propertyValue)) {
-                $ret[$property] = $this->{$property}->getOutput();
+            if ($propertyValue instanceof ForeignKey) {
+                $ret['foreignKey'] = true;
+                $ret['foreignKeyName'] = $propertyValue->getName();
+                $ret['foreignKeyRefSchema'] = $propertyValue->getRefSchema();
+                $ret['foreignKeyRefTable'] = $propertyValue->getRefTable();
+                $ret['foreignKeyRefColumn'] = $propertyValue->getRefColumn();
             } elseif (!is_null($propertyValue)) {
                 $ret[$property] = $this->{$property};
             }
