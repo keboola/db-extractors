@@ -59,14 +59,27 @@ class TableResultFormatTest extends TestCase
         $column = new TableColumn();
         $column
             ->setName('Asdno osdn')
-            ->setType('int');
+            ->setType('int')
+            ->setOrdinalPosition(1)
+            ->setUniqueKey(true)
+        ;
 
         $table->addColumn($column);
 
         $column = new TableColumn();
+        $foreignKey = new ForeignKey();
+        $foreignKey
+            ->setName('testForeignKey')
+            ->setRefSchema('refSchema')
+            ->setRefTable('refTable')
+            ->setRefColumn('refColumn');
         $column
             ->setName('Asdno osdn')
-            ->setType('varchar');
+            ->setType('varchar')
+            ->setOrdinalPosition(1)
+            ->setPrimaryKey(true)
+            ->setForeignKey($foreignKey)
+        ;
 
         $table->addColumn($column);
 
@@ -81,8 +94,14 @@ class TableResultFormatTest extends TestCase
                     'name' => 'Asdno osdn',
                     'sanitizedName' => 'Asdno_osdn',
                     'type' => 'int',
-                    'primaryKey' => false,
-                    'uniqueKey' => false,
+                    'primaryKey' => true,
+                    'uniqueKey' => true,
+                    'ordinalPosition' => 1,
+                    'foreignKey' => true,
+                    'foreignKeyName' => 'testForeignKey',
+                    'foreignKeyRefSchema' => 'refSchema',
+                    'foreignKeyRefTable' => 'refTable',
+                    'foreignKeyRefColumn' => 'refColumn',
                 ],
             ],
         ], $table->getOutput());
