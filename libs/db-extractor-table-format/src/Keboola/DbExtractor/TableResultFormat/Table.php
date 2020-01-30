@@ -64,7 +64,28 @@ class Table
 
     public function addColumn(TableColumn $column): self
     {
-        $this->columns[] = $column;
+        $columnKey = $column->getOrdinalPosition() ?: $column->getSanitizedName();
+        if (isset($this->columns[$columnKey])) {
+            $oldColumn = $this->columns[$columnKey];
+            if ($column->isAutoIncrement()) {
+                $oldColumn->setAutoIncrement(true);
+            }
+            if ($column->isPrimaryKey()) {
+                $oldColumn->setPrimaryKey(true);
+            }
+            if ($column->isUniqueKey()) {
+                $oldColumn->setUniqueKey(true);
+            }
+            if ($column->getDefault()) {
+                $oldColumn->setDefault($column->getDefault());
+            }
+            if ($column->getForeignKey() instanceof ForeignKey) {
+                $oldColumn->setForeignKey($column->getForeignKey());
+            }
+            $this->columns[$columnKey] = $oldColumn;
+        } else {
+            $this->columns[$columnKey] = $column;
+        }
         return $this;
     }
 
@@ -76,8 +97,8 @@ class Table
                     'Column is not instance \Keboola\DbExtractor\TableResultFormat\TableColumn'
                 );
             }
+            $this->addColumn($item);
         });
-        $this->columns = $columns;
         return $this;
     }
 

@@ -58,6 +58,11 @@ class TableColumn
         return $this;
     }
 
+    public function getSanitizedName(): string
+    {
+        return $this->sanitizedName;
+    }
+
     public function setType(string $type): self
     {
         $this->type = $type;
@@ -68,6 +73,26 @@ class TableColumn
     {
         $this->primaryKey = $primaryKey;
         return $this;
+    }
+
+    public function isPrimaryKey(): bool
+    {
+        return $this->primaryKey;
+    }
+
+    public function isUniqueKey(): bool
+    {
+        return $this->uniqueKey;
+    }
+
+    public function getDefault(): ?string
+    {
+        return $this->default;
+    }
+
+    public function isAutoIncrement(): ?bool
+    {
+        return $this->autoIncrement;
     }
 
     public function setUniqueKey(bool $uniqueKey): self
@@ -100,6 +125,11 @@ class TableColumn
         return $this;
     }
 
+    public function getOrdinalPosition(): ?int
+    {
+        return $this->ordinalPosition;
+    }
+
     public function setDescription(?string $description): self
     {
         $this->description = $description;
@@ -122,6 +152,11 @@ class TableColumn
     {
         $this->foreignKey = $foreignKey;
         return $this;
+    }
+
+    public function getForeignKey(): ?ForeignKey
+    {
+        return $this->foreignKey;
     }
 
     public function getOutput(): array

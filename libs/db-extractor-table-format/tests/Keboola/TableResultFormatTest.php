@@ -46,6 +46,66 @@ class TableResultFormatTest extends TestCase
             ],
         ], $table->getOutput());
     }
+    public function testDuplicatedTableColumn(): void
+    {
+        $table = new Table();
+        $table
+            ->setName('testName')
+            ->setCatalog('catalog')
+            ->setSchema('schema')
+            ->setType('view')
+            ->setRowCount(22);
+
+        $column = new TableColumn();
+        $column
+            ->setName('Asdno osdn')
+            ->setType('int')
+            ->setOrdinalPosition(1)
+            ->setUniqueKey(true)
+        ;
+
+        $table->addColumn($column);
+
+        $column = new TableColumn();
+        $foreignKey = new ForeignKey();
+        $foreignKey
+            ->setName('testForeignKey')
+            ->setRefSchema('refSchema')
+            ->setRefTable('refTable')
+            ->setRefColumn('refColumn');
+        $column
+            ->setName('Asdno osdn')
+            ->setType('varchar')
+            ->setOrdinalPosition(1)
+            ->setPrimaryKey(true)
+            ->setForeignKey($foreignKey)
+        ;
+
+        $table->addColumn($column);
+
+        $this->assertEquals([
+            'name' => 'testName',
+            'catalog' => 'catalog',
+            'schema' => 'schema',
+            'type' => 'view',
+            'rowCount' => 22,
+            'columns' => [
+                0 => [
+                    'name' => 'Asdno osdn',
+                    'sanitizedName' => 'Asdno_osdn',
+                    'type' => 'int',
+                    'primaryKey' => true,
+                    'uniqueKey' => true,
+                    'ordinalPosition' => 1,
+                    'foreignKey' => true,
+                    'foreignKeyName' => 'testForeignKey',
+                    'foreignKeyRefSchema' => 'refSchema',
+                    'foreignKeyRefTable' => 'refTable',
+                    'foreignKeyRefColumn' => 'refColumn',
+                ],
+            ],
+        ], $table->getOutput());
+    }
 
     public function testTableFormatWithForeignKey(): void
     {
