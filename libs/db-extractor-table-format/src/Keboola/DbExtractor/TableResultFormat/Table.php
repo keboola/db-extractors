@@ -67,11 +67,25 @@ class Table
         $columnKey = $column->getOrdinalPosition() ?: $column->getSanitizedName();
         if (isset($this->columns[$columnKey])) {
             $oldColumn = $this->columns[$columnKey];
-            if ($oldColumn->isPrimaryKey()) {
-                $column->setPrimaryKey(true);
+            if ($column->isAutoIncrement()) {
+                $oldColumn->setAutoIncrement(true);
             }
+            if ($column->isPrimaryKey()) {
+                $oldColumn->setPrimaryKey(true);
+            }
+            if ($column->isUniqueKey()) {
+                $oldColumn->setUniqueKey(true);
+            }
+            if ($column->getDefault()) {
+                $oldColumn->setDefault($column->getDefault());
+            }
+            if ($column->getForeignKey() instanceof ForeignKey) {
+                $oldColumn->setForeignKey($column->getForeignKey());
+            }
+            $this->columns[$columnKey] = $oldColumn;
+        } else {
+            $this->columns[$columnKey] = $column;
         }
-        $this->columns[$columnKey] = $column;
         return $this;
     }
 

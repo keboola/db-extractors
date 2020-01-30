@@ -80,7 +80,7 @@ class TableResultFormatTest extends TestCase
                 0 => [
                     'name' => 'Asdno osdn',
                     'sanitizedName' => 'Asdno_osdn',
-                    'type' => 'varchar',
+                    'type' => 'int',
                     'primaryKey' => false,
                     'uniqueKey' => false,
                 ],

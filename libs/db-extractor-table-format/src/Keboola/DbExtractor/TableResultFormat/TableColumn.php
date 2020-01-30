@@ -80,6 +80,21 @@ class TableColumn
         return $this->primaryKey;
     }
 
+    public function isUniqueKey(): bool
+    {
+        return $this->uniqueKey;
+    }
+
+    public function getDefault(): ?string
+    {
+        return $this->default;
+    }
+
+    public function isAutoIncrement(): ?bool
+    {
+        return $this->autoIncrement;
+    }
+
     public function setUniqueKey(bool $uniqueKey): self
     {
         $this->uniqueKey = $uniqueKey;
@@ -137,6 +152,11 @@ class TableColumn
     {
         $this->foreignKey = $foreignKey;
         return $this;
+    }
+
+    public function getForeignKey(): ?ForeignKey
+    {
+        return $this->foreignKey;
     }
 
     public function getOutput(): array
