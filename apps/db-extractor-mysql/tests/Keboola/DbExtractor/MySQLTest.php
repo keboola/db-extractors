@@ -572,13 +572,25 @@ class MySQLTest extends AbstractMySQLTest
                     10 =>
                         array (
                             'key' => 'KBC.foreignKey',
-                            'value' => [
-                                'name' => 'auto_increment_timestamp_withFK_ibfk_1',
-                                'refSchema' => 'test',
-                                'refTable' => 'auto_increment_timestamp',
-                                'refColumn' => '_weird-i-d',
-                            ],
-                        )
+                            'value' => true,
+                        ),
+                    11 => array(
+                        'key' => 'KBC.foreignKeyName',
+                        'value' => 'auto_increment_timestamp_withFK_ibfk_1',
+                    ),
+                    12 => array(
+                        'key' => 'KBC.foreignKeyRefSchema',
+                        'value' => 'test',
+                    ),
+                    13 => array(
+                        'key' => 'KBC.foreignKeyRefTable',
+                        'value' => 'auto_increment_timestamp',
+
+                    ),
+                    14 => array(
+                        'key' => 'KBC.foreignKeyRefColumn',
+                        'value' => '_weird-i-d',
+                    ),
                 ),
         );
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
