@@ -284,9 +284,11 @@ class MySQL extends Extractor
         }
         array_walk($tableDefs, function (Table &$item): void {
             $item = $item->getOutput();
-            usort($item['columns'], function ($a, $b) {
-                return (int) ($a['ordinalPosition'] > $b['ordinalPosition']);
-            });
+            if (isset($item['columns'])) {
+                usort($item['columns'], function ($a, $b) {
+                    return (int) ($a['ordinalPosition'] > $b['ordinalPosition']);
+                });
+            }
         });
 
         return array_values($tableDefs);
