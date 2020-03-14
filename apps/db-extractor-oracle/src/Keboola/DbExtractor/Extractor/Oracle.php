@@ -107,7 +107,7 @@ class Oracle extends Extractor
             'db' => $dbParams
         );
         $config = array(
-            'parameters' => array_merge($parameters, $table)
+            'parameters' => array_merge($table, $parameters)
         );
         file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
