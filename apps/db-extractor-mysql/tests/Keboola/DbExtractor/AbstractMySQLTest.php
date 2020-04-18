@@ -40,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $dbConfig = $config['parameters']['db'];
 
         $dsn = sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
+            'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
             $dbConfig['host'],
             $dbConfig['port'],
             $dbConfig['database']
@@ -49,7 +49,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['#password'], $options);
 
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
-        $this->pdo->exec('SET NAMES utf8;');
+        $this->pdo->exec('SET NAMES utf8mb4;');
     }
 
     protected function createAutoIncrementAndTimestampTable(): void
@@ -130,7 +130,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         ));
 
         $this->pdo->exec(sprintf(
-            'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;',
+            'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;',
             $schemaName,
             $tableName,
             implode(
@@ -144,7 +144,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $query = "
 			LOAD DATA LOCAL INFILE '{$file}'
 			INTO TABLE `{$schemaName}`.`{$tableName}`
-			CHARACTER SET utf8
+			CHARACTER SET utf8mb4
 			FIELDS TERMINATED BY ','
 			OPTIONALLY ENCLOSED BY '\"'
 			ESCAPED BY ''
@@ -512,6 +512,20 @@ abstract class AbstractMySQLTest extends ExtractorTest
                                 'nullable' => true,
                                 'ordinalPosition' => 2,
                                 'uniqueKey' => false,
+                            ),
+                    );
+                case 'emoji':
+                    return array (
+                        0 =>
+                            array (
+                                'name' => 'emoji',
+                                'sanitizedName' => 'emoji',
+                                'type' => 'text',
+                                'primaryKey' => false,
+                                'uniqueKey' => false,
+                                'length' => '65535',
+                                'nullable' => true,
+                                'ordinalPosition' => 1,
                             ),
                     );
                 case 'auto_increment_timestamp':
