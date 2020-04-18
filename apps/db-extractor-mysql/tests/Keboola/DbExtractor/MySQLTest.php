@@ -176,6 +176,39 @@ class MySQLTest extends AbstractMySQLTest
         $app->run();
     }
 
+    public function testEmoji(): void
+    {
+        $this->createTextTable(
+            new CsvFile($this->dataDir . '/mysql/emoji.csv'),
+            'emoji',
+            'test'
+        );
+
+        $config = $this->getConfigRow();
+        unset($config['parameters']['primaryKey']);
+        $config['parameters'] = array_merge(
+            $config['parameters'],
+            [
+                'query' => 'SELECT * FROM emoji',
+                'outputTable' => 'in.c-main.emoji',
+            ]
+        );
+
+        $app = $this->createApplication($config);
+
+        $result = $app->run();
+
+        $expectedFile = $this->dataDir . '/mysql/emoji.csv';
+        $outputFile = $this->dataDir . '/out/tables/in.c-main.emoji.csv';
+
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals('success', $result['status']);
+
+        $this->assertEquals(58, $result['imported']['rows']);
+
+        $this->assertFileEquals($expectedFile, $outputFile);
+    }
+
     public function testGetTables(): void
     {
         $this->createAutoIncrementAndTimestampTable();
@@ -197,7 +230,7 @@ class MySQLTest extends AbstractMySQLTest
         $this->assertArrayHasKey('tables', $result);
 
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(3, $result['tables']);
+        $this->assertCount(4, $result['tables']);
 
         $expectedData = array (
             0 =>
@@ -209,7 +242,14 @@ class MySQLTest extends AbstractMySQLTest
                     'columns' => $this->expectedTableColumns('test', 'auto_increment_timestamp'),
                     'description' => 'This is a table comment',
                 ),
-            1 =>
+            1 => [
+                'name' => 'emoji',
+                'schema' => 'test',
+                'type' => 'BASE TABLE',
+                'rowCount' => 58,
+                'columns' => $this->expectedTableColumns('test', 'emoji'),
+            ],
+            2 =>
                 array (
                     'name' => 'escaping',
                     'schema' => 'test',
@@ -217,7 +257,7 @@ class MySQLTest extends AbstractMySQLTest
                     'rowCount' => 7,
                     'columns' => $this->expectedTableColumns('test', 'escaping'),
                 ),
-            2 =>
+            3 =>
                 array (
                     'name' => 'sales',
                     'schema' => 'test',
@@ -268,7 +308,14 @@ class MySQLTest extends AbstractMySQLTest
                     'columns' => $this->expectedTableColumns('test', 'auto_increment_timestamp'),
                     'description' => 'This is a table comment'
                 ),
-            2 =>
+            2 =>[
+                'name' => 'emoji',
+                'schema' => 'test',
+                'type' => 'BASE TABLE',
+                'rowCount' => 58,
+                'columns' => $this->expectedTableColumns('test', 'emoji'),
+            ],
+            3 =>
                 array (
                     'name' => 'escaping',
                     'schema' => 'test',
@@ -276,7 +323,7 @@ class MySQLTest extends AbstractMySQLTest
                     'rowCount' => 7,
                     'columns' => $this->expectedTableColumns('test', 'escaping'),
                 ),
-            3 =>
+            4 =>
                 array (
                     'name' => 'sales',
                     'schema' => 'test',

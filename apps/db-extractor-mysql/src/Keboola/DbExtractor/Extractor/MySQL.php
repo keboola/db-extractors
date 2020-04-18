@@ -109,7 +109,12 @@ class MySQL extends Extractor
             throw $e;
         }
         $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        $pdo->exec('SET NAMES utf8;');
+        try {
+            $pdo->exec('SET NAMES utf8mb4;');
+        } catch (PDOException $exception) {
+            $this->logger->info('Falling back to "utf8" charset');
+            $pdo->exec('SET NAMES utf8;');
+        }
 
         if ($isSsl) {
             $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(PDO::FETCH_ASSOC);
