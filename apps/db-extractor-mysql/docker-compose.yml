@@ -10,6 +10,8 @@ services:
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
+    volumes:
+      - ./tests/data/mysql/ssl/mysql5:/ssl-cert
     links:
       - mysql
       - mysql:mysql-different-cn
@@ -25,6 +27,8 @@ services:
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3307
+    volumes:
+      - ./tests/data/mysql/ssl/mysql8:/ssl-cert
     links:
       - mysql8:mysql
       - mysql8:mysql-different-cn
@@ -58,7 +62,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
 
   mysql8:
-    image: mysql:8.0.18
+    image: mysql:8
     volumes:
         - ./tests/data/mysql/ssl:/ssl-cert
         - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
