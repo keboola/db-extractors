@@ -1,4 +1,3 @@
-FROM keboola/db-component-ssh-proxy:latest AS sshproxy
 FROM php:7.3-cli-stretch
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -21,7 +20,5 @@ WORKDIR /code
 COPY . /code
 
 RUN composer install --no-interaction
-
-COPY --from=sshproxy /root/.ssh /root/.ssh
 
 CMD php ./src/run.php --data=/data
