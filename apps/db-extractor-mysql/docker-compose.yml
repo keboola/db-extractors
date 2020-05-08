@@ -40,19 +40,21 @@ services:
     <<: *app5
     volumes:
       - .:/code
+      - ./tests/data/mysql/ssl/mysql5:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
   dev8:
     <<: *app8
     volumes:
       - .:/code
+      - ./tests/data/mysql/ssl/mysql8:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
   mysql5:
     image: mysql:5.6
     volumes:
-        - ./tests/data/mysql/ssl:/ssl-cert
-        - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
+      - ./tests/data/mysql/ssl/mysql5:/ssl-cert
+      - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -60,8 +62,8 @@ services:
   mysql8:
     image: mysql:8
     volumes:
-        - ./tests/data/mysql/ssl:/ssl-cert
-        - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
+      - ./tests/data/mysql/ssl/mysql8:/ssl-cert
+      - ./tests/data/mysql/conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: rootpassword

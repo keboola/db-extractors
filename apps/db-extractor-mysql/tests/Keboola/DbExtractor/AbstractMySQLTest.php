@@ -32,9 +32,9 @@ abstract class AbstractMySQLTest extends ExtractorTest
             PDO::MYSQL_ATTR_LOCAL_INFILE => true,
         ];
 
-        $options[PDO::MYSQL_ATTR_SSL_KEY] = realpath($this->dataDir . '/mysql/ssl/client-key.pem');
-        $options[PDO::MYSQL_ATTR_SSL_CERT] = realpath($this->dataDir . '/mysql/ssl/client-cert.pem');
-        $options[PDO::MYSQL_ATTR_SSL_CA] = realpath($this->dataDir . '/mysql/ssl/ca.pem');
+        $options[PDO::MYSQL_ATTR_SSL_KEY] = realpath('/ssl-cert/client-key.pem');
+        $options[PDO::MYSQL_ATTR_SSL_CERT] = realpath('/ssl-cert/client-cert.pem');
+        $options[PDO::MYSQL_ATTR_SSL_CA] = realpath('/ssl-cert/ca.pem');
 
         $config = $this->getConfig(self::DRIVER);
         $dbConfig = $config['parameters']['db'];
