@@ -53,6 +53,8 @@ class ForeignKeyBuilder implements Builder
 
     public function setRefSchema(string $refSchema): self
     {
+        $refSchema = trim($refSchema);
+
         if (empty($refSchema)) {
             throw new InvalidArgumentException('ForeignKey\'s refSchema cannot be empty string.');
         }
@@ -63,6 +65,8 @@ class ForeignKeyBuilder implements Builder
 
     public function setRefTable(string $refTable): self
     {
+        $refTable = trim($refTable);
+
         if (empty($refTable)) {
             throw new InvalidArgumentException('ForeignKey\'s refTable cannot be empty string.');
         }
@@ -73,6 +77,8 @@ class ForeignKeyBuilder implements Builder
 
     public function setRefColumn(string $refColumn): self
     {
+        $refColumn = trim($refColumn);
+
         if (empty($refColumn)) {
             throw new InvalidArgumentException('ForeignKey\'s refColumn cannot be empty string.');
         }

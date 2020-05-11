@@ -96,6 +96,9 @@ class TableBuilder implements Builder
 
     public function setName(string $name): self
     {
+        // Trim
+        $name = trim($name);
+
         if (empty($name)) {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
         }
@@ -107,6 +110,9 @@ class TableBuilder implements Builder
 
     public function setDescription(?string $description): self
     {
+        // Trim
+        $description = $description !== null ? trim($description) : null;
+
         // Normalize, empty string is not allowed
         $this->description = empty($description) ? null : $description;
         return $this;
@@ -114,6 +120,9 @@ class TableBuilder implements Builder
 
     public function setSchema(?string $schema): self
     {
+        // Trim
+        $schema = $schema !== null ? trim($schema) : null;
+
         // Normalize, empty string is not allowed
         $this->schema = empty($schema) ? null : $schema;
         return $this;
@@ -121,6 +130,9 @@ class TableBuilder implements Builder
 
     public function setCatalog(?string $catalog): self
     {
+        // Trim
+        $catalog = $catalog !== null ? trim($catalog) : null;
+
         // Normalize, empty string is not allowed
         $this->catalog = empty($catalog) ? null : $catalog;
         return $this;
