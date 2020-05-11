@@ -23,9 +23,9 @@ class MySQLSSLTest extends AbstractMySQLTest
 
         $config['parameters']['db']['ssl'] = [
             'enabled' => true,
-            'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
-            'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
-            'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+            'ca' => file_get_contents('/ssl-cert/ca.pem'),
+            'cert' => file_get_contents('/ssl-cert/client-cert.pem'),
+            'key' => file_get_contents('/ssl-cert/client-key.pem'),
         ];
 
         $config['parameters']['tables'] = [];
@@ -43,9 +43,9 @@ class MySQLSSLTest extends AbstractMySQLTest
 
         $config['parameters']['db']['ssl'] = [
             'enabled' => true,
-            'ca' => file_get_contents($this->dataDir . '/mysql/ssl/ca.pem'),
-            'cert' => file_get_contents($this->dataDir . '/mysql/ssl/client-cert.pem'),
-            'key' => file_get_contents($this->dataDir . '/mysql/ssl/client-key.pem'),
+            'ca' => file_get_contents('/ssl-cert/ca.pem'),
+            'cert' => file_get_contents('/ssl-cert/client-cert.pem'),
+            'key' => file_get_contents('/ssl-cert/client-key.pem'),
         ];
 
         $app = $this->createApplication($config);
