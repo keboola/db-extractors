@@ -20,15 +20,15 @@
         }
     },
     "require": {
-        "php": "^7.4",
+        "php": ">=7.4",
         "keboola/common-exceptions": "^1.0",
         "keboola/php-datatypes": "^4.7",
         "keboola/php-utils": "^4.1"
     },
     "require-dev": {
-        "keboola/coding-standard": "^9.0",
+        "keboola/coding-standard": ">=9.0",
         "phpstan/phpstan": "^0.12.2",
-        "phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "^9.1"
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit",
