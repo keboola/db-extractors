@@ -17,6 +17,13 @@ use PDOException;
 
 class MySQL extends Extractor
 {
+    // Some SSL keys who worked in Debian Stretch (OpenSSL 1.1.0) stopped working in Debian Buster (OpenSSL 1.1.1).
+    // Eg. "Signature Algorithm: sha1WithRSAEncryption" used in mysql5 tests in this repo.
+    // This is because Debian wants to be "more secure"
+    // and has set "SECLEVEL", which in OpenSSL defaults to "1", to value "2".
+    // See https://wiki.debian.org/ContinuousIntegration/TriagingTips/openssl-1.1.1
+    // So we reset this value to OpenSSL default.
+    public const SSL_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
     public const INCREMENT_TYPE_NUMERIC = 'numeric';
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
@@ -65,6 +72,8 @@ class MySQL extends Extractor
             if (isset($ssl['verifyServerCert']) && $ssl['verifyServerCert'] === false) {
                 $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
+
+            $options[PDO::MYSQL_ATTR_SSL_CIPHER] = self::SSL_CIPHER_CONFIG;
         }
 
         foreach (['host', 'user', '#password'] as $r) {
