@@ -11,16 +11,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "Keboola\\": "src/Keboola/"
+            "Keboola\\DbExtractor\\TableResultFormat\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractor\\Tests\\": "tests/Keboola/"
+            "Keboola\\DbExtractor\\Tests\\": "tests/phpunit"
         }
     },
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "keboola/common-exceptions": "^1.0",
         "keboola/php-utils": "^4.1"
     },
