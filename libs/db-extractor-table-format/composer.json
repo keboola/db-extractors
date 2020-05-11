@@ -16,7 +16,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractor\\Tests\\": "tests/phpunit"
+            "Keboola\\DbExtractor\\TableResultFormat\\Tests\\": "tests/phpunit"
         }
     },
     "require": {
@@ -28,7 +28,8 @@
     "require-dev": {
         "keboola/coding-standard": ">=9.0",
         "phpstan/phpstan": "^0.12.2",
-        "phpunit/phpunit": "^9.1"
+        "phpunit/phpunit": "^9.1",
+        "ext-json": "*"
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit",

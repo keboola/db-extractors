@@ -1,4 +1,5 @@
 parameters:
     checkMissingIterableValueType: false
     ignoreErrors:
-        - '#Call to an undefined method object::getOutput\(\)\.#'
+        # Required constructor argumens of ValueObjects are checked, see: RequiredPropertiesTrait
+        - '#ValueObject\\.* constructor expects string, string\|null given.#'
