@@ -43,6 +43,9 @@ class Column implements ValueObject
 
     private array $constraints;
 
+    /**
+     * @internal Should be created using ColumnBuilder, don't call it directly!
+     */
     public function __construct(
         string $name,
         string $sanitizedName,

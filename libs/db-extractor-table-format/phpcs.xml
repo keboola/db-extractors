@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="Project">
     <rule ref="vendor/keboola/coding-standard/src/ruleset.xml">
-        <exclude name="SlevomatCodingStandard.Classes.UnusedPrivateElements.WriteOnlyProperty"/>
+        <!-- Don't remove @internal doc comments from ValueObjects __construct -->
+        <exclude name="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.UselessDocComment"/>
     </rule>
 </ruleset>

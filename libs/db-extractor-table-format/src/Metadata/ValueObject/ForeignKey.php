@@ -16,6 +16,9 @@ class ForeignKey implements ValueObject
 
     private string $refColumn;
 
+    /**
+     * @internal Should be created using ForeignKeyBuilder, don't call it directly!
+     */
     public function __construct(?string $refSchema, string $refTable, string $refColumn)
     {
         if ($refSchema !== null && empty($refSchema)) {

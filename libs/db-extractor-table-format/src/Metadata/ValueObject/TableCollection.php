@@ -20,6 +20,7 @@ class TableCollection implements ValueObject, Countable, IteratorAggregate
     private array $tables;
 
     /**
+     * @internal Should be created using MetadataBuilder, don't call it directly!
      * @param array|Table[] $tables
      */
     public function __construct(array $tables)

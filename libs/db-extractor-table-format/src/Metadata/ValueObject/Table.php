@@ -26,6 +26,9 @@ class Table implements ValueObject
 
     private ?ColumnCollection $columns;
 
+    /**
+     * @internal Should be created using TableBuilder, don't call it directly!
+     */
     public function __construct(
         string $name,
         string $sanitizedName,

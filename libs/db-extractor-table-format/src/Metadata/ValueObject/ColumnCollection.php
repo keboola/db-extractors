@@ -21,6 +21,7 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
     private array $columns;
 
     /**
+     * @internal Should be created using TableBuilder, don't call it directly!
      * @param array|Column[] $columns
      */
     public function __construct(array $columns)
