@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "ext-filter": "*",
         "ext-json": "*",
         "keboola/db-extractor-common": "^12.2",
