@@ -12,7 +12,7 @@ use Symfony\Component\Process\Process;
 class ApplicationTest extends OracleBaseTest
 {
     /** @var string */
-    protected $rootPath = __DIR__ . '/../../..';
+    protected $rootPath = __DIR__ . '/../..';
 
     public function testTestConnectionAction(): void
     {

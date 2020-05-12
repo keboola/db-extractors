@@ -16,7 +16,7 @@ abstract class OracleBaseTest extends ExtractorTest
     protected $connection;
 
     /** @var string  */
-    protected $dataDir = __DIR__ . '/../../data';
+    protected $dataDir = __DIR__ . '/data';
 
     public const DRIVER = 'oracle';
 
