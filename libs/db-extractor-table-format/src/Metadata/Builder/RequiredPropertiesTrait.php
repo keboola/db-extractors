@@ -10,7 +10,7 @@ use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
 
 trait RequiredPropertiesTrait
 {
-    /** @var array|string[] */
+    /** @var string[] */
     protected array $requiredProperties;
 
     protected function setRequiredProperties(array $props, array $alwaysRequired, array $optionalRequired): void

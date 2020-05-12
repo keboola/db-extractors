@@ -8,13 +8,13 @@ use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\TableCollection;
 
 class MetadataBuilder implements Builder
 {
-    /** @var array|string[] */
+    /** @var string[] */
     private array $tableRequiredProperties;
 
-    /** @var array|string[] */
+    /** @var string[] */
     private array $columnRequiredProperties;
 
-    /** @var array|TableBuilder[] */
+    /** @var TableBuilder[] */
     private array $tables;
 
     public static function create(array $tableRequiredProperties = [], array $columnRequiredProperties = []): self

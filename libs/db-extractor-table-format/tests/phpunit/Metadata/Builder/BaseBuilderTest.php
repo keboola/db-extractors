@@ -28,19 +28,19 @@ abstract class BaseBuilderTest extends TestCase
 
     /**
      * Get all builder / value object properties that will be tested
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getAllProperties(): array;
 
     /**
      * Get properties that are always required = must be set by setter
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getAlwaysRequiredProperties(): array;
 
     /**
      * Get properties that can be marked as required through the constructor.
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getOptionalRequiredProperties(): array;
 
@@ -51,51 +51,51 @@ abstract class BaseBuilderTest extends TestCase
      *     self::NULL_IS_REGULAR_DEFAULT_NULL,
      *     self::NULL_IS_REGULAR_DEFAULT_NOT_SET
      * )
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getNullableProperties(): array;
 
     /**
      * Get properties for which an attempt to set an empty string will result in an error.
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getEmptyStringNotAllowedProperties(): array;
 
     /**
      * Get properties for which an empty string is converted to null.
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getEmptyStringConvertToNullProperties(): array;
 
     /**
      * Key => property name,
      * Value => property default value
-     * @return array|mixed[]
+     * @return mixed[]
      */
     abstract public function getDefaultValues(): array;
 
     /**
      * Get "set" callbacks called on Builder
-     * @return array|callable<Builder, mixed>[]
+     * @return callable<Builder, mixed>[]
      */
     abstract public function getSetCallbacks(): array;
 
     /**
      * Get "has" callbacks called on ValueObject
-     * @return array|callable<ValueObject>[]
+     * @return callable<ValueObject>[]
      */
     abstract public function getHasCallbacks(): array;
 
     /**
      * Get "get" callbacks called on ValueObject
-     * @return array|callable<ValueObject>[]
+     * @return callable<ValueObject>[]
      */
     abstract public function getGetCallbacks(): array;
 
     /**
      * Get valid inputs for testing.
      * Invalid inputs are automatically generated from these valid by changing a property.
-     * @return array|mixed[][]
+     * @return mixed[][]
      */
     abstract public function getValidInputs(): array;
 

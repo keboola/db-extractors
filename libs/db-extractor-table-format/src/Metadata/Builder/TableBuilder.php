@@ -24,7 +24,7 @@ class TableBuilder implements Builder
      */
     public const OPTIONAL_REQUIRED_PROPERTIES = ['schema', 'catalog', 'type', 'rowCount'];
 
-    /** @var array|string[] */
+    /** @var string[] */
     protected array $columnRequiredProperties;
 
     private ?string $name = null;
@@ -41,7 +41,7 @@ class TableBuilder implements Builder
 
     private ?int $rowCount = null;
 
-    /** @var array|null|ColumnBuilder[] */
+    /** @var null|ColumnBuilder[] */
     private ?array $columns = [];
 
     public static function create(array $requiredProperties = [], array $columnRequiredProperties = []): self

@@ -54,7 +54,7 @@ class ColumnBuilder implements Builder
     private array $constraints = [];
 
     /**
-     * @param array|string[] $requiredProperties
+     * @param string[] $requiredProperties
      */
     public static function create(array $requiredProperties = []): self
     {

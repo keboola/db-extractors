@@ -25,39 +25,39 @@ abstract class BaseValueObjectTest extends TestCase
 
     /**
      * Get ValueObject's properties that will be tested
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getAllProperties(): array;
 
 
     /**
      * Get properties with allowed null value
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getNullableProperties(): array;
 
     /**
      * Get properties for which an attempt to set an empty string will result in an error.
-     * @return array|string[]
+     * @return string[]
      */
     abstract public function getEmptyStringNotAllowedProperties(): array;
 
     /**
      * Get "has" callbacks called on ValueObject
-     * @return array|callable<ValueObject>[]
+     * @return callable<ValueObject>[]
      */
     abstract public function getHasCallbacks(): array;
 
     /**
      * Get "get" callbacks called on ValueObject
-     * @return array|callable<ValueObject>[]
+     * @return callable<ValueObject>[]
      */
     abstract public function getGetCallbacks(): array;
 
     /**
      * Get valid inputs for testing.
      * Invalid inputs are automatically generated from these valid by changing a property.
-     * @return array|mixed[][]
+     * @return mixed[][]
      */
     abstract public function getValidInputs(): array;
 

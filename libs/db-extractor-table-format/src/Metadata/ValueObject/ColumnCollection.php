@@ -17,12 +17,12 @@ use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
  */
 class ColumnCollection implements ValueObject, Countable, IteratorAggregate
 {
-    /** @var array|Column[] */
+    /** @var Column[] */
     private array $columns;
 
     /**
      * @internal Should be created using TableBuilder, don't call it directly!
-     * @param array|Column[] $columns
+     * @param Column[] $columns
      */
     public function __construct(array $columns)
     {
@@ -60,7 +60,7 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
     }
 
     /**
-     * @return array|Column[]
+     * @return Column[]
      */
     public function getAll(): array
     {
@@ -68,7 +68,7 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
     }
 
     /**
-     * @return array|string[]
+     * @return string[]
      */
     public function getNames(): array
     {
