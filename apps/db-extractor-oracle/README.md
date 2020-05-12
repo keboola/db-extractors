@@ -1,11 +1,18 @@
 # Oracle DB Extractor
 
-### Development ###
+## Development
+ 
+Clone this repository and init the workspace with following command:
 
-- clone this repository
+```
+git clone https://github.com/keboola/db-extractor-oracle
+cd db-extractor-oracle
+docker-compose build
+docker-compose run --rm dev composer install --no-scripts
+```
 
-- Build it `docker-compose build`
+Run the test suite using this command:
 
-- To run locally make sure that you have a valid json configuration (config.json) in `path/to/my/test/data/dir` in the local repository root. Then run `docker-compose run --rm dev php /code/src/run.php --data /code/path/to/my/test/data/dir`
-
-- To run tests `docker-compose run --rm dev`
+```
+docker-compose run --rm dev composer tests
+```

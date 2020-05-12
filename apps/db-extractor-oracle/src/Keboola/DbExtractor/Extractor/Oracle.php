@@ -232,7 +232,7 @@ class Oracle extends Extractor
         $cmd = [
             'java',
             '-jar',
-            '/code/table-exporter.jar',
+            '/opt/table-exporter.jar',
             'export',
             $this->exportConfigFiles[$table['name']],
             var_export(false, true),
@@ -252,7 +252,7 @@ class Oracle extends Extractor
         $cmd = [
             'java',
             '-jar',
-            '/code/table-exporter.jar',
+            '/opt/table-exporter.jar',
             'export',
             $this->exportConfigFiles[$tableName],
             var_export($advancedQuery, true),
@@ -300,7 +300,7 @@ class Oracle extends Extractor
         $cmd = [
             'java',
             '-jar',
-            '/code/table-exporter.jar',
+            '/opt/table-exporter.jar',
             'testConnection',
             $this->dataDir . '/' . self::TABLELESS_CONFIG_FILE,
         ];
@@ -319,7 +319,7 @@ class Oracle extends Extractor
         $cmd = [
             'java',
             '-jar',
-            '/code/table-exporter.jar',
+            '/opt/table-exporter.jar',
             'getTables',
             $this->dataDir . '/' . self::TABLES_CONFIG_FILE,
         ];

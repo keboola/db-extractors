@@ -23,7 +23,7 @@ RUN apt-get update -q \
   && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr --no-install-recommends
 
 # Table exporter
-COPY --from=1 /tmp/table-exporter.jar /code/table-exporter.jar
+COPY --from=1 /tmp/table-exporter.jar /opt/table-exporter.jar
 
 # Oracle instantclient
 COPY --from=1 /tmp/instantclient-basiclite.zip /tmp/instantclient-basiclite.zip
