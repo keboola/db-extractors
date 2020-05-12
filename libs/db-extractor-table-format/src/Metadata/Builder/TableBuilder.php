@@ -41,8 +41,16 @@ class TableBuilder implements Builder
 
     private ?int $rowCount = null;
 
-    /** @var null|ColumnBuilder[] */
-    private ?array $columns = [];
+    /**
+     * Table can be build without columns if buildColumns = false, see method "setColumnsNotExpected".
+     * It is useful when there are a lot of tables and in first step are loaded only tables without columns.
+     * Than, in second step, is loaded selected table with columns.
+     * @var bool
+     */
+    private bool $buildColumns = true;
+
+    /** @var ColumnBuilder[] */
+    private array $columns = [];
 
     public static function create(array $requiredProperties = [], array $columnRequiredProperties = []): self
     {
@@ -70,7 +78,7 @@ class TableBuilder implements Builder
             $this->catalog,
             $this->type,
             $this->rowCount,
-            $this->columns !== null ?
+            $this->buildColumns ?
                 new ColumnCollection(array_map(fn(ColumnBuilder $col) => $col->build(), $this->columns)) :
                 null
         );
@@ -79,13 +87,14 @@ class TableBuilder implements Builder
     public function setColumnsNotExpected(): self
     {
         $this->setPropertyAsOptional('columns');
-        $this->columns = null;
+        $this->columns = [];
+        $this->buildColumns = false;
         return $this;
     }
 
     public function addColumn(?ColumnBuilder $builder = null): ColumnBuilder
     {
-        if ($this->columns === null) {
+        if ($this->buildColumns === false) {
             throw new InvalidStateException('Columns are not expected.');
         }
 
