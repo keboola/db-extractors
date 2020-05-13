@@ -750,4 +750,15 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
     }
+
+    public function testIncrementalNotPresentNoResults(): void
+    {
+        $configurationArray = $this->getConfigRow(self::DRIVER);
+        unset($configurationArray['parameters']['incremental']);
+        $configurationArray['parameters']['query'] = 'SELECT * FROM sales WHERE 1 = 2;'; // no results
+        $app = $this->createApplication($configurationArray);
+        $result = $app->run();
+
+        $this->assertEquals('success', $result['status']);
+    }
 }
