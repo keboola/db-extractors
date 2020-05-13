@@ -26,14 +26,11 @@ class Oracle extends Extractor
     private const TABLELESS_CONFIG_FILE = 'tableless.json';
     private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
 
-    /** @var  array */
-    protected $exportConfigFiles;
+    protected array $exportConfigFiles;
 
-    /** @var array */
-    private $tablesToList = [];
+    private array $tablesToList = [];
 
-    /** @var bool */
-    private $listColumns = true;
+    private bool $listColumns = true;
 
     public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
     {
