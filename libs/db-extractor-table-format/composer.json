@@ -11,23 +11,25 @@
     ],
     "autoload": {
         "psr-4": {
-            "Keboola\\": "src/Keboola/"
+            "Keboola\\DbExtractor\\TableResultFormat\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractor\\Tests\\": "tests/Keboola/"
+            "Keboola\\DbExtractor\\TableResultFormat\\Tests\\": "tests/phpunit"
         }
     },
     "require": {
-        "php": "^7.3",
+        "php": ">=7.4",
         "keboola/common-exceptions": "^1.0",
+        "keboola/php-datatypes": "^4.7",
         "keboola/php-utils": "^4.1"
     },
     "require-dev": {
-        "keboola/coding-standard": "^9.0",
+        "keboola/coding-standard": ">=9.0",
         "phpstan/phpstan": "^0.12.2",
-        "phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "^9.1",
+        "ext-json": "*"
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit",
