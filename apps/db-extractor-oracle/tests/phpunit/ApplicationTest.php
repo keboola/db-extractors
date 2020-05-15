@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
-use Keboola\DbExtractor\Exception\UserException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class ApplicationTest extends OracleBaseTest
 {
-    /** @var string */
-    protected $rootPath = __DIR__ . '/../../..';
+    protected string $rootPath = __DIR__ . '/../..';
 
     public function testTestConnectionAction(): void
     {

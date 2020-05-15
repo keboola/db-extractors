@@ -11,7 +11,7 @@ RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-s
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/instantclient-sqlplus.zip
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-table-exporter/TableExporter-$TABLE_EXPORTER_VERSION-jar-with-dependencies.jar /tmp/table-exporter.jar
 
-FROM php:7.3-cli-stretch
+FROM php:7.4-cli
 
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -23,7 +23,7 @@ RUN apt-get update -q \
   && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr --no-install-recommends
 
 # Table exporter
-COPY --from=1 /tmp/table-exporter.jar /code/table-exporter.jar
+COPY --from=1 /tmp/table-exporter.jar /opt/table-exporter.jar
 
 # Oracle instantclient
 COPY --from=1 /tmp/instantclient-basiclite.zip /tmp/instantclient-basiclite.zip

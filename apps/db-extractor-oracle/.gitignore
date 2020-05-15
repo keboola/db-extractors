@@ -1,9 +1,10 @@
 .env
 vendor/
 /data/
-/tests/data/out/
-/tests/data/config.yml
-/tests/data/*.json
+/tests/phpunit/data/in
+/tests/phpunit/data/out/
+/tests/phpunit/data/config.yml
+/tests/phpunit/data/*.json
 .idea/
 composer.phar
 runtests.sh
