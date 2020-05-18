@@ -18,15 +18,25 @@ class TableNodesDecorator
             ->scalarNode('name')
                 ->cannotBeEmpty()
             ->end()
-            ->scalarNode('query')->end()
+            ->scalarNode('query')
+                ->cannotBeEmpty()
+            ->end()
             ->arrayNode('table')
                 ->children()
-                    ->scalarNode('schema')->isRequired()->end()
-                    ->scalarNode('tableName')->isRequired()->end()
+                    ->scalarNode('schema')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('tableName')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
                 ->end()
             ->end()
             ->arrayNode('columns')
-                ->prototype('scalar')->end()
+                ->prototype('scalar')
+                    ->cannotBeEmpty()
+                ->end()
             ->end()
             ->scalarNode('outputTable')
                 ->isRequired()
@@ -35,13 +45,19 @@ class TableNodesDecorator
             ->booleanNode('incremental')
                 ->defaultValue(false)
             ->end()
-            ->scalarNode('incrementalFetchingColumn')->end()
-            ->scalarNode('incrementalFetchingLimit')->end()
+            ->scalarNode('incrementalFetchingColumn')
+                ->cannotBeEmpty()
+            ->end()
+            ->integerNode('incrementalFetchingLimit')
+                ->min(0)
+            ->end()
             ->booleanNode('enabled')
                 ->defaultValue(true)
             ->end()
             ->arrayNode('primaryKey')
-                ->prototype('scalar')->end()
+                ->prototype('scalar')
+                    ->cannotBeEmpty()
+                ->end()
             ->end()
             ->integerNode('retries')
                 ->min(0)
@@ -50,16 +66,48 @@ class TableNodesDecorator
 
     public function validate(array $v): array
     {
-        if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
+        if (empty($v['query']) && empty($v['table'])) {
+            throw new InvalidConfigurationException('Table or query must be configured.');
+        }
+
+        if (!empty($v['query']) && !empty($v['table'])) {
             throw new InvalidConfigurationException('Both table and query cannot be set together.');
         }
-        if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
-            $message = 'Incremental fetching is not supported for advanced queries.';
-            throw new InvalidConfigurationException($message);
+
+        if (!empty($v['query'])  && !empty($v['incrementalFetchingColumn'])) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingColumn" is configured, ' .
+                'but incremental fetching is not supported for custom query.'
+            );
         }
-        if (!isset($v['table']) && !isset($v['query'])) {
-            throw new InvalidConfigurationException('One of table or query is required');
+
+        if (!empty($v['query'])  && !empty($v['incrementalFetchingLimit'])) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingLimit" is configured, ' .
+                'but incremental fetching is not supported for custom query.'
+            );
         }
+
+        if ($v['incremental'] === true && empty($v['incrementalFetchingColumn'])) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingColumn" must be configured, if is incremental fetching enabled.'
+            );
+        }
+
+        if ($v['incremental'] === false && !empty($v['incrementalFetchingColumn'])) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingColumn" is configured, ' .
+                'but incremental fetching is not enabled.'
+            );
+        }
+
+        if ($v['incremental'] === false && !empty($v['incrementalFetchingLimit'])) {
+            throw new InvalidConfigurationException(
+                'The "incrementalFetchingLimit" is configured, ' .
+                'but incremental fetching is not enabled.'
+            );
+        }
+
         return $v;
     }
 }

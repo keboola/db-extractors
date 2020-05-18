@@ -136,7 +136,9 @@ class ConfigTest extends AbstractConfigTest
             ],
         ];
 
-        $exceptionMessage = 'Incremental fetching is not supported for advanced queries.';
+        $exceptionMessage =
+            '"incrementalFetchingColumn" is configured, ' .
+            'but incremental fetching is not supported for custom query.';
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
@@ -154,7 +156,7 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('One of table or query is required');
+        $this->expectExceptionMessage('Table or query must be configured.');
 
         new Config($configurationArray, new ConfigRowDefinition());
     }
@@ -232,7 +234,9 @@ class ConfigTest extends AbstractConfigTest
             ],
         ];
 
-        $exceptionMessage = 'Incremental fetching is not supported for advanced queries.';
+        $exceptionMessage =
+            '"incrementalFetchingColumn" is configured, ' .
+            'but incremental fetching is not supported for custom query.';
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($exceptionMessage);
