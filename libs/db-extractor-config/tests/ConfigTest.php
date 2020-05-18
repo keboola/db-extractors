@@ -34,10 +34,6 @@ class ConfigTest extends AbstractConfigTest
                         'name' => 'sales',
                         'query' => 'SELECT * FROM sales',
                         'outputTable' => 'in.c-main.sales',
-                        'incremental' => false,
-                        'primaryKey' => [],
-                        'enabled' => true,
-                        'columns' => [],
                     ],
                     [
                         'id' => 2,
@@ -50,6 +46,7 @@ class ConfigTest extends AbstractConfigTest
                         ],
                         'enabled' => true,
                         'columns' => [],
+                        'retries' => 20,
                     ],
                     [
                         'id' => 3,
@@ -68,14 +65,74 @@ class ConfigTest extends AbstractConfigTest
                             2 => 'usersentiment',
                             3 => 'zipcode',
                         ],
+                        'retries' => 30,
                     ],
                 ],
             ],
         ];
-
         $config = new Config($configurationArray, new ConfigDefinition());
 
-        $this->assertEquals($configurationArray, $config->getData());
+        $expected = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'tables' => [
+                    [
+                        'id' => 1,
+                        'name' => 'sales',
+                        'query' => 'SELECT * FROM sales',
+                        'outputTable' => 'in.c-main.sales',
+                        // Default values:
+                        'incremental' => false,
+                        'primaryKey' => [],
+                        'enabled' => true,
+                        'columns' => [],
+                        'retries' => 5,
+                    ],
+                    [
+                        'id' => 2,
+                        'name' => 'escaping',
+                        'query' => 'SELECT * FROM escaping',
+                        'outputTable' => 'in.c-main.escaping',
+                        'incremental' => false,
+                        'primaryKey' => [
+                            0 => 'orderId',
+                        ],
+                        'enabled' => true,
+                        'columns' => [],
+                        'retries' => 20,
+                    ],
+                    [
+                        'id' => 3,
+                        'enabled' => true,
+                        'name' => 'tableColumns',
+                        'outputTable' => 'in.c-main.tableColumns',
+                        'incremental' => false,
+                        'primaryKey' => [],
+                        'table' => [
+                            'schema' => 'test',
+                            'tableName' => 'sales',
+                        ],
+                        'columns' => [
+                            0 => 'usergender',
+                            1 => 'usercity',
+                            2 => 'usersentiment',
+                            3 => 'zipcode',
+                        ],
+                        'retries' => 30,
+                        'query' => null,
+                    ],
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $config->getData());
     }
 
     public function testConfigRow(): void
@@ -92,16 +149,34 @@ class ConfigTest extends AbstractConfigTest
                 ],
                 'name' => 'auto-increment-timestamp',
                 'incrementalFetchingColumn' => '_weird-I-d',
-                'primaryKey' => [],
-                'columns' => [],
-                'enabled' => true,
             ],
         ];
 
         $config = new Config($configurationArray, new ConfigRowDefinition());
 
-        $this->assertEquals($configurationArray, $config->getData());
+        $expected = [
+            'parameters' => [
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'incremental' => true,
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'auto_increment_timestamp',
+                    'schema' => 'test',
+                ],
+                'name' => 'auto-increment-timestamp',
+                'incrementalFetchingColumn' => '_weird-I-d',
+                // Default values:
+                'retries' => 5,
+                'columns' => [],
+                'enabled' => true,
+                'primaryKey' => [],
+                'query' => null,
+            ],
+        ];
+        $this->assertEquals($expected, $config->getData());
     }
+
 
     public function testConfigActionRow(): void
     {
@@ -286,6 +361,7 @@ class ConfigTest extends AbstractConfigTest
                 'enabled' => true,
                 'primaryKey' => [],
                 'advancedMode' => true,
+                'retries' => 10,
             ],
         ];
 
