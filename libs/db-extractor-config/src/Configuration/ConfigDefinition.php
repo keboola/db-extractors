@@ -7,32 +7,24 @@ namespace Keboola\DbExtractorConfig\Configuration;
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SshNode;
-use Keboola\DbExtractorConfig\Configuration\NodeDefinition\TablesNode;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\TableNodesDecorator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ConfigDefinition extends BaseConfigDefinition
 {
-    /** @var NodeDefinition */
-    protected $dbNodeDefinition;
+    protected NodeDefinition $dbNode;
 
-    /** @var NodeDefinition */
-    protected $tablesNodeDefinition;
+    protected TableNodesDecorator $tableNodesDecorator;
 
     public function __construct(
         ?DbNode $dbNode = null,
         ?SshNode $sshNode = null,
-        ?TablesNode $tablesNode = null
+        ?TableNodesDecorator $tableNodesDecorator = null
     ) {
-        if (is_null($dbNode)) {
-            $dbNode = new DbNode($sshNode);
-        }
-        if (is_null($tablesNode)) {
-            $tablesNode = new TablesNode();
-        }
-        $this->dbNodeDefinition = $dbNode;
-        $this->tablesNodeDefinition = $tablesNode;
+        $this->dbNode = $dbNode ?? new DbNode($sshNode);
+        $this->tableNodesDecorator = $tableNodesDecorator ?? new TableNodesDecorator();
     }
 
     protected function getParametersDefinition(): ArrayNodeDefinition
@@ -54,10 +46,15 @@ class ConfigDefinition extends BaseConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->dbNodeDefinition)
-                ->append($this->tablesNodeDefinition)
+                ->append($this->dbNode)
             ->end();
         // @formatter:on
+
+        // Add common nodes for tables/rows config
+        $tablesItemNode = $parametersNode->children()->arrayNode('tables')->prototype('array');
+        $this->tableNodesDecorator->addNodes($tablesItemNode->children());
+        $tablesItemNode->validate()->always(fn($v) => $this->tableNodesDecorator->validate($v));
+
         return $parametersNode;
     }
 }

@@ -4,12 +4,13 @@
     "type": "library",
     "license": "MIT",
     "require": {
+        "php": ">=7.4",
         "keboola/php-component": "^8.1",
         "symfony/config": "^5.0"
     },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "^1.2",
-        "keboola/coding-standard": "^8.0",
+        "keboola/coding-standard": ">=9.0",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.1"
     },
