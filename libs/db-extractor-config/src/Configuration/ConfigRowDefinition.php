@@ -7,20 +7,24 @@ namespace Keboola\DbExtractorConfig\Configuration;
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SshNode;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\TableNodesDecorator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigRowDefinition extends BaseConfigDefinition
 {
     protected NodeDefinition $dbNode;
 
+    protected TableNodesDecorator $tableNodesDecorator;
+
     public function __construct(
         ?DbNode $dbNode = null,
-        ?SshNode $sshNode = null
+        ?SshNode $sshNode = null,
+        ?TableNodesDecorator $tableNodesDecorator = null
     ) {
         $this->dbNode = $dbNode ?? new DbNode($sshNode);
+        $this->tableNodesDecorator = $tableNodesDecorator ?? new TableNodesDecorator();
     }
 
     protected function getParametersDefinition(): ArrayNodeDefinition
@@ -29,7 +33,6 @@ class ConfigRowDefinition extends BaseConfigDefinition
 
         /** @var ArrayNodeDefinition $parametersNode */
         $parametersNode = $treeBuilder->getRootNode();
-        $this->addValidation($parametersNode);
 
         // @formatter:off
         $parametersNode
@@ -44,65 +47,13 @@ class ConfigRowDefinition extends BaseConfigDefinition
                     ->cannotBeEmpty()
                 ->end()
                 ->append($this->dbNode)
-                ->integerNode('id')
-                    ->min(0)
-                ->end()
-                ->scalarNode('name')
-                    ->cannotBeEmpty()
-                ->end()
-                ->scalarNode('query')->end()
-                ->arrayNode('table')
-                    ->children()
-                        ->scalarNode('schema')->isRequired()->end()
-                        ->scalarNode('tableName')->isRequired()->end()
-                    ->end()
-                ->end()
-                ->arrayNode('columns')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->scalarNode('outputTable')
-                    ->isRequired()
-                    ->cannotBeEmpty()
-                ->end()
-                ->booleanNode('incremental')
-                    ->defaultValue(false)
-                ->end()
-                ->scalarNode('incrementalFetchingColumn')->end()
-                ->scalarNode('incrementalFetchingLimit')->end()
-                ->booleanNode('enabled')
-                    ->defaultValue(true)
-                ->end()
-                ->arrayNode('primaryKey')
-                    ->prototype('scalar')->end()
-                ->end()
-                ->integerNode('retries')
-                    ->min(0)
-                ->end()
             ->end();
         // @formatter:on
 
-        return $parametersNode;
-    }
+        // Add common nodes for tables/rows config
+        $this->tableNodesDecorator->addNodes($parametersNode->children());
+        $parametersNode->validate()->always(fn($v) => $this->tableNodesDecorator->validate($v));
 
-    protected function addValidation(NodeDefinition $definition): NodeDefinition
-    {
-        $definition
-            ->validate()
-            ->always(function ($v) {
-                if (isset($v['query']) && $v['query'] !== '' && isset($v['table'])) {
-                    throw new InvalidConfigurationException('Both table and query cannot be set together.');
-                }
-                if (isset($v['query']) && $v['query'] !== '' && isset($v['incrementalFetchingColumn'])) {
-                    $message = 'Incremental fetching is not supported for advanced queries.';
-                    throw new InvalidConfigurationException($message);
-                }
-                if (!isset($v['table']) && !isset($v['query'])) {
-                    throw new InvalidConfigurationException('One of table or query is required');
-                }
-                return $v;
-            })
-            ->end()
-        ;
-        return $definition;
+        return $parametersNode;
     }
 }
