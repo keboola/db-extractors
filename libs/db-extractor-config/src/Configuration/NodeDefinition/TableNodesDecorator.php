@@ -11,63 +11,6 @@ class TableNodesDecorator
 {
     public const DEFAULT_MAX_TRIES = 5;
 
-    public function addNodes(NodeBuilder $builder): void
-    {
-        $builder
-            ->integerNode('id')
-                ->min(0)
-            ->end()
-            ->scalarNode('name')
-                ->cannotBeEmpty()
-            ->end()
-            ->scalarNode('query')
-                ->defaultNull()
-                ->cannotBeEmpty()
-            ->end()
-            ->arrayNode('table')
-                ->children()
-                    ->scalarNode('schema')
-                        ->cannotBeEmpty()
-                        ->isRequired()
-                    ->end()
-                    ->scalarNode('tableName')
-                        ->cannotBeEmpty()
-                        ->isRequired()
-                    ->end()
-                ->end()
-            ->end()
-            ->arrayNode('columns')
-                ->prototype('scalar')
-                    ->cannotBeEmpty()
-                ->end()
-            ->end()
-            ->scalarNode('outputTable')
-                ->isRequired()
-                ->cannotBeEmpty()
-            ->end()
-            ->booleanNode('incremental')
-                ->defaultValue(false)
-            ->end()
-            ->scalarNode('incrementalFetchingColumn')
-                ->cannotBeEmpty()
-            ->end()
-            ->integerNode('incrementalFetchingLimit')
-                ->min(0)
-            ->end()
-            ->booleanNode('enabled')
-                ->defaultValue(true)
-            ->end()
-            ->arrayNode('primaryKey')
-                ->prototype('scalar')
-                    ->cannotBeEmpty()
-                ->end()
-            ->end()
-            ->integerNode('retries')
-                ->min(0)
-                ->defaultValue(self::DEFAULT_MAX_TRIES)
-            ->end();
-    }
-
     public function validate(array $v): array
     {
         if (empty($v['query']) && empty($v['table'])) {
@@ -113,5 +56,118 @@ class TableNodesDecorator
         }
 
         return $v;
+    }
+
+    public function addNodes(NodeBuilder $builder): void
+    {
+        $this->addIdNode($builder);
+        $this->addNameNode($builder);
+        $this->addQueryNode($builder);
+        $this->addTableNode($builder);
+        $this->addColumnsNode($builder);
+        $this->addOutputTableNode($builder);
+        $this->addIncrementalFetchingNodes($builder);
+        $this->addEnabledNode($builder);
+        $this->addPrimaryKeyNode($builder);
+        $this->addRetriesNode($builder);
+    }
+
+    protected function addIdNode(NodeBuilder $builder): void
+    {
+        $builder->integerNode('id')->min(0);
+    }
+
+    protected function addNameNode(NodeBuilder $builder): void
+    {
+        $builder->scalarNode('name')->cannotBeEmpty();
+    }
+
+    protected function addQueryNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->scalarNode('query')
+                ->defaultNull()
+                ->cannotBeEmpty();
+        // @formatter:on
+    }
+
+    protected function addTableNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->arrayNode('table')
+                ->children()
+                    ->scalarNode('schema')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('tableName')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end();
+        // @formatter:on
+    }
+
+    protected function addColumnsNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->arrayNode('columns')
+                ->prototype('scalar')
+                    ->cannotBeEmpty();
+        // @formatter:on
+    }
+
+    protected function addOutputTableNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->scalarNode('outputTable')
+                ->isRequired()
+                ->cannotBeEmpty();
+        // @formatter:on
+    }
+
+    protected function addIncrementalFetchingNodes(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->booleanNode('incremental')
+                ->defaultValue(false)
+            ->end()
+            ->scalarNode('incrementalFetchingColumn')
+                ->cannotBeEmpty()
+            ->end()
+            ->integerNode('incrementalFetchingLimit')
+                ->min(0)
+            ->end();
+        // @formatter:on
+    }
+
+    protected function addEnabledNode(NodeBuilder $builder): void
+    {
+        $builder->booleanNode('enabled')->defaultValue(true);
+    }
+
+    protected function addPrimaryKeyNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->arrayNode('primaryKey')
+                ->prototype('scalar')
+                    ->cannotBeEmpty()
+                ->end();
+        // @formatter:on
+    }
+
+    protected function addRetriesNode(NodeBuilder $builder): void
+    {
+        // @formatter:off
+        $builder
+            ->integerNode('retries')
+                ->min(0)
+                ->defaultValue(self::DEFAULT_MAX_TRIES);
+        // @formatter:on
     }
 }
