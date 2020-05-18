@@ -16,35 +16,17 @@ class IncrementalFetchingConfig implements ValueObject
     public static function fromArray(array $data): ?self
     {
         // Enabled ?
-        $enabled = $data['incremental'] ?? false;
-        if (!is_bool($enabled)) {
-            throw new InvalidArgumentException(sprintf(
-                'Key "incremental" should be bool, given: %s',
-                is_object($enabled) ? get_class($enabled) : gettype($enabled)
-            ));
-        } elseif ($enabled === false) {
+        if (empty($data['incremental'])) {
             return null;
         }
 
-        // Column
-        if (!isset($data['incrementalFetchingColumn'])) {
-            throw new InvalidArgumentException('Missing key "incrementalFetchingColumn".');
-        }
         $column = $data['incrementalFetchingColumn'];
-
-        // Limit
         $limit = $data['incrementalFetchingLimit'] ?? null;
-
-        // Create object
         return new self($column, $limit);
     }
 
     public function __construct(string $column, ?int $limit)
     {
-        if ($column === '') {
-            throw new InvalidArgumentException('Column cannot be empty string.');
-        }
-
         $this->column = $column;
         $this->limit = $limit;
     }

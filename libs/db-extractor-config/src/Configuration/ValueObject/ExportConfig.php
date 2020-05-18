@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Configuration\ValueObject;
 
-use Keboola\DbExtractorConfig\Exception\InvalidArgumentException;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 
 class ExportConfig implements ValueObject
 {
-    public const DEFAULT_MAX_TRIES = 5;
-
     /** Custom export query */
     private ?string $query;
 
@@ -20,81 +17,42 @@ class ExportConfig implements ValueObject
     /** Configuration of incremental fetching */
     private ?IncrementalFetchingConfig $incrementalFetchingConfig;
 
-    /** Columns that will be exported, cannot be used with query, if null => all columns */
-    private ?array $columns;
+    /** Columns that will be exported, cannot be used with query, if empty => all columns */
+    private array $columns;
 
     /** Name of the output table */
     private string $outputTable;
 
     /** PK key can be composed of multiple columns, therefore an array */
-    private ?array $primaryKey;
+    private array $primaryKey;
 
     /** Number of max retries if an error occurs */
     private int $maxRetries;
 
     public static function fromArray(array $data): self
     {
-        if (!isset($data['outputTable'])) {
-            throw new InvalidArgumentException('Key "outputTable" is required.');
-        }
-
-        if (!isset($data['table']) && !isset($data['query'])) {
-            throw new InvalidArgumentException('Key "table" or "query" must be set.');
-        }
-
-        // Compatibility fix: unset columns when custom query is set
-        if (!empty($data['query']) && !empty($data['columns'])) {
-            unset($data['columns']);
-        }
-
-        $query = empty($data['query']) ? null : $data['query']; // undefined/empty string => null
-        $table = $query ? null : InputTable::fromArray($data);
-        $incrementalFetchingConfig = IncrementalFetchingConfig::fromArray($data);
-        $columns = empty($data['columns']) ? null : $data['columns']; // undefined/empty array => null
-        $outputTable = $data['outputTable'];
-        $primaryKey = empty($data['primaryKey']) ? null : $data['primaryKey']; // undefined/empty array => null
-        $maxRetries = $data['retries'] ?? self::DEFAULT_MAX_TRIES;
-
-        return new self($query, $table, $incrementalFetchingConfig, $columns, $outputTable, $primaryKey, $maxRetries);
+        return new self(
+            $data['query'],
+            empty($data['query']) ? InputTable::fromArray($data) : null,
+            empty($data['query']) ? IncrementalFetchingConfig::fromArray($data) : null,
+            $data['columns'],
+            $data['outputTable'],
+            $data['primaryKey'],
+            $data['retries']
+        );
     }
 
     public function __construct(
         ?string $query,
         ?InputTable $table,
         ?IncrementalFetchingConfig $incrementalFetchingConfig,
-        ?array $columns,
+        array $columns,
         string $outputTable,
-        ?array $primaryKey,
+        array $primaryKey,
         int $maxRetries
     ) {
-        if ($query === null && $table === null) {
-            throw new InvalidArgumentException('Query or table must be specified.');
-        }
-
-        if ($query === '') {
-            throw new InvalidArgumentException('Query cannot be empty string.');
-        }
-
-        if ($outputTable === '') {
-            throw new InvalidArgumentException('Output table cannot be empty string.');
-        }
-
-        if ($maxRetries < 0) {
-            throw new InvalidArgumentException('Max retries must be >= 0.');
-        }
-
-        if ($columns && $query) {
-            throw new InvalidArgumentException('Columns cannot be used with custom query.');
-        }
-
-        if (is_array($columns) && count($columns) === 0) {
-            throw new InvalidArgumentException('Columns cannot be empty array, null expected.');
-        }
-
-        if (is_array($primaryKey) && count($primaryKey) === 0) {
-            throw new InvalidArgumentException('Primary key cannot be empty array, null expected.');
-        }
-
+        $query = $query !== null ? trim($query) : null;
+        $outputTable = trim($outputTable);
         $this->query = $query;
         $this->table = $table;
         $this->incrementalFetchingConfig = $incrementalFetchingConfig;
@@ -118,7 +76,7 @@ class ExportConfig implements ValueObject
         return $this->table;
     }
 
-    public function isIncremental(): bool
+    public function isIncrementalFetching(): bool
     {
         return $this->incrementalFetchingConfig !== null;
     }
@@ -132,7 +90,7 @@ class ExportConfig implements ValueObject
         return $this->incrementalFetchingConfig->hasLimit();
     }
 
-    public function getIncrementalLimit(): int
+    public function getIncrementalFetchingLimit(): int
     {
         if ($this->incrementalFetchingConfig === null) {
             throw new PropertyNotSetException('Incremental fetching is not enabled.');
@@ -141,7 +99,7 @@ class ExportConfig implements ValueObject
         return $this->incrementalFetchingConfig->getLimit();
     }
 
-    public function getIncrementalColumn(): string
+    public function getIncrementalFetchingColumn(): string
     {
         if ($this->incrementalFetchingConfig === null) {
             throw new PropertyNotSetException('Incremental fetching is not enabled.');
@@ -175,12 +133,12 @@ class ExportConfig implements ValueObject
 
     public function hasColumns(): bool
     {
-        return $this->columns !== null;
+        return !empty($this->columns);
     }
 
     public function getColumns(): array
     {
-        if ($this->columns === null) {
+        if (empty($this->columns)) {
             throw new PropertyNotSetException('Columns are not set.');
         }
 
@@ -194,12 +152,12 @@ class ExportConfig implements ValueObject
 
     public function hasPrimaryKey(): bool
     {
-        return $this->primaryKey !== null;
+        return !empty($this->primaryKey);
     }
 
     public function getPrimaryKey(): array
     {
-        if ($this->primaryKey === null) {
+        if (empty($this->primaryKey)) {
             throw new PropertyNotSetException('Primary key is not set.');
         }
 
