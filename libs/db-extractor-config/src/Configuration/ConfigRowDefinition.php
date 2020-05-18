@@ -14,13 +14,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigRowDefinition extends BaseConfigDefinition
 {
-    protected NodeDefinition $dbNodeDefinition;
+    protected NodeDefinition $dbNode;
 
     public function __construct(
         ?DbNode $dbNode = null,
         ?SshNode $sshNode = null
     ) {
-        $this->dbNodeDefinition = $dbNode ?? new DbNode($sshNode);
+        $this->dbNode = $dbNode ?? new DbNode($sshNode);
     }
 
     protected function getParametersDefinition(): ArrayNodeDefinition
@@ -43,7 +43,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->dbNodeDefinition)
+                ->append($this->dbNode)
                 ->integerNode('id')
                     ->min(0)
                 ->end()
