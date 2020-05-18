@@ -81,7 +81,7 @@ class ExportConfig implements ValueObject
         return $this->incrementalFetchingConfig !== null;
     }
 
-    public function hasIncrementalLimit(): bool
+    public function hasIncrementalFetchingLimit(): bool
     {
         if ($this->incrementalFetchingConfig === null) {
             return false;
