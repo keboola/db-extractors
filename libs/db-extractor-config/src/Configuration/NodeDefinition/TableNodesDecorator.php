@@ -90,7 +90,7 @@ class TableNodesDecorator
 
         if ($v['incremental'] === true && empty($v['incrementalFetchingColumn'])) {
             throw new InvalidConfigurationException(
-                'The "incrementalFetchingColumn" must be configured, if is incremental fetching enabled.'
+                'The "incrementalFetchingColumn" must be configured, if incremental fetching is enabled.'
             );
         }
 

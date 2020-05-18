@@ -392,7 +392,7 @@ class ConfigTest extends AbstractConfigTest
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage(
-            'The "incrementalFetchingColumn" must be configured, if is incremental fetching enabled.'
+            'The "incrementalFetchingColumn" must be configured, if incremental fetching is enabled.'
         );
         new Config($configurationArray, new ConfigRowDefinition());
     }
