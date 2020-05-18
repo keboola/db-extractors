@@ -12,18 +12,12 @@ class DbNode extends ArrayNodeDefinition
 {
     public const NODE_NAME = 'db';
 
-    /** @var NodeDefinition */
-    protected $sshNode;
+    protected NodeDefinition $sshNode;
 
     public function __construct(?SshNode $sshNode = null, ?NodeParentInterface $parent = null)
     {
         parent::__construct(self::NODE_NAME, $parent);
-
-        if (is_null($sshNode)) {
-            $sshNode = new SshNode();
-        }
-        $this->sshNode = $sshNode;
-
+        $this->sshNode = $sshNode ?? new SshNode();
         $this->init();
     }
 

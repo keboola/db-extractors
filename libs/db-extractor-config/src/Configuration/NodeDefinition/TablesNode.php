@@ -15,7 +15,6 @@ class TablesNode extends ArrayNodeDefinition
     public function __construct(?NodeParentInterface $parent = null)
     {
         parent::__construct(self::NODE_NAME, $parent);
-
         $this->init();
     }
 

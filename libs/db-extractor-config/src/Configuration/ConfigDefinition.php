@@ -14,25 +14,17 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class ConfigDefinition extends BaseConfigDefinition
 {
-    /** @var NodeDefinition */
-    protected $dbNodeDefinition;
+    protected NodeDefinition $dbNodeDefinition;
 
-    /** @var NodeDefinition */
-    protected $tablesNodeDefinition;
+    protected NodeDefinition $tablesNodeDefinition;
 
     public function __construct(
         ?DbNode $dbNode = null,
         ?SshNode $sshNode = null,
         ?TablesNode $tablesNode = null
     ) {
-        if (is_null($dbNode)) {
-            $dbNode = new DbNode($sshNode);
-        }
-        if (is_null($tablesNode)) {
-            $tablesNode = new TablesNode();
-        }
-        $this->dbNodeDefinition = $dbNode;
-        $this->tablesNodeDefinition = $tablesNode;
+        $this->dbNodeDefinition = $dbNode ?? new DbNode($sshNode);
+        $this->tablesNodeDefinition = $tablesNode ?? new TablesNode();
     }
 
     protected function getParametersDefinition(): ArrayNodeDefinition
