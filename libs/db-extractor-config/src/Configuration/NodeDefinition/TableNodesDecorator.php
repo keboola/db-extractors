@@ -9,6 +9,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class TableNodesDecorator
 {
+    public const DEFAULT_MAX_TRIES = 5;
+
     public function addNodes(NodeBuilder $builder): void
     {
         $builder
@@ -19,6 +21,7 @@ class TableNodesDecorator
                 ->cannotBeEmpty()
             ->end()
             ->scalarNode('query')
+                ->defaultNull()
                 ->cannotBeEmpty()
             ->end()
             ->arrayNode('table')
@@ -61,6 +64,7 @@ class TableNodesDecorator
             ->end()
             ->integerNode('retries')
                 ->min(0)
+                ->defaultValue(self::DEFAULT_MAX_TRIES)
             ->end();
     }
 
