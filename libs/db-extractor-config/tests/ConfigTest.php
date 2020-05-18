@@ -137,7 +137,7 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $exceptionMessage =
-            '"incrementalFetchingColumn" is configured, ' .
+            'The "incrementalFetchingColumn" is configured, ' .
             'but incremental fetching is not supported for custom query.';
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -235,7 +235,7 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $exceptionMessage =
-            '"incrementalFetchingColumn" is configured, ' .
+            'The "incrementalFetchingColumn" is configured, ' .
             'but incremental fetching is not supported for custom query.';
 
         $this->expectException(ConfigUserException::class);
@@ -312,5 +312,178 @@ class ConfigTest extends AbstractConfigTest
 
         $config = new Config($configurationArray, new ActionConfigRowDefinition());
         $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testQueryCannotBeEmpty(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                ],
+                'query' => '',
+                'outputTable' => 'testOutput',
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('"root.parameters.query" cannot contain an empty value, but got "".');
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testTableSchemaCannotBeEmpty(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'auto_increment_timestamp',
+                    'schema' => '',
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('"root.parameters.table.schema" cannot contain an empty value, but got "".');
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testTableNameCannotBeEmpty(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => '',
+                    'schema' => 'schema',
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('"root.parameters.table.tableName" cannot contain an empty value, but got "".');
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testMissingIncrementalFetchingColumn(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'incremental' => true,
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage(
+            'The "incrementalFetchingColumn" must be configured, if is incremental fetching enabled.'
+        );
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testIncrementalFetchingColumnSetButIncrementalDisabled(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'incremental' => false,
+                'incrementalFetchingColumn' => 'name',
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage(
+            'The "incrementalFetchingColumn" is configured, but incremental fetching is not enabled.'
+        );
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testIncrementalFetchingLimitSetButIncrementalDisabled(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'incremental' => false,
+                'incrementalFetchingLimit' => 100,
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage(
+            'The "incrementalFetchingLimit" is configured, but incremental fetching is not enabled.'
+        );
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testEmptyColumnName(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'columns' => ['abc', ''],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage(
+            'The path "root.parameters.columns.1" cannot contain an empty value, but got "".'
+        );
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testEmptyNameInPK(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'primaryKey' => ['abc', ''],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage(
+            'The path "root.parameters.primaryKey.1" cannot contain an empty value, but got "".'
+        );
+        new Config($configurationArray, new ConfigRowDefinition());
     }
 }
