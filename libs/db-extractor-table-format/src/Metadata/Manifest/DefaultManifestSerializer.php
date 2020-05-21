@@ -44,7 +44,7 @@ class DefaultManifestSerializer implements ManifestSerializer
         $options = [
             'type' => $column->getType(),
             'length' => $column->hasLength() ? $column->getLength() : null,
-            'nullable' => $column->isNullable(),
+            'nullable' => $column->hasNullable() ? $column->isNullable() : null,
             'default' => $column->hasDefault() ? (string) $column->getDefault() : null,
         ];
         $options = array_filter($options, fn($value) => $value !== null); // remove null values

@@ -7,12 +7,13 @@ namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\DefaultManifestSerializer;
+use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\ManifestSerializer;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class DefaultMetadataSerializerTest extends TestCase
+class DefaultManifestSerializerTest extends TestCase
 {
-    private DefaultManifestSerializer $serializer;
+    private ManifestSerializer $serializer;
 
     protected function setUp(): void
     {
@@ -20,7 +21,37 @@ class DefaultMetadataSerializerTest extends TestCase
         $this->serializer = new DefaultManifestSerializer();
     }
 
-    public function testTableMetadata(): void
+    public function testTableMinimal(): void
+    {
+        $tableBuilder = TableBuilder::create()
+            ->setName('simple')
+            ->setSchema('testdb');
+
+        $tableBuilder
+            ->addColumn()
+            ->setName('Col1')
+            ->setType('INT');
+
+        $table = $tableBuilder->build();
+
+        $expectedOutput = [
+            [
+                'key' => 'KBC.name',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.schema',
+                'value' => 'testdb',
+            ],
+        ];
+        Assert::assertEquals($expectedOutput, $this->serializer->serializeTable($table));
+    }
+
+    public function testTableComplex(): void
     {
         $tableBuilder = TableBuilder::create()
             ->setName('simple')
@@ -60,7 +91,45 @@ class DefaultMetadataSerializerTest extends TestCase
         Assert::assertEquals($expectedOutput, $this->serializer->serializeTable($table));
     }
 
-    public function testColumnMetadata(): void
+    public function testColumnMinimal(): void
+    {
+        $column = ColumnBuilder::create()
+            ->setName('simple')
+            ->setType('varchar')
+            ->build();
+
+        $expectedOutput = [
+            [
+                'key' => 'KBC.datatype.type',
+                'value' => 'varchar',
+            ],
+            // Keboola\Datatype\Definition\Common has default value for "nullable" set to "true"
+            [
+                'key' => 'KBC.datatype.nullable',
+                'value' => true,
+            ],
+            [
+                'key' => 'KBC.datatype.basetype',
+                'value' => 'STRING',
+            ],
+            [
+                'key' => 'KBC.sourceName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.primaryKey',
+                'value' => false,
+            ],
+        ];
+
+        Assert::assertEquals($expectedOutput, $this->serializer->serializeColumn($column));
+    }
+
+    public function testColumnComplex(): void
     {
         $column = ColumnBuilder::create()
             ->setName('_weird-I-d')
