@@ -7,12 +7,13 @@ namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\DefaultManifestSerializer;
+use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\ManifestSerializer;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class DefaultMetadataSerializerTest extends TestCase
+class DefaultManifestSerializerTest extends TestCase
 {
-    private DefaultManifestSerializer $serializer;
+    private ManifestSerializer $serializer;
 
     protected function setUp(): void
     {
