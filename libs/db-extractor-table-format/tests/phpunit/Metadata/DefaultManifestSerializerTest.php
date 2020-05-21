@@ -21,7 +21,37 @@ class DefaultManifestSerializerTest extends TestCase
         $this->serializer = new DefaultManifestSerializer();
     }
 
-    public function testTableMetadata(): void
+    public function testTableMinimal(): void
+    {
+        $tableBuilder = TableBuilder::create()
+            ->setName('simple')
+            ->setSchema('testdb');
+
+        $tableBuilder
+            ->addColumn()
+            ->setName('Col1')
+            ->setType('INT');
+
+        $table = $tableBuilder->build();
+
+        $expectedOutput = [
+            [
+                'key' => 'KBC.name',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.schema',
+                'value' => 'testdb',
+            ],
+        ];
+        Assert::assertEquals($expectedOutput, $this->serializer->serializeTable($table));
+    }
+
+    public function testTableComplex(): void
     {
         $tableBuilder = TableBuilder::create()
             ->setName('simple')
@@ -61,7 +91,45 @@ class DefaultManifestSerializerTest extends TestCase
         Assert::assertEquals($expectedOutput, $this->serializer->serializeTable($table));
     }
 
-    public function testColumnMetadata(): void
+    public function testColumnMinimal(): void
+    {
+        $column = ColumnBuilder::create()
+            ->setName('simple')
+            ->setType('varchar')
+            ->build();
+
+        $expectedOutput = [
+            [
+                'key' => 'KBC.datatype.type',
+                'value' => 'varchar',
+            ],
+            // Keboola\Datatype\Definition\Common has default value for "nullable" set to "true"
+            [
+                'key' => 'KBC.datatype.nullable',
+                'value' => true,
+            ],
+            [
+                'key' => 'KBC.datatype.basetype',
+                'value' => 'STRING',
+            ],
+            [
+                'key' => 'KBC.sourceName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'simple',
+            ],
+            [
+                'key' => 'KBC.primaryKey',
+                'value' => false,
+            ],
+        ];
+
+        Assert::assertEquals($expectedOutput, $this->serializer->serializeColumn($column));
+    }
+
+    public function testColumnComplex(): void
     {
         $column = ColumnBuilder::create()
             ->setName('_weird-I-d')
