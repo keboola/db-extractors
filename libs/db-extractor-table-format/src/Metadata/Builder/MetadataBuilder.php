@@ -15,7 +15,7 @@ class MetadataBuilder implements Builder
     private array $columnRequiredProperties;
 
     /** @var TableBuilder[] */
-    private array $tables;
+    private array $tables = [];
 
     public static function create(array $tableRequiredProperties = [], array $columnRequiredProperties = []): self
     {
