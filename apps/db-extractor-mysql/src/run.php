@@ -6,8 +6,7 @@ use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorLogger\Logger;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Keboola\Component\JsonHelper;
 use Monolog\Handler\NullHandler;
 
 require_once(dirname(__FILE__) . '/../vendor/autoload.php');
@@ -17,8 +16,6 @@ $logger = new Logger('ex-db-mysql');
 $runAction = true;
 
 try {
-    $jsonDecode = new JsonDecode([JsonDecode::ASSOCIATIVE => true]);
-
     $arguments = getopt('d::', ['data::']);
     if (!isset($arguments['data']) || !is_string($arguments['data'])) {
         throw new UserException('Data folder not set.');
@@ -26,10 +23,7 @@ try {
     $dataFolder = $arguments['data'];
 
     if (file_exists($dataFolder . '/config.json')) {
-        $config = $jsonDecode->decode(
-            (string) file_get_contents($dataFolder . '/config.json'),
-            JsonEncoder::FORMAT
-        );
+        $config = JsonHelper::readFile($dataFolder . '/config.json');
     } else {
         throw new UserException('Configuration file not found.');
     }
@@ -38,10 +32,7 @@ try {
     $inputState = [];
     $inputStateFile = $dataFolder . '/in/state.json';
     if (file_exists($inputStateFile)) {
-        $inputState = $jsonDecode->decode(
-            (string) file_get_contents($inputStateFile),
-            JsonEncoder::FORMAT
-        );
+        $inputState = JsonHelper::readFile($inputStateFile);
     }
 
     $app = new MySQLApplication(
@@ -59,13 +50,12 @@ try {
     $result = $app->run();
 
     if (!$runAction) {
-        echo json_encode($result);
+        echo JsonHelper::encode($result);
     } else {
         if (!empty($result['state'])) {
             // write state
             $outputStateFile = $dataFolder . '/out/state.json';
-            $jsonEncode = new \Symfony\Component\Serializer\Encoder\JsonEncode();
-            file_put_contents($outputStateFile, $jsonEncode->encode($result['state'], JsonEncoder::FORMAT));
+            JsonHelper::writeFile($outputStateFile, $result['state']);
         }
     }
     $app['logger']->log('info', 'Extractor finished successfully.');

@@ -18,8 +18,7 @@
         "keboola/php-datatypes": "^4.7",
         "keboola/php-temp": "^2.0",
         "keboola/php-utils": "^4.1",
-        "symfony/config": "^5.0",
-        "symfony/serializer": "^5.0"
+        "symfony/config": "^5.0"
     },
     "require-dev": {
         "keboola/coding-standard": ">=9.0.0",
