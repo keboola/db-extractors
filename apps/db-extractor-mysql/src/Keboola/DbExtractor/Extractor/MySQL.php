@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
-use Keboola\DbExtractor\Exception\ApplicationException;
-use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
-use Throwable;
 use PDO;
 use PDOException;
+use Throwable;
+use Keboola\DbExtractor\Exception\ApplicationException;
+use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
 use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
-use Keboola\DbExtractor\DbRetryProxy;
-use Keboola\DbExtractor\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Keboola\Datatype\Definition\MySQL;
 use Keboola\Temp\Temp;
 
 class MySQL extends BaseExtractor
@@ -183,141 +180,6 @@ class MySQL extends BaseExtractor
         return parent::export($exportConfig);
     }
 
-    public function getTables(?array $tables = null): array
-    {
-
-        $sql = 'SELECT * FROM INFORMATION_SCHEMA.TABLES as c';
-
-        $whereClause = " WHERE c.TABLE_SCHEMA != 'performance_schema' 
-                          AND c.TABLE_SCHEMA != 'mysql'
-                          AND c.TABLE_SCHEMA != 'information_schema'
-                          AND c.TABLE_SCHEMA != 'sys'";
-
-        if ($this->database) {
-            $whereClause = sprintf(' WHERE c.TABLE_SCHEMA = %s', $this->db->quote($this->database));
-        }
-
-        if (!is_null($tables) && count($tables) > 0) {
-            $whereClause .= sprintf(
-                ' AND c.TABLE_NAME IN (%s) AND c.TABLE_SCHEMA IN (%s)',
-                implode(',', array_map(function ($table) {
-                    return $this->db->quote($table['tableName']);
-                }, $tables)),
-                implode(',', array_map(function ($table) {
-                    return $this->db->quote($table['schema']);
-                }, $tables))
-            );
-        }
-
-        $sql .= $whereClause;
-        $arr = $this->runRetriableQuery($sql);
-        if (count($arr) === 0) {
-            return [];
-        }
-
-        /** @var Table[] $tableDefs */
-        $tableDefs = [];
-        $autoIncrements = [];
-        foreach ($arr as $table) {
-            $curTable = $table['TABLE_SCHEMA'] . '.' . $table['TABLE_NAME'];
-            $tableFormat = new Table();
-            $tableFormat
-                ->setName($table['TABLE_NAME'])
-                ->setSchema((isset($table['TABLE_SCHEMA'])) ? $table['TABLE_SCHEMA'] : '')
-                ->setType((isset($table['TABLE_TYPE'])) ? $table['TABLE_TYPE'] : '')
-                ->setRowCount((isset($table['TABLE_ROWS'])) ? (int) $table['TABLE_ROWS'] : null);
-
-            if (!empty($table['TABLE_COMMENT'])) {
-                $tableFormat->setDescription($table['TABLE_COMMENT']);
-            }
-
-            if (!empty($table['AUTO_INCREMENT'])) {
-                $autoIncrements[$curTable] = (int) $table['AUTO_INCREMENT'];
-            }
-
-            $tableDefs[$curTable] = $tableFormat;
-        }
-        ksort($tableDefs);
-
-        // add additional info
-        $foreignKeys = [];
-        if (!is_null($tables) && count($tables) > 0) {
-            $additionalSql = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
-                    CONSTRAINT_NAME, REFERENCED_TABLE_NAME, LOWER(REFERENCED_COLUMN_NAME) as REFERENCED_COLUMN_NAME, 
-                    REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS c ';
-
-            $rows = $this->runRetriableQuery($additionalSql . $whereClause);
-            foreach ($rows as $column) {
-                $foreignKey = new ForeignKey();
-                if (array_key_exists('CONSTRAINT_NAME', $column) && !is_null($column['CONSTRAINT_NAME'])) {
-                    $foreignKey->setName($column['CONSTRAINT_NAME']);
-                }
-                if (!array_key_exists('REFERENCED_TABLE_NAME', $column) || is_null($column['REFERENCED_TABLE_NAME'])) {
-                    continue;
-                }
-                $foreignKey
-                    ->setRefSchema($column['REFERENCED_TABLE_SCHEMA'])
-                    ->setRefTable($column['REFERENCED_TABLE_NAME'])
-                    ->setRefColumn($column['REFERENCED_COLUMN_NAME']);
-                $curTableName = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'] . '.' . $column['COLUMN_NAME'];
-                $foreignKeys[$curTableName] = $foreignKey;
-            }
-        }
-
-        $sql = 'SELECT c.* FROM INFORMATION_SCHEMA.COLUMNS as c';
-        $sql .= $whereClause;
-        $rows = $this->runRetriableQuery($sql);
-        foreach ($rows as $i => $column) {
-            $curTable = $column['TABLE_SCHEMA'] . '.' . $column['TABLE_NAME'];
-            $curColumn = $curTable . '.' . $column['COLUMN_NAME'];
-            $length = ($column['CHARACTER_MAXIMUM_LENGTH']) ? $column['CHARACTER_MAXIMUM_LENGTH'] : null;
-            if (is_null($length) && !is_null($column['NUMERIC_PRECISION'])) {
-                if ($column['NUMERIC_SCALE'] > 0) {
-                    $length = $column['NUMERIC_PRECISION'] . ',' . $column['NUMERIC_SCALE'];
-                } else {
-                    $length = $column['NUMERIC_PRECISION'];
-                }
-            }
-
-            $columnFormat = new TableColumn();
-            $columnFormat
-                ->setName($column['COLUMN_NAME'])
-                ->setType($column['DATA_TYPE'])
-                ->setPrimaryKey(($column['COLUMN_KEY'] === 'PRI') ? true : false)
-                ->setLength($length)
-                ->setNullable(($column['IS_NULLABLE'] === 'NO') ? false : true)
-                ->setDefault($column['COLUMN_DEFAULT'])
-                ->setOrdinalPosition((int) $column['ORDINAL_POSITION']);
-
-            if ($column['COLUMN_COMMENT']) {
-                $columnFormat->setDescription($column['COLUMN_COMMENT']);
-            }
-
-            if ($column['EXTRA']) {
-                if ($column['EXTRA'] === 'auto_increment') {
-                    $columnFormat->setAutoIncrement(true);
-                    if (isset($autoIncrements[$curTable])) {
-                        $columnFormat->setAutoIncrementValue($autoIncrements[$curTable]);
-                    }
-                }
-            }
-            if (isset($foreignKeys[$curColumn])) {
-                $columnFormat->setForeignKey($foreignKeys[$curColumn]);
-            }
-            $tableDefs[$curTable]->addColumn($columnFormat);
-        }
-        array_walk($tableDefs, function (Table &$item): void {
-            $item = $item->getOutput();
-            if (isset($item['columns'])) {
-                usort($item['columns'], function ($a, $b) {
-                    return (int) ($a['ordinalPosition'] > $b['ordinalPosition']);
-                });
-            }
-        });
-
-        return array_values($tableDefs);
-    }
-
     public function validateIncrementalFetching(ExportConfig $exportConfig): void
     {
         try {
@@ -420,40 +282,5 @@ class MySQL extends BaseExtractor
     private function quote(string $obj): string
     {
         return "`{$obj}`";
-    }
-
-    private function runRetriableQuery(string $query, array $values = []): array
-    {
-        $retryProxy = new DbRetryProxy($this->logger);
-        return $retryProxy->call(function () use ($query, $values) {
-            try {
-                $stmt = $this->db->prepare($query);
-                $stmt->execute($values);
-                return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            } catch (\Throwable $exception) {
-                $this->tryReconnect();
-                throw $exception;
-            }
-        });
-    }
-
-    private function tryReconnect(): void
-    {
-        try {
-            $this->isAlive();
-        } catch (DeadConnectionException $deadConnectionException) {
-            $reconnectionRetryProxy = new DbRetryProxy($this->logger, self::CONNECT_MAX_RETRIES, null, 1000);
-            try {
-                $this->db = $reconnectionRetryProxy->call(function () {
-                    return $this->createConnection($this->getDbParameters());
-                });
-            } catch (\Throwable $reconnectException) {
-                throw new UserException(
-                    'Unable to reconnect to the database: ' . $reconnectException->getMessage(),
-                    $reconnectException->getCode(),
-                    $reconnectException
-                );
-            }
-        }
     }
 }
