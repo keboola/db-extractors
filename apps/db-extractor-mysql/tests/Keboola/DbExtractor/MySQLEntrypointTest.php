@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use SplFileInfo;
+use Keboola\Csv\CsvReader;
 use Symfony\Component\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -26,13 +27,17 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config = $this->getConfig();
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
 
-        $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+        $csv2 = new SplFileInfo($this->dataDir . '/mysql/escaping.csv');
         $this->createTextTable($csv2);
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
@@ -65,7 +70,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         ];
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
@@ -81,7 +90,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         $config['action'] = 'testConnection';
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -108,7 +121,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         ];
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
         $this->assertJson($process->getOutput());
@@ -123,7 +140,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.json');
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
@@ -144,12 +165,16 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         @unlink($this->dataDir . '/config.json');
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
 
-        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
+        $expectedOutput = new SplFileInfo($this->dataDir . '/mysql/tableColumns.csv');
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
@@ -176,7 +201,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         // try exporting before the table exists
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->start();
 
@@ -187,7 +216,7 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         while ($process->isRunning()) {
             sleep(5);
             if (!$tableCreated) {
-                $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+                $csv1 = new SplFileInfo($this->dataDir . '/mysql/sales.csv');
                 $this->createTextTable($csv1, $table['tableName']);
                 $tableCreated = true;
             }
@@ -196,12 +225,12 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         // check that it had to retry at least 2x
         $this->assertStringContainsString('[2x]', $process->getOutput());
 
-        $expectedOutput = new CsvFile($this->dataDir . '/mysql/tableColumns.csv');
+        $expectedOutput = new SplFileInfo($this->dataDir . '/mysql/tableColumns.csv');
 
         $this->assertEquals(0, $process->getExitCode());
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest');
-        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileEquals($expectedOutput->getPathname(), $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }
 
@@ -220,18 +249,22 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
-        $expectedOutput = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+        $expectedOutput = new SplFileInfo($this->dataDir . '/mysql/escaping.csv');
 
         $this->assertEquals(0, $process->getExitCode());
         // state file should not be written if state is empty
-        $this->assertFileNotExists($outputStateFile);
+        $this->assertFileDoesNotExist($outputStateFile);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($this->dataDir . '/out/tables/in.c-main.escaping.csv.manifest');
-        $this->assertFileEquals((string) $expectedOutput, $outputCsvFile);
+        $this->assertFileEquals($expectedOutput->getPathname(), $outputCsvFile);
         $this->assertFileExists($outputCsvFile);
     }
 
@@ -267,7 +300,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 
@@ -282,7 +319,11 @@ class MySQLEntrypointTest extends AbstractMySQLTest
         file_put_contents($inputStateFile, file_get_contents($outputStateFile));
 
         // run the config again
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline(
+            'php ' . $this->rootPath . '/src/run.php',
+            null,
+            ['KBC_DATADIR' => $this->dataDir]
+        );
         $process->setTimeout(300);
         $process->run();
 

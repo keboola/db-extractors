@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Csv\CsvReader;
+use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Extractor\MySQL;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\Component\Logger;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Filesystem\Filesystem;
@@ -16,6 +17,8 @@ use PDO;
 abstract class AbstractMySQLTest extends ExtractorTest
 {
     public const DRIVER = 'mysql';
+
+    protected string $dataDir = __DIR__ . '/../../data';
 
     /** @var PDO */
     protected $pdo;
@@ -103,7 +106,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $config;
     }
 
-    protected function generateTableName(CsvFile $file): string
+    protected function generateTableName(SplFileInfo $file): string
     {
         $tableName = sprintf(
             '%s',
@@ -113,7 +116,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $tableName;
     }
 
-    protected function createTextTable(CsvFile $file, ?string $tableName = null, ?string $schemaName = null): void
+    protected function createTextTable(SplFileInfo $file, ?string $tableName = null, ?string $schemaName = null): void
     {
         if (!$tableName) {
             $tableName = $this->generateTableName($file);
@@ -131,6 +134,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
             $tableName
         ));
 
+        $csv = new CsvReader($file->getPathname());
         $this->pdo->exec(sprintf(
             'CREATE TABLE %s.%s (%s) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;',
             $schemaName,
@@ -139,7 +143,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
                 ', ',
                 array_map(function ($column) {
                     return $column . ' text NULL';
-                }, $file->getHeader())
+                }, $csv->getHeader())
             )
         ));
 
@@ -156,16 +160,10 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec($query);
 
         $count = $this->pdo->query(sprintf('SELECT COUNT(*) AS itemsCount FROM %s.%s', $schemaName, $tableName))->fetchColumn();
-        $this->assertEquals($this->countTable($file), (int) $count);
+        $this->assertEquals($this->countTable($csv), (int) $count);
     }
 
-    /**
-     * Count records in CSV (with headers)
-     *
-     * @param CsvFile $file
-     * @return int
-     */
-    protected function countTable(CsvFile $file): int
+    protected function countTable(CsvReader $file): int
     {
         $linesCount = 0;
         foreach ($file as $i => $line) {
@@ -182,7 +180,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     public function createApplication(array $config, array $state = []): MySQLApplication
     {
-        $logger = new Logger('ex-db-mysql-tests');
+        $logger = new Logger();
         $app = new MySQLApplication($config, $logger, $state, $this->dataDir);
 
         return $app;
@@ -217,400 +215,205 @@ abstract class AbstractMySQLTest extends ExtractorTest
     {
         if ($schema === 'temp_schema') {
             if ($table === 'ext_sales') {
-                return array (
+                return [
                     0 =>
-                        array (
+                        [
                             'name' => 'usergender',
-                            'sanitizedName' => 'usergender',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 1,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     1 =>
-                        array (
+                        [
                             'name' => 'usercity',
-                            'sanitizedName' => 'usercity',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 2,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     2 =>
-                        array (
+                        [
                             'name' => 'usersentiment',
-                            'sanitizedName' => 'usersentiment',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 3,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     3 =>
-                        array (
+                        [
                             'name' => 'zipcode',
-                            'sanitizedName' => 'zipcode',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 4,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     4 =>
-                        array (
+                        [
                             'name' => 'sku',
-                            'sanitizedName' => 'sku',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 5,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     5 =>
-                        array (
+                        [
                             'name' => 'createdat',
-                            'sanitizedName' => 'createdat',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 6,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     6 =>
-                        array (
+                        [
                             'name' => 'category',
-                            'sanitizedName' => 'category',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 7,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     7 =>
-                        array (
+                        [
                             'name' => 'price',
-                            'sanitizedName' => 'price',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 8,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     8 =>
-                        array (
+                        [
                             'name' => 'county',
-                            'sanitizedName' => 'county',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 9,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     9 =>
-                        array (
+                        [
                             'name' => 'countycode',
-                            'sanitizedName' => 'countycode',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 10,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     10 =>
-                        array (
+                        [
                             'name' => 'userstate',
-                            'sanitizedName' => 'userstate',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 11,
-                            'uniqueKey' => false,
-                        ),
+                        ],
                     11 =>
-                        array (
+                        [
                             'name' => 'categorygroup',
-                            'sanitizedName' => 'categorygroup',
                             'type' => 'text',
                             'primaryKey' => false,
-                            'length' => '65535',
-                            'nullable' => true,
-                            'ordinalPosition' => 12,
-                            'uniqueKey' => false,
-                        ),
-                );
+                        ],
+                ];
             } else {
                 throw new UserException(sprintf('Unexpected test table %s in schema %s', $table, $schema));
             }
         } else if ($schema === 'test') {
             switch ($table) {
                 case 'sales':
-                    return array (
-                        0 =>
-                            array (
-                                'name' => 'usergender',
-                                'sanitizedName' => 'usergender',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 1,
-                                'uniqueKey' => false,
-                            ),
-                        1 =>
-                            array (
-                                'name' => 'usercity',
-                                'sanitizedName' => 'usercity',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 2,
-                                'uniqueKey' => false,
-                            ),
-                        2 =>
-                            array (
-                                'name' => 'usersentiment',
-                                'sanitizedName' => 'usersentiment',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 3,
-                                'uniqueKey' => false,
-                            ),
-                        3 =>
-                            array (
-                                'name' => 'zipcode',
-                                'sanitizedName' => 'zipcode',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 4,
-                                'uniqueKey' => false,
-                            ),
-                        4 =>
-                            array (
-                                'name' => 'sku',
-                                'sanitizedName' => 'sku',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 5,
-                                'uniqueKey' => false,
-                            ),
-                        5 =>
-                            array (
-                                'name' => 'createdat',
-                                'sanitizedName' => 'createdat',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 6,
-                                'uniqueKey' => false,
-                            ),
-                        6 =>
-                            array (
-                                'name' => 'category',
-                                'sanitizedName' => 'category',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 7,
-                                'uniqueKey' => false,
-                            ),
-                        7 =>
-                            array (
-                                'name' => 'price',
-                                'sanitizedName' => 'price',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 8,
-                                'uniqueKey' => false,
-                            ),
-                        8 =>
-                            array (
-                                'name' => 'county',
-                                'sanitizedName' => 'county',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 9,
-                                'uniqueKey' => false,
-                            ),
-                        9 =>
-                            array (
-                                'name' => 'countycode',
-                                'sanitizedName' => 'countycode',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 10,
-                                'uniqueKey' => false,
-                            ),
-                        10 =>
-                            array (
-                                'name' => 'userstate',
-                                'sanitizedName' => 'userstate',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 11,
-                                'uniqueKey' => false,
-                            ),
-                        11 =>
-                            array (
-                                'name' => 'categorygroup',
-                                'sanitizedName' => 'categorygroup',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 12,
-                                'uniqueKey' => false,
-                            ),
-                    );
+                    return [
+                        [
+                            'name' => 'usergender',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'usercity',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'usersentiment',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'zipcode',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'sku',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'createdat',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'category',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'price',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'county',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'countycode',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'userstate',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'categorygroup',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                    ];
                 case 'escaping':
-                    return array (
-                        0 =>
-                            array (
-                                'name' => 'col1',
-                                'sanitizedName' => 'col1',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 1,
-                                'uniqueKey' => false,
-                            ),
-                        1 =>
-                            array (
-                                'name' => 'col2',
-                                'sanitizedName' => 'col2',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 2,
-                                'uniqueKey' => false,
-                            ),
-                    );
+                    return [
+                        [
+                            'name' => 'col1',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'col2',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                    ];
                 case 'emoji':
-                    return array (
-                        0 =>
-                            array (
-                                'name' => 'emoji',
-                                'sanitizedName' => 'emoji',
-                                'type' => 'text',
-                                'primaryKey' => false,
-                                'uniqueKey' => false,
-                                'length' => '65535',
-                                'nullable' => true,
-                                'ordinalPosition' => 1,
-                            ),
-                    );
+                    return [
+                        [
+                            'name' => 'emoji',
+                            'type' => 'text',
+                            'primaryKey' => false,
+                        ],
+                    ];
                 case 'auto_increment_timestamp':
-                    return array (
-                        0 =>
-                            array (
-                                'name' => '_weird-I-d',
-                                'sanitizedName' => 'weird_I_d',
-                                'type' => 'int',
-                                'primaryKey' => true,
-                                'length' => '10',
-                                'nullable' => false,
-                                'ordinalPosition' => 1,
-                                'autoIncrement' => true,
-                                'description' => 'This is a weird ID',
-                                'uniqueKey' => false,
-                                'autoIncrementValue' => 3,
-                            ),
-                        1 =>
-                            array (
-                                'name' => 'weird-Name',
-                                'sanitizedName' => 'weird_Name',
-                                'type' => 'varchar',
-                                'primaryKey' => false,
-                                'length' => '30',
-                                'nullable' => false,
-                                'default' => 'pam',
-                                'ordinalPosition' => 2,
-                                'description' => 'This is a weird name',
-                                'uniqueKey' => false,
-                            ),
-                        2 =>
-                            array (
-                                'name' => 'timestamp',
-                                'sanitizedName' => 'timestamp',
-                                'type' => 'timestamp',
-                                'primaryKey' => false,
-                                'nullable' => false,
-                                'default' => 'CURRENT_TIMESTAMP',
-                                'ordinalPosition' => 3,
-                                'description' => 'This is a timestamp',
-                                'uniqueKey' => false,
-                            ),
-                        3 =>
-                            array (
-                                'name' => 'datetime',
-                                'sanitizedName' => 'datetime',
-                                'type' => 'datetime',
-                                'primaryKey' => false,
-                                'nullable' => false,
-                                'default' => 'CURRENT_TIMESTAMP',
-                                'ordinalPosition' => 4,
-                                'description' => 'This is a datetime',
-                                'uniqueKey' => false,
-                            ),
-                        4 =>
-                            array (
-                                'name' => 'intColumn',
-                                'sanitizedName' => 'intColumn',
-                                'type' => 'int',
-                                'primaryKey' => false,
-                                'length' => '10',
-                                'nullable' => true,
-                                'default' => '1',
-                                'ordinalPosition' => 5,
-                                'uniqueKey' => false,
-                            ),
-                        5 =>
-                            array (
-                                'name' => 'decimalColumn',
-                                'sanitizedName' => 'decimalColumn',
-                                'type' => 'decimal',
-                                'primaryKey' => false,
-                                'length' => '10,2',
-                                'nullable' => true,
-                                'default' => '10.20',
-                                'ordinalPosition' => 6,
-                                'uniqueKey' => false,
-                            ),
-                    );
+                    return [
+                        [
+                            'name' => '_weird-I-d',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'weird-Name',
+                            'type' => 'varchar',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'timestamp',
+                            'type' => 'timestamp',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'datetime',
+                            'type' => 'datetime',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'intColumn',
+                            'type' => 'int',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'decimalColumn',
+                            'type' => 'decimal',
+                            'primaryKey' => false,
+                        ],
+                    ];
             }
-        } else {
-            throw new UserException(sprintf('Unexpected schema %s', $schema));
         }
+
+        throw new UserException(sprintf('Unexpected schema %s', $schema));
     }
 }

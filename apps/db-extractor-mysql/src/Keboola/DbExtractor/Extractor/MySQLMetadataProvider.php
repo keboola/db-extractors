@@ -106,6 +106,7 @@ class MySQLMetadataProvider implements MetadataProvider
         if (isset($data['REFERENCED_TABLE_NAME'])) {
             $builder
                 ->addForeignKey()
+                ->setName($data['CONSTRAINT_NAME'])
                 ->setRefSchema($data['REFERENCED_TABLE_SCHEMA'])
                 ->setRefTable($data['REFERENCED_TABLE_NAME'])
                 ->setRefColumn($data['REFERENCED_COLUMN_NAME']);
@@ -124,6 +125,7 @@ class MySQLMetadataProvider implements MetadataProvider
         // Basic values
         $builder
             ->setName($data['COLUMN_NAME'])
+            ->setDescription($data['COLUMN_COMMENT'])
             ->setOrdinalPosition((int) $data['ORDINAL_POSITION'])
             ->setType($data['DATA_TYPE'])
             ->setPrimaryKey($data['COLUMN_KEY'] === 'PRI')

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use SplFileInfo;
 
 class MySQLSSLTest extends AbstractMySQLTest
 {
@@ -50,10 +50,10 @@ class MySQLSSLTest extends AbstractMySQLTest
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/mysql/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/mysql/sales.csv');
         $this->createTextTable($csv1);
 
-        $csv2 = new CsvFile($this->dataDir . '/mysql/escaping.csv');
+        $csv2 = new SplFileInfo($this->dataDir . '/mysql/escaping.csv');
         $this->createTextTable($csv2);
 
         $result = $app->run();

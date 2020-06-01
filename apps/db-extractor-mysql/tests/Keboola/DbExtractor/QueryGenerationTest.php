@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Extractor\MySQL;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\Component\Logger;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
 class QueryGenerationTest extends AbstractMySQLTest
 {
-    /** @var array */
-    private $config;
-
     public function setUp(): void
     {
         $this->dataDir = __DIR__ . '/../../data';
-        $this->config = $this->getConfigRow(self::DRIVER);
     }
 
     /**
@@ -23,16 +20,17 @@ class QueryGenerationTest extends AbstractMySQLTest
      */
     public function testGetSimplifiedPdoQuery(array $params, array $state, string $expected): void
     {
-        $extractor = new MySQL($this->config['parameters'], $state, new Logger('mssql-extractor-test'));
+        $config = $this->getConfigRow(self::DRIVER);
+        $config['parameters'] = array_merge($config['parameters'], $params);
+        $config['parameters']['query'] = empty($config['parameters']['table']) ?
+            $config['parameters']['query'] : null;
 
-        if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
-            $extractor->validateIncrementalFetching(
-                $params['table'],
-                $params['incrementalFetchingColumn'],
-                isset($params['incrementalFetchingLimit']) ? $params['incrementalFetchingLimit'] : null
-            );
+        $exportConfig = ExportConfig::fromArray($config['parameters']);
+        $extractor = new MySQL($config['parameters'], $state, new Logger());
+        if ($exportConfig->isIncrementalFetching()) {
+            $extractor->validateIncrementalFetching($exportConfig);
         }
-        $query = $extractor->simpleQuery($params['table'], $params['columns']);
+        $query = $extractor->simpleQuery($exportConfig);
         $this->assertEquals($expected, $query);
     }
 
@@ -83,6 +81,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                         'schema' => 'test',
                     ],
                     'columns' => [],
+                    'incremental' => true,
                     'incrementalFetchingLimit' => 10,
                     'incrementalFetchingColumn' => 'timestamp',
                 ],
@@ -97,6 +96,7 @@ class QueryGenerationTest extends AbstractMySQLTest
                         'schema' => 'test',
                     ],
                     'columns' => [],
+                    'incremental' => true,
                     'incrementalFetchingLimit' => 10,
                     'incrementalFetchingColumn' => '_weird-I-d',
                 ],
@@ -113,13 +113,14 @@ class QueryGenerationTest extends AbstractMySQLTest
                         'schema' => 'test',
                     ],
                     'columns' => [],
+                    'incremental' => true,
                     'incrementalFetchingLimit' => null,
                     'incrementalFetchingColumn' => 'timestamp',
                 ],
                 [],
                 'SELECT * FROM `test`.`auto_increment_timestamp` ORDER BY `timestamp`',
             ],
-            // test simplePDO query id column and previos state and no limit
+            // test simplePDO query id column and previous state and no limit
             [
                 [
                     'table' => [
@@ -127,7 +128,8 @@ class QueryGenerationTest extends AbstractMySQLTest
                         'schema' => 'test',
                     ],
                     'columns' => [],
-                    'incrementalFetchingLimit' => 0,
+                    'incremental' => true,
+                    'incrementalFetchingLimit' => null,
                     'incrementalFetchingColumn' => '_weird-I-d',
                 ],
                 [

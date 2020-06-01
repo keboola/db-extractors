@@ -7,7 +7,6 @@ namespace Keboola\DbExtractor\Extractor;
 use PDO;
 use PDOException;
 use Throwable;
-use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
 use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
@@ -24,13 +23,9 @@ class MySQL extends BaseExtractor
     // See https://wiki.debian.org/ContinuousIntegration/TriagingTips/openssl-1.1.1
     // So we reset this value to OpenSSL default.
     public const SSL_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
-    public const INCREMENT_TYPE_NUMERIC = 'numeric';
-    public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
-    public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
+    public const INCREMENTAL_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT', 'TIMESTAMP'];
 
     protected ?string $database = null;
-
-    protected string $incrementalFetchingColType;
 
     public function getMetadataProvider(): MetadataProvider
     {
@@ -167,7 +162,9 @@ class MySQL extends BaseExtractor
     public function export(ExportConfig $exportConfig): array
     {
         // if database set make sure the database and selected table schema match
-        if ($this->database && $this->database !== $exportConfig->getTable()->getSchema()) {
+        if ($this->database && $exportConfig->hasTable() &&
+            $this->database !== $exportConfig->getTable()->getSchema()
+        ) {
             throw new UserException(sprintf(
                 'Invalid Configuration [%s].  The table schema "%s" is different from the connection database "%s"',
                 $exportConfig->getTable()->getName(),
@@ -190,7 +187,7 @@ class MySQL extends BaseExtractor
         } catch (ColumnNotFoundException $e) {
             throw new UserException(
                 sprintf(
-                    'Column [%s] specified for incremental fetching was not found in the table',
+                    'Column "%s" specified for incremental fetching was not found in the table',
                     $exportConfig->getIncrementalFetchingColumn()
                 )
             );
@@ -198,20 +195,23 @@ class MySQL extends BaseExtractor
 
         try {
             $datatype = new MysqlDatatype($column->getType());
-            if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
-                $this->incrementalFetchingColType = self::INCREMENT_TYPE_NUMERIC;
-            } else if ($datatype->getBasetype() === 'TIMESTAMP') {
-                $this->incrementalFetchingColType = self::INCREMENT_TYPE_TIMESTAMP;
-            } else {
-                throw new UserException('invalid incremental fetching column type');
-            }
-        } catch (InvalidLengthException | UserException $exception) {
+            $type = $datatype->getBasetype();
+        } catch (InvalidLengthException $e) {
             throw new UserException(
                 sprintf(
-                    'Column [%s] specified for incremental fetching is not a numeric or timestamp type column',
+                    'Column "%s" specified for incremental fetching must has numeric or timestamp type.',
                     $exportConfig->getIncrementalFetchingColumn()
                 )
             );
+        }
+
+        if (!in_array($type, self::INCREMENTAL_TYPES, true)) {
+            throw new UserException(sprintf(
+                'Column "%s" specified for incremental fetching has unexpected type "%s", expected: "%s".',
+                $exportConfig->getIncrementalFetchingColumn(),
+                $datatype->getBasetype(),
+                implode('", "', self::INCREMENTAL_TYPES),
+            ));
         }
     }
 
@@ -248,28 +248,17 @@ class MySQL extends BaseExtractor
         );
 
         if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
-            if ($this->incrementalFetchingColType === self::INCREMENT_TYPE_NUMERIC) {
-                $sql[] = sprintf(
-                    // intentionally ">=" last row should be included, it is handled by storage deduplication process
-                    'WHERE %s >= %d',
-                    $this->quote($exportConfig->getIncrementalFetchingColumn()),
-                    (int) $this->state['lastFetchedRow']
-                );
-            } else if ($this->incrementalFetchingColType === self::INCREMENT_TYPE_TIMESTAMP) {
-                $sql[] = sprintf(
-                    // intentionally ">=" last row should be included, it is handled by storage deduplication process
-                    'WHERE %s >= \'%s\'',
-                    $this->quote($exportConfig->getIncrementalFetchingColumn()),
-                    $this->state['lastFetchedRow']
-                );
-            } else {
-                throw new ApplicationException(
-                    sprintf('Unknown incremental fetching column type %s', $this->incrementalFetchingColType)
-                );
-            }
+            $sql[] = sprintf(
+            // intentionally ">=" last row should be included, it is handled by storage deduplication process
+                'WHERE %s >= %s',
+                $this->quote($exportConfig->getIncrementalFetchingColumn()),
+                $this->db->quote((string) $this->state['lastFetchedRow'])
+            );
         }
 
-        $sql[] = sprintf('ORDER BY %s', $this->quote($exportConfig->getIncrementalFetchingColumn()));
+        if ($exportConfig->isIncrementalFetching()) {
+            $sql[] = sprintf('ORDER BY %s', $this->quote($exportConfig->getIncrementalFetchingColumn()));
+        }
 
         if ($exportConfig->hasIncrementalFetchingLimit()) {
             $sql[] = sprintf('LIMIT %d', $exportConfig->getIncrementalFetchingLimit());
