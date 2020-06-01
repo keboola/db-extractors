@@ -9,17 +9,17 @@ use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlTablesNode;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractorConfig\Config;
+use Psr\Log\LoggerInterface;
 
 class MySQLApplication extends Application
 {
-    public function __construct(array $config, ?Logger $logger = null, array $state = [], string $dataDir = '/data/')
+    public function __construct(array $config, LoggerInterface $logger, array $state = [], string $dataDir = '/data/')
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'MySQL';
 
-        parent::__construct($config, ($logger) ? $logger : new Logger('ex-db-mysql'), $state);
+        parent::__construct($config, $logger, $state);
     }
 
     protected function buildConfig(array $config): void
