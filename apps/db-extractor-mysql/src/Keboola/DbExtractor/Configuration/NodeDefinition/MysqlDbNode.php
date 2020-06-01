@@ -11,36 +11,23 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 class MysqlDbNode extends DbNode
 {
-    /** @var NodeDefinition */
-    protected $sslNode;
+    protected NodeDefinition $sslNode;
 
     public function __construct(?SshNode $sshNode = null, ?NodeParentInterface $parent = null)
     {
         $this->sslNode = new MysqlSslNode();
-
         parent::__construct($sshNode, $parent);
     }
 
     protected function init(): void
     {
+        parent::init();
+
         // @formatter:off
         $this
             ->children()
-                ->scalarNode('driver')->end()
-                ->scalarNode('host')->end()
-                ->scalarNode('port')->end()
-                ->scalarNode('database')->end()
-                ->scalarNode('user')
-                    ->isRequired()
-                ->end()
-                ->scalarNode('#password')
-                    ->isRequired()
-                ->end()
-                ->append($this->sshNode)
                 ->append($this->sslNode)
-                ->booleanNode('networkCompression')->defaultValue(false)->end()
-            ->end()
-        ;
+                ->booleanNode('networkCompression')->defaultValue(false)->end();
         // @formatter:on
     }
 }

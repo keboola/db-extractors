@@ -28,14 +28,13 @@ class MySQL extends BaseExtractor
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
 
-    /** @var  string -- database name from connection parameters */
-    protected $database;
+    protected ?string $database = null;
 
     protected string $incrementalFetchingColType;
 
     public function getMetadataProvider(): MetadataProvider
     {
-        return new MySQLMetadataProvider();
+        return new MySQLMetadataProvider($this->db, $this->database);
     }
 
     private function createSSLFile(string $sslCa, Temp $temp): string
