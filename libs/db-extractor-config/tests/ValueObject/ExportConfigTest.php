@@ -209,6 +209,10 @@ class ExportConfigTest extends TestCase
         Assert::assertSame(true, $config->isIncrementalFetching());
         Assert::assertSame('col123', $config->getIncrementalFetchingConfig()->getColumn());
         Assert::assertSame('col123', $config->getIncrementalFetchingColumn());
+
+        Assert::assertFalse($config->hasIncrementalFetchingLimit());
+        Assert::assertFalse($config->getIncrementalFetchingConfig()->hasLimit());
+
         try {
             $config->getIncrementalFetchingConfig()->getLimit();
             Assert::fail('Exception is expected.');
@@ -238,6 +242,9 @@ class ExportConfigTest extends TestCase
             'incrementalFetchingColumn' => 'col123',
             'incrementalFetchingLimit' => 456,
         ]);
+
+        Assert::assertTrue($config->hasIncrementalFetchingLimit());
+        Assert::assertTrue($config->getIncrementalFetchingConfig()->hasLimit());
 
         // Incremental fetching
         Assert::assertSame(true, $config->isIncrementalFetching());
