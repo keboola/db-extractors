@@ -2,26 +2,18 @@
 
 declare(strict_types=1);
 
-use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\Component\Logger;
 use Keboola\Component\JsonHelper;
-use Monolog\Handler\NullHandler;
+use \Keboola\DbExtractor\MySQLApplication;
+use Keboola\CommonExceptions\UserExceptionInterface;
 
-require_once(dirname(__FILE__) . '/../vendor/autoload.php');
+require __DIR__ . '/../vendor/autoload.php';
 
-$logger = new Logger('ex-db-mysql');
-
-$runAction = true;
+$logger = new Logger();
 
 try {
-    $arguments = getopt('d::', ['data::']);
-    if (!isset($arguments['data']) || !is_string($arguments['data'])) {
-        throw new UserException('Data folder not set.');
-    }
-    $dataFolder = $arguments['data'];
-
+    $dataFolder = getenv('KBC_DATADIR') === false ? '/data/' : (string) getenv('KBC_DATADIR');
     if (file_exists($dataFolder . '/config.json')) {
         $config = JsonHelper::readFile($dataFolder . '/config.json');
     } else {
@@ -29,42 +21,28 @@ try {
     }
 
     // get the state
-    $inputState = [];
     $inputStateFile = $dataFolder . '/in/state.json';
     if (file_exists($inputStateFile)) {
         $inputState = JsonHelper::readFile($inputStateFile);
+    } else {
+        $inputState = [];
     }
 
-    $app = new MySQLApplication(
-        $config,
-        $logger,
-        $inputState,
-        $dataFolder
-    );
-
-    if ($app['action'] !== 'run') {
-        $app['logger']->setHandlers(array(new NullHandler(Logger::INFO)));
-        $runAction = false;
-    }
-
+    $app = new MySQLApplication($config, $logger, $inputState, $dataFolder);
     $result = $app->run();
 
-    if (!$runAction) {
+    if ($app['action'] !== 'run') {
+        // Print sync action result
         echo JsonHelper::encode($result);
-    } else {
-        if (!empty($result['state'])) {
-            // write state
-            $outputStateFile = $dataFolder . '/out/state.json';
-            JsonHelper::writeFile($outputStateFile, $result['state']);
-        }
+    } else if (!empty($result['state'])) {
+        // Write state if present
+        $outputStateFile = $dataFolder . '/out/state.json';
+        JsonHelper::writeFile($outputStateFile, $result['state']);
     }
-    $app['logger']->log('info', 'Extractor finished successfully.');
+    $logger->log('info', 'Extractor finished successfully.');
     exit(0);
-} catch (UserException|ConfigUserException $e) {
-    $logger->log('error', $e->getMessage());
-    if (!$runAction) {
-        echo $e->getMessage();
-    }
+} catch (UserExceptionInterface $e) {
+    $logger->error($e->getMessage());
     exit(1);
 } catch (\Throwable $e) {
     $logger->critical(
@@ -74,7 +52,7 @@ try {
             'errLine' => $e->getLine(),
             'errCode' => $e->getCode(),
             'errTrace' => $e->getTraceAsString(),
-            'errPrevious' => is_object($e->getPrevious()) ? get_class($e->getPrevious()) : '',
+            'errPrevious' => $e->getPrevious() ? get_class($e->getPrevious()) : '',
         ]
     );
     exit(2);
