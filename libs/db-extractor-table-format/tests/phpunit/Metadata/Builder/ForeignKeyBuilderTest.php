@@ -17,6 +17,7 @@ class ForeignKeyBuilderTest extends BaseBuilderTest
     public function getAllProperties(): array
     {
         return [
+            'name',
             'refSchema',
             'refTable',
             'refColumn',
@@ -41,6 +42,7 @@ class ForeignKeyBuilderTest extends BaseBuilderTest
     public function getEmptyStringNotAllowedProperties(): array
     {
         return [
+            'name',
             'refSchema',
             'refTable',
             'refColumn',
@@ -60,6 +62,9 @@ class ForeignKeyBuilderTest extends BaseBuilderTest
     public function getSetCallbacks(): array
     {
         return [
+            'name' => function (ForeignKeyBuilder $builder, $v) {
+                return $builder->setName($v);
+            },
             'refSchema' => function (ForeignKeyBuilder $builder, $v) {
                 return $builder->setRefSchema($v);
             },
@@ -74,12 +79,22 @@ class ForeignKeyBuilderTest extends BaseBuilderTest
 
     public function getHasCallbacks(): array
     {
-        return [];
+        return [
+            'name' => function (ForeignKey $column) {
+                return $column->hasName();
+            },
+            'refSchema' => function (ForeignKey $column) {
+                return $column->hasRefSchema();
+            },
+        ];
     }
 
     public function getGetCallbacks(): array
     {
         return [
+            'name' => function (ForeignKey $column) {
+                return $column->getName();
+            },
             'refSchema' => function (ForeignKey $column) {
                 return $column->getRefSchema();
             },
@@ -96,6 +111,7 @@ class ForeignKeyBuilderTest extends BaseBuilderTest
     {
         return [
             [
+                'name' => 'name',
                 'refSchema' => 'schema',
                 'refTable' => 'table',
                 'refColumn' => 'column',

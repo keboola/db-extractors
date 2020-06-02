@@ -200,4 +200,100 @@ class DefaultManifestSerializerTest extends TestCase
 
         Assert::assertEquals($expectedOutput, $this->serializer->serializeColumn($column));
     }
+
+    public function testColumnFk(): void
+    {
+        $columnBuilder = ColumnBuilder::create()
+            ->setName('some_fk')
+            ->setType('varchar')
+            ->setLength('155')
+            ->setNullable(false)
+            ->setDefault('abc')
+            ->setUniqueKey(true)
+            ->setOrdinalPosition(2)
+            ->addConstraint('abc')
+            ->addConstraint('def');
+
+        $columnBuilder
+            ->addForeignKey()
+            ->setName('fk_123')
+            ->setRefSchema('ref_schema')
+            ->setRefTable('ref_table')
+            ->setRefColumn('ref_column');
+
+        $column = $columnBuilder->build();
+
+        $expectedOutput = [
+            [
+                'key' => 'KBC.datatype.type',
+                'value' => 'varchar',
+            ],
+            [
+                'key' => 'KBC.datatype.nullable',
+                'value' => false,
+            ],
+            [
+                'key' => 'KBC.datatype.basetype',
+                'value' => 'STRING',
+            ],
+            [
+                'key' => 'KBC.datatype.length',
+                'value' => '155',
+            ],
+            [
+                'key' => 'KBC.datatype.default',
+                'value' => 'abc',
+            ],
+            [
+                'key' => 'KBC.sourceName',
+                'value' => 'some_fk',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'some_fk',
+            ],
+            [
+                'key' => 'KBC.primaryKey',
+                'value' => false,
+            ],
+            [
+                'key' => 'KBC.uniqueKey',
+                'value' => true,
+            ],
+            [
+                'key' => 'KBC.ordinalPosition',
+                'value' => '2',
+            ],
+            [
+                'key' => 'KBC.foreignKey',
+                'value' => true,
+            ],
+            [
+                'key' => 'KBC.foreignKeyName',
+                'value' => 'fk_123',
+            ],
+            [
+                'key' => 'KBC.foreignKeyRefSchema',
+                'value' => 'ref_schema',
+            ],
+            [
+                'key' => 'KBC.foreignKeyRefTable',
+                'value' => 'ref_table',
+            ],
+            [
+                'key' => 'KBC.foreignKeyRefColumn',
+                'value' => 'ref_column',
+            ],
+            [
+                'key' => 'KBC.constraintName',
+                'value' => 'abc',
+            ],
+            [
+                'key' => 'KBC.constraintName',
+                'value' => 'def',
+            ],
+        ];
+
+        Assert::assertEquals($expectedOutput, $this->serializer->serializeColumn($column));
+    }
 }

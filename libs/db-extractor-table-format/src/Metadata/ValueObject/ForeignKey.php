@@ -10,6 +10,8 @@ use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
 class ForeignKey implements ValueObject
 {
+    private ?string $name;
+
     private ?string $refSchema;
 
     private string $refTable;
@@ -19,8 +21,12 @@ class ForeignKey implements ValueObject
     /**
      * @internal Should be created using ForeignKeyBuilder, don't call it directly!
      */
-    public function __construct(?string $refSchema, string $refTable, string $refColumn)
+    public function __construct(?string $name, ?string $refSchema, string $refTable, string $refColumn)
     {
+        if ($name !== null && empty($name)) {
+            throw new InvalidArgumentException('Name of foreign key cannot be empty string.');
+        }
+
         if ($refSchema !== null && empty($refSchema)) {
             throw new InvalidArgumentException('Ref schema of foreign key cannot be empty string.');
         }
@@ -33,9 +39,24 @@ class ForeignKey implements ValueObject
             throw new InvalidArgumentException('Ref column cannot be empty.');
         }
 
+        $this->name = $name;
         $this->refSchema = $refSchema;
         $this->refTable = $refTable;
         $this->refColumn = $refColumn;
+    }
+
+    public function hasName(): bool
+    {
+        return $this->name !== null;
+    }
+
+    public function getName(): string
+    {
+        if ($this->name === null) {
+            throw new PropertyNotSetException('Name is not set.');
+        }
+
+        return $this->name;
     }
 
     public function hasRefSchema(): bool
