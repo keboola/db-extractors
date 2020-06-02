@@ -56,8 +56,21 @@ class DefaultManifestSerializer implements ManifestSerializer
             'sourceName' => $column->getName(),
             'sanitizedName' => $column->getSanitizedName(),
             'primaryKey' => $column->isPrimaryKey(),
+            'uniqueKey' => $column->isUniqueKey(),
             'ordinalPosition' => $column->hasOrdinalPosition() ? $column->getOrdinalPosition() : null,
+            'autoIncrement' => $column->isAutoIncrement() ?: null,
+            'autoIncrementValue' => $column->hasAutoIncrementValue() ? $column->getAutoIncrementValue() : null,
         ];
+
+        // Foreign key
+        if ($column->hasForeignKey()) {
+            $fk = $column->getForeignKey();
+            $nonDatatypeMetadata['foreignKey'] = true;
+            $nonDatatypeMetadata['foreignKeyName'] = $fk->hasName() ? $fk->getName() : null;
+            $nonDatatypeMetadata['foreignKeyRefSchema'] = $fk->hasRefSchema() ? $fk->getRefSchema() : null;
+            $nonDatatypeMetadata['foreignKeyRefTable'] = $fk->getRefTable();
+            $nonDatatypeMetadata['foreignKeyRefColumn'] = $fk->getRefColumn();
+        }
 
         foreach ($nonDatatypeMetadata as $key => $value) {
             if ($value === null) {

@@ -19,7 +19,9 @@ class ForeignKeyBuilder implements Builder
     /**
      * List of properties that can be marked as required through the constructor.
      */
-    public const OPTIONAL_REQUIRED_PROPERTIES = ['refSchema'];
+    public const OPTIONAL_REQUIRED_PROPERTIES = ['name', 'refSchema'];
+
+    private ?string $name = null;
 
     private ?string $refSchema = null;
 
@@ -45,10 +47,23 @@ class ForeignKeyBuilder implements Builder
     {
         $this->checkRequiredProperties();
         return new ForeignKey(
+            $this->name,
             $this->refSchema,
             $this->refTable,
             $this->refColumn
         );
+    }
+
+    public function setName(string $name): self
+    {
+        $name = trim($name);
+
+        if (empty($name)) {
+            throw new InvalidArgumentException('ForeignKey\'s name cannot be empty string.');
+        }
+
+        $this->name = $name;
+        return $this;
     }
 
     public function setRefSchema(string $refSchema): self

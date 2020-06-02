@@ -11,10 +11,12 @@ class ForeignKeyTest extends BaseValueObjectTest
 {
     public function createValueObjectFromArray(array $properties): ValueObject
     {
+        $name = $properties['name'];
         $refSchema = $properties['refSchema'];
         $refTable = $properties['refTable'];
         $refColumn = $properties['refColumn'];
         return new ForeignKey(
+            $name,
             $refSchema,
             $refTable,
             $refColumn
@@ -24,6 +26,7 @@ class ForeignKeyTest extends BaseValueObjectTest
     public function getAllProperties(): array
     {
         return [
+            'name',
             'refSchema',
             'refTable',
             'refColumn',
@@ -37,6 +40,7 @@ class ForeignKeyTest extends BaseValueObjectTest
             // NONE
             // These properties CANNOT be set to null in Builder
             // ... null value in constructor means "not set"
+            'name' => self::NULL_MEANS_NOT_SET,
             'refSchema' => self::NULL_MEANS_NOT_SET,
         ];
     }
@@ -44,6 +48,7 @@ class ForeignKeyTest extends BaseValueObjectTest
     public function getEmptyStringNotAllowedProperties(): array
     {
         return [
+            'name',
             'refSchema',
             'refTable',
             'refColumn',
@@ -53,6 +58,9 @@ class ForeignKeyTest extends BaseValueObjectTest
     public function getHasCallbacks(): array
     {
         return [
+            'name' => function (ForeignKey $column) {
+                return $column->hasName();
+            },
             'refSchema' => function (ForeignKey $column) {
                 return $column->hasRefSchema();
             },
@@ -62,6 +70,9 @@ class ForeignKeyTest extends BaseValueObjectTest
     public function getGetCallbacks(): array
     {
         return [
+            'name' => function (ForeignKey $column) {
+                return $column->getName();
+            },
             'refSchema' => function (ForeignKey $column) {
                 return $column->getRefSchema();
             },
@@ -78,6 +89,7 @@ class ForeignKeyTest extends BaseValueObjectTest
     {
         return [
             [
+                'name' => 'name',
                 'refSchema' => 'schema',
                 'refTable' => 'table',
                 'refColumn' => 'column',
