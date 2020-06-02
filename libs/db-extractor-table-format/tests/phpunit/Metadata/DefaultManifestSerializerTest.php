@@ -124,6 +124,10 @@ class DefaultManifestSerializerTest extends TestCase
                 'key' => 'KBC.primaryKey',
                 'value' => false,
             ],
+            [
+                'key' => 'KBC.uniqueKey',
+                'value' => false,
+            ],
         ];
 
         Assert::assertEquals($expectedOutput, $this->serializer->serializeColumn($column));
@@ -175,6 +179,10 @@ class DefaultManifestSerializerTest extends TestCase
             [
                 'key' => 'KBC.primaryKey',
                 'value' => true,
+            ],
+            [
+                'key' => 'KBC.uniqueKey',
+                'value' => false,
             ],
             [
                 'key' => 'KBC.ordinalPosition',
