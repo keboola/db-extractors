@@ -8,8 +8,11 @@ use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorConfig\Test\AbstractConfigTest;
+use PHPUnit\Framework\Assert;
 
 class ConfigTest extends AbstractConfigTest
 {
@@ -561,5 +564,64 @@ class ConfigTest extends AbstractConfigTest
             'The path "root.parameters.primaryKey.1" cannot contain an empty value, but got "".'
         );
         new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testIncrementalFetchingLimit(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'table',
+                    'schema' => 'schema',
+                ],
+                'outputTable' => 'output-table',
+                'retries' => 12,
+                'columns' => [],
+                'primaryKey' => [],
+                'incremental' => true,
+                'incrementalFetchingColumn' => 'col123',
+                'incrementalFetchingLimit' => 456, // <<<<<<<<<<
+            ],
+        ];
+
+        // Normalized
+        $expected = $configurationArray;
+        $expected['parameters']['query'] = null;
+        $expected['parameters']['enabled'] = true;
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        $this->assertEquals($expected, $config->getData());
+    }
+
+    public function testIncrementalFetchingLimitZero(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'table',
+                    'schema' => 'schema',
+                ],
+                'outputTable' => 'output-table',
+                'retries' => 12,
+                'columns' => [],
+                'primaryKey' => [],
+                'incremental' => true,
+                'incrementalFetchingColumn' => 'col123',
+                'incrementalFetchingLimit' => 0, // <<<<<<<<<<
+            ],
+        ];
+
+        // Normalized
+        $expected = $configurationArray;
+        $expected['parameters']['incrementalFetchingLimit'] = null;
+        $expected['parameters']['query'] = null;
+        $expected['parameters']['enabled'] = true;
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        $this->assertEquals($expected, $config->getData());
     }
 }

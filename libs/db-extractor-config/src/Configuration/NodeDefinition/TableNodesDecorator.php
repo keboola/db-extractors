@@ -11,8 +11,20 @@ class TableNodesDecorator
 {
     public const DEFAULT_MAX_TRIES = 5;
 
+    public function normalize(array $v): array
+    {
+        // Backward compatibility: some older configurations may use "zero" in the meaning of "disabled"".
+        if (($v['incrementalFetchingLimit'] ?? null) === 0) {
+            $v['incrementalFetchingLimit'] = null;
+        }
+
+        return $v;
+    }
+
     public function validate(array $v): array
     {
+        $v  = $this->normalize($v);
+
         if (empty($v['query']) && empty($v['table'])) {
             throw new InvalidConfigurationException('Table or query must be configured.');
         }
@@ -140,7 +152,7 @@ class TableNodesDecorator
                 ->cannotBeEmpty()
             ->end()
             ->integerNode('incrementalFetchingLimit')
-                ->min(0)
+                ->min(0) // zero is taken as disabled
             ->end();
         // @formatter:on
     }
