@@ -137,6 +137,7 @@ class DefaultManifestSerializerTest extends TestCase
     {
         $column = ColumnBuilder::create()
             ->setName('_weird-I-d')
+            ->setDescription('Primary key column.')
             ->setType('varchar')
             ->setPrimaryKey(true)
             ->setLength('155')
@@ -187,6 +188,10 @@ class DefaultManifestSerializerTest extends TestCase
             [
                 'key' => 'KBC.ordinalPosition',
                 'value' => '1',
+            ],
+            [
+                'key' => 'KBC.description',
+                'value' => 'Primary key column.',
             ],
             [
                 'key' => 'KBC.constraintName',
