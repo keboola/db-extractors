@@ -60,6 +60,7 @@ class DefaultManifestSerializer implements ManifestSerializer
             'ordinalPosition' => $column->hasOrdinalPosition() ? $column->getOrdinalPosition() : null,
             'autoIncrement' => $column->isAutoIncrement() ?: null,
             'autoIncrementValue' => $column->hasAutoIncrementValue() ? $column->getAutoIncrementValue() : null,
+            'description' => $column->hasDescription() ? $column->getDescription() : null,
         ];
 
         // Foreign key
