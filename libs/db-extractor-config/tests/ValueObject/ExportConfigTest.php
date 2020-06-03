@@ -289,7 +289,7 @@ class ExportConfigTest extends TestCase
     public function testConfigIdAndName(): void
     {
         $config = ExportConfig::fromArray([
-            'id' => 'my config id',
+            'id' => 123,
             'name' => 'my config name',
             'table' => [
                 'tableName' => 'table',
@@ -304,7 +304,7 @@ class ExportConfigTest extends TestCase
 
         Assert::assertTrue($config->hasConfigId());
         Assert::assertTrue($config->hasConfigName());
-        Assert::assertSame('my config id', $config->getConfigId());
+        Assert::assertSame(123, $config->getConfigId());
         Assert::assertSame('my config name', $config->getConfigName());
     }
 }
