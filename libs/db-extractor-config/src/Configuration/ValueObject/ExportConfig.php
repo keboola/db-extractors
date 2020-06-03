@@ -8,6 +8,12 @@ use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 
 class ExportConfig implements ValueObject
 {
+    /** Id of config row or tables config item */
+    private ?string $configId;
+
+    /** Name of config row or tables config item */
+    private ?string $configName;
+
     /** Custom export query */
     private ?string $query;
 
@@ -32,6 +38,8 @@ class ExportConfig implements ValueObject
     public static function fromArray(array $data): self
     {
         return new self(
+            $data['id'] ?? null,
+            $data['name'] ?? null,
             $data['query'],
             empty($data['query']) ? InputTable::fromArray($data) : null,
             empty($data['query']) ? IncrementalFetchingConfig::fromArray($data) : null,
@@ -43,6 +51,8 @@ class ExportConfig implements ValueObject
     }
 
     public function __construct(
+        ?string $configId,
+        ?string $configName,
         ?string $query,
         ?InputTable $table,
         ?IncrementalFetchingConfig $incrementalFetchingConfig,
@@ -51,6 +61,8 @@ class ExportConfig implements ValueObject
         array $primaryKey,
         int $maxRetries
     ) {
+        $this->configId = $configId;
+        $this->configName = $configName;
         $query = $query !== null ? trim($query) : null;
         $outputTable = trim($outputTable);
         $this->query = $query;
@@ -60,6 +72,34 @@ class ExportConfig implements ValueObject
         $this->outputTable = $outputTable;
         $this->primaryKey = $primaryKey;
         $this->maxRetries = $maxRetries;
+    }
+
+    public function hasConfigId(): bool
+    {
+        return $this->configId !== null;
+    }
+
+    public function getConfigId(): string
+    {
+        if ($this->configId === null) {
+            throw new PropertyNotSetException('Config id is not set.');
+        }
+
+        return $this->configId;
+    }
+
+    public function hasConfigName(): bool
+    {
+        return $this->configName !== null;
+    }
+
+    public function getConfigName(): string
+    {
+        if ($this->configName === null) {
+            throw new PropertyNotSetException('Config name is not set.');
+        }
+
+        return $this->configName;
     }
 
     public function hasTable(): bool

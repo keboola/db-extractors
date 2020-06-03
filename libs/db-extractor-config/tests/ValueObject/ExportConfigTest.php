@@ -82,6 +82,22 @@ class ExportConfigTest extends TestCase
 
         // Max retries
         Assert::assertSame(12, $config->getMaxRetries());
+
+        // Config id
+        try {
+            $config->getConfigId();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
+
+        // Config name
+        try {
+            $config->getConfigName();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
     }
 
     public function testColumns(): void
@@ -188,6 +204,22 @@ class ExportConfigTest extends TestCase
 
         // Max retries
         Assert::assertSame(12, $config->getMaxRetries());
+
+        // Config id
+        try {
+            $config->getConfigId();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
+
+        // Config name
+        try {
+            $config->getConfigName();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
     }
 
     public function testIncremental(): void
@@ -252,5 +284,27 @@ class ExportConfigTest extends TestCase
         Assert::assertSame('col123', $config->getIncrementalFetchingColumn());
         Assert::assertSame(456, $config->getIncrementalFetchingConfig()->getLimit());
         Assert::assertSame(456, $config->getIncrementalFetchingLimit());
+    }
+
+    public function testConfigIdAndName(): void
+    {
+        $config = ExportConfig::fromArray([
+            'id' => 'my config id',
+            'name' => 'my config name',
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+            'incremental' => false,
+        ]);
+
+        Assert::assertTrue($config->hasConfigId());
+        Assert::assertTrue($config->hasConfigName());
+        Assert::assertSame('my config id', $config->getConfigId());
+        Assert::assertSame('my config name', $config->getConfigName());
     }
 }
