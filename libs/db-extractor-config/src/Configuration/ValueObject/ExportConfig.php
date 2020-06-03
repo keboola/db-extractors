@@ -9,7 +9,7 @@ use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 class ExportConfig implements ValueObject
 {
     /** Id of config row or tables config item */
-    private ?string $configId;
+    private ?int $configId;
 
     /** Name of config row or tables config item */
     private ?string $configName;
@@ -51,7 +51,7 @@ class ExportConfig implements ValueObject
     }
 
     public function __construct(
-        ?string $configId,
+        ?int $configId,
         ?string $configName,
         ?string $query,
         ?InputTable $table,
@@ -79,7 +79,7 @@ class ExportConfig implements ValueObject
         return $this->configId !== null;
     }
 
-    public function getConfigId(): string
+    public function getConfigId(): int
     {
         if ($this->configId === null) {
             throw new PropertyNotSetException('Config id is not set.');
