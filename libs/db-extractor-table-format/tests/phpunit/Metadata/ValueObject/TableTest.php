@@ -18,6 +18,8 @@ class TableTest extends BaseValueObjectTest
         $description = $properties['description'];
         $schema = $properties['schema'];
         $catalog = $properties['catalog'];
+        $tablespaceName = $properties['tablespaceName'];
+        $owner = $properties['owner'];
         $type = $properties['type'];
         $rowCount = $properties['rowCount'];
         $column = $properties['columns'];
@@ -27,6 +29,8 @@ class TableTest extends BaseValueObjectTest
             $description,
             $schema,
             $catalog,
+            $tablespaceName,
+            $owner,
             $type,
             $rowCount,
             $column,
@@ -41,6 +45,8 @@ class TableTest extends BaseValueObjectTest
             'description',
             'schema',
             'catalog',
+            'tablespaceName',
+            'owner',
             'type',
             'rowCount',
             'columns',
@@ -54,6 +60,8 @@ class TableTest extends BaseValueObjectTest
             'description' => self::NULL_MEANS_NOT_SET,
             'schema' => self::NULL_MEANS_NOT_SET,
             'catalog' => self::NULL_MEANS_NOT_SET,
+            'tablespaceName' => self::NULL_MEANS_NOT_SET,
+            'owner' => self::NULL_MEANS_NOT_SET,
             'rowCount' => self::NULL_MEANS_NOT_SET,
             // These properties CANNOT be set to null in Builder
             // ... null value in constructor means "not set"
@@ -81,6 +89,12 @@ class TableTest extends BaseValueObjectTest
             },
             'catalog' => function (Table $column) {
                 return  $column->hasCatalog();
+            },
+            'tablespaceName' => function (Table $column) {
+                return  $column->hasTablespaceName();
+            },
+            'owner' => function (Table $column) {
+                return  $column->hasOwner();
             },
             'type' => function (Table $column) {
                 return  $column->hasType();
@@ -112,6 +126,12 @@ class TableTest extends BaseValueObjectTest
             'catalog' => function (Table $column) {
                 return $column->getCatalog();
             },
+            'tablespaceName' => function (Table $column) {
+                return $column->getTablespaceName();
+            },
+            'owner' => function (Table $column) {
+                return $column->getOwner();
+            },
             'type' => function (Table $column) {
                 return $column->getType();
             },
@@ -133,6 +153,8 @@ class TableTest extends BaseValueObjectTest
                 'description' => 'Some description',
                 'schema' => 'my_schema',
                 'catalog' => 'my_catalog',
+                'tablespaceName' => 'Table Space',
+                'owner' => 'My Owner',
                 'type' => 'table',
                 'rowCount' => 123,
                 'columns' => new ColumnCollection([

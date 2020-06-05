@@ -22,7 +22,7 @@ class TableBuilder implements Builder
     /**
      * List of properties that can be marked as required through the constructor.
      */
-    public const OPTIONAL_REQUIRED_PROPERTIES = ['schema', 'catalog', 'type', 'rowCount'];
+    public const OPTIONAL_REQUIRED_PROPERTIES = ['schema', 'catalog', 'tablespaceName', 'owner', 'type', 'rowCount'];
 
     /** @var string[] */
     protected array $columnRequiredProperties;
@@ -36,6 +36,10 @@ class TableBuilder implements Builder
     private ?string $schema = null;
 
     private ?string $catalog = null;
+
+    private ?string $tablespaceName = null;
+
+    private ?string $owner = null;
 
     private ?string $type = null;
 
@@ -76,6 +80,8 @@ class TableBuilder implements Builder
             $this->description,
             $this->schema,
             $this->catalog,
+            $this->tablespaceName,
+            $this->owner,
             $this->type,
             $this->rowCount,
             $this->buildColumns ?
@@ -144,6 +150,26 @@ class TableBuilder implements Builder
 
         // Normalize, empty string is not allowed
         $this->catalog = empty($catalog) ? null : $catalog;
+        return $this;
+    }
+
+    public function setTablespaceName(?string $tablespaceName): self
+    {
+        // Trim
+        $tablespaceName = $tablespaceName !== null ? trim($tablespaceName) : null;
+
+        // Normalize, empty string is not allowed
+        $this->tablespaceName = empty($tablespaceName) ? null : $tablespaceName;
+        return $this;
+    }
+
+    public function setOwner(?string $owner): self
+    {
+        // Trim
+        $owner = $owner !== null ? trim($owner) : null;
+
+        // Normalize, empty string is not allowed
+        $this->owner = empty($owner) ? null : $owner;
         return $this;
     }
 
