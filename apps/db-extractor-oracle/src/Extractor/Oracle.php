@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use function Keboola\Utils\formatDateTime;
+use Throwable;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
 use Keboola\Datatype\Definition\GenericStorage;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
+use Keboola\DbExtractor\Exception\OracleJavaExportException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\TableResultFormat\Table;
 use Keboola\DbExtractor\TableResultFormat\TableColumn;
 use Keboola\DbExtractorLogger\Logger;
-use Symfony\Component\Process\Process;
-
-use Throwable;
-use function Keboola\Utils\formatDateTime;
 
 class Oracle extends Extractor
 {
@@ -23,17 +22,16 @@ class Oracle extends Extractor
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
     public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
-    private const TABLELESS_CONFIG_FILE = 'tableless.json';
-    private const TABLES_CONFIG_FILE = 'getTablesMetadata.json';
-
-    protected array $exportConfigFiles;
 
     private array $tablesToList = [];
 
     private bool $listColumns = true;
 
-    public function __construct(array $parameters, array $state = [], ?Logger $logger = null)
+    private OracleJavaExportWrapper $exportWrapper;
+
+    public function __construct(array $parameters, array $state, Logger $logger)
     {
+        $this->exportWrapper = new OracleJavaExportWrapper($logger, $parameters['data_dir'], $parameters['db']);
         parent::__construct($parameters, $state, $logger);
 
         // check for special table fetching option
@@ -45,68 +43,6 @@ class Oracle extends Extractor
                 $this->listColumns = $parameters['tableListFilter']['listColumns'];
             }
         }
-
-        // setup the export config files for the export tool
-        if (array_key_exists('tables', $parameters)) {
-            foreach ($parameters['tables'] as $table) {
-                $this->writeExportConfig($table);
-            }
-        } elseif (isset($parameters['id'])) {
-            $this->writeExportConfig($parameters);
-        }
-        $this->writeTablelessConfig();
-    }
-
-    private function writeTablelessConfig(): void
-    {
-        $dbParams = $this->getDbParameters();
-        $dbParams['port'] = (string) $dbParams['port'];
-        $config = [
-            'parameters' => [
-                'db' => $dbParams,
-                'outputFile' => $this->dataDir . '/' . 'tables.json',
-            ],
-        ];
-        file_put_contents($this->dataDir . '/' . self::TABLELESS_CONFIG_FILE, json_encode($config));
-    }
-
-    private function prepareTablesConfig(?array $tables = null): void
-    {
-        $dbParams = $this->getDbParameters();
-        $dbParams['port'] = (string) $dbParams['port'];
-        $config = [
-            'parameters' => [
-                'db' => $dbParams,
-                'outputFile' => $this->dataDir . '/' . 'tables.json',
-                'tables' => (!empty($tables)) ? $tables : [],
-                'includeColumns' => $this->listColumns,
-            ],
-        ];
-        file_put_contents($this->dataDir . '/' . self::TABLES_CONFIG_FILE, json_encode($config));
-    }
-
-    private function writeExportConfig(array $table): void
-    {
-        $this->exportConfigFiles[$table['name']] = $this->dataDir . '/' . $table['id'] . '.json';
-        if (!isset($table['query'])) {
-            $table['query'] = $this->simplyQueryWithIncrementalAddon(
-                $table['table'],
-                isset($table['columns']) ? $table['columns'] : []
-            );
-            unset($table['table']);
-        } else {
-            $table['query'] = rtrim($table['query'], ' ;');
-        }
-        $table['outputFile'] = $this->getOutputFilename($table['outputTable']);
-        $dbParams = $this->getDbParameters();
-        $dbParams['port'] = (string) $dbParams['port'];
-        $parameters = array(
-            'db' => $dbParams
-        );
-        $config = array(
-            'parameters' => array_merge($table, $parameters)
-        );
-        file_put_contents($this->exportConfigFiles[$table['name']], json_encode($config));
     }
 
     public function createConnection(array $params): void
@@ -142,18 +78,22 @@ class Oracle extends Extractor
                 $maxValue = $this->getMaxOfIncrementalFetchingColumn($table);
             }
         }
-        $maxTries = isset($table['retries']) ? (int) $table['retries'] : null;
 
-        /* set backoff initial interval to 1 second */
-        $proxy = new DbRetryProxy($this->logger, $maxTries);
-        $tableName = $table['name'];
+        $query = isset($table['query']) ?
+            rtrim($table['query'], ' ;') :
+            $this->simplyQueryWithIncrementalAddon(
+                $table['table'],
+                isset($table['columns']) ? $table['columns'] : []
+            );
+        $maxTries = isset($table['retries']) ? (int) $table['retries'] : DbRetryProxy::DEFAULT_MAX_TRIES;
+        $outputFile = $this->getOutputFilename($table['outputTable']);
+
         try {
-            $linesWritten = $proxy->call(function () use ($tableName, $isAdvancedQuery) {
-                return $this->exportTable($tableName, $isAdvancedQuery);
-            });
-        } catch (Throwable $e) {
+            $linesWritten = $this->exportWrapper->export($query, $maxTries, $outputFile, $isAdvancedQuery);
+        } catch (OracleJavaExportException $e) {
             throw $this->handleDbError($e, $table, $maxTries);
         }
+
         $rowCount = $linesWritten - 1;
         if ($rowCount > 0) {
             $this->createManifest($table);
@@ -216,93 +156,31 @@ class Oracle extends Extractor
 
     public function getMaxOfIncrementalFetchingColumn(array $table): ?string
     {
-        $table['id'] .= 'LastRow';
-        $table['name'] .= 'LastRow';
-        $table['outputTable'] .= 'LastRow';
+        $outputFile = $this->getOutputFilename('last_row');
+        $maxTries = isset($table['retries']) ? (int) $table['retries'] : DbRetryProxy::DEFAULT_MAX_TRIES;
+
         $simplyQuery = $this->simplyQueryWithIncrementalAddon(
             $table['table'],
             [$this->incrementalFetching['column']]
         );
-        $table['query'] = $this->getLastRowQuery($simplyQuery);
-        unset($table['table']);
-        $this->writeExportConfig($table);
-        $cmd = [
-            'java',
-            '-jar',
-            '/opt/table-exporter.jar',
-            'export',
-            $this->exportConfigFiles[$table['name']],
-            var_export(false, true),
-        ];
-        $processLastRowValue = new Process($cmd);
 
-        $processLastRowValue
-            ->setTimeout(null)
-            ->setIdleTimeout(null)
-            ->run()
-        ;
-        return json_decode((string) file_get_contents($this->getOutputFilename($table['outputTable'])));
-    }
+        try {
+            $this->exportWrapper->export(
+                $this->getLastRowQuery($simplyQuery),
+                $maxTries,
+                $outputFile,
+                false,
+            );
 
-    protected function exportTable(string $tableName, bool $advancedQuery): int
-    {
-        $cmd = [
-            'java',
-            '-jar',
-            '/opt/table-exporter.jar',
-            'export',
-            $this->exportConfigFiles[$tableName],
-            var_export($advancedQuery, true),
-        ];
-
-        $process = $this->runRetriableCommand($cmd, 'Export process failed');
-        // log the process output
-        $output = $process->getOutput();
-        $this->logger->info($output);
-
-        $fetchedPos = (int) strpos($output, 'Fetched');
-        $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
-        $linesWritten = (int) filter_var(
-            $rowCountStr,
-            FILTER_SANITIZE_NUMBER_INT
-        );
-        return $linesWritten;
-    }
-
-    private function runRetriableCommand(array $cmd, string $errorMessage): Process
-    {
-        $retryProxy = new DbRetryProxy(
-            $this->logger,
-            DbRetryProxy::DEFAULT_MAX_TRIES,
-            [\ErrorException::class]
-        );
-        return $retryProxy->call(function () use ($cmd, $errorMessage): Process {
-            $process = new Process($cmd);
-            $process->setTimeout(null);
-            $process->setIdleTimeout(null);
-            $process->run();
-            if (!$process->isSuccessful()) {
-                throw new \ErrorException(sprintf(
-                    '%s: %s',
-                    $errorMessage,
-                    $process->getErrorOutput()
-                ));
-            }
-            return $process;
-        });
+            return json_decode((string) file_get_contents($outputFile));
+        } finally {
+            @unlink($outputFile);
+        }
     }
 
     public function testConnection(): bool
     {
-        $cmd = [
-            'java',
-            '-jar',
-            '/opt/table-exporter.jar',
-            'testConnection',
-            $this->dataDir . '/' . self::TABLELESS_CONFIG_FILE,
-        ];
-
-        $this->runRetriableCommand($cmd, 'Failed connecting to DB');
+        $this->exportWrapper->testConnection();
         return true;
     }
 
@@ -312,17 +190,7 @@ class Oracle extends Extractor
             $tables = $this->tablesToList;
         }
 
-        $this->prepareTablesConfig($tables);
-        $cmd = [
-            'java',
-            '-jar',
-            '/opt/table-exporter.jar',
-            'getTables',
-            $this->dataDir . '/' . self::TABLES_CONFIG_FILE,
-        ];
-
-        $this->runRetriableCommand($cmd, 'Error fetching table listing');
-        $tableListing = json_decode((string) file_get_contents($this->dataDir . '/tables.json'), true);
+        $tableListing =  $this->exportWrapper->getTables($tables ?? [], $this->listColumns);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
                 'Cannot parse JSON data of table listing - error: ' . json_last_error()

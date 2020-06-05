@@ -9,6 +9,7 @@ use Keboola\DbExtractorLogger\Logger;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Keboola\Csv\CsvFile;
+use Symfony\Component\Process\Process;
 
 abstract class OracleBaseTest extends ExtractorTest
 {
@@ -78,6 +79,11 @@ abstract class OracleBaseTest extends ExtractorTest
         if ($this->connection) {
             oci_close($this->connection);
         }
+
+        # Close SSH tunnel if created
+        $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
+        $process->mustRun();
+
         parent::tearDown();
     }
 
