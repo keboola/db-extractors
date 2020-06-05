@@ -18,6 +18,8 @@ class DefaultManifestSerializer implements ManifestSerializer
             'description' => $table->hasDescription() ? $table->getDescription() : null,
             'schema' => $table->hasSchema() ? $table->getSchema() : null,
             'catalog' => $table->hasCatalog() ? $table->getCatalog() : null,
+            'tablespaceName' => $table->hasTablespaceName() ? $table->getTablespaceName() : null,
+            'owner' => $table->hasOwner() ? $table->getOwner() : null,
             'type' => $table->hasType() ? $table->getType() : null,
             'rowCount' => $table->hasRowCount() ? $table->getRowCount() : null,
         ];
