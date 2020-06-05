@@ -8,11 +8,9 @@ use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
+use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorConfig\Test\AbstractConfigTest;
-use PHPUnit\Framework\Assert;
 
 class ConfigTest extends AbstractConfigTest
 {
@@ -623,5 +621,46 @@ class ConfigTest extends AbstractConfigTest
 
         $config = new Config($configurationArray, new ConfigRowDefinition());
         $this->assertEquals($expected, $config->getData());
+    }
+
+    public function testGetTablesSimple(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+            ],
+        ];
+
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+        $this->expectNotToPerformAssertions(); // no error expected
+    }
+
+    public function testGetTablesListFilter(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [
+                        [
+                            'tableName' => 'table1',
+                            'schema' => 'default',
+                        ],
+                        [
+                            'tableName' => 'table2',
+                            'schema' => 'default',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+        $this->expectNotToPerformAssertions(); // no error expected
     }
 }
