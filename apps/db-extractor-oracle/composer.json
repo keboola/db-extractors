@@ -40,6 +40,7 @@
         "tests": "./wait-for-it.sh oracle:8080 -t 120 -- phpunit",
         "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
+        "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "build": [
             "@phpcs",
             "@phpstan",
