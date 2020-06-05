@@ -23,10 +23,13 @@ class Oracle extends Extractor
     public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
 
+    private array $parameters;
+
     private OracleJavaExportWrapper $exportWrapper;
 
     public function __construct(array $parameters, array $state, Logger $logger)
     {
+        $this->parameters = $parameters;
         $this->exportWrapper = new OracleJavaExportWrapper($logger, $parameters['data_dir'], $parameters['db']);
         parent::__construct($parameters, $state, $logger);
     }
@@ -67,7 +70,7 @@ class Oracle extends Extractor
 
         $query = isset($table['query']) ?
             rtrim($table['query'], ' ;') :
-            $this->simplyQueryWithIncrementalAddon(
+            $this->simpleQuery(
                 $table['table'],
                 isset($table['columns']) ? $table['columns'] : []
             );
@@ -145,7 +148,7 @@ class Oracle extends Extractor
         $outputFile = $this->getOutputFilename('last_row');
         $maxTries = isset($table['retries']) ? (int) $table['retries'] : DbRetryProxy::DEFAULT_MAX_TRIES;
 
-        $simplyQuery = $this->simplyQueryWithIncrementalAddon(
+        $simplyQuery = $this->simpleQuery(
             $table['table'],
             [$this->incrementalFetching['column']]
         );
@@ -175,7 +178,7 @@ class Oracle extends Extractor
         $loadColumns = $this->parameters['tableListFilter']['listColumns'] ?? true;
         $whiteList = $this->parameters['tableListFilter']['tablesToList'] ?? [];
         $tables = $whiteList && !$tables ? $whiteList : $tables;
-        $tableListing =  $this->exportWrapper->getTables($tables, $loadColumns);
+        $tableListing =  $this->exportWrapper->getTables($tables ?? [], $loadColumns);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
@@ -219,36 +222,24 @@ class Oracle extends Extractor
 
     public function simpleQuery(array $table, array $columns = array()): string
     {
-        if (count($columns) > 0) {
-            return sprintf(
-                'SELECT %s FROM %s.%s',
-                implode(
-                    ', ',
-                    array_map(
-                        function ($column) {
-                            return $this->quote($column);
-                        },
-                        $columns
-                    )
-                ),
-                $this->quote($table['schema']),
-                $this->quote($table['tableName'])
-            );
-        } else {
-            return sprintf(
-                'SELECT * FROM %s.%s',
-                $this->quote($table['schema']),
-                $this->quote($table['tableName'])
-            );
-        }
-    }
+        $sql = [];
+        $where = [];
 
-    private function simplyQueryWithIncrementalAddon(
-        array $table,
-        array $columns = array()
-    ): string {
-        $incrementalAddonOrder = null;
-        $incrementalAddonConditions = [];
+        if (count($columns) > 0) {
+            $sql[] = sprintf('SELECT %s', implode(', ', array_map(
+                fn(string $c) => $this->quote($c),
+                $columns
+            )));
+        } else {
+            $sql[] = 'SELECT *';
+        }
+
+        $sql[] = sprintf(
+            'FROM %s.%s',
+            $this->quote($table['schema']),
+            $this->quote($table['tableName'])
+        );
+
         if ($this->incrementalFetching) {
             if (isset($this->incrementalFetching['column']) && isset($this->state['lastFetchedRow'])) {
                 if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
@@ -261,7 +252,9 @@ class Oracle extends Extractor
                 } else {
                     $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
                 }
-                $incrementalAddonConditions[] = sprintf(
+
+                // intentionally ">=" last row should be included, it is handled by storage deduplication process
+                $where[] = sprintf(
                     '%s >= %s',
                     $this->quote($this->incrementalFetching['column']),
                     $lastFetchedRow
@@ -269,37 +262,28 @@ class Oracle extends Extractor
             }
 
             if (isset($this->incrementalFetching['limit'])) {
-                $incrementalAddonConditions[] = sprintf(
+                $where[] = sprintf(
                     'ROWNUM <= %d',
                     $this->incrementalFetching['limit']
                 );
             }
         }
 
-        $query = $this->simpleQuery($table, $columns);
-
-        if (!empty($incrementalAddonConditions)) {
-            $query .= ' WHERE ' . implode(' AND ', $incrementalAddonConditions);
+        if ($where) {
+            $sql[] = sprintf('WHERE %s', implode(' AND ', $where));
         }
 
-        return $query;
+        return implode(' ', $sql);
     }
 
     private function getLastRowQuery(string $query): string
     {
-        $query = sprintf(
-            'SELECT "%s" FROM (%s) ORDER BY "%s" DESC',
-            $this->incrementalFetching['column'],
+        return sprintf(
+            'SELECT %s FROM (SELECT * FROM (%s) ORDER BY %s DESC) WHERE ROWNUM = 1',
+            $this->quote($this->incrementalFetching['column']),
             $query,
-            $this->incrementalFetching['column']
+            $this->quote($this->incrementalFetching['column']),
         );
-        $query = sprintf(
-            'SELECT "%s" FROM (%s) WHERE ROWNUM = 1',
-            $this->incrementalFetching['column'],
-            $query
-        );
-
-        return $query;
     }
 
     private function quote(string $obj): string
