@@ -23,26 +23,12 @@ class Oracle extends Extractor
     public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
 
-    private array $tablesToList = [];
-
-    private bool $listColumns = true;
-
     private OracleJavaExportWrapper $exportWrapper;
 
     public function __construct(array $parameters, array $state, Logger $logger)
     {
         $this->exportWrapper = new OracleJavaExportWrapper($logger, $parameters['data_dir'], $parameters['db']);
         parent::__construct($parameters, $state, $logger);
-
-        // check for special table fetching option
-        if (!empty($parameters['tableListFilter'])) {
-            if (!empty($parameters['tableListFilter']['tablesToList'])) {
-                $this->tablesToList = $parameters['tableListFilter']['tablesToList'];
-            }
-            if (isset($parameters['tableListFilter']['listColumns'])) {
-                $this->listColumns = $parameters['tableListFilter']['listColumns'];
-            }
-        }
     }
 
     public function createConnection(array $params): void
@@ -186,11 +172,11 @@ class Oracle extends Extractor
 
     public function getTables(?array $tables = null): array
     {
-        if ($this->tablesToList && !$tables) {
-            $tables = $this->tablesToList;
-        }
+        $loadColumns = $this->parameters['tableListFilter']['listColumns'] ?? true;
+        $whiteList = $this->parameters['tableListFilter']['tablesToList'] ?? [];
+        $tables = $whiteList && !$tables ? $whiteList : $tables;
+        $tableListing =  $this->exportWrapper->getTables($tables, $loadColumns);
 
-        $tableListing =  $this->exportWrapper->getTables($tables ?? [], $this->listColumns);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
                 'Cannot parse JSON data of table listing - error: ' . json_last_error()
