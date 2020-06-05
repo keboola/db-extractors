@@ -177,8 +177,8 @@ class Oracle extends Extractor
     {
         $loadColumns = $this->parameters['tableListFilter']['listColumns'] ?? true;
         $whiteList = $this->parameters['tableListFilter']['tablesToList'] ?? [];
-        $tables = $whiteList && !$tables ? $whiteList : $tables;
-        $tableListing =  $this->exportWrapper->getTables($tables ?? [], $loadColumns);
+        $tables = $tables ?: $whiteList;
+        $tableListing =  $this->exportWrapper->getTables($tables, $loadColumns);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new ApplicationException(
