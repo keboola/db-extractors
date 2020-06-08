@@ -53,25 +53,47 @@ abstract class AbstractMySQLTest extends ExtractorTest
         );
 
         $this->pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['#password'], $options);
-
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
         $this->pdo->exec('SET NAMES utf8mb4;');
+        $this->dropAllTables();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
+        $this->dropAllTables();
+
         # Close SSH tunnel if created
         $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
         $process->mustRun();
     }
 
+    protected function dropAllTables(): void
+    {
+        $sql = <<<END
+          SET FOREIGN_KEY_CHECKS = 0; 
+          SET @tables = NULL;
+          SET GROUP_CONCAT_MAX_LEN=32768;
+        
+          SELECT GROUP_CONCAT('`', table_schema, '`.`', table_name, '`') INTO @tables
+          FROM   information_schema.tables 
+          WHERE  TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys");
+          SELECT IFNULL(@tables, '') INTO @tables;
+        
+          SET        @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+          PREPARE    stmt FROM @tables;
+          EXECUTE    stmt;
+          DEALLOCATE PREPARE stmt;
+          SET        FOREIGN_KEY_CHECKS = 1;
+        END;
+
+        $this->pdo->query($sql);
+    }
+
+
     protected function createAutoIncrementAndTimestampTable(): void
     {
-        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp_withFK');
-        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp');
-
         $this->pdo->exec('CREATE TABLE auto_increment_timestamp (
             `_weird-I-d` INT NOT NULL AUTO_INCREMENT COMMENT \'This is a weird ID\',
             `weird-Name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
@@ -89,8 +111,6 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
     protected function createAutoIncrementAndTimestampTableWithFK(): void
     {
-        $this->pdo->exec('DROP TABLE IF EXISTS auto_increment_timestamp_withFK');
-
         $this->pdo->exec('CREATE TABLE auto_increment_timestamp_withFK (
             `some_primary_key` INT NOT NULL AUTO_INCREMENT COMMENT \'This is a weird ID\',
             `random_name` VARCHAR(30) NOT NULL DEFAULT \'pam\' COMMENT \'This is a weird name\',
@@ -137,12 +157,6 @@ abstract class AbstractMySQLTest extends ExtractorTest
         } else {
             $this->pdo->exec(sprintf('CREATE DATABASE IF NOT EXISTS %s', $schemaName));
         }
-
-        $this->pdo->exec(sprintf(
-            'DROP TABLE IF EXISTS %s.%s',
-            $schemaName,
-            $tableName
-        ));
 
         $csv = new CsvReader($file->getPathname());
         $this->pdo->exec(sprintf(

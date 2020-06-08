@@ -12,14 +12,15 @@ class QueryGenerationTest extends AbstractMySQLTest
 {
     public function setUp(): void
     {
+        parent::setUp();
         $this->dataDir = __DIR__ . '/../../data';
     }
-
     /**
      * @dataProvider simpleTableColumnsDataProvider
      */
     public function testGetSimplifiedPdoQuery(array $params, array $state, string $expected): void
     {
+        $this->createAutoIncrementAndTimestampTable();
         $config = $this->getConfigRow(self::DRIVER);
         $config['parameters'] = array_merge($config['parameters'], $params);
         $config['parameters']['query'] = empty($config['parameters']['table']) ?
