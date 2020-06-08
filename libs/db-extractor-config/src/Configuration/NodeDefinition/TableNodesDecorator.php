@@ -47,23 +47,10 @@ class TableNodesDecorator
             );
         }
 
-        if ($v['incremental'] === true && empty($v['incrementalFetchingColumn'])) {
-            throw new InvalidConfigurationException(
-                'The "incrementalFetchingColumn" must be configured, if incremental fetching is enabled.'
-            );
-        }
-
-        if ($v['incremental'] === false && !empty($v['incrementalFetchingColumn'])) {
-            throw new InvalidConfigurationException(
-                'The "incrementalFetchingColumn" is configured, ' .
-                'but incremental fetching is not enabled.'
-            );
-        }
-
-        if ($v['incremental'] === false && !empty($v['incrementalFetchingLimit'])) {
+        if (!empty($v['incrementalFetchingLimit']) && empty($v['incrementalFetchingColumn'])) {
             throw new InvalidConfigurationException(
                 'The "incrementalFetchingLimit" is configured, ' .
-                'but incremental fetching is not enabled.'
+                'but "incrementalFetchingColumn" is missing.'
             );
         }
 
@@ -78,6 +65,7 @@ class TableNodesDecorator
         $this->addTableNode($builder);
         $this->addColumnsNode($builder);
         $this->addOutputTableNode($builder);
+        $this->addIncrementalLoading($builder);
         $this->addIncrementalFetchingNodes($builder);
         $this->addEnabledNode($builder);
         $this->addPrimaryKeyNode($builder);
@@ -141,13 +129,22 @@ class TableNodesDecorator
         // @formatter:on
     }
 
+    protected function addIncrementalLoading(NodeBuilder $builder): void
+    {
+        // NOTE: "incremental" key enables incremental loading to storage table,
+        // it is not directly related to incrementalFetching, it's a different feature!
+
+        // @formatter:off
+        $builder
+            ->booleanNode('incremental')
+                ->defaultValue(false);
+        // @formatter:on
+    }
+
     protected function addIncrementalFetchingNodes(NodeBuilder $builder): void
     {
         // @formatter:off
         $builder
-            ->booleanNode('incremental')
-                ->defaultValue(false)
-            ->end()
             ->scalarNode('incrementalFetchingColumn')
                 ->cannotBeEmpty()
             ->end()

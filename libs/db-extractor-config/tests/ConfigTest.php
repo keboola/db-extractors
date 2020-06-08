@@ -11,6 +11,7 @@ use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Keboola\DbExtractorConfig\Test\AbstractConfigTest;
+use PHPUnit\Framework\Assert;
 
 class ConfigTest extends AbstractConfigTest
 {
@@ -452,7 +453,7 @@ class ConfigTest extends AbstractConfigTest
         new Config($configurationArray, new ConfigRowDefinition());
     }
 
-    public function testMissingIncrementalFetchingColumn(): void
+    public function testIncrementalLoadingWithNoIncrementalFetchingColumn(): void
     {
         $configurationArray = [
             'parameters' => [
@@ -467,14 +468,27 @@ class ConfigTest extends AbstractConfigTest
             ],
         ];
 
-        $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage(
-            'The "incrementalFetchingColumn" must be configured, if incremental fetching is enabled.'
-        );
-        new Config($configurationArray, new ConfigRowDefinition());
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        Assert::assertSame([
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'incremental' => true,
+                'query' => null,
+                'columns' => [],
+                'enabled' => true,
+                'primaryKey' => [],
+                'retries' => 5,
+            ],
+        ], $config->getData());
     }
 
-    public function testIncrementalFetchingColumnSetButIncrementalDisabled(): void
+    public function testIncrementalFetchingColumnAndNoIncrementalLoading(): void
     {
         $configurationArray = [
             'parameters' => [
@@ -490,14 +504,28 @@ class ConfigTest extends AbstractConfigTest
             ],
         ];
 
-        $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage(
-            'The "incrementalFetchingColumn" is configured, but incremental fetching is not enabled.'
-        );
-        new Config($configurationArray, new ConfigRowDefinition());
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        Assert::assertSame([
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'table' => [
+                    'tableName' => 'name',
+                    'schema' => 'schema',
+                ],
+                'incremental' => false,
+                'incrementalFetchingColumn' => 'name',
+                'query' => null,
+                'columns' => [],
+                'enabled' => true,
+                'primaryKey' => [],
+                'retries' => 5,
+            ],
+        ], $config->getData());
     }
 
-    public function testIncrementalFetchingLimitSetButIncrementalDisabled(): void
+    public function testIncrementalFetchingLimitButNoColumn(): void
     {
         $configurationArray = [
             'parameters' => [
@@ -515,7 +543,7 @@ class ConfigTest extends AbstractConfigTest
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage(
-            'The "incrementalFetchingLimit" is configured, but incremental fetching is not enabled.'
+            'The "incrementalFetchingLimit" is configured, but "incrementalFetchingColumn" is missing.'
         );
         new Config($configurationArray, new ConfigRowDefinition());
     }
