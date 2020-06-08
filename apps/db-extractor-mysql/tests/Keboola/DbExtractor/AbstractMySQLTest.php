@@ -13,6 +13,7 @@ use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
 use Symfony\Component\Filesystem\Filesystem;
 use PDO;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractMySQLTest extends ExtractorTest
 {
@@ -55,6 +56,15 @@ abstract class AbstractMySQLTest extends ExtractorTest
 
         $this->pdo->setAttribute(PDO::MYSQL_ATTR_LOCAL_INFILE, true);
         $this->pdo->exec('SET NAMES utf8mb4;');
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        # Close SSH tunnel if created
+        $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
+        $process->mustRun();
     }
 
     protected function createAutoIncrementAndTimestampTable(): void
