@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Csv\CsvReader;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 
@@ -266,7 +266,7 @@ class IncrementalFetchingTest extends AbstractMySQLTest
 
         $result = ($this->createApplication($config))->run();
         $outputCsvFile = iterator_to_array(
-            new CsvFile(
+            new CsvReader(
                 $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
             )
         );
@@ -297,11 +297,11 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         return [
             'column does not exist' => [
                 'fakeCol',
-                'Column [fakeCol] specified for incremental fetching was not found in the table',
+                'Column "fakeCol" specified for incremental fetching was not found in the table',
             ],
             'column exists but is not auto-increment nor updating timestamp so should fail' => [
                 'weird-Name',
-                'Column [weird-Name] specified for incremental fetching is not a numeric or timestamp type column',
+                'Column "weird-Name" specified for incremental fetching must has numeric or timestamp type.',
             ],
         ];
     }
@@ -314,7 +314,9 @@ class IncrementalFetchingTest extends AbstractMySQLTest
         unset($config['parameters']['table']);
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('Incremental fetching is not supported for advanced queries.');
+        $this->expectExceptionMessage(
+            'The "incrementalFetchingColumn" is configured, but incremental fetching is not supported for custom query.'
+        );
         $app = $this->createApplication($config);
         $app->run();
     }

@@ -10,6 +10,7 @@
     "query": "SELECT * FROM escaping",
     "outputTable": "in.c-main.escaping",
     "incremental": false,
-    "primaryKey": ["col1"]
+    "primaryKey": ["col1"],
+    "retries": 3
   }
 }
