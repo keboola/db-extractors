@@ -122,6 +122,32 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $this->pdo->exec('INSERT INTO auto_increment_timestamp_withFK (`random_name`, `foreign_key`) VALUES (\'sue\',1)');
     }
 
+    protected function createTableOneColumnMultipleForeignKeys(): void
+    {
+        $this->pdo->exec('CREATE TABLE `pk_fk_target_table1` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `value` VARCHAR(30) NOT NULL,
+            PRIMARY KEY (`id`)
+        )');
+
+        $this->pdo->exec('CREATE TABLE `pk_fk_target_table2` (
+            `id` INT NOT NULL AUTO_INCREMENT,
+            `value` VARCHAR(30) NOT NULL,
+            PRIMARY KEY (`id`)
+        )');
+
+        $this->pdo->exec('CREATE TABLE `pk_fk_table` (
+            `id` INT NOT NULL,
+            PRIMARY KEY (`id`),
+            FOREIGN KEY (id) REFERENCES pk_fk_target_table1(id),
+            FOREIGN KEY (id) REFERENCES pk_fk_target_table2(id)
+        )');
+
+        $this->pdo->exec('INSERT INTO pk_fk_target_table1 (`id`, `value`) VALUES (123, "test")');
+        $this->pdo->exec('INSERT INTO pk_fk_target_table2 (`id`, `value`) VALUES (123, "test")');
+        $this->pdo->exec('INSERT INTO pk_fk_table (`id`) VALUES (123)');
+    }
+
     public function getConfig(string $driver = self::DRIVER): array
     {
         $config = parent::getConfig($driver);

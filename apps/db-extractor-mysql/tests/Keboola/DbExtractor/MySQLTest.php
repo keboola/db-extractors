@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use PHPUnit\Framework\Assert;
 use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
 use Nette\Utils;
@@ -715,5 +716,63 @@ class MySQLTest extends AbstractMySQLTest
         $result = $app->run();
 
         $this->assertEquals('success', $result['status']);
+    }
+
+    public function testMultipleForeignKeysOnOneColumn(): void
+    {
+        $this->createTableOneColumnMultipleForeignKeys();
+        $config = $this->getConfig();
+        $config['action'] = 'getTables';
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        $this->assertEquals([
+            [
+                'name' => 'pk_fk_table',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'pk_fk_target_table1',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'value',
+                            'type' => 'varchar',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'pk_fk_target_table2',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'value',
+                            'type' => 'varchar',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+        ], $result['tables']);
     }
 }
