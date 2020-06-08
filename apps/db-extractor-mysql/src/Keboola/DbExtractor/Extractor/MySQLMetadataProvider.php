@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
 use PDO;
 use PDOStatement;
 use Keboola\DbExtractor\Exception\InvalidArgumentException;
@@ -104,12 +105,17 @@ class MySQLMetadataProvider implements MetadataProvider
     {
         // Foreign key
         if (isset($data['REFERENCED_TABLE_NAME'])) {
-            $builder
-                ->addForeignKey()
-                ->setName($data['CONSTRAINT_NAME'])
-                ->setRefSchema($data['REFERENCED_TABLE_SCHEMA'])
-                ->setRefTable($data['REFERENCED_TABLE_NAME'])
-                ->setRefColumn($data['REFERENCED_COLUMN_NAME']);
+            try {
+                $builder
+                    ->addForeignKey()
+                    ->setName($data['CONSTRAINT_NAME'])
+                    ->setRefSchema($data['REFERENCED_TABLE_SCHEMA'])
+                    ->setRefTable($data['REFERENCED_TABLE_NAME'])
+                    ->setRefColumn($data['REFERENCED_COLUMN_NAME']);
+            } catch (InvalidStateException $e) {
+                // In MySQL, one column can have multiple foreign keys, it is useless, but possible.
+                // Ignore second foreign key, metadata and manifest expect max one FK.
+            }
         }
 
         // Constraints
