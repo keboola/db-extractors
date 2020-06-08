@@ -27,6 +27,8 @@ class TableBuilderTest extends BaseBuilderTest
             'description',
             'schema',
             'catalog',
+            'tablespaceName',
+            'owner',
             'type',
             'rowCount',
         ];
@@ -48,6 +50,8 @@ class TableBuilderTest extends BaseBuilderTest
             'description' => self::NULL_MEANS_NOT_SET,
             'schema' => self::NULL_MEANS_NOT_SET,
             'catalog' => self::NULL_MEANS_NOT_SET,
+            'tablespaceName' => self::NULL_MEANS_NOT_SET,
+            'owner' => self::NULL_MEANS_NOT_SET,
             'rowCount' => self::NULL_MEANS_NOT_SET,
             'columns' => self::NULL_MEANS_NOT_SET,
         ];
@@ -66,6 +70,8 @@ class TableBuilderTest extends BaseBuilderTest
             'description',
             'schema',
             'catalog',
+            'tablespaceName',
+            'owner',
         ];
     }
 
@@ -88,6 +94,12 @@ class TableBuilderTest extends BaseBuilderTest
             },
             'catalog' => function (TableBuilder $builder, $v) {
                 return $builder->setCatalog($v);
+            },
+            'tablespaceName' => function (TableBuilder $builder, $v) {
+                return $builder->setTablespaceName($v);
+            },
+            'owner' => function (TableBuilder $builder, $v) {
+                return $builder->setOwner($v);
             },
             'type' => function (TableBuilder $builder, $v) {
                 return $builder->setType($v);
@@ -116,6 +128,12 @@ class TableBuilderTest extends BaseBuilderTest
             'catalog' => function (Table $column) {
                 return  $column->hasCatalog();
             },
+            'tablespaceName' => function (Table $column) {
+                return  $column->hasTablespaceName();
+            },
+            'owner' => function (Table $column) {
+                return  $column->hasOwner();
+            },
             'type' => function (Table $column) {
                 return  $column->hasType();
             },
@@ -143,6 +161,12 @@ class TableBuilderTest extends BaseBuilderTest
             'catalog' => function (Table $column) {
                 return $column->getCatalog();
             },
+            'tablespaceName' => function (Table $column) {
+                return $column->getTablespaceName();
+            },
+            'owner' => function (Table $column) {
+                return $column->getOwner();
+            },
             'type' => function (Table $column) {
                 return $column->getType();
             },
@@ -163,6 +187,8 @@ class TableBuilderTest extends BaseBuilderTest
                 'description' => 'Some description.',
                 'schema' => 'My Schema',
                 'catalog' => 'My Catalog',
+                'tablespaceName' => 'Table Space',
+                'owner' => 'My Owner',
                 'type' => 'table',
                 'rowCount' => 25,
             ],

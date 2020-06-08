@@ -20,6 +20,10 @@ class Table implements ValueObject
 
     private ?string $catalog;
 
+    private ?string $tablespaceName;
+
+    private ?string $owner;
+
     private ?string $type;
 
     private ?int $rowCount;
@@ -35,6 +39,8 @@ class Table implements ValueObject
         ?string $description,
         ?string $schema,
         ?string $catalog,
+        ?string $tablespaceName,
+        ?string $owner,
         ?string $type,
         ?int $rowCount,
         ?ColumnCollection $columns
@@ -59,6 +65,14 @@ class Table implements ValueObject
             throw new InvalidArgumentException('Table\'s catalog cannot be empty string, use null.');
         }
 
+        if ($tablespaceName !== null && empty($tablespaceName)) {
+            throw new InvalidArgumentException('Table\'s tablespaceName cannot be empty string, use null.');
+        }
+
+        if ($owner !== null && empty($owner)) {
+            throw new InvalidArgumentException('Table\'s owner cannot be empty string, use null.');
+        }
+
         if ($type !== null && empty($type)) {
             throw new InvalidArgumentException('Table\'s type cannot be empty string, use null.');
         }
@@ -72,6 +86,8 @@ class Table implements ValueObject
         $this->description = $description;
         $this->schema = $schema;
         $this->catalog = $catalog;
+        $this->tablespaceName = $tablespaceName;
+        $this->owner = $owner;
         $this->type = $type;
         $this->rowCount = $rowCount;
         $this->columns = $columns;
@@ -124,6 +140,32 @@ class Table implements ValueObject
             throw new PropertyNotSetException('Catalog is not set.');
         }
         return $this->catalog;
+    }
+
+    public function hasTablespaceName(): bool
+    {
+        return $this->tablespaceName !== null;
+    }
+
+    public function getTablespaceName(): string
+    {
+        if ($this->tablespaceName === null) {
+            throw new PropertyNotSetException('TablespaceName is not set.');
+        }
+        return $this->tablespaceName;
+    }
+
+    public function hasOwner(): bool
+    {
+        return $this->owner !== null;
+    }
+
+    public function getOwner(): string
+    {
+        if ($this->owner === null) {
+            throw new PropertyNotSetException('Owner is not set.');
+        }
+        return $this->owner;
     }
 
     public function hasType(): bool

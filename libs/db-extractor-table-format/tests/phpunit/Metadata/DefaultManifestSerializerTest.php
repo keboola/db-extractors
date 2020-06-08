@@ -56,6 +56,9 @@ class DefaultManifestSerializerTest extends TestCase
         $tableBuilder = TableBuilder::create()
             ->setName('simple')
             ->setSchema('testdb')
+            ->setCatalog('my_catalog')
+            ->setTablespaceName('my_tablespace')
+            ->setOwner('db_owner')
             ->setType('BASE TABLE')
             ->setRowCount(2);
 
@@ -78,6 +81,18 @@ class DefaultManifestSerializerTest extends TestCase
             [
                 'key' => 'KBC.schema',
                 'value' => 'testdb',
+            ],
+            [
+                'key' => 'KBC.catalog',
+                'value' => 'my_catalog',
+            ],
+            [
+                'key' => 'KBC.tablespaceName',
+                'value' => 'my_tablespace',
+            ],
+            [
+                'key' => 'KBC.owner',
+                'value' => 'db_owner',
             ],
             [
                 'key' => 'KBC.type',
