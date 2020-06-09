@@ -23,20 +23,21 @@ class Oracle extends Extractor
     public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
 
-    private array $parameters;
+    private array $tableListFilter;
 
     private OracleJavaExportWrapper $exportWrapper;
 
-    public function __construct(array $parameters, array $state, Logger $logger)
+    public function __construct(array $parameters, array $state, ?Logger $logger)
     {
-        $this->parameters = $parameters;
-        $this->exportWrapper = new OracleJavaExportWrapper($logger, $parameters['data_dir'], $parameters['db']);
         parent::__construct($parameters, $state, $logger);
+        $this->tableListFilter = $parameters['tableListFilter'] ?? [];
     }
 
     public function createConnection(array $params): void
     {
-        // not required
+        // OracleJavaExportWrapper must be created after parent constructor,
+        // ... because dbParameters are modified by SSH tunnel.
+        $this->exportWrapper = new OracleJavaExportWrapper($this->logger, $this->dataDir, $this->getDbParameters());
     }
 
     protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
@@ -175,8 +176,8 @@ class Oracle extends Extractor
 
     public function getTables(?array $tables = null): array
     {
-        $loadColumns = $this->parameters['tableListFilter']['listColumns'] ?? true;
-        $whiteList = $this->parameters['tableListFilter']['tablesToList'] ?? [];
+        $loadColumns = $this->tableListFilter['listColumns'] ?? true;
+        $whiteList = $this->tableListFilter['tablesToList'] ?? [];
         $tables = $tables ?: $whiteList;
         $tableListing =  $this->exportWrapper->getTables($tables, $loadColumns);
 
