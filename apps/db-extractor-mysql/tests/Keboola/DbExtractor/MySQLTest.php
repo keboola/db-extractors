@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use PHPUnit\Framework\Assert;
 use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
 use Nette\Utils;
@@ -212,6 +213,9 @@ class MySQLTest extends AbstractMySQLTest
     public function testGetTables(): void
     {
         $this->createAutoIncrementAndTimestampTable();
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/emoji.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
 
         // add a table to a different schema (should not be fetched)
         $this->createTextTable(
@@ -261,6 +265,9 @@ class MySQLTest extends AbstractMySQLTest
     public function testGetTablesNoDatabase(): void
     {
         $this->createAutoIncrementAndTimestampTable();
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/emoji.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
 
         // add a table to a different schema
         $this->createTextTable(
@@ -653,6 +660,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testRunWithNetworkCompression(): void
     {
+        $this->createAutoIncrementAndTimestampTable();
         $config = $this->getIncrementalFetchingConfig();
         $config['parameters']['db']['networkCompression'] = true;
         $result = ($this->createApplication($config))->run();
@@ -689,6 +697,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testTestIgnoringExtraKeys(): void
     {
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
         $configurationArray = $this->getConfigRow(self::DRIVER);
         $configurationArray['parameters']['someExtraKey'] = 'test';
         $app = $this->createApplication($configurationArray);
@@ -699,6 +708,7 @@ class MySQLTest extends AbstractMySQLTest
 
     public function testIncrementalNotPresentNoResults(): void
     {
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
         $configurationArray = $this->getConfigRow(self::DRIVER);
         unset($configurationArray['parameters']['incremental']);
         $configurationArray['parameters']['query'] = 'SELECT * FROM sales WHERE 1 = 2;'; // no results
@@ -706,5 +716,63 @@ class MySQLTest extends AbstractMySQLTest
         $result = $app->run();
 
         $this->assertEquals('success', $result['status']);
+    }
+
+    public function testMultipleForeignKeysOnOneColumn(): void
+    {
+        $this->createTableOneColumnMultipleForeignKeys();
+        $config = $this->getConfig();
+        $config['action'] = 'getTables';
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        $this->assertEquals([
+            [
+                'name' => 'pk_fk_table',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'pk_fk_target_table1',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'value',
+                            'type' => 'varchar',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'pk_fk_target_table2',
+                'schema' => 'test',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'id',
+                            'type' => 'int',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'value',
+                            'type' => 'varchar',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+        ], $result['tables']);
     }
 }

@@ -55,6 +55,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
     public function testRunActionSshTunnel(): void
     {
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
 
         @unlink($this->dataDir . '/config.json');
         $config = $this->getConfig();
@@ -236,6 +238,8 @@ class MySQLEntrypointTest extends AbstractMySQLTest
 
     public function testRunConfigRow(): void
     {
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+
         $outputCsvFile = $this->dataDir . '/out/tables/in.c-main.escaping.csv';
         @unlink($outputCsvFile);
 
