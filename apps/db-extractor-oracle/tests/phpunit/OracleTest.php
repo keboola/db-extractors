@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvFile;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Extractor\Oracle;
 use Keboola\DbExtractorLogger\Logger;
 use Monolog\Handler\TestHandler;
-use PHPUnit\Framework\Assert;
-use Psr\Log\Test\TestLogger;
 use Symfony\Component\Process\Process;
 
 class OracleTest extends OracleBaseTest
@@ -372,6 +371,7 @@ class OracleTest extends OracleBaseTest
         // Test connection must fail.
         // Test whether the SSH tunnel is really used,
         // because the direct connection is also available in the test environment.
+        $this->expectException(UserException::class);
         $this->expectExceptionMessage('The Network Adapter could not establish the connection');
         $extractor->testConnection();
     }
@@ -402,6 +402,7 @@ class OracleTest extends OracleBaseTest
         // Export must fail
         // Test whether the SSH tunnel is really used,
         // because the direct connection is also available in the test environment.
+        $this->expectException(UserException::class);
         $this->expectExceptionMessage('The Network Adapter could not establish the connection');
         $extractor->export($config['parameters']);
     }
