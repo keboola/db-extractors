@@ -99,13 +99,9 @@ abstract class OracleBaseTest extends ExtractorTest
         }
     }
 
-    /**
-     * @param array $config
-     * @return OracleApplication
-     */
-    public function createApplication(array $config, array $state = []): OracleApplication
+    public function createApplication(array $config, array $state = [], ?Logger $logger = null): OracleApplication
     {
-        $logger = new Logger('ex-db-mysql-tests');
+        $logger = $logger ?? new Logger('ex-db-mysql-tests');
         return new OracleApplication($config, $logger, $state, $this->dataDir);
     }
 

@@ -132,7 +132,7 @@ class OracleJavaExportWrapper
 
     private function writeTestConnectionConfig(): string
     {
-        return $this->writeConfig([
+        return $this->writeConfig('test connection', [
             'parameters' => [
                 'db' => $this->dbParams,
             ],
@@ -141,7 +141,7 @@ class OracleJavaExportWrapper
 
     private function writeTestGetTablesConfig(array $whitelist, bool $loadColumns, string $outputFile): string
     {
-        return $this->writeConfig([
+        return $this->writeConfig('get tables', [
             'parameters' => [
                 'db' => $this->dbParams,
                 'outputFile' => $outputFile,
@@ -153,7 +153,7 @@ class OracleJavaExportWrapper
 
     private function writeExportConfig(string $query, string $outputFile): string
     {
-        return $this->writeConfig([
+        return $this->writeConfig('export', [
             'parameters' => [
                 'db' => $this->dbParams,
                 'query' => $query,
@@ -162,10 +162,18 @@ class OracleJavaExportWrapper
         ]);
     }
 
-    private function writeConfig(array $config): string
+    private function writeConfig(string $configDesc, array $config): string
     {
         $configPath = $this->dataDir . '/javaConfig.json';
         JsonHelper::writeFile($configPath, $config);
+
+        $this->logger->info(sprintf(
+            'Created "%s" configuration for "java-oracle-exporter" tool, host: "%s", port: "%d".',
+            $configDesc,
+            $this->dbParams['host'],
+            $this->dbParams['port'],
+        ));
+
         return $configPath;
     }
 }
