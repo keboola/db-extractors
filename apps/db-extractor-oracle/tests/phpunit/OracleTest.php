@@ -27,7 +27,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         // Check host and port in log msg
-        Assert::assertTrue(
+        $this->assertTrue(
             $testLogHandler->hasInfoThatContains(
                 'Created "test connection" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
@@ -63,7 +63,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         // Check host and port in log msg
-        Assert::assertTrue(
+        $this->assertTrue(
             $testLogHandler->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
@@ -101,7 +101,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         // Check host and port in log msg
-        Assert::assertTrue(
+        $this->assertTrue(
             $testLogHandler->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
@@ -200,7 +200,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         // Check host and port in log msg
-        Assert::assertTrue(
+        $this->assertTrue(
             $testLogHandler->hasInfoThatContains(
                 'Created "test connection" configuration for "java-oracle-exporter" tool, ' .
                 'host: "127.0.0.1", port: "15211".'
@@ -240,7 +240,7 @@ class OracleTest extends OracleBaseTest
         $result = $app->run();
 
         // Check host and port in log msg
-        Assert::assertTrue(
+        $this->assertTrue(
             $testLogHandler->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "127.0.0.1", port: "15212".'
             )
