@@ -7,6 +7,10 @@ namespace Keboola\DbExtractor\Tests;
 use Keboola\Csv\CsvFile;
 use Keboola\DbExtractor\Extractor\Oracle;
 use Keboola\DbExtractorLogger\Logger;
+use Monolog\Handler\TestHandler;
+use PHPUnit\Framework\Assert;
+use Psr\Log\Test\TestLogger;
+use Symfony\Component\Process\Process;
 
 class OracleTest extends OracleBaseTest
 {
@@ -16,9 +20,20 @@ class OracleTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
-        $app = $this->createApplication($config);
+        $logger = new Logger();
+        $testLogHandler = new TestHandler();
+        $logger->pushHandler($testLogHandler);
+        $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
 
+        // Check host and port in log msg
+        Assert::assertTrue(
+            $testLogHandler->hasInfoThatContains(
+                'Created "test connection" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
+            )
+        );
+
+        // Check output
         $this->assertArrayHasKey('status', $result);
         $this->assertEquals('success', $result['status']);
     }
@@ -39,12 +54,23 @@ class OracleTest extends OracleBaseTest
     public function testRunRowConfig(): void
     {
         $config = $this->getConfigRow('oracle');
-        $app = $this->createApplication($config);
         $this->setupTestRowTable();
 
+        $logger = new Logger();
+        $testLogHandler = new TestHandler();
+        $logger->pushHandler($testLogHandler);
+        $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv';
 
+        // Check host and port in log msg
+        Assert::assertTrue(
+            $testLogHandler->hasInfoThatContains(
+                'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
+            )
+        );
+
+        // Check output
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv';
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists(
@@ -66,12 +92,23 @@ class OracleTest extends OracleBaseTest
     public function testRunConfig(): void
     {
         $config = $this->getConfig('oracle');
-        $app = $this->createApplication($config);
         $this->setupTestTables();
 
+        $logger = new Logger();
+        $testLogHandler = new TestHandler();
+        $logger->pushHandler($testLogHandler);
+        $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
-        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
 
+        // Check host and port in log msg
+        Assert::assertTrue(
+            $testLogHandler->hasInfoThatContains(
+                'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
+            )
+        );
+
+        // Check output
+        $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
         $this->assertEquals('success', $result['status']);
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists(
@@ -156,8 +193,19 @@ class OracleTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
-        $app = $this->createApplication($config);
+        $logger = new Logger();
+        $testLogHandler = new TestHandler();
+        $logger->pushHandler($testLogHandler);
+        $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
+
+        // Check host and port in log msg
+        Assert::assertTrue(
+            $testLogHandler->hasInfoThatContains(
+                'Created "test connection" configuration for "java-oracle-exporter" tool, ' .
+                'host: "127.0.0.1", port: "15211".'
+            )
+        );
 
         $this->assertArrayHasKey('status', $result);
         $this->assertEquals('success', $result['status']);
@@ -179,7 +227,10 @@ class OracleTest extends OracleBaseTest
             'localPort' => '15212',
         ];
 
-        $app = $this->createApplication($config);
+        $logger = new Logger();
+        $testLogHandler = new TestHandler();
+        $logger->pushHandler($testLogHandler);
+        $app = $this->createApplication($config, [], $logger);
 
         $this->setupTestTables();
 
@@ -188,10 +239,16 @@ class OracleTest extends OracleBaseTest
 
         $result = $app->run();
 
+        // Check host and port in log msg
+        Assert::assertTrue(
+            $testLogHandler->hasInfoThatContains(
+                'Created "export" configuration for "java-oracle-exporter" tool, host: "127.0.0.1", port: "15212".'
+            )
+        );
+
+        // Check output
         $outputCsvFile = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv';
-
         $this->assertEquals('success', $result['status']);
-
         $this->assertFileExists($outputCsvFile);
         $filenameManifest = $this->dataDir . '/out/tables/' . $result['imported'][0]['outputTable'] . '.csv.manifest';
         $this->assertFileExists($filenameManifest);
@@ -287,6 +344,68 @@ class OracleTest extends OracleBaseTest
 
         $this->assertCount(2, $tables);
     }
+
+    public function testSSHTestConnectionFailed(): void
+    {
+        $config = $this->getConfigRow('oracle');
+        $config['action'] = 'testConnection';
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'remoteHost' => 'oracle',
+            'remotePort' => $config['parameters']['db']['port'],
+            'localPort' => '15212',
+        ];
+
+        // Create extractor: SSH tunnel is created
+        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
+
+        // Kill SSH tunnel
+        $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
+        $process->mustRun();
+
+        // Test connection must fail.
+        // Test whether the SSH tunnel is really used,
+        // because the direct connection is also available in the test environment.
+        $this->expectExceptionMessage('The Network Adapter could not establish the connection');
+        $extractor->testConnection();
+    }
+
+    public function testSSHRunConnectionFailed(): void
+    {
+        $config = $this->getConfigRow('oracle');
+        $config['parameters']['db']['ssh'] = [
+            'enabled' => true,
+            'keys' => [
+                '#private' => $this->getPrivateKey(),
+                'public' => $this->getPublicKey(),
+            ],
+            'user' => 'root',
+            'sshHost' => 'sshproxy',
+            'remoteHost' => 'oracle',
+            'remotePort' => $config['parameters']['db']['port'],
+            'localPort' => '15212',
+        ];
+
+        // Create extractor: SSH tunnel is created
+        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
+
+        // Kill SSH tunnel
+        $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
+        $process->mustRun();
+
+        // Export must fail
+        // Test whether the SSH tunnel is really used,
+        // because the direct connection is also available in the test environment.
+        $this->expectExceptionMessage('The Network Adapter could not establish the connection');
+        $extractor->export($config['parameters']);
+    }
+
 
     public function testGetTables(): void
     {
