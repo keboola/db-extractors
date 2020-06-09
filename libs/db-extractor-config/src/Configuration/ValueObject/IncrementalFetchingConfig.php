@@ -16,7 +16,7 @@ class IncrementalFetchingConfig implements ValueObject
     public static function fromArray(array $data): ?self
     {
         // Enabled ?
-        if (empty($data['incremental'])) {
+        if (empty($data['incrementalFetchingColumn'])) {
             return null;
         }
 

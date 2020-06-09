@@ -20,6 +20,14 @@ class ExportConfig implements ValueObject
     /** Table that will be exported (if query is not set) */
     private ?InputTable $table;
 
+    /**
+     * If enabled, new rows are added and existing (same PK value) are updated.
+     * If disabled, full load is performed and the storage table is overwritten.
+     * It's a different feature from incrementalFetching!
+     * @var bool
+     */
+    private bool $incrementalLoading;
+
     /** Configuration of incremental fetching */
     private ?IncrementalFetchingConfig $incrementalFetchingConfig;
 
@@ -42,6 +50,7 @@ class ExportConfig implements ValueObject
             $data['name'] ?? null,
             $data['query'],
             empty($data['query']) ? InputTable::fromArray($data) : null,
+            $data['incremental'] ?? false,
             empty($data['query']) ? IncrementalFetchingConfig::fromArray($data) : null,
             $data['columns'],
             $data['outputTable'],
@@ -55,6 +64,7 @@ class ExportConfig implements ValueObject
         ?string $configName,
         ?string $query,
         ?InputTable $table,
+        bool $incrementalLoading,
         ?IncrementalFetchingConfig $incrementalFetchingConfig,
         array $columns,
         string $outputTable,
@@ -67,6 +77,7 @@ class ExportConfig implements ValueObject
         $outputTable = trim($outputTable);
         $this->query = $query;
         $this->table = $table;
+        $this->incrementalLoading = $incrementalLoading;
         $this->incrementalFetchingConfig = $incrementalFetchingConfig;
         $this->columns = $columns;
         $this->outputTable = $outputTable;
@@ -114,6 +125,11 @@ class ExportConfig implements ValueObject
         }
 
         return $this->table;
+    }
+
+    public function isIncrementalLoading(): bool
+    {
+        return $this->incrementalLoading;
     }
 
     public function isIncrementalFetching(): bool

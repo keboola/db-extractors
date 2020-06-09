@@ -25,7 +25,6 @@ class IncrementalFetchingConfigTest extends TestCase
     {
         /** @var IncrementalFetchingConfig $config */
         $config = IncrementalFetchingConfig::fromArray([
-            'incremental' => true,
             'incrementalFetchingColumn' => 'col123',
         ]);
         Assert::assertSame('col123', $config->getColumn());
@@ -41,7 +40,6 @@ class IncrementalFetchingConfigTest extends TestCase
     {
         /** @var IncrementalFetchingConfig $config */
         $config = IncrementalFetchingConfig::fromArray([
-            'incremental' => true,
             'incrementalFetchingColumn' => 'col123',
             'incrementalFetchingLimit' => 456,
         ]);

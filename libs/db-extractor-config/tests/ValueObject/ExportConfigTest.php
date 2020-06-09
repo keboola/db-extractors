@@ -38,6 +38,9 @@ class ExportConfigTest extends TestCase
         Assert::assertSame('table', $config->getTable()->getName());
         Assert::assertSame('schema', $config->getTable()->getSchema());
 
+        // Incremental loading
+        Assert::assertSame(false, $config->isIncrementalLoading());
+
         // Incremental fetching
         Assert::assertSame(false, $config->isIncrementalFetching());
         try {
@@ -160,6 +163,9 @@ class ExportConfigTest extends TestCase
             // ok
         }
 
+        // Incremental loading
+        Assert::assertSame(false, $config->isIncrementalLoading());
+
         // Incremental fetching
         Assert::assertSame(false, $config->isIncrementalFetching());
         try {
@@ -222,7 +228,7 @@ class ExportConfigTest extends TestCase
         }
     }
 
-    public function testIncremental(): void
+    public function testIncrementalFetching(): void
     {
         $config = ExportConfig::fromArray([
             'table' => [
@@ -233,9 +239,11 @@ class ExportConfigTest extends TestCase
             'retries' => 12,
             'columns' => [],
             'primaryKey' => [],
-            'incremental' => true,
             'incrementalFetchingColumn' => 'col123',
         ]);
+
+        // Incremental loading
+        Assert::assertSame(false, $config->isIncrementalLoading());
 
         // Incremental fetching
         Assert::assertSame(true, $config->isIncrementalFetching());
@@ -259,7 +267,73 @@ class ExportConfigTest extends TestCase
         }
     }
 
-    public function testIncrementalWithLimit(): void
+    public function testIncrementalLoading(): void
+    {
+        $config = ExportConfig::fromArray([
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+            'incremental' => true,
+        ]);
+
+        // Incremental loading
+        Assert::assertSame(true, $config->isIncrementalLoading());
+
+        // Incremental fetching
+        Assert::assertSame(false, $config->isIncrementalFetching());
+        try {
+            $config->getIncrementalFetchingConfig();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
+        try {
+            $config->getIncrementalFetchingColumn();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
+        try {
+            $config->getIncrementalFetchingLimit();
+            Assert::fail('Exception is expected.');
+        } catch (PropertyNotSetException $e) {
+            // ok
+        }
+    }
+
+    public function testIncrementalFetchingAndLoading(): void
+    {
+        $config = ExportConfig::fromArray([
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+            'incremental' => true,
+            'incrementalFetchingColumn' => 'col123',
+            'incrementalFetchingLimit' => 456,
+        ]);
+
+        // Incremental loading
+        Assert::assertSame(true, $config->isIncrementalLoading());
+
+        // Incremental fetching
+        Assert::assertSame(true, $config->isIncrementalFetching());
+        Assert::assertSame('col123', $config->getIncrementalFetchingConfig()->getColumn());
+        Assert::assertSame('col123', $config->getIncrementalFetchingColumn());
+        Assert::assertSame(456, $config->getIncrementalFetchingConfig()->getLimit());
+        Assert::assertSame(456, $config->getIncrementalFetchingLimit());
+    }
+
+    public function testIncrementalFetchingWithLimit(): void
     {
         $config = ExportConfig::fromArray([
             'table' => [
