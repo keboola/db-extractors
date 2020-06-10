@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Component\JsonHelper;
 use PHPUnit\Framework\Assert;
 use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
@@ -774,5 +775,29 @@ class MySQLTest extends AbstractMySQLTest
                     ],
             ],
         ], $result['tables']);
+    }
+
+    public function testIncrementalLoadingWithCustomQuery(): void
+    {
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
+        $config = $this->getConfigRow(self::DRIVER);
+        $config['parameters']['outputTable'] = 'in.c-main.sales';
+        $config['parameters']['incremental'] = true;
+        $config['parameters']['query'] = 'SELECT * FROM sales;';
+        $app = $this->createApplication($config);
+        $result = $app->run();
+
+        // Check status
+        $this->assertEquals('success', $result['status']);
+
+        // Check csv
+        $this->assertFileEquals(
+            $this->dataDir . '/mysql/sales.csv',
+            $this->dataDir . '/out/tables/in.c-main.sales.csv'
+        );
+
+        // Check manifest incremental key
+        $manifest = JsonHelper::readFile($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');
+        $this->assertTrue($manifest['incremental']);
     }
 }
