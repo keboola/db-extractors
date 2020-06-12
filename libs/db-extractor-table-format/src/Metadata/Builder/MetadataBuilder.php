@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Metadata\Builder;
 
+use Generator;
+use Keboola\DbExtractor\TableResultFormat\Exception\NoColumnException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\TableCollection;
 
 class MetadataBuilder implements Builder
@@ -17,6 +19,14 @@ class MetadataBuilder implements Builder
     /** @var TableBuilder[] */
     private array $tables = [];
 
+    /**
+     * In some databases (eg. MySql),
+     * the user may have the permission to list tables,
+     * but without permission to list the columns in the table.
+     * Such table cannot be used even for export and therefore we ignore it.
+     */
+    private bool $ignoreTableWithoutColumns = true;
+
     public static function create(array $tableRequiredProperties = [], array $columnRequiredProperties = []): self
     {
         return new self($tableRequiredProperties, $columnRequiredProperties);
@@ -28,11 +38,15 @@ class MetadataBuilder implements Builder
         $this->columnRequiredProperties = $columnRequiredProperties;
     }
 
+    public function setIgnoreTableWithoutColumns(bool $value): self
+    {
+        $this->ignoreTableWithoutColumns = $value;
+        return $this;
+    }
+
     public function build(): TableCollection
     {
-        return new TableCollection(
-            array_map(fn(TableBuilder $table) => $table->build(), $this->tables)
-        );
+        return new TableCollection(iterator_to_array($this->buildTables()));
     }
 
     public function addTable(): TableBuilder
@@ -40,5 +54,18 @@ class MetadataBuilder implements Builder
         $table = TableBuilder::create($this->tableRequiredProperties, $this->columnRequiredProperties);
         $this->tables[] = $table;
         return $table;
+    }
+
+    private function buildTables(): Generator
+    {
+        foreach ($this->tables as $table) {
+            try {
+                yield $table->build();
+            } catch (NoColumnException $e) {
+                if ($this->ignoreTableWithoutColumns === false) {
+                    throw $e;
+                }
+            }
+        }
     }
 }
