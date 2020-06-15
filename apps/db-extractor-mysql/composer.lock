@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fc156435b1a513af33d402aa87824d98",
+    "content-hash": "43ba714d32434701e25ad9179ddddfda",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -297,16 +297,16 @@
         },
         {
             "name": "keboola/db-extractor-table-format",
-            "version": "3.0.5",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-table-format.git",
-                "reference": "84e43330cbaeae7c87d902be9ef86793972e2a9b"
+                "reference": "9510ccf276fb9c3bb303ef2c43ad02ed48b70ced"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-table-format/zipball/84e43330cbaeae7c87d902be9ef86793972e2a9b",
-                "reference": "84e43330cbaeae7c87d902be9ef86793972e2a9b",
+                "url": "https://api.github.com/repos/keboola/db-extractor-table-format/zipball/9510ccf276fb9c3bb303ef2c43ad02ed48b70ced",
+                "reference": "9510ccf276fb9c3bb303ef2c43ad02ed48b70ced",
                 "shasum": ""
             },
             "require": {
@@ -338,7 +338,7 @@
                 }
             ],
             "description": "PHP class for formating table result",
-            "time": "2020-06-08T07:43:31+00:00"
+            "time": "2020-06-15T07:33:56+00:00"
         },
         {
             "name": "keboola/php-component",
@@ -398,16 +398,16 @@
         },
         {
             "name": "keboola/php-datatypes",
-            "version": "4.7.0",
+            "version": "4.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-datatypes.git",
-                "reference": "da1ddb3e370eceedfbf46f8fdd510b0a4056daa6"
+                "reference": "8861a4dca7ab4bf08896af0fc9a4ea47edbb3a98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/da1ddb3e370eceedfbf46f8fdd510b0a4056daa6",
-                "reference": "da1ddb3e370eceedfbf46f8fdd510b0a4056daa6",
+                "url": "https://api.github.com/repos/keboola/php-datatypes/zipball/8861a4dca7ab4bf08896af0fc9a4ea47edbb3a98",
+                "reference": "8861a4dca7ab4bf08896af0fc9a4ea47edbb3a98",
                 "shasum": ""
             },
             "require": {
@@ -437,7 +437,7 @@
                 }
             ],
             "description": "PHP datatypes for databases",
-            "time": "2020-04-08T07:50:29+00:00"
+            "time": "2020-06-11T07:43:55+00:00"
         },
         {
             "name": "keboola/php-temp",
@@ -2545,7 +2545,7 @@
         },
         {
             "name": "symfony/config",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
@@ -2685,7 +2685,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
@@ -2749,7 +2749,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
@@ -2960,7 +2960,7 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
@@ -3024,16 +3024,16 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v5.1.0",
+            "version": "v5.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "f3ea48ec7fea41397dea61f74ff86dba1d29560a"
+                "reference": "d1151fc0fd64b613f2a7012afc22d36b1341a5fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/f3ea48ec7fea41397dea61f74ff86dba1d29560a",
-                "reference": "f3ea48ec7fea41397dea61f74ff86dba1d29560a",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/d1151fc0fd64b613f2a7012afc22d36b1341a5fd",
+                "reference": "d1151fc0fd64b613f2a7012afc22d36b1341a5fd",
                 "shasum": ""
             },
             "require": {
@@ -3117,7 +3117,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-05-30T20:35:19+00:00"
+            "time": "2020-06-07T15:42:22+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -3237,16 +3237,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.28",
+            "version": "0.12.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "76c0c4ec90b1eed66fa4855b8b4b53fa9054353f"
+                "reference": "9771daaf6b95c6313b908d0bcdee0afcd51f838a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/76c0c4ec90b1eed66fa4855b8b4b53fa9054353f",
-                "reference": "76c0c4ec90b1eed66fa4855b8b4b53fa9054353f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9771daaf6b95c6313b908d0bcdee0afcd51f838a",
+                "reference": "9771daaf6b95c6313b908d0bcdee0afcd51f838a",
                 "shasum": ""
             },
             "require": {
@@ -3289,7 +3289,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-06-10T06:20:14+00:00"
+            "time": "2020-06-14T14:10:59+00:00"
         },
         {
             "name": "slevomat/coding-standard",
