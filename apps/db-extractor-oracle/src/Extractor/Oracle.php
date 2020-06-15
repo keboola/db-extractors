@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
-use Psr\Log\LoggerInterface;
-use function Keboola\Utils\formatDateTime;
 use Throwable;
+use Psr\Log\LoggerInterface;
+use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
+use function Keboola\Utils\formatDateTime;
+use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
 use Keboola\Datatype\Definition\GenericStorage;
-use Keboola\DbExtractor\DbRetryProxy;
-use Keboola\DbExtractor\Exception\ApplicationException;
-use Keboola\DbExtractor\Exception\OracleJavaExportException;
-use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractor\TableResultFormat\Table;
-use Keboola\DbExtractor\TableResultFormat\TableColumn;
 
 class Oracle extends BaseExtractor
 {
@@ -23,15 +20,9 @@ class Oracle extends BaseExtractor
     public const INCREMENT_TYPE_DATE = 'date';
     public const NUMERIC_BASE_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT'];
 
-    private array $tableListFilter;
-
     private OracleJavaExportWrapper $exportWrapper;
 
-    public function __construct(array $parameters, array $state, LoggerInterface $logger)
-    {
-        parent::__construct($parameters, $state, $logger);
-        $this->tableListFilter = $parameters['tableListFilter'] ?? [];
-    }
+    private ?string $incrementalFetchingType = null;
 
     public function createConnection(array $params): void
     {
@@ -40,65 +31,55 @@ class Oracle extends BaseExtractor
         $this->exportWrapper = new OracleJavaExportWrapper($this->logger, $this->dataDir, $this->getDbParameters());
     }
 
-    protected function handleDbError(Throwable $e, ?array $table = null, ?int $counter = null): UserException
+    public function getMetadataProvider(): MetadataProvider
     {
-        $message = '';
-        if ($table) {
-            $message = sprintf('[%s]: ', $table['name']);
-        }
-        $message .= sprintf('DB query failed: %s', $e->getMessage());
-        if ($counter) {
-            $message .= sprintf(' Tried %d times.', $counter);
-        }
-        return new UserException($message, 0, $e);
+        return new OracleMetadataProvider($this->exportWrapper);
     }
 
-    public function export(array $table): array
+    public function export(ExportConfig $exportConfig): array
     {
-        $outputTable = $table['outputTable'];
-        $csv = $this->createOutputCsv($outputTable);
-
-        $this->logger->info('Exporting to ' . $outputTable);
-
-        $isAdvancedQuery = true;
-        $maxValue = null;
-        if (array_key_exists('table', $table)) {
-            $isAdvancedQuery = false;
-            if ($this->incrementalFetching) {
-                $maxValue = $this->getMaxOfIncrementalFetchingColumn($table);
-            }
+        if ($exportConfig->isIncrementalFetching()) {
+            $this->validateIncrementalFetching($exportConfig);
         }
 
-        $query = isset($table['query']) ?
-            rtrim($table['query'], ' ;') :
-            $this->simpleQuery(
-                $table['table'],
-                isset($table['columns']) ? $table['columns'] : []
-            );
-        $maxTries = isset($table['retries']) ? (int) $table['retries'] : DbRetryProxy::DEFAULT_MAX_TRIES;
-        $outputFile = $this->getOutputFilename($table['outputTable']);
+        $this->logger->info('Exporting to ' . $exportConfig->getOutputTable());
 
+        // Max value
+        $maxValue = $exportConfig->hasTable() && $exportConfig->isIncrementalFetching() ?
+            $this->getMaxOfIncrementalFetchingColumn($exportConfig) : null;
+
+        // Query
+        $query = $exportConfig->hasQuery() ?
+            rtrim($exportConfig->getQuery(), ' ;') :
+            $this->simpleQuery($exportConfig);
+
+        // Export
         try {
-            $linesWritten = $this->exportWrapper->export($query, $maxTries, $outputFile, $isAdvancedQuery);
-        } catch (OracleJavaExportException $e) {
-            throw $this->handleDbError($e, $table, $maxTries);
+            $linesWritten = $this->exportWrapper->export(
+                $query,
+                $exportConfig->getMaxRetries(),
+                $this->getOutputFilename($exportConfig->getOutputTable()),
+                $exportConfig->hasQuery()
+            );
+        } catch (Throwable $e) {
+            $logPrefix = $exportConfig->hasConfigName() ?
+                $exportConfig->getConfigName() : $exportConfig->getOutputTable();
+            throw $this->handleDbError($e, $exportConfig->getMaxRetries(), $logPrefix);
         }
 
         $rowCount = $linesWritten - 1;
         if ($rowCount > 0) {
-            $this->createManifest($table);
+            $this->createManifest($exportConfig);
         } else {
-            @unlink($csv->getPathname());
-            $this->logger->warn(
-                sprintf(
-                    'Query returned empty result. Nothing was imported for table [%s]',
-                    $table['name']
-                )
-            );
+            @unlink($this->getOutputFilename($exportConfig->getOutputTable())); // no rows, no file
+            $this->logger->warning(sprintf(
+                'Query returned empty result. Nothing was imported to [%s]',
+                $exportConfig->getOutputTable()
+            ));
         }
 
         $output = [
-            'outputTable'=> $outputTable,
+            'outputTable' => $exportConfig->getOutputTable(),
             'rows' => $rowCount,
         ];
 
@@ -106,130 +87,76 @@ class Oracle extends BaseExtractor
         if ($maxValue) {
             $output['state']['lastFetchedRow'] = $maxValue;
         }
+
         return $output;
     }
 
-    public function validateIncrementalFetching(array $table, string $columnName, ?int $limit = null): void
+    public function validateIncrementalFetching(ExportConfig $exportConfig): void
     {
-        $table = current($this->getTables([$table]));
-        $columns = array_values(array_filter($table['columns'], function ($item) use ($columnName) {
-            return $item['name'] === $columnName;
-        }));
+        try {
+            $column = $this
+                ->getMetadataProvider()
+                ->getTable($exportConfig->getTable())
+                ->getColumns()
+                ->getByName($exportConfig->getIncrementalFetchingColumn());
+        } catch (ColumnNotFoundException $e) {
+            throw new UserException(sprintf(
+                'Column "%s" specified for incremental fetching was not found in the table.',
+                $exportConfig->getIncrementalFetchingColumn()
+            ));
+        }
 
         try {
-            $datatype = new GenericStorage($columns[0]['type']);
+            $datatype = new GenericStorage($column->getType());
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
-                $this->incrementalFetching['column'] = $columnName;
-                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_NUMERIC;
-            } elseif ($datatype->getBasetype() === 'TIMESTAMP') {
-                $this->incrementalFetching['column'] = $columnName;
-                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_TIMESTAMP;
-            } elseif ($datatype->getBasetype() === 'DATE') {
-                $this->incrementalFetching['column'] = $columnName;
-                $this->incrementalFetching['type'] = self::INCREMENT_TYPE_DATE;
+                $this->incrementalFetchingType = self::INCREMENT_TYPE_NUMERIC;
+            } else if ($datatype->getBasetype() === 'TIMESTAMP') {
+                $this->incrementalFetchingType = self::INCREMENT_TYPE_TIMESTAMP;
+            } else if ($datatype->getBasetype() === 'DATE') {
+                $this->incrementalFetchingType = self::INCREMENT_TYPE_DATE;
             } else {
                 throw new UserException('invalid incremental fetching column type');
             }
         } catch (InvalidLengthException | UserException $exception) {
             throw new UserException(
                 sprintf(
-                    'Column [%s] specified for incremental fetching is not a numeric or timestamp type column',
-                    $columnName
+                    'Column "%s" specified for incremental fetching is not a numeric or timestamp type column.',
+                    $column->getName()
                 )
             );
         }
-
-        if ($limit) {
-            $this->incrementalFetching['limit'] = $limit;
-        }
     }
 
-    public function getMaxOfIncrementalFetchingColumn(array $table): ?string
+    public function getMaxOfIncrementalFetchingColumn(ExportConfig $exportConfig): ?string
     {
         $outputFile = $this->getOutputFilename('last_row');
-        $maxTries = isset($table['retries']) ? (int) $table['retries'] : DbRetryProxy::DEFAULT_MAX_TRIES;
-
-        $simplyQuery = $this->simpleQuery(
-            $table['table'],
-            [$this->incrementalFetching['column']]
+        $this->exportWrapper->export(
+            $this->getLastRowQuery($exportConfig),
+            $exportConfig->getMaxRetries(),
+            $outputFile,
+            false
         );
 
-        try {
-            $this->exportWrapper->export(
-                $this->getLastRowQuery($simplyQuery),
-                $maxTries,
-                $outputFile,
-                false,
-            );
-
-            return json_decode((string) file_get_contents($outputFile));
-        } finally {
-            @unlink($outputFile);
-        }
+        $value = json_decode((string) file_get_contents($outputFile));
+        unlink($outputFile);
+        return $value;
     }
 
-    public function testConnection(): bool
+
+    public function testConnection(): void
     {
         $this->exportWrapper->testConnection();
-        return true;
     }
 
-    public function getTables(?array $tables = null): array
-    {
-        $loadColumns = $this->tableListFilter['listColumns'] ?? true;
-        $whiteList = $this->tableListFilter['tablesToList'] ?? [];
-        $tables = $tables ?: $whiteList;
-        $tableListing =  $this->exportWrapper->getTables($tables, $loadColumns);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new ApplicationException(
-                'Cannot parse JSON data of table listing - error: ' . json_last_error()
-            );
-        }
-        /** @var Table[] $tableDefs */
-        $tableDefs = [];
-        foreach ($tableListing as $table) {
-            $tableFormat = new Table();
-            $tableFormat
-                ->setName($table['name'])
-                ->setSchema($table['schema']);
-
-            if (isset($table['tablespaceName'])) {
-                $tableFormat->setCatalog($table['tablespaceName']);
-            }
-
-            if (isset($table['columns'])) {
-                foreach ($table['columns'] as $column) {
-                    $columnFormat = new TableColumn();
-                    $columnFormat
-                        ->setName($column['name'])
-                        ->setType($column['type'])
-                        ->setNullable($column['nullable'])
-                        ->setLength($column['length'])
-                        ->setOrdinalPosition($column['ordinalPosition'])
-                        ->setPrimaryKey($column['primaryKey'])
-                        ->setUniqueKey($column['uniqueKey']);
-
-                    $tableFormat->addColumn($columnFormat);
-                }
-            }
-            $tableDefs[] = $tableFormat;
-        }
-        array_walk($tableDefs, function (Table &$item): void {
-            $item = $item->getOutput();
-        });
-        return $tableListing;
-    }
-
-    public function simpleQuery(array $table, array $columns = array()): string
+    public function simpleQuery(ExportConfig $exportConfig): string
     {
         $sql = [];
         $where = [];
 
-        if (count($columns) > 0) {
+        if ($exportConfig->hasColumns()) {
             $sql[] = sprintf('SELECT %s', implode(', ', array_map(
                 fn(string $c) => $this->quote($c),
-                $columns
+                $exportConfig->getColumns()
             )));
         } else {
             $sql[] = 'SELECT *';
@@ -237,37 +164,32 @@ class Oracle extends BaseExtractor
 
         $sql[] = sprintf(
             'FROM %s.%s',
-            $this->quote($table['schema']),
-            $this->quote($table['tableName'])
+            $this->quote($exportConfig->getTable()->getSchema()),
+            $this->quote($exportConfig->getTable()->getName())
         );
 
-        if ($this->incrementalFetching) {
-            if (isset($this->incrementalFetching['column']) && isset($this->state['lastFetchedRow'])) {
-                if ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_NUMERIC) {
-                    $lastFetchedRow = $this->state['lastFetchedRow'];
-                } elseif ($this->incrementalFetching['type'] === self::INCREMENT_TYPE_DATE) {
-                    $lastFetchedRow = sprintf(
-                        'DATE \'%s\'',
-                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
-                    );
-                } else {
-                    $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
-                }
-
-                // intentionally ">=" last row should be included, it is handled by storage deduplication process
-                $where[] = sprintf(
-                    '%s >= %s',
-                    $this->quote($this->incrementalFetching['column']),
-                    $lastFetchedRow
+        if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
+            if ($this->incrementalFetchingType === self::INCREMENT_TYPE_NUMERIC) {
+                $lastFetchedRow = $this->state['lastFetchedRow'];
+            } else if ($this->incrementalFetchingType === self::INCREMENT_TYPE_DATE) {
+                $lastFetchedRow = sprintf(
+                    "DATE '%s'",
+                    formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
                 );
+            } else {
+                $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
             }
 
-            if (isset($this->incrementalFetching['limit'])) {
-                $where[] = sprintf(
-                    'ROWNUM <= %d',
-                    $this->incrementalFetching['limit']
-                );
-            }
+            // intentionally ">=" last row should be included, it is handled by storage deduplication process
+            $where[] = sprintf(
+                '%s >= %s',
+                $this->quote($exportConfig->getIncrementalFetchingColumn()),
+                $lastFetchedRow
+            );
+        }
+
+        if ($exportConfig->hasIncrementalFetchingLimit()) {
+            $where[] = sprintf('ROWNUM <= %d', $exportConfig->getIncrementalFetchingLimit());
         }
 
         if ($where) {
@@ -277,13 +199,13 @@ class Oracle extends BaseExtractor
         return implode(' ', $sql);
     }
 
-    private function getLastRowQuery(string $query): string
+    private function getLastRowQuery(ExportConfig $exportConfig): string
     {
         return sprintf(
             'SELECT %s FROM (SELECT * FROM (%s) ORDER BY %s DESC) WHERE ROWNUM = 1',
-            $this->quote($this->incrementalFetching['column']),
-            $query,
-            $this->quote($this->incrementalFetching['column']),
+            $this->quote($exportConfig->getIncrementalFetchingColumn()),
+            $this->simpleQuery($exportConfig),
+            $this->quote($exportConfig->getIncrementalFetchingColumn()),
         );
     }
 

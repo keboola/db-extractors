@@ -92,7 +92,7 @@ abstract class OracleBaseTest extends ExtractorTest
         if (file_exists($this->dataDir . '/out/tables')) {
             $dh = opendir($this->dataDir . '/out/tables');
             if ($dh) {
-                while (false !== ($file = readdir($dh))) {
+                while (($file = readdir($dh)) !== false) {
                     @unlink($file);
                 }
             }
