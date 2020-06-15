@@ -16,8 +16,11 @@ class ActionConfigRowDefinition extends BaseConfigDefinition
 {
     protected NodeDefinition $dbNode;
 
-    public function __construct(?DbNode $dbNode = null, ?SshNode $sshNode = null, ?SslNodeDecorator $sslNodeDecorator = null)
-    {
+    public function __construct(
+        ?DbNode $dbNode = null,
+        ?SshNode $sshNode = null,
+        ?SslNodeDecorator $sslNodeDecorator = null
+    ) {
         $this->dbNode = $dbNode ?? new DbNode($sshNode, $sslNodeDecorator);
     }
 

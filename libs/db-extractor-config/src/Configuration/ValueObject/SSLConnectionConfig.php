@@ -39,22 +39,22 @@ class SSLConnectionConfig implements ValueObject
         $this->verifyServerCert = $verifyServerCert;
     }
 
-    public function hasKey()
+    public function hasKey(): bool
     {
         return $this->key !== null;
     }
 
-    public function hasCert()
+    public function hasCert(): bool
     {
         return $this->cert !== null;
     }
 
-    public function hasCa()
+    public function hasCa(): bool
     {
         return $this->ca !== null;
     }
 
-    public function hasCipher()
+    public function hasCipher(): bool
     {
         return $this->cipher !== null;
     }

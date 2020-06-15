@@ -396,7 +396,7 @@ class ExportConfigTest extends TestCase
                     'cert' => 'testCert',
                     'cipher' => 'testCipher',
                     'key' => 'testKey',
-                ]
+                ],
             ],
             'outputTable' => 'output-table',
             'retries' => 12,

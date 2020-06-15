@@ -16,8 +16,11 @@ class DbNode extends ArrayNodeDefinition
 
     protected SslNodeDecorator $sslNodeDecorator;
 
-    public function __construct(?SshNode $sshNode = null, ?SslNodeDecorator $sslNodeDecorator = null, ?NodeParentInterface $parent = null)
-    {
+    public function __construct(
+        ?SshNode $sshNode = null,
+        ?SslNodeDecorator $sslNodeDecorator = null,
+        ?NodeParentInterface $parent = null
+    ) {
         parent::__construct(self::NODE_NAME, $parent);
         $this->sshNode = $sshNode ?? new SshNode();
         $this->sslNodeDecorator = $sslNodeDecorator ?? new SslNodeDecorator();

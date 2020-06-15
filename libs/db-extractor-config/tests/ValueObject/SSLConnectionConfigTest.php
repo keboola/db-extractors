@@ -24,6 +24,10 @@ class SSLConnectionConfigTest extends TestCase
             ],
         ]);
 
+        Assert::assertTrue($sslConnectionConfig->hasKey());
+        Assert::assertTrue($sslConnectionConfig->hasCa());
+        Assert::assertTrue($sslConnectionConfig->hasCert());
+        Assert::assertTrue($sslConnectionConfig->hasCipher());
         Assert::assertEquals('testKey', $sslConnectionConfig->getKey());
         Assert::assertEquals('testCa', $sslConnectionConfig->getCa());
         Assert::assertEquals('testCertificate', $sslConnectionConfig->getCert());
