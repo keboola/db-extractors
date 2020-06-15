@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Psr\Log\LoggerInterface;
 use function Keboola\Utils\formatDateTime;
 use Throwable;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
@@ -14,9 +15,8 @@ use Keboola\DbExtractor\Exception\OracleJavaExportException;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\TableResultFormat\Table;
 use Keboola\DbExtractor\TableResultFormat\TableColumn;
-use Keboola\DbExtractorLogger\Logger;
 
-class Oracle extends Extractor
+class Oracle extends BaseExtractor
 {
     public const INCREMENT_TYPE_NUMERIC = 'numeric';
     public const INCREMENT_TYPE_TIMESTAMP = 'timestamp';
@@ -27,7 +27,7 @@ class Oracle extends Extractor
 
     private OracleJavaExportWrapper $exportWrapper;
 
-    public function __construct(array $parameters, array $state, ?Logger $logger)
+    public function __construct(array $parameters, array $state, LoggerInterface $logger)
     {
         parent::__construct($parameters, $state, $logger);
         $this->tableListFilter = $parameters['tableListFilter'] ?? [];

@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Component\JsonHelper;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\OracleJavaExportException;
-use Keboola\DbExtractorLogger\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -15,13 +15,13 @@ use Symfony\Component\Process\Process;
  */
 class OracleJavaExportWrapper
 {
-    private Logger $logger;
+    private LoggerInterface $logger;
 
     private string $dataDir;
 
     private array $dbParams;
 
-    public function __construct(Logger $logger, string $dataDir, array $dbParams)
+    public function __construct(LoggerInterface $logger, string $dataDir, array $dbParams)
     {
         $this->logger = $logger;
         $this->dataDir = $dataDir;

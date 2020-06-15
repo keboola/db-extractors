@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
+use Keboola\Component\Logger;
+use Monolog\Handler\NullHandler;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
-use Keboola\DbExtractorLogger\Logger;
-use Monolog\Handler\NullHandler;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
-$logger = new Logger('ex-db-oracle');
+$logger = new Logger();
 
 $runAction = true;
 

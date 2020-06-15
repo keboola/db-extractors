@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
+use Psr\Log\LoggerInterface;
 use Keboola\DbExtractorConfig\Config;
+use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Keboola\DbExtractorLogger\Logger;
 
 class OracleApplication extends Application
 {
-    public function __construct(array $config, Logger $logger, array $state, string $dataDir)
+    public function __construct(array $config, LoggerInterface $logger, array $state, string $dataDir)
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'Oracle';
