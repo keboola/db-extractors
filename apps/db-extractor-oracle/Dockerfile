@@ -75,4 +75,4 @@ RUN composer install $COMPOSER_FLAGS
 
 COPY --from=sshproxy /root/.ssh /root/.ssh
 
-CMD php ./src/run.php --data=/data
+CMD php ./src/run.php
