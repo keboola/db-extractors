@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
+use Keboola\DbExtractor\TableResultFormat\Exception\NoColumnException;
 use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
@@ -78,7 +79,7 @@ class Table implements ValueObject
         }
 
         if ($columns && $columns->isEmpty()) {
-            throw new InvalidArgumentException(sprintf('Table "%s" must have at least one column.', $name));
+            throw new NoColumnException(sprintf('Table "%s" must have at least one column.', $name));
         }
 
         $this->name = $name;
