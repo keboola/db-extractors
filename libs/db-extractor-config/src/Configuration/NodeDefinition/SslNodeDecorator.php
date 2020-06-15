@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Keboola\DbExtractorConfig\Configuration\NodeDefinition;
+
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+
+class SslNodeDecorator
+{
+
+    public function addNodes(NodeBuilder $nodeBuilder): void
+    {
+        $this->addKeyNode($nodeBuilder);
+        $this->addCaNode($nodeBuilder);
+        $this->addCertNode($nodeBuilder);
+        $this->addCipherNode($nodeBuilder);
+        $this->addVerifyServerCertNode($nodeBuilder);
+    }
+
+    protected function addKeyNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('key');
+    }
+
+    protected function addCaNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('ca');
+    }
+
+    protected function addCertNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('cert');
+    }
+
+    protected function addCipherNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('cipher');
+    }
+
+    protected function addVerifyServerCertNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('verifyServerCert');
+    }
+}

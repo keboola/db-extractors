@@ -14,10 +14,13 @@ class DbNode extends ArrayNodeDefinition
 
     protected NodeDefinition $sshNode;
 
-    public function __construct(?SshNode $sshNode = null, ?NodeParentInterface $parent = null)
+    protected SslNodeDecorator $sslNodeDecorator;
+
+    public function __construct(?SshNode $sshNode = null, ?SslNodeDecorator $sslNodeDecorator = null, ?NodeParentInterface $parent = null)
     {
         parent::__construct(self::NODE_NAME, $parent);
         $this->sshNode = $sshNode ?? new SshNode();
+        $this->sslNodeDecorator = $sslNodeDecorator ?? new SslNodeDecorator();
         $this->init();
     }
 
@@ -42,5 +45,8 @@ class DbNode extends ArrayNodeDefinition
             ->end()
         ;
         // @formatter:on
+
+        $sslNode = $this->children()->arrayNode('ssl');
+        $this->sslNodeDecorator->addNodes($sslNode->children());
     }
 }

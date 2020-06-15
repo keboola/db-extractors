@@ -29,6 +29,13 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'ssl' => [
+                        'key' => 'testKey',
+                        'ca' => 'testCa',
+                        'cert' => 'testCert',
+                        'cipher' => 'testCipher',
+                        'verifyServerCert' => false,
+                    ],
                 ],
                 'tables' => [
                     [
@@ -84,6 +91,13 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'ssl' => [
+                        'key' => 'testKey',
+                        'ca' => 'testCa',
+                        'cert' => 'testCert',
+                        'cipher' => 'testCipher',
+                        'verifyServerCert' => false,
+                    ],
                 ],
                 'tables' => [
                     [

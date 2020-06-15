@@ -7,7 +7,7 @@ namespace Keboola\DbExtractorConfig\Configuration\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class TableNodesDecorator
+class TableNodesDecorator implements DecoratorInterface
 {
     public const DEFAULT_MAX_TRIES = 5;
 

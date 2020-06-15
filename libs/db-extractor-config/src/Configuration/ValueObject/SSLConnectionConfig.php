@@ -18,7 +18,7 @@ class SSLConnectionConfig implements ValueObject
 
     public static function fromArray(array $data): self
     {
-        $ssl = $data['ssl'];
+        $ssl = $data['db']['ssl'];
         return new self(
             $ssl['key'] ?? null,
             $ssl['cert'] ?? null,
