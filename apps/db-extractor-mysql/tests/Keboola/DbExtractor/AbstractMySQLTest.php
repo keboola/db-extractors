@@ -236,6 +236,19 @@ abstract class AbstractMySQLTest extends ExtractorTest
         return $app;
     }
 
+    public function createUserWithoutPermissions(): void
+    {
+        try {
+            $this->pdo->query("DROP USER 'user_no_perms'");
+        } catch (\PDOException $e) {
+            // ignore, the user does not have to exist
+        }
+
+        $this->pdo->query(
+            "CREATE USER 'user_no_perms' IDENTIFIED BY 'password'"
+        );
+    }
+
     public function configProvider(): array
     {
         $this->dataDir = __DIR__ . '/../../data';

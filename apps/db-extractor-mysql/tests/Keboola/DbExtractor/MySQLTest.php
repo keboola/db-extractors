@@ -800,4 +800,34 @@ class MySQLTest extends AbstractMySQLTest
         $manifest = JsonHelper::readFile($this->dataDir . '/out/tables/in.c-main.sales.csv.manifest');
         $this->assertTrue($manifest['incremental']);
     }
+
+    public function testGetTablesWithoutListColumnsPermissions(): void
+    {
+        $this->createUserWithoutPermissions();
+
+        $this->createAutoIncrementAndTimestampTable();
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/emoji.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
+        $this->createTextTable(
+            new SplFileInfo($this->dataDir . '/mysql/sales.csv'),
+            'ext_sales',
+            'temp_schema'
+        );
+
+        // With this privilege can user list table names but not names of the columns
+        // In MySQLMetadataProvider must be this situation properly handled
+        $this->pdo->query("GRANT CREATE ON test.* TO 'user_no_perms'");
+
+        $config = $this->getConfig();
+        $config['parameters']['db']['user'] = 'user_no_perms';
+        $config['parameters']['db']['#password'] = 'password';
+        $config['action'] = 'getTables';
+        $app = $this->createApplication($config);
+
+        $result = $app->run();
+
+        $this->assertEquals('success', $result['status']);
+        $this->assertEquals([], $result['tables']);
+    }
 }
