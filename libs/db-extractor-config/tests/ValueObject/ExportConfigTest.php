@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractorConfig\Tests\ValueObject;
 
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\SSLConnectionConfig;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -380,5 +381,34 @@ class ExportConfigTest extends TestCase
         Assert::assertTrue($config->hasConfigName());
         Assert::assertSame(123, $config->getConfigId());
         Assert::assertSame('my config name', $config->getConfigName());
+    }
+
+    public function testSslConnectionConfig(): void
+    {
+        $config = ExportConfig::fromArray([
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'ssl' => [
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+                'cipher' => 'testCipher',
+                'key' => 'testKey',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+        ]);
+
+        Assert::assertTrue($config->isSSlConnection());
+
+        Assert::assertInstanceOf(SSLConnectionConfig::class, $config->getSslConnectionConfig());
+
+        Assert::assertEquals('testCa', $config->getSslConnectionConfig()->getCa());
+        Assert::assertEquals('testCert', $config->getSslConnectionConfig()->getCert());
+        Assert::assertEquals('testCipher', $config->getSslConnectionConfig()->getCipher());
+        Assert::assertEquals('testKey', $config->getSslConnectionConfig()->getKey());
     }
 }
