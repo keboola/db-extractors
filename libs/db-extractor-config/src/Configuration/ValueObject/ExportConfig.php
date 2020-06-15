@@ -59,7 +59,7 @@ class ExportConfig implements ValueObject
             $data['outputTable'],
             $data['primaryKey'],
             $data['retries'],
-            !empty($data['ssl']) ? SSLConnectionConfig::fromArray($data) : null
+            !empty($data['db']['ssl']) ? SSLConnectionConfig::fromArray($data) : null
         );
     }
 

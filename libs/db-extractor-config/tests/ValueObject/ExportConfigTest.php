@@ -390,11 +390,13 @@ class ExportConfigTest extends TestCase
                 'tableName' => 'table',
                 'schema' => 'schema',
             ],
-            'ssl' => [
-                'ca' => 'testCa',
-                'cert' => 'testCert',
-                'cipher' => 'testCipher',
-                'key' => 'testKey',
+            'db' => [
+                'ssl' => [
+                    'ca' => 'testCa',
+                    'cert' => 'testCert',
+                    'cipher' => 'testCipher',
+                    'key' => 'testKey',
+                ]
             ],
             'outputTable' => 'output-table',
             'retries' => 12,
