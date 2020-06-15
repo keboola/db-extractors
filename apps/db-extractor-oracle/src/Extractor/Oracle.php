@@ -148,6 +148,7 @@ class Oracle extends BaseExtractor
         $this->exportWrapper->testConnection();
     }
 
+
     public function simpleQuery(ExportConfig $exportConfig): string
     {
         $sql = [];
