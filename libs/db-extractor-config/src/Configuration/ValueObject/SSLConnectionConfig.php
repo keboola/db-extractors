@@ -8,13 +8,13 @@ use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 
 class SSLConnectionConfig implements ValueObject
 {
-    private string $key;
+    private ?string $key;
 
-    private string $cert;
+    private ?string $cert;
 
-    private string $ca;
+    private ?string $ca;
 
-    private string $cipher;
+    private ?string $cipher;
 
     private bool $verifyServerCert;
 
@@ -93,9 +93,6 @@ class SSLConnectionConfig implements ValueObject
 
     public function isVerifyServerCert(): bool
     {
-        if ($this->verifyServerCert === null) {
-            throw new PropertyNotSetException('Property "verifyServerCert" is not set.');
-        }
         return $this->verifyServerCert;
     }
 }
