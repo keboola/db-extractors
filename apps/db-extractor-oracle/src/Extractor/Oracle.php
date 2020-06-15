@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Throwable;
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use function Keboola\Utils\formatDateTime;
 use Keboola\DbExtractor\Exception\UserException;

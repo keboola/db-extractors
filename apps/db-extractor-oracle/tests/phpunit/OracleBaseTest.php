@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Csv\CsvReader;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Process\Process;
+use Throwable;
 use Exception;
-use Keboola\DbExtractorLogger\Logger;
+use SplFileInfo;
+use Keboola\Component\Logger;
 use Keboola\DbExtractor\OracleApplication;
 use Keboola\DbExtractor\Test\ExtractorTest;
-use Keboola\Csv\CsvFile;
-use Symfony\Component\Process\Process;
 
 abstract class OracleBaseTest extends ExtractorTest
 {
-    /** @var mixed */
+    /** @var resource */
     protected $connection;
 
-    /** @var string  */
-    protected $dataDir = __DIR__ . '/data';
+    protected string $dataDir = __DIR__ . '/data';
 
     public const DRIVER = 'oracle';
 
@@ -31,6 +33,7 @@ abstract class OracleBaseTest extends ExtractorTest
 
         $adminConnection = @oci_connect('system', 'oracle', $dbString, 'AL32UTF8');
         if (!$adminConnection) {
+            /** @var array $error */
             $error = oci_error();
             echo 'ADMIN CONNECTION ERROR: ' . $error['message'];
         } else {
@@ -56,7 +59,7 @@ abstract class OracleBaseTest extends ExtractorTest
                     $adminConnection,
                     sprintf('GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s', $dbConfig['user'])
                 );
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // make sure this is the case that TESTER already exists
                 if (!strstr($e->getMessage(), 'ORA-01920')) {
                     echo "\nCreate test user error: " . $e->getMessage() . "\n";
@@ -67,7 +70,9 @@ abstract class OracleBaseTest extends ExtractorTest
         if ($adminConnection) {
             oci_close($adminConnection);
         }
-        $this->connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+        /** @var resource $connection */
+        $connection = oci_connect($dbConfig['user'], $dbConfig['#password'], $dbString, 'AL32UTF8');
+        $this->connection = $connection;
         $this->setupTestTables();
         $this->createClobTable();
         $this->createRegionsTable();
@@ -76,8 +81,10 @@ abstract class OracleBaseTest extends ExtractorTest
 
     public function tearDown(): void
     {
-        if ($this->connection) {
-            oci_close($this->connection);
+        /** @var false|resource $connection */
+        $connection = $this->connection;
+        if ($connection) {
+            oci_close($connection);
         }
 
         # Close SSH tunnel if created
@@ -99,16 +106,17 @@ abstract class OracleBaseTest extends ExtractorTest
         }
     }
 
-    public function createApplication(array $config, array $state = [], ?Logger $logger = null): OracleApplication
-    {
-        $logger = $logger ?? new Logger('ex-db-mysql-tests');
+    public function createApplication(
+        array $config,
+        array $state = [],
+        ?LoggerInterface $logger = null
+    ): OracleApplication {
+        $logger =  $logger ?? new Logger();
         return new OracleApplication($config, $logger, $state, $this->dataDir);
     }
 
     /**
-     * @param mixed $connection
-     * @param string $sql
-     * @throws \Throwable
+     * @param resource $connection
      */
     protected function executeStatement($connection, string $sql): void
     {
@@ -118,7 +126,7 @@ abstract class OracleBaseTest extends ExtractorTest
         }
         try {
             oci_execute($stmt);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         } finally {
             oci_free_statement($stmt);
@@ -127,20 +135,20 @@ abstract class OracleBaseTest extends ExtractorTest
 
     protected function setupTestTables(): void
     {
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/oracle/sales.csv');
         $this->createTextTable($csv1, ['CREATEDAT']);
 
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $csv2 = new SplFileInfo($this->dataDir . '/oracle/escaping.csv');
         $this->createTextTable($csv2);
     }
 
     protected function setupTestRowTable(): void
     {
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/oracle/sales.csv');
         $this->createTextTable($csv1, ['CREATEDAT']);
     }
 
-    protected function generateTableName(CsvFile $file): string
+    protected function generateTableName(SplFileInfo $file): string
     {
         $tableName = $file->getBasename('.' . $file->getExtension());
         return $tableName;
@@ -300,18 +308,14 @@ EOT;
         );
     }
 
-    /**
-     * Create table from csv file with text columns
-     *
-     * @param CsvFile $file
-     */
-    protected function createTextTable(CsvFile $file, array $primaryKey = []): void
+    protected function createTextTable(SplFileInfo $file, array $primaryKey = []): void
     {
         $tableName = $this->generateTableName($file);
 
         $this->dropTableIfExists($tableName);
 
-        $header = $file->getHeader();
+        $reader = new CsvReader($file->getPathname());
+        $header = $reader->getHeader();
 
         $createTableStatement = sprintf(
             'CREATE TABLE %s (%s) tablespace users',
@@ -348,15 +352,15 @@ EOT;
             );
         }
 
-        $file->next();
+        $reader->next();
 
-        $columnsCount = count($file->current());
+        $columnsCount = count($reader->current());
         $rowsPerInsert = intval((1000 / $columnsCount) - 1);
 
-        while ($file->current() !== false) {
-            for ($i=0; $i<$rowsPerInsert && $file->current() !== false; $i++) {
+        while ($reader->current() !== false) {
+            for ($i=0; $i<$rowsPerInsert && $reader->current() !== false; $i++) {
                 $cols = [];
-                foreach ($file->current() as $col) {
+                foreach ($reader->current() as $col) {
                     $cols[] = "'" . $col . "'";
                 }
                 $sql = sprintf(
@@ -367,7 +371,7 @@ EOT;
 
                 $this->executeStatement($this->connection, $sql);
 
-                $file->next();
+                $reader->next();
             }
         }
 
@@ -377,18 +381,13 @@ EOT;
             throw new Exception(sprintf('Can\'t parse sql statement %s', $sql));
         }
         oci_execute($stmt);
+        /** @var array $row */
         $row = oci_fetch_assoc($stmt);
         oci_free_statement($stmt);
-        $this->assertEquals($this->countTable($file), (int) $row['ITEMSCOUNT']);
+        $this->assertEquals($this->countTable($reader), (int) $row['ITEMSCOUNT']);
     }
 
-    /**
-     * Count records in CSV (with headers)
-     *
-     * @param CsvFile $file
-     * @return int
-     */
-    protected function countTable(CsvFile $file): int
+    protected function countTable(CsvReader $file): int
     {
         $linesCount = 0;
         foreach ($file as $i => $line) {

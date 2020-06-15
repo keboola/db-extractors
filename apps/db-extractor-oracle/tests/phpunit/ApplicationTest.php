@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Csv\CsvReader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -18,7 +18,9 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         $this->putConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->run();
 
@@ -33,7 +35,9 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         $this->putConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->run();
 
@@ -58,13 +62,13 @@ class ApplicationTest extends OracleBaseTest
         @unlink($manifestFile2);
         @unlink($manifestFile3);
 
-        $expectedCsv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $expectedCsv1 = new CsvReader($this->dataDir . '/oracle/sales.csv');
         $expectedCsv1 = iterator_to_array($expectedCsv1);
 
-        $expectedCsv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $expectedCsv2 = new CsvReader($this->dataDir . '/oracle/escaping.csv');
         $expectedCsv2 = iterator_to_array($expectedCsv2);
         array_shift($expectedCsv2);
-        $expectedCsv3 = new CsvFile($this->dataDir . '/oracle/tableColumns.csv');
+        $expectedCsv3 = new CsvReader($this->dataDir . '/oracle/tableColumns.csv');
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
@@ -73,13 +77,15 @@ class ApplicationTest extends OracleBaseTest
 
         $this->setupTestTables();
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->mustRun();
 
-        $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
-        $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
-        $outputCsvData3 = iterator_to_array(new CsvFile($outputCsvFile2));
+        $outputCsvData1 = iterator_to_array(new CsvReader($outputCsvFile1));
+        $outputCsvData2 = iterator_to_array(new CsvReader($outputCsvFile2));
+        $outputCsvData3 = iterator_to_array(new CsvReader($outputCsvFile2));
 
         $this->assertFileExists($outputCsvFile1);
         $this->assertEquals(ksort($expectedCsv1), ksort($outputCsvData1));
@@ -108,13 +114,13 @@ class ApplicationTest extends OracleBaseTest
         @unlink($manifestFile2);
         @unlink($manifestFile3);
 
-        $expectedCsv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $expectedCsv1 = new CsvReader($this->dataDir . '/oracle/sales.csv');
         $expectedCsv1 = iterator_to_array($expectedCsv1);
 
-        $expectedCsv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $expectedCsv2 = new CsvReader($this->dataDir . '/oracle/escaping.csv');
         $expectedCsv2 = iterator_to_array($expectedCsv2);
         array_shift($expectedCsv2);
-        $expectedCsv3 = new CsvFile($this->dataDir . '/oracle/tableColumns.csv');
+        $expectedCsv3 = new CsvReader($this->dataDir . '/oracle/tableColumns.csv');
         $expectedCsv3 = iterator_to_array($expectedCsv3);
         array_shift($expectedCsv3);
 
@@ -134,13 +140,15 @@ class ApplicationTest extends OracleBaseTest
         $this->putConfig($config);
         $this->setupTestTables();
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->mustRun();
 
-        $outputCsvData1 = iterator_to_array(new CsvFile($outputCsvFile1));
-        $outputCsvData2 = iterator_to_array(new CsvFile($outputCsvFile2));
-        $outputCsvData3 = iterator_to_array(new CsvFile($outputCsvFile3));
+        $outputCsvData1 = iterator_to_array(new CsvReader($outputCsvFile1));
+        $outputCsvData2 = iterator_to_array(new CsvReader($outputCsvFile2));
+        $outputCsvData3 = iterator_to_array(new CsvReader($outputCsvFile3));
 
         $this->assertFileExists($outputCsvFile1);
         $this->assertEquals(ksort($expectedCsv1), ksort($outputCsvData1));
@@ -159,7 +167,9 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'getTables';
         $this->putConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->run();
 
@@ -176,7 +186,9 @@ class ApplicationTest extends OracleBaseTest
             'listColumns' => false,
         ];
         $this->putConfig($config);
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->mustRun();
 
@@ -200,7 +212,9 @@ class ApplicationTest extends OracleBaseTest
             ]],
         ];
         $this->putConfig($config);
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->mustRun();
 
@@ -222,7 +236,9 @@ class ApplicationTest extends OracleBaseTest
         $config['parameters']['tables'][3]['query'] = 'SELECT SOMETHING ORDER BY INVALID FROM "invalid"."escaping"';
         $this->putConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->run();
 
@@ -253,7 +269,9 @@ class ApplicationTest extends OracleBaseTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+                ]);
         $process->setTimeout(300);
         $process->run();
 
@@ -274,7 +292,9 @@ class ApplicationTest extends OracleBaseTest
         file_put_contents($inputStateFile, file_get_contents($outputStateFile));
 
         // run the config again
-        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+            'KBC_DATADIR' => $this->dataDir,
+        ]);
         $process->setTimeout(300);
         $process->run();
 

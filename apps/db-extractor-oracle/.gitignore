@@ -1,8 +1,10 @@
 .env
 vendor/
 /data/
-/tests/phpunit/data/in
-/tests/phpunit/data/out/
+/tests/phpunit/data/in/**
+!/tests/phpunit/data/in/,gitkeep
+/tests/phpunit/data/out/**
+!/tests/phpunit/data/out/tables/.gitkeep
 /tests/phpunit/data/config.yml
 /tests/phpunit/data/*.json
 .idea/

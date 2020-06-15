@@ -210,7 +210,7 @@ class OracleIncrementalTest extends OracleBaseTest
                     'INSERT INTO %s ("name", "decimal") VALUES (\'%s\', %d)',
                     $config['parameters']['table']['tableName'],
                     $this->generateRandomString(),
-                    mt_rand(0, 100)
+                    mt_rand(0, 99)
                 )
             );
         }
