@@ -37,7 +37,7 @@ class SSLConnectionConfigTest extends TestCase
         Assert::assertFalse($sslConnectionConfig->isVerifyServerCert());
     }
 
-    public function testMissingConfigProperty()
+    public function testMissingConfigProperty(): void
     {
         $sslConnectionConfig = SSLConnectionConfig::fromArray([
             'db' => [
@@ -76,6 +76,5 @@ class SSLConnectionConfigTest extends TestCase
         } catch (PropertyNotSetException $e) {
             Assert::assertEquals('Property "cipher" is not set.', $e->getMessage());
         }
-
     }
 }
