@@ -10,7 +10,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 class SslNode extends ArrayNodeDefinition
 {
-
     private const NODE_NAME = 'ssl';
 
     public function __construct(?NodeParentInterface $parent = null)
