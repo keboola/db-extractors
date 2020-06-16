@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Component\Logger;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Extractor\Oracle;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Monolog\Handler\TestHandler;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\Process\Process;
+use SplFileInfo;
 
 class OracleTest extends OracleBaseTest
 {
@@ -19,15 +21,13 @@ class OracleTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
-        $logger = new Logger();
-        $testLogHandler = new TestHandler();
-        $logger->pushHandler($testLogHandler);
+        $logger = new TestLogger();
         $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
 
         // Check host and port in log msg
         $this->assertTrue(
-            $testLogHandler->hasInfoThatContains(
+            $logger->hasInfoThatContains(
                 'Created "test connection" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
         );
@@ -55,15 +55,13 @@ class OracleTest extends OracleBaseTest
         $config = $this->getConfigRow('oracle');
         $this->setupTestRowTable();
 
-        $logger = new Logger();
-        $testLogHandler = new TestHandler();
-        $logger->pushHandler($testLogHandler);
+        $logger = new TestLogger();
         $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
 
         // Check host and port in log msg
         $this->assertTrue(
-            $testLogHandler->hasInfoThatContains(
+            $logger->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
         );
@@ -93,15 +91,13 @@ class OracleTest extends OracleBaseTest
         $config = $this->getConfig('oracle');
         $this->setupTestTables();
 
-        $logger = new Logger();
-        $testLogHandler = new TestHandler();
-        $logger->pushHandler($testLogHandler);
+        $logger = new TestLogger();
         $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
 
         // Check host and port in log msg
         $this->assertTrue(
-            $testLogHandler->hasInfoThatContains(
+            $logger->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".'
             )
         );
@@ -192,15 +188,13 @@ class OracleTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         unset($config['parameters']['tables']);
 
-        $logger = new Logger();
-        $testLogHandler = new TestHandler();
-        $logger->pushHandler($testLogHandler);
+        $logger = new TestLogger();
         $app = $this->createApplication($config, [], $logger);
         $result = $app->run();
 
         // Check host and port in log msg
         $this->assertTrue(
-            $testLogHandler->hasInfoThatContains(
+            $logger->hasInfoThatContains(
                 'Created "test connection" configuration for "java-oracle-exporter" tool, ' .
                 'host: "127.0.0.1", port: "15211".'
             )
@@ -226,21 +220,19 @@ class OracleTest extends OracleBaseTest
             'localPort' => '15212',
         ];
 
-        $logger = new Logger();
-        $testLogHandler = new TestHandler();
-        $logger->pushHandler($testLogHandler);
+        $logger = new TestLogger();
         $app = $this->createApplication($config, [], $logger);
 
         $this->setupTestTables();
 
-        $salesCsv = new CsvFile($this->dataDir. '/oracle/sales.csv');
-        $escapingCsv = new CsvFile($this->dataDir. '/oracle/headerlessEscaping.csv');
+        $salesCsv = new SplFileInfo($this->dataDir . '/oracle/sales.csv');
+        $escapingCsv = new SplFileInfo($this->dataDir . '/oracle/headerlessEscaping.csv');
 
         $result = $app->run();
 
         // Check host and port in log msg
         $this->assertTrue(
-            $testLogHandler->hasInfoThatContains(
+            $logger->hasInfoThatContains(
                 'Created "export" configuration for "java-oracle-exporter" tool, host: "127.0.0.1", port: "15212".'
             )
         );
@@ -267,29 +259,30 @@ class OracleTest extends OracleBaseTest
         $this->assertEquals(file_get_contents($escapingCsv->getPathname()), file_get_contents($outputCsvFile));
     }
 
-    public function testExtractorGetTablesWithSchema(): void
+    public function testExtractorGetTablesWithSchemaHR(): void
     {
         $config = $this->getConfig('oracle');
         $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
         $config['parameters']['tables'] = [];
 
-        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
-
-        $this->assertTrue($extractor->testConnection());
-
-        $this->assertGreaterThan(2, $extractor->getTables());
-
         $tableName = 'REGIONS';
-
-        // get table from HR schema
-        $tables = $extractor->getTables(
-            [
+        $config['parameters']['tableListFilter'] = [
+            'listColumns' => true,
+            'tablesToList' => [
                 [
                     'tableName' => $tableName,
                     'schema' => 'HR',
                 ],
-            ]
+            ],
+        ];
+
+        $extractor = new Oracle(
+            $config['parameters'],
+            [],
+            new Logger()
         );
+        $extractor->testConnection(); // expect no error
+        $tables = $extractor->getTables();
 
         $this->assertCount(1, $tables);
         $table = $tables[0];
@@ -302,18 +295,33 @@ class OracleTest extends OracleBaseTest
 
         $this->assertArrayHasKey('columns', $table);
         $this->assertCount(2, $table['columns']);
+    }
 
-        // get table from user schema
+    public function testExtractorGetTablesWithSchemaUser(): void
+    {
+        $config = $this->getConfig('oracle');
+        $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        $config['parameters']['tables'] = [];
+
+        $tableName = 'REGIONS';
         $userSchema = mb_strtoupper($config['parameters']['db']['user']);
-
-        $tables = $extractor->getTables(
-            [
+        $config['parameters']['tableListFilter'] = [
+            'listColumns' => true,
+            'tablesToList' => [
                 [
                     'tableName' => $tableName,
                     'schema' => $userSchema,
                 ],
-            ]
+            ],
+        ];
+
+        $extractor = new Oracle(
+            $config['parameters'],
+            [],
+            new Logger()
         );
+        $extractor->testConnection(); // expect no error
+        $tables = $extractor->getTables();
 
         $this->assertCount(1, $tables);
         $table = $tables[0];
@@ -326,10 +334,19 @@ class OracleTest extends OracleBaseTest
 
         $this->assertArrayHasKey('columns', $table);
         $this->assertCount(1, $table['columns']);
+    }
 
-        // get tables from both schemas
-        $tables = $extractor->getTables(
-            [
+    public function testExtractorGetTablesWithSchemaBoth(): void
+    {
+        $config = $this->getConfig('oracle');
+        $config['parameters']['db']['password'] = $config['parameters']['db']['#password'];
+        $config['parameters']['tables'] = [];
+
+        $tableName = 'REGIONS';
+        $userSchema = mb_strtoupper($config['parameters']['db']['user']);
+        $config['parameters']['tableListFilter'] = [
+            'listColumns' => true,
+            'tablesToList' => [
                 [
                     'tableName' => $tableName,
                     'schema' => 'HR',
@@ -338,9 +355,15 @@ class OracleTest extends OracleBaseTest
                     'tableName' => $tableName,
                     'schema' => $userSchema,
                 ],
-            ]
+            ],
+        ];
+        $extractor = new Oracle(
+            $config['parameters'],
+            [],
+            new Logger()
         );
-
+        $extractor->testConnection(); // expect no error
+        $tables = $extractor->getTables();
         $this->assertCount(2, $tables);
     }
 
@@ -362,7 +385,7 @@ class OracleTest extends OracleBaseTest
         ];
 
         // Create extractor: SSH tunnel is created
-        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
+        $extractor = new Oracle($config['parameters'], [], new Logger());
 
         // Kill SSH tunnel
         $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
@@ -391,9 +414,13 @@ class OracleTest extends OracleBaseTest
             'remotePort' => $config['parameters']['db']['port'],
             'localPort' => '15212',
         ];
+        $config['parameters']['columns'] = [];
+        $config['parameters']['outputTable'] =  'output';
+        $config['parameters']['primaryKey'] = [];
+        $config['parameters']['retries'] = 3;
 
         // Create extractor: SSH tunnel is created
-        $extractor = new Oracle($config['parameters'], [], new Logger('ex-db-mysql-tests'));
+        $extractor = new Oracle($config['parameters'], [], new Logger());
 
         // Kill SSH tunnel
         $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
@@ -404,9 +431,8 @@ class OracleTest extends OracleBaseTest
         // because the direct connection is also available in the test environment.
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('The Network Adapter could not establish the connection');
-        $extractor->export($config['parameters']);
+        $extractor->export(ExportConfig::fromArray($config['parameters']));
     }
-
 
     public function testGetTables(): void
     {
@@ -415,10 +441,10 @@ class OracleTest extends OracleBaseTest
 
         $app = $this->createApplication($config);
 
-        $csv1 = new CsvFile($this->dataDir . '/oracle/sales.csv');
+        $csv1 = new SplFileInfo($this->dataDir . '/oracle/sales.csv');
         $this->createTextTable($csv1);
 
-        $csv2 = new CsvFile($this->dataDir . '/oracle/escaping.csv');
+        $csv2 = new SplFileInfo($this->dataDir . '/oracle/escaping.csv');
         $this->createTextTable($csv2);
 
         $result = $app->run();
@@ -429,736 +455,361 @@ class OracleTest extends OracleBaseTest
         $this->assertCount(11, $result['tables']);
 
         $expectedTables = [
-            0 => [
-                    'name' => 'DEPARTMENTS',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 27,
-                    'columns' =>
+            [
+                'name' => 'DEPARTMENTS',
+                'schema' => 'HR',
+                'columns' =>
+                    [
                         [
-                            0 =>
-                                [
-                                    'name' => 'DEPARTMENT_ID',
-                                    'sanitizedName' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'DEPT_ID_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'DEPARTMENT_NAME',
-                                    'sanitizedName' => 'DEPARTMENT_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '30',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'MANAGER_ID',
-                                    'sanitizedName' => 'MANAGER_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'DEPT_MGR_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'LOCATION_ID',
-                                    'sanitizedName' => 'LOCATION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'DEPT_LOC_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'LOC_ID_PK',
-                                ],
+                            'name' => 'DEPARTMENT_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
                         ],
-                ],
-            1 => [
-                    'name' => 'EMPLOYEES',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 107,
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => 'EMPLOYEE_ID',
-                                    'sanitizedName' => 'EMPLOYEE_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'EMP_EMP_ID_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'FIRST_NAME',
-                                    'sanitizedName' => 'FIRST_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '20',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'LAST_NAME',
-                                    'sanitizedName' => 'LAST_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '25',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'EMAIL',
-                                    'sanitizedName' => 'EMAIL',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '25',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => true,
-                                    'uniqueKeyName' => 'EMP_EMAIL_UK',
-                                ],
-                            4 =>
-                                [
-                                    'name' => 'PHONE_NUMBER',
-                                    'sanitizedName' => 'PHONE_NUMBER',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '20',
-                                    'ordinalPosition' => '5',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            5 =>
-                                [
-                                    'name' => 'HIRE_DATE',
-                                    'sanitizedName' => 'HIRE_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
-                                    'length' => null,
-                                    'ordinalPosition' => '6',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            6 =>
-                                [
-                                    'name' => 'JOB_ID',
-                                    'sanitizedName' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '10',
-                                    'ordinalPosition' => '7',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_JOB_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'JOB_ID_PK',
-                                ],
-                            7 =>
-                                [
-                                    'name' => 'SALARY',
-                                    'sanitizedName' => 'SALARY',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '8,2',
-                                    'ordinalPosition' => '8',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            8 =>
-                                [
-                                    'name' => 'COMMISSION_PCT',
-                                    'sanitizedName' => 'COMMISSION_PCT',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '2,2',
-                                    'ordinalPosition' => '9',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            9 =>
-                                [
-                                    'name' => 'MANAGER_ID',
-                                    'sanitizedName' => 'MANAGER_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '10',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_MANAGER_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                ],
-                            10 =>
-                                [
-                                    'name' => 'DEPARTMENT_ID',
-                                    'sanitizedName' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => '11',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'EMP_DEPT_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'DEPT_ID_PK',
-                                ],
+                            'name' => 'DEPARTMENT_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
                         ],
-                ],
-            2 => [
-                    'name' => 'JOBS',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 19,
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => 'JOB_ID',
-                                    'sanitizedName' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '10',
-                                    'ordinalPosition' => '1',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'JOB_ID_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'JOB_TITLE',
-                                    'sanitizedName' => 'JOB_TITLE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '35',
-                                    'ordinalPosition' => '2',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'MIN_SALARY',
-                                    'sanitizedName' => 'MIN_SALARY',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '3',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'MAX_SALARY',
-                                    'sanitizedName' => 'MAX_SALARY',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => '4',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
+                            'name' => 'MANAGER_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
                         ],
-                ],
-            3 => [
-                    'name' => 'JOB_HISTORY',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 10,
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => 'EMPLOYEE_ID',
-                                    'sanitizedName' => 'EMPLOYEE_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => '6,0',
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'JHIST_EMP_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'EMP_EMP_ID_PK',
-                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'START_DATE',
-                                    'sanitizedName' => 'START_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
-                                    'length' => null,
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'JHIST_EMP_ID_ST_DATE_PK',
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'END_DATE',
-                                    'sanitizedName' => 'END_DATE',
-                                    'type' => 'DATE',
-                                    'nullable' => false,
-                                    'length' => null,
-                                    'ordinalPosition' => 3,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'JOB_ID',
-                                    'sanitizedName' => 'JOB_ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '10',
-                                    'ordinalPosition' => 4,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'JHIST_JOB_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'JOB_ID_PK',
-                                ],
-                            4 =>
-                                [
-                                    'name' => 'DEPARTMENT_ID',
-                                    'sanitizedName' => 'DEPARTMENT_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => true,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => 5,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'JHIST_DEPT_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'DEPT_ID_PK',
-                                ],
+                            'name' => 'LOCATION_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
                         ],
-                ],
-            4 => [
-                    'name' => 'LOCATIONS',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 23,
-                    'columns' =>
+                    ],
+            ],
+            [
+                'name' => 'EMPLOYEES',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+
                         [
-                            0 =>
-                                [
-                                    'name' => 'LOCATION_ID',
-                                    'sanitizedName' => 'LOCATION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => '4,0',
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'LOC_ID_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'STREET_ADDRESS',
-                                    'sanitizedName' => 'STREET_ADDRESS',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '40',
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'POSTAL_CODE',
-                                    'sanitizedName' => 'POSTAL_CODE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '12',
-                                    'ordinalPosition' => 3,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'CITY',
-                                    'sanitizedName' => 'CITY',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => false,
-                                    'length' => '30',
-                                    'ordinalPosition' => 4,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            4 =>
-                                [
-                                    'name' => 'STATE_PROVINCE',
-                                    'sanitizedName' => 'STATE_PROVINCE',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '25',
-                                    'ordinalPosition' => 5,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            5 =>
-                                [
-                                    'name' => 'COUNTRY_ID',
-                                    'sanitizedName' => 'COUNTRY_ID',
-                                    'type' => 'CHAR',
-                                    'nullable' => true,
-                                    'length' => '2',
-                                    'ordinalPosition' => 6,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'foreignKeyName' => 'LOC_C_ID_FK',
-                                    'foreignKeyRefTable' => 'HR',
-                                    'foreignKeyRef' => 'COUNTRY_C_ID_PK',
-                                ],
+                            'name' => 'EMPLOYEE_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
                         ],
-                ],
-            5 => [
-                    'name' => 'REGIONS',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'HR',
-                    'owner' => 'HR',
-                    'rowCount' => 4,
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => 'REGION_ID',
-                                    'sanitizedName' => 'REGION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => null,
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'REG_ID_PK',
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'REGION_NAME',
-                                    'sanitizedName' => 'REGION_NAME',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '25',
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
+                            'name' => 'FIRST_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
                         ],
-                ],
-            6 => [
+                        [
+                            'name' => 'LAST_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'EMAIL',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'PHONE_NUMBER',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'HIRE_DATE',
+                            'type' => 'DATE',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'JOB_ID',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'SALARY',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COMMISSION_PCT',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'MANAGER_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'DEPARTMENT_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'JOBS',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'JOB_ID',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'JOB_TITLE',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'MIN_SALARY',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'MAX_SALARY',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'JOB_HISTORY',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'EMPLOYEE_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'START_DATE',
+                            'type' => 'DATE',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'END_DATE',
+                            'type' => 'DATE',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'JOB_ID',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'DEPARTMENT_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'LOCATIONS',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'LOCATION_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'STREET_ADDRESS',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'POSTAL_CODE',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'CITY',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'STATE_PROVINCE',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COUNTRY_ID',
+                            'type' => 'CHAR',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'REGIONS',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'REGION_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
+                        ],
+                        [
+                            'name' => 'REGION_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
                 'name' => 'AUTO_INCREMENT_TIMESTAMP',
-                'tablespaceName' => 'USERS',
                 'schema' => 'TESTER',
-                'owner' => 'TESTER',
                 'columns' => [
-                    0 => [
+                    [
                         'name' => 'id',
-                        'sanitizedName' => 'id',
                         'type' => 'NUMBER',
-                        'nullable' => false,
-                        'length' => null,
-                        'ordinalPosition' => 1,
                         'primaryKey' => true,
-                        'uniqueKey' => false,
-                        'primaryKeyName' => 'PK',
                     ],
-                    1 => [
+                    [
                         'name' => 'name',
-                        'sanitizedName' => 'name',
                         'type' => 'NVARCHAR2',
-                        'nullable' => true,
-                        'length' => '400',
-                        'ordinalPosition' => 2,
                         'primaryKey' => false,
-                        'uniqueKey' => false,
                     ],
-                    2 => [
+                    [
                         'name' => 'decimal',
-                        'sanitizedName' => 'decimal',
                         'type' => 'NUMBER',
-                        'nullable' => true,
-                        'length' => '10,8',
-                        'ordinalPosition' => 3,
                         'primaryKey' => false,
-                        'uniqueKey' => false,
                     ],
-                    3 => [
+                    [
                         'name' => 'date',
-                        'sanitizedName' => 'date',
                         'type' => 'DATE',
-                        'nullable' => true,
-                        'length' => null,
-                        'ordinalPosition' => 4,
                         'primaryKey' => false,
-                        'uniqueKey' => false,
                     ],
-                    4 => [
+                    [
                         'name' => 'timestamp',
-                        'sanitizedName' => 'timestamp',
                         'type' => 'TIMESTAMP(6)',
-                        'nullable' => true,
-                        'length' => null,
-                        'ordinalPosition' => 5,
                         'primaryKey' => false,
-                        'uniqueKey' => false,
                     ],
                 ],
             ],
-            7 => [
-                    'name' => 'CLOB_TEST',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'TESTER',
-                    'owner' => 'TESTER',
-                    'columns' =>
+            [
+                'name' => 'CLOB_TEST',
+                'schema' => 'TESTER',
+                'columns' =>
+                    [
+
                         [
-                            0 =>
-                                [
-                                    'name' => 'ID',
-                                    'sanitizedName' => 'ID',
-                                    'type' => 'VARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '25',
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'CLOB_COL',
-                                    'sanitizedName' => 'CLOB_COL',
-                                    'type' => 'CLOB',
-                                    'nullable' => true,
-                                    'length' => null,
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
+                            'name' => 'ID',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
                         ],
-                ],
-            8 => [
-                    'name' => 'ESCAPING',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'TESTER',
-                    'owner' => 'TESTER',
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => '_funnY#-col',
-                                    'sanitizedName' => 'funnY_col',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            1 =>
-                                [
-                                    'name' => '_s%d-col',
-                                    'sanitizedName' => 's_d_col',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
+                            'name' => 'CLOB_COL',
+                            'type' => 'CLOB',
+                            'primaryKey' => false,
                         ],
-                ],
-            9 => [
-                    'name' => 'REGIONS',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'TESTER',
-                    'owner' => 'TESTER',
-                    'columns' =>
+                    ],
+            ],
+            [
+                'name' => 'ESCAPING',
+                'schema' => 'TESTER',
+                'columns' =>
+                    [
+
                         [
-                            0 =>
-                                [
-                                    'name' => 'REGION_ID',
-                                    'sanitizedName' => 'REGION_ID',
-                                    'type' => 'NUMBER',
-                                    'nullable' => false,
-                                    'length' => null,
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'primaryKeyName' => 'REG_ID_PK',
-                                ],
+                            'name' => '_funnY#-col',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
                         ],
-                ],
-            10 => [
-                    'name' => 'SALES',
-                    'tablespaceName' => 'USERS',
-                    'schema' => 'TESTER',
-                    'owner' => 'TESTER',
-                    'columns' =>
                         [
-                            0 =>
-                                [
-                                    'name' => 'USERGENDER',
-                                    'sanitizedName' => 'USERGENDER',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 1,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            1 =>
-                                [
-                                    'name' => 'USERCITY',
-                                    'sanitizedName' => 'USERCITY',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 2,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            2 =>
-                                [
-                                    'name' => 'USERSENTIMENT',
-                                    'sanitizedName' => 'USERSENTIMENT',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 3,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            3 =>
-                                [
-                                    'name' => 'ZIPCODE',
-                                    'sanitizedName' => 'ZIPCODE',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 4,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            4 =>
-                                [
-                                    'name' => 'SKU',
-                                    'sanitizedName' => 'SKU',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 5,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            5 =>
-                                [
-                                    'name' => 'CREATEDAT',
-                                    'sanitizedName' => 'CREATEDAT',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 6,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            6 =>
-                                [
-                                    'name' => 'CATEGORY',
-                                    'sanitizedName' => 'CATEGORY',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 7,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            7 =>
-                                [
-                                    'name' => 'PRICE',
-                                    'sanitizedName' => 'PRICE',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 8,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            8 =>
-                                [
-                                    'name' => 'COUNTY',
-                                    'sanitizedName' => 'COUNTY',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 9,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            9 =>
-                                [
-                                    'name' => 'COUNTYCODE',
-                                    'sanitizedName' => 'COUNTYCODE',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 10,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            10 =>
-                                [
-                                    'name' => 'USERSTATE',
-                                    'sanitizedName' => 'USERSTATE',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 11,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
-                            11 =>
-                                [
-                                    'name' => 'CATEGORYGROUP',
-                                    'sanitizedName' => 'CATEGORYGROUP',
-                                    'type' => 'NVARCHAR2',
-                                    'nullable' => true,
-                                    'length' => '400',
-                                    'ordinalPosition' => 12,
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                ],
+                            'name' => '_s%d-col',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
                         ],
-                ],
+                    ],
+            ],
+            [
+                'name' => 'REGIONS',
+                'schema' => 'TESTER',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'REGION_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => true,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'SALES',
+                'schema' => 'TESTER',
+                'columns' =>
+                    [
+
+                        [
+                            'name' => 'USERGENDER',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'USERCITY',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'USERSENTIMENT',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'ZIPCODE',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'SKU',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'CREATEDAT',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'CATEGORY',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'PRICE',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COUNTY',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COUNTYCODE',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'USERSTATE',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'CATEGORYGROUP',
+                            'type' => 'NVARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
         ];
         $this->assertEquals($expectedTables, $result['tables']);
     }
@@ -1175,7 +826,7 @@ class OracleTest extends OracleBaseTest
 
         $this->setupTestTables();
 
-        $result = $app->run();
+        $app->run();
 
         $outputManifest = json_decode(
             (string) file_get_contents($this->dataDir . '/out/tables/in.c-main.tablecolumns.csv.manifest'),
@@ -1186,227 +837,199 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('incremental', $outputManifest);
         $this->assertArrayHasKey('metadata', $outputManifest);
 
-        $expectedMetadata = array (
-            0 =>
-                array (
-                    'key' => 'KBC.name',
-                    'value' => 'SALES',
-                ),
-            1 =>
-                array (
-                    'key' => 'KBC.tablespaceName',
-                    'value' => 'USERS',
-                ),
-            2 =>
-                array (
-                    'key' => 'KBC.schema',
-                    'value' => 'TESTER',
-                ),
-            3 =>
-                array (
-                    'key' => 'KBC.owner',
-                    'value' => 'TESTER',
-                ),
-        );
+        $expectedMetadata = [
+            [
+                'key' => 'KBC.name',
+                'value' => 'SALES',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'SALES',
+            ],
+            [
+                'key' => 'KBC.schema',
+                'value' => 'TESTER',
+            ],
+            [
+                'key' => 'KBC.catalog',
+                'value' => 'USERS',
+            ],
+            [
+                'key' => 'KBC.tablespaceName',
+                'value' => 'USERS',
+            ],
+            [
+                'key' => 'KBC.owner',
+                'value' => 'TESTER',
+            ],
+        ];
 
         $this->assertEquals($expectedMetadata, $outputManifest['metadata']);
         $this->assertArrayHasKey('column_metadata', $outputManifest);
         $this->assertCount(4, $outputManifest['column_metadata']);
 
-        $expectedColumnMetadata = array (
+        $expectedColumnMetadata = [
             'USERGENDER' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'NVARCHAR2',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => true,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => '400',
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'USERGENDER',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'USERGENDER',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => '1',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => false,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                ),
+                [
+
+                    [
+                        'key' => 'KBC.datatype.type',
+                        'value' => 'NVARCHAR2',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.nullable',
+                        'value' => true,
+                    ],
+                    [
+                        'key' => 'KBC.datatype.basetype',
+                        'value' => 'STRING',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.length',
+                        'value' => '400',
+                    ],
+                    [
+                        'key' => 'KBC.sourceName',
+                        'value' => 'USERGENDER',
+                    ],
+                    [
+                        'key' => 'KBC.sanitizedName',
+                        'value' => 'USERGENDER',
+                    ],
+                    [
+                        'key' => 'KBC.primaryKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.uniqueKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.ordinalPosition',
+                        'value' => '1',
+                    ],
+                ],
             'USERCITY' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'NVARCHAR2',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => true,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => '400',
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'USERCITY',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'USERCITY',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => '2',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => false,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                ),
+                [
+
+                    [
+                        'key' => 'KBC.datatype.type',
+                        'value' => 'NVARCHAR2',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.nullable',
+                        'value' => true,
+                    ],
+                    [
+                        'key' => 'KBC.datatype.basetype',
+                        'value' => 'STRING',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.length',
+                        'value' => '400',
+                    ],
+                    [
+                        'key' => 'KBC.sourceName',
+                        'value' => 'USERCITY',
+                    ],
+                    [
+                        'key' => 'KBC.sanitizedName',
+                        'value' => 'USERCITY',
+                    ],
+                    [
+                        'key' => 'KBC.primaryKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.uniqueKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.ordinalPosition',
+                        'value' => '2',
+                    ],
+                ],
             'USERSENTIMENT' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'NVARCHAR2',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => true,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => '400',
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'USERSENTIMENT',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'USERSENTIMENT',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => '3',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => false,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                ),
+                [
+
+                    [
+                        'key' => 'KBC.datatype.type',
+                        'value' => 'NVARCHAR2',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.nullable',
+                        'value' => true,
+                    ],
+                    [
+                        'key' => 'KBC.datatype.basetype',
+                        'value' => 'STRING',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.length',
+                        'value' => '400',
+                    ],
+                    [
+                        'key' => 'KBC.sourceName',
+                        'value' => 'USERSENTIMENT',
+                    ],
+                    [
+                        'key' => 'KBC.sanitizedName',
+                        'value' => 'USERSENTIMENT',
+                    ],
+                    [
+                        'key' => 'KBC.primaryKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.uniqueKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.ordinalPosition',
+                        'value' => '3',
+                    ],
+                ],
             'ZIPCODE' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'NVARCHAR2',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => true,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => '400',
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'ZIPCODE',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'ZIPCODE',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => '4',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => false,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                ),
-        );
+                [
+
+                    [
+                        'key' => 'KBC.datatype.type',
+                        'value' => 'NVARCHAR2',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.nullable',
+                        'value' => true,
+                    ],
+                    [
+                        'key' => 'KBC.datatype.basetype',
+                        'value' => 'STRING',
+                    ],
+                    [
+                        'key' => 'KBC.datatype.length',
+                        'value' => '400',
+                    ],
+                    [
+                        'key' => 'KBC.sourceName',
+                        'value' => 'ZIPCODE',
+                    ],
+                    [
+                        'key' => 'KBC.sanitizedName',
+                        'value' => 'ZIPCODE',
+                    ],
+                    [
+                        'key' => 'KBC.primaryKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.uniqueKey',
+                        'value' => false,
+                    ],
+                    [
+                        'key' => 'KBC.ordinalPosition',
+                        'value' => '4',
+                    ],
+                ],
+        ];
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
@@ -1429,8 +1052,8 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertEquals('success', $result['status']);
 
-        $this->assertFileNotExists($regionsManifestFile);
-        $this->assertFileNotExists($regionsDataFile);
+        $this->assertFileDoesNotExist($regionsManifestFile);
+        $this->assertFileDoesNotExist($regionsDataFile);
     }
 
     public function testExtractClob(): void

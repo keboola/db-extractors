@@ -7,7 +7,8 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\Component\JsonHelper;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\OracleJavaExportException;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -15,13 +16,13 @@ use Symfony\Component\Process\Process;
  */
 class OracleJavaExportWrapper
 {
-    private Logger $logger;
+    private LoggerInterface $logger;
 
     private string $dataDir;
 
     private array $dbParams;
 
-    public function __construct(Logger $logger, string $dataDir, array $dbParams)
+    public function __construct(LoggerInterface $logger, string $dataDir, array $dbParams)
     {
         $this->logger = $logger;
         $this->dataDir = $dataDir;
@@ -40,6 +41,9 @@ class OracleJavaExportWrapper
         );
     }
 
+    /**
+     * @param array|InputTable[] $whitelist
+     */
     public function getTables(array $whitelist, bool $loadColumns): array
     {
         $outputFile = $this->dataDir . '/tables.json';
@@ -139,13 +143,21 @@ class OracleJavaExportWrapper
         ]);
     }
 
+    /***
+     * @param array|InputTable[] $whitelist
+     */
     private function writeTestGetTablesConfig(array $whitelist, bool $loadColumns, string $outputFile): string
     {
         return $this->writeConfig('get tables', [
             'parameters' => [
                 'db' => $this->dbParams,
                 'outputFile' => $outputFile,
-                'tables' => $whitelist,
+                'tables' => array_map(function (InputTable $table) {
+                    return [
+                        'tableName' => $table->getName(),
+                        'schema' => $table->getSchema(),
+                    ];
+                }, $whitelist),
                 'includeColumns' => $loadColumns,
             ],
         ]);

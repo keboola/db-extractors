@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 
-use Keboola\DbExtractor\Configuration\OracleGetTablesDefinition;
+use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
+use Psr\Log\LoggerInterface;
 use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Keboola\DbExtractorLogger\Logger;
 
 class OracleApplication extends Application
 {
-    public function __construct(array $config, Logger $logger, array $state, string $dataDir)
+    public function __construct(array $config, LoggerInterface $logger, array $state, string $dataDir)
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'Oracle';
@@ -24,7 +24,7 @@ class OracleApplication extends Application
     public function buildConfig(array $config): void
     {
         if ($this['action'] === 'getTables') {
-            $this->config = new Config($config, new OracleGetTablesDefinition());
+            $this->config = new Config($config, new GetTablesListFilterDefinition());
         } elseif ($this->isRowConfiguration($config)) {
             if ($this['action'] === 'run') {
                 $config['parameters']['id'] = 1;
