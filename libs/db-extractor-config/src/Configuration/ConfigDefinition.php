@@ -7,7 +7,7 @@ namespace Keboola\DbExtractorConfig\Configuration;
 use Keboola\Component\Config\BaseConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\DbNode;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SshNode;
-use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SslNodeDecorator;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SslNode;
 use Keboola\DbExtractorConfig\Configuration\NodeDefinition\TableNodesDecorator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -22,10 +22,10 @@ class ConfigDefinition extends BaseConfigDefinition
     public function __construct(
         ?DbNode $dbNode = null,
         ?SshNode $sshNode = null,
-        ?SslNodeDecorator $sslNodeDecorator = null,
+        ?SslNode $sslNode = null,
         ?TableNodesDecorator $tableNodesDecorator = null
     ) {
-        $this->dbNode = $dbNode ?? new DbNode($sshNode, $sslNodeDecorator);
+        $this->dbNode = $dbNode ?? new DbNode($sshNode, $sslNode);
         $this->tableNodesDecorator = $tableNodesDecorator ?? new TableNodesDecorator();
     }
 
