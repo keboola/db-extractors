@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Tests\ValueObject;
 
-use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportDatabaseConfig;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\SSLConnectionConfig;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ExportDatabaseConfigTest extends TestCase
+class DatabaseConfigTest extends TestCase
 {
     public function testExportConfig(): void
     {
@@ -28,7 +28,7 @@ class ExportDatabaseConfigTest extends TestCase
             ],
         ];
 
-        $exportDatabaseConfig = ExportDatabaseConfig::fromArray($config);
+        $exportDatabaseConfig = DatabaseConfig::fromArray($config);
 
         Assert::assertTrue($exportDatabaseConfig->hasPort());
         Assert::assertTrue($exportDatabaseConfig->hasDatabase());
@@ -58,7 +58,7 @@ class ExportDatabaseConfigTest extends TestCase
             '#password' => 'secretPassword',
         ];
 
-        $exportDatabaseConfig = ExportDatabaseConfig::fromArray($config);
+        $exportDatabaseConfig = DatabaseConfig::fromArray($config);
 
         Assert::assertFalse($exportDatabaseConfig->hasPort());
         Assert::assertFalse($exportDatabaseConfig->hasDatabase());

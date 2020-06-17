@@ -6,7 +6,7 @@ namespace Keboola\DbExtractorConfig\Configuration\ValueObject;
 
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 
-class ExportDatabaseConfig
+class DatabaseConfig
 {
 
     private ?SSLConnectionConfig $sslConnectionConfig;
