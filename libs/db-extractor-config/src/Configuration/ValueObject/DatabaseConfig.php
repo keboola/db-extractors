@@ -74,7 +74,7 @@ class DatabaseConfig
         return $this->sslConnectionConfig !== null;
     }
 
-    public function getSslConnectionConfig(): ?SSLConnectionConfig
+    public function getSslConnectionConfig(): SSLConnectionConfig
     {
         if ($this->sslConnectionConfig === null) {
             throw new PropertyNotSetException('SSL config is not set.');
@@ -87,7 +87,7 @@ class DatabaseConfig
         return $this->host;
     }
 
-    public function getPort(): ?int
+    public function getPort(): int
     {
         if ($this->port === null) {
             throw new PropertyNotSetException('Property "port" is not set.');
@@ -105,7 +105,7 @@ class DatabaseConfig
         return $this->password;
     }
 
-    public function getDatabase(): ?string
+    public function getDatabase(): string
     {
         if ($this->database === null) {
             throw new PropertyNotSetException('Property "database" is not set.');
@@ -113,7 +113,7 @@ class DatabaseConfig
         return $this->database;
     }
 
-    public function getSchema(): ?string
+    public function getSchema(): string
     {
         if ($this->schema === null) {
             throw new PropertyNotSetException('Property "schema" is not set.');
