@@ -117,7 +117,7 @@ class ExportDatabaseConfig
     public function getDatabase(): ?string
     {
         if ($this->database === null) {
-            throw new PropertyNotSetException('Property "databse" is not set.');
+            throw new PropertyNotSetException('Property "database" is not set.');
         }
         return $this->database;
     }
