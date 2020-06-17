@@ -41,7 +41,7 @@ class ExportDatabaseConfig
             $data['#password'],
             $data['database'] ?? null,
             $data['schema'] ?? null,
-            $data['ssl'] ? SSLConnectionConfig::fromArray($data) : null
+            $data['ssl'] ? SSLConnectionConfig::fromArray($data['ssl']) : null
         );
     }
 
