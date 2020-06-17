@@ -382,35 +382,4 @@ class ExportConfigTest extends TestCase
         Assert::assertSame(123, $config->getConfigId());
         Assert::assertSame('my config name', $config->getConfigName());
     }
-
-    public function testSslConnectionConfig(): void
-    {
-        $config = ExportConfig::fromArray([
-            'table' => [
-                'tableName' => 'table',
-                'schema' => 'schema',
-            ],
-            'db' => [
-                'ssl' => [
-                    'ca' => 'testCa',
-                    'cert' => 'testCert',
-                    'cipher' => 'testCipher',
-                    'key' => 'testKey',
-                ],
-            ],
-            'outputTable' => 'output-table',
-            'retries' => 12,
-            'columns' => [],
-            'primaryKey' => [],
-        ]);
-
-        Assert::assertTrue($config->isSSlConnection());
-
-        Assert::assertInstanceOf(SSLConnectionConfig::class, $config->getSslConnectionConfig());
-
-        Assert::assertEquals('testCa', $config->getSslConnectionConfig()->getCa());
-        Assert::assertEquals('testCert', $config->getSslConnectionConfig()->getCert());
-        Assert::assertEquals('testCipher', $config->getSslConnectionConfig()->getCipher());
-        Assert::assertEquals('testKey', $config->getSslConnectionConfig()->getKey());
-    }
 }

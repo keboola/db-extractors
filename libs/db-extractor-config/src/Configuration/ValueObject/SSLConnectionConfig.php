@@ -20,13 +20,12 @@ class SSLConnectionConfig implements ValueObject
 
     public static function fromArray(array $data): self
     {
-        $ssl = $data['db']['ssl'];
         return new self(
-            $ssl['key'] ?? null,
-            $ssl['cert'] ?? null,
-            $ssl['ca'] ?? null,
-            $ssl['cipher'] ?? null,
-            $ssl['verifyServerCert'] ?? true
+            $data['key'] ?? null,
+            $data['cert'] ?? null,
+            $data['ca'] ?? null,
+            $data['cipher'] ?? null,
+            $data['verifyServerCert'] ?? true
         );
     }
 

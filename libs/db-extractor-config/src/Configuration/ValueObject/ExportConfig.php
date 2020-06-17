@@ -43,9 +43,6 @@ class ExportConfig implements ValueObject
     /** Number of max retries if an error occurs */
     private int $maxRetries;
 
-    /** ssl connection */
-    private ?SSLConnectionConfig $sslConnectionConfig;
-
     public static function fromArray(array $data): self
     {
         return new self(
@@ -58,8 +55,7 @@ class ExportConfig implements ValueObject
             $data['columns'],
             $data['outputTable'],
             $data['primaryKey'],
-            $data['retries'],
-            !empty($data['db']['ssl']) ? SSLConnectionConfig::fromArray($data) : null
+            $data['retries']
         );
     }
 
@@ -73,8 +69,7 @@ class ExportConfig implements ValueObject
         array $columns,
         string $outputTable,
         array $primaryKey,
-        int $maxRetries,
-        ?SSLConnectionConfig $SSLConnectionConfig
+        int $maxRetries
     ) {
         $this->configId = $configId;
         $this->configName = $configName;
@@ -88,7 +83,6 @@ class ExportConfig implements ValueObject
         $this->outputTable = $outputTable;
         $this->primaryKey = $primaryKey;
         $this->maxRetries = $maxRetries;
-        $this->sslConnectionConfig = $SSLConnectionConfig;
     }
 
     public function hasConfigId(): bool
@@ -229,19 +223,5 @@ class ExportConfig implements ValueObject
     public function getMaxRetries(): int
     {
         return $this->maxRetries;
-    }
-
-    public function isSSlConnection(): bool
-    {
-        return $this->sslConnectionConfig !== null;
-    }
-
-    public function getSslConnectionConfig(): SSLConnectionConfig
-    {
-        if ($this->sslConnectionConfig === null) {
-            throw new PropertyNotSetException('SSL config is not set.');
-        }
-
-        return $this->sslConnectionConfig;
     }
 }
