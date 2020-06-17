@@ -17,7 +17,7 @@ class DatabaseConfigTest extends TestCase
         $config = [
             'host' => 'testHost.local',
             'port' => 12345,
-            'username' => 'username',
+            'user' => 'username',
             '#password' => 'secretPassword',
             'database' => 'database',
             'schema' => 'schema',
@@ -54,7 +54,7 @@ class DatabaseConfigTest extends TestCase
     {
         $config = [
             'host' => 'testHost.local',
-            'username' => 'username',
+            'user' => 'username',
             '#password' => 'secretPassword',
         ];
 
