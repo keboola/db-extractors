@@ -41,10 +41,13 @@ class ExportDatabaseConfigTest extends TestCase
         Assert::assertEquals('database', $exportDatabaseConfig->getDatabase());
         Assert::assertEquals('schema', $exportDatabaseConfig->getSchema());
 
-        Assert::assertInstanceOf(SSLConnectionConfig::class, $exportDatabaseConfig->getSslConnectionConfig());
-        Assert::assertEquals('testKey', $exportDatabaseConfig->getSslConnectionConfig()->getKey());
-        Assert::assertEquals('testCa', $exportDatabaseConfig->getSslConnectionConfig()->getCa());
-        Assert::assertEquals('testCert', $exportDatabaseConfig->getSslConnectionConfig()->getCert());
+        $sslConnectionConfig = $exportDatabaseConfig->getSslConnectionConfig();
+        Assert::assertInstanceOf(SSLConnectionConfig::class, $sslConnectionConfig);
+        if ($sslConnectionConfig !== null) {
+            Assert::assertEquals('testKey', $sslConnectionConfig->getKey());
+            Assert::assertEquals('testCa', $sslConnectionConfig->getCa());
+            Assert::assertEquals('testCert', $sslConnectionConfig->getCert());
+        }
     }
 
     public function testOnlyRequiredProperties(): void
