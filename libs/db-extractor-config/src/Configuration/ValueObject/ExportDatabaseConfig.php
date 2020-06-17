@@ -25,15 +25,6 @@ class ExportDatabaseConfig
 
     public static function fromArray(array $data): self
     {
-        if (!$data['host']) {
-            throw new PropertyNotSetException('Property "host" does not exists');
-        }
-        if (!$data['username']) {
-            throw new PropertyNotSetException('Property "username" does not exists');
-        }
-        if (!$data['#password']) {
-            throw new PropertyNotSetException('Property "#password" does not exists');
-        }
         return new self(
             $data['host'],
             $data['port'] ?? null,
