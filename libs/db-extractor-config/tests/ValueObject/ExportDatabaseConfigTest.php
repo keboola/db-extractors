@@ -93,43 +93,4 @@ class ExportDatabaseConfigTest extends TestCase
             Assert::assertEquals('Property "port" is not set.', $e->getMessage());
         }
     }
-
-    /**
-     * @dataProvider exportMissingRequiredPropertiesProvider
-     */
-    public function testExportMissingRequiredProperties(array $config, string $expectedExceptionMessage): void
-    {
-        try {
-            ExportDatabaseConfig::fromArray($config);
-        } catch (PropertyNotSetException $e) {
-            Assert::assertEquals($expectedExceptionMessage, $e->getMessage());
-        }
-    }
-
-    public function exportMissingRequiredPropertiesProvider(): array
-    {
-        return [
-            [
-                [
-                    'username' => 'username',
-                    '#password' => 'secretPassword',
-                ],
-                'Property "host" does not exists',
-            ],
-            [
-                [
-                    'host' => 'testHost.local',
-                    '#password' => 'secretPassword',
-                ],
-                'Property "username" does not exists',
-            ],
-            [
-                [
-                    'host' => 'testHost.local',
-                    'username' => 'username',
-                ],
-                'Property "#password" does not exists',
-            ],
-        ];
-    }
 }
