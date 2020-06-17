@@ -15,15 +15,11 @@ class SSLConnectionConfigTest extends TestCase
     public function testValid(): void
     {
         $sslConnectionConfig = SSLConnectionConfig::fromArray([
-            'db' => [
-                'ssl' => [
-                    'key' => 'testKey',
-                    'ca' => 'testCa',
-                    'cipher' => 'testCipher',
-                    'cert' => 'testCertificate',
-                    'verifyServerCert' => false,
-                ],
-            ],
+            'key' => 'testKey',
+            'ca' => 'testCa',
+            'cipher' => 'testCipher',
+            'cert' => 'testCertificate',
+            'verifyServerCert' => false,
         ]);
 
         Assert::assertTrue($sslConnectionConfig->hasKey());
@@ -39,11 +35,7 @@ class SSLConnectionConfigTest extends TestCase
 
     public function testMissingConfigProperty(): void
     {
-        $sslConnectionConfig = SSLConnectionConfig::fromArray([
-            'db' => [
-                'ssl' => [],
-            ],
-        ]);
+        $sslConnectionConfig = SSLConnectionConfig::fromArray([]);
 
         Assert::assertFalse($sslConnectionConfig->hasKey());
         try {
