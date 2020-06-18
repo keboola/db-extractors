@@ -54,10 +54,31 @@ class TableCollection implements ValueObject, Countable, IteratorAggregate
         return empty($this->tables);
     }
 
-    public function getByNameAndSchema(string $name, string $schema): Table
+    public function getByNameAndSchema(string $name, string $schema, bool $caseSensitive = false): Table
+    {
+        try {
+            // First, let's try to find an exact match
+            return $this->doGetByNameAndSchema($name, $schema, true);
+        } catch (TableNotFoundException $e) {
+            if ($caseSensitive === true) {
+                throw $e;
+            }
+
+            // Try to find by case-insensitive
+            return $this->doGetByNameAndSchema($name, $schema, false);
+        }
+    }
+
+    protected function doGetByNameAndSchema(string $name, string $schema, bool $caseSensitive): Table
     {
         foreach ($this->tables as $table) {
-            if ($table->getName() === $name && $table->getSchema() === $schema) {
+            if (($table->getName() === $name && $table->getSchema() === $schema) ||
+                (
+                    !$caseSensitive &&
+                    mb_strtolower($table->getName()) === mb_strtolower($name) &&
+                    mb_strtolower($table->getSchema()) === mb_strtolower($schema)
+                )
+            ) {
                 return $table;
             }
         }
