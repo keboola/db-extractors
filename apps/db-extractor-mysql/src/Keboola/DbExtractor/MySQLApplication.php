@@ -28,7 +28,7 @@ class MySQLApplication extends Application
             if ($this['action'] === 'run') {
                 $this->config = new Config(
                     $config,
-                    new ConfigRowDefinition($dbNode, null, new MysqlTableNodesDecorator())
+                    new ConfigRowDefinition($dbNode, null, null, new MysqlTableNodesDecorator())
                 );
             } else {
                 $this->config = new Config($config, new ActionConfigRowDefinition($dbNode));
@@ -36,7 +36,7 @@ class MySQLApplication extends Application
         } else {
             $this->config = new Config(
                 $config,
-                new ConfigDefinition($dbNode, null, new MysqlTableNodesDecorator())
+                new ConfigDefinition($dbNode, null, null, new MysqlTableNodesDecorator())
             );
         }
     }
