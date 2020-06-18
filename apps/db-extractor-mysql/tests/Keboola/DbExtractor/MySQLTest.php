@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Component\JsonHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Constraint\StringContains;
 use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
 use Nette\Utils;
@@ -829,5 +830,35 @@ class MySQLTest extends AbstractMySQLTest
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals([], $result['tables']);
+    }
+
+    public function testRunTableSchemaCaseInsensitive(): void
+    {
+        $this->createAutoIncrementAndTimestampTable();
+        $config = $this->getIncrementalFetchingConfig();
+        unset($config['query']);
+        $config['parameters']['table'] = [
+            'schema' => 'TesT',
+            'tableName' => 'Auto_INCREMENT_TimestamP',
+        ];
+
+        $app = $this->createApplication($config);
+
+        // The export should crash on a database error
+        // MySQL case sensitive settings vary by platform: https://stackoverflow.com/a/6134059
+        // "Database and table names are not case sensitive in Windows, and case sensitive in most varieties of Unix."
+        // So in PHP all check must be done case-insensitive
+        try {
+            $app->run();
+            Assert::fail('Exception expected.');
+        } catch (UserException $e) {
+            Assert::assertThat($e->getMessage(), Assert::logicalOr(
+                // Message differs between MySQL versions
+                Assert::stringContains(
+                    "Base table or view not found: 1146 Table 'TesT.Auto_INCREMENT_TimestamP' doesn't exist"
+                ),
+                Assert::stringContains("Unknown database 'TesT'")
+            ));
+        }
     }
 }
