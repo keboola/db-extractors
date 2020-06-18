@@ -16,12 +16,13 @@ class DatabaseConfigTest extends TestCase
     {
         $config = [
             'host' => 'testHost.local',
-            'port' => 12345,
+            'port' => '12345',
             'user' => 'username',
             '#password' => 'secretPassword',
             'database' => 'database',
             'schema' => 'schema',
             'ssl' => [
+                'enabled' => true,
                 'key' => 'testKey',
                 'ca' => 'testCa',
                 'cert' => 'testCert',
@@ -48,6 +49,24 @@ class DatabaseConfigTest extends TestCase
             Assert::assertEquals('testCa', $sslConnectionConfig->getCa());
             Assert::assertEquals('testCert', $sslConnectionConfig->getCert());
         }
+    }
+
+    public function testNotEnabledSslConnection(): void
+    {
+        $config = [
+            'host' => 'testHost.local',
+            'user' => 'username',
+            '#password' => 'secretPassword',
+            'ssl' => [
+                'enabled' => false,
+                'key' => 'testKey',
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+            ],
+        ];
+
+        $exportDatabaseConfig = DatabaseConfig::fromArray($config);
+        Assert::assertFalse($exportDatabaseConfig->hasSSLConnection());
     }
 
     public function testOnlyRequiredProperties(): void

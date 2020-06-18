@@ -13,7 +13,7 @@ class DatabaseConfig
 
     private string $host;
 
-    private ?int $port;
+    private ?string $port;
 
     private string $username;
 
@@ -25,6 +25,8 @@ class DatabaseConfig
 
     public static function fromArray(array $data): self
     {
+        $sslEnabled = !empty($data['ssl']) && !empty($data['ssl']['enabled']);
+
         return new self(
             $data['host'],
             $data['port'] ?? null,
@@ -32,13 +34,13 @@ class DatabaseConfig
             $data['#password'],
             $data['database'] ?? null,
             $data['schema'] ?? null,
-            $data['ssl'] ? SSLConnectionConfig::fromArray($data['ssl']) : null
+            $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null
         );
     }
 
     public function __construct(
         string $host,
-        ?int $port,
+        ?string $port,
         string $username,
         string $password,
         ?string $database,
@@ -87,7 +89,7 @@ class DatabaseConfig
         return $this->host;
     }
 
-    public function getPort(): int
+    public function getPort(): string
     {
         if ($this->port === null) {
             throw new PropertyNotSetException('Property "port" is not set.');
