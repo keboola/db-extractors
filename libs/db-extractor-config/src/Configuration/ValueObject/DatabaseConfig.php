@@ -13,7 +13,7 @@ class DatabaseConfig
 
     private string $host;
 
-    private ?int $port;
+    private ?string $port;
 
     private string $username;
 
@@ -40,7 +40,7 @@ class DatabaseConfig
 
     public function __construct(
         string $host,
-        ?int $port,
+        ?string $port,
         string $username,
         string $password,
         ?string $database,
@@ -89,7 +89,7 @@ class DatabaseConfig
         return $this->host;
     }
 
-    public function getPort(): int
+    public function getPort(): string
     {
         if ($this->port === null) {
             throw new PropertyNotSetException('Property "port" is not set.');
