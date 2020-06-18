@@ -169,15 +169,7 @@ class MySQLMetadataProvider implements MetadataProvider
         $sql[] = 'SELECT *';
         $sql[] = 'FROM INFORMATION_SCHEMA.TABLES as c';
 
-        if ($this->database !== null) {
-            $sql[] = sprintf('WHERE c.TABLE_SCHEMA = %s', $this->db->quote($this->database));
-        } else {
-            $sql[] = 'WHERE c.TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys")';
-        }
-
-        if ($whitelist) {
-            $sql[] =sprintf('AND c.TABLE_NAME IN (%s)', $this->quoteTables($whitelist));
-        }
+        $this->addTableSchemaWhereConditions($sql, $whitelist);
 
         $sql[] = 'ORDER BY TABLE_SCHEMA, TABLE_NAME';
 
@@ -197,20 +189,28 @@ class MySQLMetadataProvider implements MetadataProvider
         $sql[] = 'LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu';
         $sql[] = 'ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME';
 
-        if ($this->database !== null) {
-            $sql[] = sprintf('WHERE c.TABLE_SCHEMA = %s', $this->db->quote($this->database));
-        } else {
-            $sql[] = 'WHERE c.TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys")';
-        }
-
-        if ($whitelist) {
-            $sql[] =sprintf('AND c.TABLE_NAME IN (%s)', $this->quoteTables($whitelist));
-        }
+        $this->addTableSchemaWhereConditions($sql, $whitelist);
 
         $sql[] = ' ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION';
 
         // Run query
         return $this->queryAndFetchAll(implode(' ', $sql));
+    }
+
+    private function addTableSchemaWhereConditions(array &$sql, ?array $whitelist): void
+    {
+        if ($this->database !== null) {
+            $sql[] = sprintf(
+                'WHERE LOWER(c.TABLE_SCHEMA) = %s',
+                $this->db->quote(mb_strtolower($this->database))
+            );
+        } else {
+            $sql[] = 'WHERE c.TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys")';
+        }
+
+        if ($whitelist) {
+            $sql[] =sprintf('AND LOWER(c.TABLE_NAME) IN (%s)', $this->quoteTables($whitelist));
+        }
     }
 
     private function queryAndFetchAll(string $sql): array
@@ -227,7 +227,7 @@ class MySQLMetadataProvider implements MetadataProvider
         return implode(
             ', ',
             array_map(function (InputTable $table) {
-                if ($table->getSchema() !== $this->database) {
+                if ($this->database && mb_strtolower($table->getSchema()) !== mb_strtolower($this->database)) {
                     throw new InvalidArgumentException(sprintf(
                         'Table "%s"."%s" is not from used database.',
                         $table->getSchema(),
@@ -235,7 +235,7 @@ class MySQLMetadataProvider implements MetadataProvider
                     ));
                 }
 
-                return $this->db->quote($table->getName());
+                return $this->db->quote(mb_strtolower($table->getName()));
             }, $whitelist)
         );
     }

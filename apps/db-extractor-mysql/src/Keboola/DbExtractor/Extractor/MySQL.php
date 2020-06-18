@@ -163,7 +163,7 @@ class MySQL extends BaseExtractor
     {
         // if database set make sure the database and selected table schema match
         if ($this->database && $exportConfig->hasTable() &&
-            $this->database !== $exportConfig->getTable()->getSchema()
+            mb_strtolower($this->database) !== mb_strtolower($exportConfig->getTable()->getSchema())
         ) {
             throw new UserException(sprintf(
                 'Invalid Configuration [%s].  The table schema "%s" is different from the connection database "%s"',
@@ -224,7 +224,13 @@ class MySQL extends BaseExtractor
             $this->quote($exportConfig->getTable()->getSchema()),
             $this->quote($exportConfig->getTable()->getName())
         );
-        $result = $this->db->query($sql)->fetchAll();
+
+        try {
+            $result = $this->db->query($sql)->fetchAll();
+        } catch (PDOException $e) {
+            throw $this->handleDbError($e, 0);
+        }
+
         return $result ? $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;
     }
 
