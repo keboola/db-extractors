@@ -30,7 +30,7 @@ class SslNode extends ArrayNodeDefinition
 
     protected function addEnabledNode(NodeBuilder $nodeBuilder): void
     {
-        $nodeBuilder->booleanNode('enabled');
+        $nodeBuilder->booleanNode('enabled')->defaultFalse();
     }
 
     protected function addKeyNode(NodeBuilder $nodeBuilder): void
