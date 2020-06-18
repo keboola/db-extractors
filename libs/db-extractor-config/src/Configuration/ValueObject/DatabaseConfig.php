@@ -25,6 +25,8 @@ class DatabaseConfig
 
     public static function fromArray(array $data): self
     {
+        $sslEnabled = !empty($data['ssl']) && !empty($data['ssl']['enabled']);
+
         return new self(
             $data['host'],
             $data['port'] ?? null,
@@ -32,7 +34,7 @@ class DatabaseConfig
             $data['#password'],
             $data['database'] ?? null,
             $data['schema'] ?? null,
-            $data['ssl'] ? SSLConnectionConfig::fromArray($data['ssl']) : null
+            $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null
         );
     }
 

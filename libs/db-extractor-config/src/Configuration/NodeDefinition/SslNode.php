@@ -20,11 +20,17 @@ class SslNode extends ArrayNodeDefinition
 
     public function init(NodeBuilder $nodeBuilder): void
     {
+        $this->addEnabledNode($nodeBuilder);
         $this->addKeyNode($nodeBuilder);
         $this->addCaNode($nodeBuilder);
         $this->addCertNode($nodeBuilder);
         $this->addCipherNode($nodeBuilder);
         $this->addVerifyServerCertNode($nodeBuilder);
+    }
+
+    protected function addEnabledNode(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->booleanNode('enabled');
     }
 
     protected function addKeyNode(NodeBuilder $nodeBuilder): void
