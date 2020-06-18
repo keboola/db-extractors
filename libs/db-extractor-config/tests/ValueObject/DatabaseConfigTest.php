@@ -16,12 +16,13 @@ class DatabaseConfigTest extends TestCase
     {
         $config = [
             'host' => 'testHost.local',
-            'port' => 12345,
+            'port' => '12345',
             'user' => 'username',
             '#password' => 'secretPassword',
             'database' => 'database',
             'schema' => 'schema',
             'ssl' => [
+                'enabled' => true,
                 'key' => 'testKey',
                 'ca' => 'testCa',
                 'cert' => 'testCert',
