@@ -15,7 +15,7 @@ use Retry\RetryProxy;
 class SSHTunnel
 {
 
-    public const DEFAULT_LOCAL_PORT = 33006;
+    public const DEFAULT_LOCAL_PORT = '33006';
 
     public const DEFAULT_SSH_PORT = 22;
 
