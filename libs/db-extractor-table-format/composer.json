@@ -21,6 +21,7 @@
     },
     "require": {
         "php": ">=7.4",
+        "ext-mbstring": "*",
         "keboola/common-exceptions": "^1.0",
         "keboola/php-datatypes": "^4.7",
         "keboola/php-utils": "^4.1"

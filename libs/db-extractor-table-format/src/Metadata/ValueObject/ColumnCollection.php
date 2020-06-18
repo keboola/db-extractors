@@ -80,23 +80,21 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
         return empty($this->columns);
     }
 
-    public function getByName(string $name): Column
+    public function getByName(string $name, bool $caseSensitive = false): Column
     {
-        foreach ($this->columns as $column) {
-            if ($column->getName() === $name) {
-                return $column;
-            }
+        $column = $this->searchByString('getName', $name, $caseSensitive);
+        if ($column) {
+            return $column;
         }
 
         throw new ColumnNotFoundException(sprintf('Column with name "%s" not found.', $name));
     }
 
-    public function getBySanitizedName(string $sanitizedName): Column
+    public function getBySanitizedName(string $sanitizedName, bool $caseSensitive = false): Column
     {
-        foreach ($this->columns as $column) {
-            if ($column->getSanitizedName() === $sanitizedName) {
-                return $column;
-            }
+        $column = $this->searchByString('getSanitizedName', $sanitizedName, $caseSensitive);
+        if ($column) {
+            return $column;
         }
 
         throw new ColumnNotFoundException(sprintf('Column with sanitized "%s" not found.'. $sanitizedName));
@@ -111,5 +109,26 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
         }
 
         throw new ColumnNotFoundException(sprintf('Column with ordinal position "%d" not found.', $ordinalPosition));
+    }
+
+    protected function searchByString(string $method, string $value, bool $caseSensitive): ?Column
+    {
+        // First, let's try to find an exact match
+        foreach ($this->columns as $column) {
+            if ($column->$method() === $value) {
+                return $column;
+            }
+        }
+
+        // Try to find by case-insensitive
+        if ($caseSensitive === false) {
+            foreach ($this->columns as $column) {
+                if (mb_strtolower($column->$method()) === mb_strtolower($value)) {
+                    return $column;
+                }
+            }
+        }
+
+        return null;
     }
 }
