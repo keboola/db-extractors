@@ -51,6 +51,24 @@ class DatabaseConfigTest extends TestCase
         }
     }
 
+    public function testNotEnabledSslConnection(): void
+    {
+        $config = [
+            'host' => 'testHost.local',
+            'user' => 'username',
+            '#password' => 'secretPassword',
+            'ssl' => [
+                'enabled' => false,
+                'key' => 'testKey',
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+            ],
+        ];
+
+        $exportDatabaseConfig = DatabaseConfig::fromArray($config);
+        Assert::assertFalse($exportDatabaseConfig->hasSSLConnection());
+    }
+
     public function testOnlyRequiredProperties(): void
     {
         $config = [
