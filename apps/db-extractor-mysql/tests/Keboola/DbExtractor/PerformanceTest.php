@@ -32,6 +32,8 @@ class PerformanceTest extends AbstractMySQLTest
 
     public function testSpeed(): void
     {
+        $this->markTestSkipped('Skip, setUp is slow, we do nott always need to run it.');
+
         $config = $this->getConfig();
         $config['parameters']['tables'] = [];
         unset($config['parameters']['db']['database']);
