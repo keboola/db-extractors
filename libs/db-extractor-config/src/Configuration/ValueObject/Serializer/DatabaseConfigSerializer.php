@@ -6,6 +6,9 @@ namespace Keboola\DbExtractorConfig\Configuration\ValueObject\Serializer;
 
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 
+/**
+ * This class can be used if you need to pass parameters to a external tool (eg. java-oracle-exporter).
+ */
 class DatabaseConfigSerializer implements IDatabaseConfigSerializer
 {
     public static function serialize(DatabaseConfig $databaseConfig): array
