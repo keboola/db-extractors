@@ -68,23 +68,21 @@ class MySQLMetadataProvider implements MetadataProvider
 
         // Process columns
         if ($loadColumns) {
-            foreach ($this->queryColumnsAndConstraints($whitelist) as $data) {
+            foreach ($this->queryColumns($whitelist) as $data) {
                 $tableId = $data['TABLE_SCHEMA'] . '.' . $data['TABLE_NAME'];
                 $columnId = $tableId . '.' . $data['COLUMN_NAME'];
-
-                // If the column has multiple constraints
-                // ... then is present multiple times in results
-                if (isset($columnBuilders[$columnId])) {
-                    $columnBuilder = $columnBuilders[$columnId];
-                    $initialize = false;
-                } else {
-                    $columnBuilder = $tableBuilders[$tableId]->addColumn();
-                    $columnBuilders[$columnId] = $columnBuilder;
-                    $initialize = true;
-                }
-
+                $columnBuilder = $tableBuilders[$tableId]->addColumn();
+                $columnBuilders[$columnId] = $columnBuilder;
                 $autoIncrement = isset($autoIncrements[$tableId]) ? (int) $autoIncrements[$tableId] : null;
-                $this->processColumnData($columnBuilder, $data, $autoIncrement, $initialize);
+                $this->processColumnData($columnBuilder, $data, $autoIncrement);
+            }
+
+            foreach ($this->queryConstraints($whitelist) as $data) {
+                $columnId = $data['TABLE_SCHEMA'] . '.' . $data['TABLE_NAME'] . '.' . $data['COLUMN_NAME'];
+                // Column data may not be available with limited database permissions
+                if (isset($columnBuilders[$columnId])) {
+                    $this->processConstraintData($columnBuilders[$columnId], $data);
+                }
             }
         }
 
@@ -101,33 +99,8 @@ class MySQLMetadataProvider implements MetadataProvider
             ->setRowCount((int) $data['TABLE_ROWS']);
     }
 
-    private function processColumnData(ColumnBuilder $builder, array $data, ?int $autoIncrement, bool $initialize): void
+    private function processColumnData(ColumnBuilder $builder, array $data, ?int $autoIncrement): void
     {
-        // Foreign key
-        if (isset($data['REFERENCED_TABLE_NAME'])) {
-            try {
-                $builder
-                    ->addForeignKey()
-                    ->setName($data['CONSTRAINT_NAME'])
-                    ->setRefSchema($data['REFERENCED_TABLE_SCHEMA'])
-                    ->setRefTable($data['REFERENCED_TABLE_NAME'])
-                    ->setRefColumn($data['REFERENCED_COLUMN_NAME']);
-            } catch (InvalidStateException $e) {
-                // In MySQL, one column can have multiple foreign keys, it is useless, but possible.
-                // Ignore second foreign key, metadata and manifest expect max one FK.
-            }
-        }
-
-        // Constraints
-        if (isset($data['CONSTRAINT_NAME'])) {
-            $builder->addConstraint($data['CONSTRAINT_NAME']);
-        }
-
-        // Other values has been already set
-        if ($initialize === false) {
-            return;
-        }
-
         // Basic values
         $builder
             ->setName($data['COLUMN_NAME'])
@@ -159,10 +132,33 @@ class MySQLMetadataProvider implements MetadataProvider
         }
     }
 
+    private function processConstraintData(ColumnBuilder $builder, array $data): void
+    {
+        // Foreign key
+        if (isset($data['REFERENCED_TABLE_NAME'])) {
+            try {
+                $builder
+                    ->addForeignKey()
+                    ->setName($data['CONSTRAINT_NAME'])
+                    ->setRefSchema($data['REFERENCED_TABLE_SCHEMA'])
+                    ->setRefTable($data['REFERENCED_TABLE_NAME'])
+                    ->setRefColumn($data['REFERENCED_COLUMN_NAME']);
+            } catch (InvalidStateException $e) {
+                // In MySQL, one column can have multiple foreign keys, it is useless, but possible.
+                // Ignore second foreign key, metadata and manifest expect max one FK.
+            }
+        }
+
+        // Constraints
+        if (isset($data['CONSTRAINT_NAME'])) {
+            $builder->addConstraint($data['CONSTRAINT_NAME']);
+        }
+    }
+
     /**
      * @param array|InputTable[] $whitelist
      */
-    private function queryTables(array $whitelist = []): array
+    private function queryTables(array $whitelist = []): iterable
     {
         // Build query, REF: https://dev.mysql.com/doc/refman/8.0/en/tables-table.html
         $sql = [];
@@ -180,18 +176,34 @@ class MySQLMetadataProvider implements MetadataProvider
     /**
      * @param array|InputTable[] $whitelist
      */
-    private function queryColumnsAndConstraints(?array $whitelist = null): array
+    private function queryColumns(?array $whitelist = null): iterable
     {
         // Build query, REF: https://dev.mysql.com/doc/refman/5.1/en/columns-table.html
         $sql = [];
-        $sql[] = 'SELECT c.*, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA';
+        $sql[] = 'SELECT *';
         $sql[] = 'FROM INFORMATION_SCHEMA.COLUMNS as c';
-        $sql[] = 'LEFT OUTER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE as kcu';
-        $sql[] = 'ON c.TABLE_NAME = kcu.TABLE_NAME AND c.COLUMN_NAME = kcu.COLUMN_NAME';
 
         $this->addTableSchemaWhereConditions($sql, $whitelist);
 
-        $sql[] = ' ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, ORDINAL_POSITION';
+        $sql[] = 'ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION';
+
+        // Run query
+        return $this->queryAndFetchAll(implode(' ', $sql));
+    }
+
+    /**
+     * @param array|InputTable[] $whitelist
+     */
+    private function queryConstraints(?array $whitelist = null): iterable
+    {
+        // Build query, REF: https://dev.mysql.com/doc/refman/8.0/en/key-column-usage-table.html
+        $sql = [];
+        $sql[] = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME,';
+        $sql[] = 'CONSTRAINT_NAME, REFERENCED_TABLE_NAME,';
+        $sql[] = 'REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA';
+        $sql[] = 'FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE as c';
+
+        $this->addTableSchemaWhereConditions($sql, $whitelist);
 
         // Run query
         return $this->queryAndFetchAll(implode(' ', $sql));
@@ -213,13 +225,13 @@ class MySQLMetadataProvider implements MetadataProvider
         }
     }
 
-    private function queryAndFetchAll(string $sql): array
+    private function queryAndFetchAll(string $sql): iterable
     {
         /** @var PDOStatement $result */
         $result = $this->db->query($sql);
-        /** @var array $array */
-        $array = $result->fetchAll(PDO::FETCH_ASSOC);
-        return $array;
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            yield $row;
+        }
     }
 
     private function quoteTables(array $whitelist): string
