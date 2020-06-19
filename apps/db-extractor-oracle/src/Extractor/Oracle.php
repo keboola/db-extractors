@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Throwable;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use function Keboola\Utils\formatDateTime;
@@ -23,11 +24,11 @@ class Oracle extends BaseExtractor
 
     private ?string $incrementalFetchingType = null;
 
-    public function createConnection(array $params): void
+    public function createConnection(DatabaseConfig $databaseConfig): void
     {
         // OracleJavaExportWrapper must be created after parent constructor,
         // ... because dbParameters are modified by SSH tunnel.
-        $this->exportWrapper = new OracleJavaExportWrapper($this->logger, $this->dataDir, $this->getDbParameters());
+        $this->exportWrapper = new OracleJavaExportWrapper($this->logger, $this->dataDir, $databaseConfig);
     }
 
     public function getMetadataProvider(): MetadataProvider
