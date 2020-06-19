@@ -29,7 +29,7 @@ class DatabaseConfig
 
         return new self(
             $data['host'],
-            $data['port'] ?? null,
+            $data['port'] ? (string) $data['port'] : null,
             $data['user'],
             $data['#password'],
             $data['database'] ?? null,
