@@ -10,7 +10,9 @@ class SSLConnectionConfigSerializer implements ISSLConnectionConfigSerializer
 {
     public static function serialize(SSLConnectionConfig $SSLConnectionConfig): array
     {
-        $config = [];
+        $config = [
+            'enabled' => true,
+        ];
         if ($SSLConnectionConfig->hasCa()) {
             $config['ca'] = $SSLConnectionConfig->getCa();
         }

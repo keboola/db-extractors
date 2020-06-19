@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractorConfig\Tests\ValueObject;
 
 use Keboola\CommonExceptions\UserExceptionInterface;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\Serializer\SSLConnectionConfigSerializer;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\SSLConnectionConfig;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 use PHPUnit\Framework\Assert;
@@ -68,5 +69,22 @@ class SSLConnectionConfigTest extends TestCase
         } catch (PropertyNotSetException $e) {
             Assert::assertEquals('Property "cipher" is not set.', $e->getMessage());
         }
+    }
+
+    public function testSSLConnectionConfigSerializer(): void
+    {
+        $config = [
+            'enabled' => true,
+            'key' => 'testKey',
+            'ca' => 'testCa',
+            'cert' => 'testCert',
+        ];
+
+        $serialize = SSLConnectionConfigSerializer::serialize(SSLConnectionConfig::fromArray($config));
+
+        sort($config);
+        sort($serialize);
+
+        Assert::assertEquals($config, $serialize);
     }
 }

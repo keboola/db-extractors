@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractorConfig\Tests\ValueObject;
 
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\Serializer\DatabaseConfigSerializer;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\SSLConnectionConfig;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
 use PHPUnit\Framework\Assert;
@@ -49,6 +50,31 @@ class DatabaseConfigTest extends TestCase
             Assert::assertEquals('testCa', $sslConnectionConfig->getCa());
             Assert::assertEquals('testCert', $sslConnectionConfig->getCert());
         }
+    }
+
+    public function testDatabaseConfigSerializer(): void
+    {
+        $config = [
+            'host' => 'testHost.local',
+            'port' => '12345',
+            'user' => 'username',
+            '#password' => 'secretPassword',
+            'database' => 'database',
+            'schema' => 'schema',
+            'ssl' => [
+                'enabled' => true,
+                'key' => 'testKey',
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+            ],
+        ];
+
+        $serialize = DatabaseConfigSerializer::serialize(DatabaseConfig::fromArray($config));
+
+        sort($config);
+        sort($serialize);
+
+        Assert::assertEquals($config, $serialize);
     }
 
     public function testNotEnabledSslConnection(): void
