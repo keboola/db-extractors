@@ -15,6 +15,12 @@ class MysqlDbNode extends DbNode
         $this->addNetworkCompression($builder);
     }
 
+    protected function addDatabaseNode(NodeBuilder $builder): void
+    {
+        // Database can be empty
+        $builder->scalarNode('database');
+    }
+
     protected function addNetworkCompression(NodeBuilder $builder): void
     {
         $builder->booleanNode('networkCompression')->defaultValue(false)->end();
