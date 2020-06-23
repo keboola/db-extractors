@@ -146,10 +146,14 @@ class TableNodesDecorator implements DecoratorInterface
         // @formatter:off
         $builder
             ->scalarNode('incrementalFetchingColumn')
-                ->cannotBeEmpty()
+                ->defaultNull()
             ->end()
             ->integerNode('incrementalFetchingLimit')
-                ->min(0) // zero is taken as disabled
+                // In old configs can be incrementalFetchingLimit = null, preserve backward compatibility
+                // Null value cannot be enabled on integer node in different way
+                ->treatNullLike(0)
+                // Zero is taken as disabled, see "self::normalize" method
+                ->min(0)
             ->end();
         // @formatter:on
     }

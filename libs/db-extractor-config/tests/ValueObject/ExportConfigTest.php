@@ -268,6 +268,38 @@ class ExportConfigTest extends TestCase
         }
     }
 
+    public function testIncrementalFetchingColumnNull(): void
+    {
+        $config = ExportConfig::fromArray([
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+            'incrementalFetchingColumn' => null, // <<<<<<<<<<
+        ]);
+        Assert::assertFalse($config->isIncrementalFetching());
+    }
+
+    public function testIncrementalFetchingLimitNull(): void
+    {
+        $config = ExportConfig::fromArray([
+            'table' => [
+                'tableName' => 'table',
+                'schema' => 'schema',
+            ],
+            'outputTable' => 'output-table',
+            'retries' => 12,
+            'columns' => [],
+            'primaryKey' => [],
+            'incrementalFetchingLimit' => null, // <<<<<<<<<<
+        ]);
+        Assert::assertFalse($config->isIncrementalFetching());
+    }
+
     public function testIncrementalLoading(): void
     {
         $config = ExportConfig::fromArray([
