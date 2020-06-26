@@ -112,6 +112,7 @@ class ConfigTest extends AbstractConfigTest
                         'enabled' => true,
                         'columns' => [],
                         'retries' => 5,
+                        'incrementalFetchingColumn' => null,
                     ],
                     [
                         'id' => 2,
@@ -125,6 +126,7 @@ class ConfigTest extends AbstractConfigTest
                         'enabled' => true,
                         'columns' => [],
                         'retries' => 20,
+                        'incrementalFetchingColumn' => null,
                     ],
                     [
                         'id' => 3,
@@ -145,6 +147,7 @@ class ConfigTest extends AbstractConfigTest
                         ],
                         'retries' => 30,
                         'query' => null,
+                        'incrementalFetchingColumn' => null,
                     ],
                 ],
             ],
@@ -374,6 +377,7 @@ class ConfigTest extends AbstractConfigTest
                 'query' => 'SELECT 1 FROM test',
                 'outputTable' => 'testOutput',
                 'columns' => [],
+                'incrementalFetchingColumn' => null,
                 'incremental' => false,
                 'enabled' => true,
                 'primaryKey' => [],
@@ -496,6 +500,7 @@ class ConfigTest extends AbstractConfigTest
                 'incremental' => true,
                 'query' => null,
                 'columns' => [],
+                'incrementalFetchingColumn' => null,
                 'enabled' => true,
                 'primaryKey' => [],
                 'retries' => 5,
@@ -705,5 +710,51 @@ class ConfigTest extends AbstractConfigTest
 
         new Config($configurationArray, new GetTablesListFilterDefinition());
         $this->expectNotToPerformAssertions(); // no error expected
+    }
+
+    public function testIncrementalFetchingLimitNull(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'table',
+                    'schema' => 'schema',
+                ],
+                'outputTable' => 'output-table',
+                'retries' => 12,
+                'columns' => [],
+                'primaryKey' => [],
+                'incremental' => false,
+                'incrementalFetchingLimit' => null, // <<<<<<<<<<
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        Assert::assertSame(null, $config->getData()['incrementalFetchingLimit']);
+    }
+
+    public function testIncrementalFetchingColumnNull(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'table' => [
+                    'tableName' => 'table',
+                    'schema' => 'schema',
+                ],
+                'outputTable' => 'output-table',
+                'retries' => 12,
+                'columns' => [],
+                'primaryKey' => [],
+                'incremental' => false,
+                'incrementalFetchingColumn' => null, // <<<<<<<<<<
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ConfigRowDefinition());
+        Assert::assertSame(null, $config->getData()['incrementalFetchingColumn']);
     }
 }
