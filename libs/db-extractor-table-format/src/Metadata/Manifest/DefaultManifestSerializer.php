@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Metadata\Manifest;
 
+use Keboola\Datatype\Definition\Common;
+use Keboola\Datatype\Definition\DefinitionInterface;
 use Keboola\Datatype\Definition\GenericStorage;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Column;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
@@ -50,7 +52,7 @@ class DefaultManifestSerializer implements ManifestSerializer
             'default' => $column->hasDefault() ? (string) $column->getDefault() : null,
         ];
         $options = array_filter($options, fn($value) => $value !== null); // remove null values
-        $datatype = new GenericStorage($column->getType(), $options);
+        $datatype = $this->columnToDatatype($column, $options);
         $columnMetadata = $datatype->toMetadata();
 
         // Non-datatype metadata
@@ -96,5 +98,10 @@ class DefaultManifestSerializer implements ManifestSerializer
         }
 
         return $columnMetadata;
+    }
+
+    protected function columnToDatatype(Column $column, array $options): Common
+    {
+        return new GenericStorage($column->getType(), $options);
     }
 }
