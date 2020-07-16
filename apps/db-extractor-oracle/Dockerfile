@@ -61,6 +61,8 @@ WORKDIR /root
 RUN curl -sS https://getcomposer.org/installer | php \
   && mv composer.phar /usr/local/bin/composer
 
+COPY ./docker/php/php-prod.ini /usr/local/etc/php/php.ini
+
 WORKDIR /code
 
 ## Composer - deps always cached unless changed
