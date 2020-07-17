@@ -24,6 +24,7 @@ services:
     image: keboola/db-extractor-oracle
     volumes:
       - .:/code
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
     tty: true
     stdin_open: true
     environment:
