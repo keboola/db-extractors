@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
+use Keboola\DbExtractorConfig\Tests\ValueObject\DatabaseConfigTest;
 use PDO;
 use PDOException;
 use Throwable;
@@ -32,14 +34,7 @@ class MySQL extends BaseExtractor
         return new MySQLMetadataProvider($this->db, $this->database);
     }
 
-    private function createSSLFile(string $sslCa, Temp $temp): string
-    {
-        $filename = $temp->createTmpFile('ssl');
-        file_put_contents((string) $filename, $sslCa);
-        return (string) realpath((string) $filename);
-    }
-
-    public function createConnection(array $params): PDO
+    public function createConnection(DatabaseConfig $databaseConfig): PDO
     {
         $isSsl = false;
         $isCompression = !empty($params['networkCompression']) ? true :false;
@@ -50,61 +45,55 @@ class MySQL extends BaseExtractor
         ];
 
         // ssl encryption
-        if (!empty($params['ssl']) && !empty($params['ssl']['enabled'])) {
-            $ssl = $params['ssl'];
+        if ($databaseConfig->hasSSLConnection()) {
+            $sslConnection = $databaseConfig->getSslConnectionConfig();
 
-            $temp = new Temp(getenv('APP_NAME') ? (string) getenv('APP_NAME') : 'ex-db-mysql');
+            $temp = new Temp('myslq-ssl');
 
-            if (!empty($ssl['key'])) {
-                $options[PDO::MYSQL_ATTR_SSL_KEY] = $this->createSSLFile($ssl['key'], $temp);
+            if ($sslConnection->hasKey()) {
+                $options[PDO::MYSQL_ATTR_SSL_KEY] = SslHelper::createSSLFile($temp, $sslConnection->getKey());
                 $isSsl = true;
             }
-            if (!empty($ssl['cert'])) {
-                $options[PDO::MYSQL_ATTR_SSL_CERT] = $this->createSSLFile($ssl['cert'], $temp);
+            if ($sslConnection->getCert()) {
+                $options[PDO::MYSQL_ATTR_SSL_CERT] = SslHelper::createSSLFile($temp, $sslConnection->getCert());
                 $isSsl = true;
             }
-            if (!empty($ssl['ca'])) {
-                $options[PDO::MYSQL_ATTR_SSL_CA] = $this->createSSLFile($ssl['ca'], $temp);
+            if ($sslConnection->getCa()) {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = SslHelper::createSSLFile($temp, $sslConnection->getCa());
                 $isSsl = true;
             }
-            if (!empty($ssl['cipher'])) {
-                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $ssl['cipher'];
+            if ($sslConnection->hasCipher()) {
+                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $sslConnection->getCipher();
             }
-            if (isset($ssl['verifyServerCert']) && $ssl['verifyServerCert'] === false) {
+            if (!$sslConnection->isVerifyServerCert()) {
                 $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
 
             $options[PDO::MYSQL_ATTR_SSL_CIPHER] = self::SSL_CIPHER_CONFIG;
         }
 
-        foreach (['host', 'user', '#password'] as $r) {
-            if (!array_key_exists($r, $params)) {
-                throw new UserException(sprintf('Parameter %s is missing.', $r));
-            }
-        }
-
-        $port = !empty($params['port']) ? $params['port'] : '3306';
+        $port = $databaseConfig->hasPort() ? $databaseConfig->getPort() : '3306';
 
         $dsn = sprintf(
             'mysql:host=%s;port=%s;charset=utf8',
-            $params['host'],
+            $databaseConfig->getHost(),
             $port
         );
 
-        if (isset($params['database'])) {
+        if ($databaseConfig->hasDatabase()) {
             $dsn = sprintf(
                 'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
-                $params['host'],
+                $databaseConfig->getHost(),
                 $port,
-                $params['database']
+                $databaseConfig->getDatabase()
             );
-            $this->database = $params['database'];
+            $this->database = $databaseConfig->getDatabase();
         }
 
         $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
 
         try {
-            $pdo = new PDO($dsn, $params['user'], $params['#password'], $options);
+            $pdo = new PDO($dsn, $databaseConfig->getUsername(), $databaseConfig->getPassword(), $options);
         } catch (PDOException $e) {
             $checkCnMismatch = function (Throwable $exception): void {
                 if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {

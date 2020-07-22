@@ -11,16 +11,16 @@
     ],
     "require": {
         "php": "^7.4",
-        "ext-pdo": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "keboola/db-extractor-common": "^13.2.4",
-        "keboola/db-extractor-config": "^1.4.4",
+        "ext-pdo": "*",
+        "keboola/db-extractor-common": "^13.3",
+        "keboola/db-extractor-config": "^1.4",
         "keboola/db-extractor-table-format": "^3.1.1",
+        "keboola/php-component": "^8.1.2",
         "keboola/php-datatypes": "^4.7",
         "keboola/php-temp": "^2.0",
         "keboola/php-utils": "^4.1",
-        "keboola/php-component": "^8.1.2",
         "symfony/config": "^5.0"
     },
     "require-dev": {
