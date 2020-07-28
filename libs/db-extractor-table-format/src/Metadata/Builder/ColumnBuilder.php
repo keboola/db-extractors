@@ -98,7 +98,7 @@ class ColumnBuilder implements Builder
         $name = trim($name);
 
         if (empty($name)) {
-            throw new InvalidArgumentException('Table\'s name cannot be empty.');
+            throw new InvalidArgumentException('Column\'s name cannot be empty.');
         }
 
         $this->name = $name;
