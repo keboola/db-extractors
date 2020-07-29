@@ -46,35 +46,35 @@ class Table implements ValueObject
         ?int $rowCount,
         ?ColumnCollection $columns
     ) {
-        if (empty($name)) {
+        if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
         }
 
-        if (empty($sanitizedName)) {
+        if ($sanitizedName === '') {
             throw new InvalidArgumentException('Table\'s sanitized name cannot be empty.');
         }
 
-        if ($description !== null && empty($description)) {
+        if ($description !== null && $description === '') {
             throw new InvalidArgumentException('Table\'s description cannot be empty string, use null.');
         }
 
-        if ($schema !== null && empty($schema)) {
+        if ($schema !== null && $schema === '') {
             throw new InvalidArgumentException('Table\'s schema cannot be empty string, use null.');
         }
 
-        if ($catalog !== null && empty($catalog)) {
+        if ($catalog !== null && $catalog === '') {
             throw new InvalidArgumentException('Table\'s catalog cannot be empty string, use null.');
         }
 
-        if ($tablespaceName !== null && empty($tablespaceName)) {
+        if ($tablespaceName !== null && $tablespaceName === '') {
             throw new InvalidArgumentException('Table\'s tablespaceName cannot be empty string, use null.');
         }
 
-        if ($owner !== null && empty($owner)) {
+        if ($owner !== null && $owner === '') {
             throw new InvalidArgumentException('Table\'s owner cannot be empty string, use null.');
         }
 
-        if ($type !== null && empty($type)) {
+        if ($type !== null && $type === '') {
             throw new InvalidArgumentException('Table\'s type cannot be empty string, use null.');
         }
 

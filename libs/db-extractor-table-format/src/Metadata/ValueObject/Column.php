@@ -63,23 +63,23 @@ class Column implements ValueObject
         ?ForeignKey $foreignKey,
         array $constraints
     ) {
-        if (empty($name)) {
+        if ($name === '') {
             throw new InvalidArgumentException('Column\'s name cannot be empty.');
         }
 
-        if (empty($sanitizedName)) {
+        if ($sanitizedName === '') {
             throw new InvalidArgumentException('Column\'s sanitized name cannot be empty.');
         }
 
-        if ($description !== null && empty($description)) {
+        if ($description !== null && $description === '') {
             throw new InvalidArgumentException('Column\'s description cannot be empty string, use null.');
         }
 
-        if (empty($type)) {
+        if ($type === '') {
             throw new InvalidArgumentException('Column\'s type cannot be empty.');
         }
 
-        if ($length !== null && empty($length)) {
+        if ($length !== null && $length === '') {
             throw new InvalidArgumentException('Column\'s length cannot be empty string, use null.');
         }
 

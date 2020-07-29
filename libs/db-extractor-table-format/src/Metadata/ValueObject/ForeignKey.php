@@ -23,19 +23,19 @@ class ForeignKey implements ValueObject
      */
     public function __construct(?string $name, ?string $refSchema, string $refTable, string $refColumn)
     {
-        if ($name !== null && empty($name)) {
+        if ($name !== null && $name === '') {
             throw new InvalidArgumentException('Name of foreign key cannot be empty string.');
         }
 
-        if ($refSchema !== null && empty($refSchema)) {
+        if ($refSchema !== null && $refSchema === '') {
             throw new InvalidArgumentException('Ref schema of foreign key cannot be empty string.');
         }
 
-        if (empty($refTable)) {
+        if ($refTable === '') {
             throw new InvalidArgumentException('Ref table cannot be empty.');
         }
 
-        if (empty($refColumn)) {
+        if ($refColumn === '') {
             throw new InvalidArgumentException('Ref column cannot be empty.');
         }
 
