@@ -92,17 +92,17 @@ class ColumnBuilder implements Builder
         );
     }
 
-    public function setName(string $name): self
+    public function setName(string $name, bool $trim = true): self
     {
-        // Trim
-        $name = trim($name);
+        // Trim can be disabled, eg. in MsSQL is one space valid column name
+        $name = $trim ? trim($name) : $name;
 
         if (empty($name)) {
             throw new InvalidArgumentException('Column\'s name cannot be empty.');
         }
 
         $this->name = $name;
-        $this->sanitizedName = ColumnNameSanitizer::sanitize($name);
+        $this->sanitizedName = self::sanitizeName($name);
         return $this;
     }
 
@@ -187,5 +187,16 @@ class ColumnBuilder implements Builder
     {
         $this->constraints[] = $constraint;
         return $this;
+    }
+
+    private static function sanitizeName(string $name): string
+    {
+        // In some databases, eg. MsSQL is one space valid column name, so we must it sanitize to non-empty string
+        if (empty(trim($name))) {
+            // Name cannot start/end with special char, it is trim in ColumnNameSanitizer
+            $name = 'empty' . preg_replace('~\s~', '_', $name) . 'name';
+        }
+
+        return ColumnNameSanitizer::sanitize($name);
     }
 }
