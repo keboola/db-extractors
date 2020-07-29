@@ -241,4 +241,17 @@ class ColumnBuilderTest extends BaseBuilderTest
         $this->expectExceptionMessage('Foreign key is already set.');
         $builder->addForeignKey();
     }
+
+    public function testTrimDisabled(): void
+    {
+        $name = ' '; // in MsSQL is one space valid column name
+
+        $builder = $this->createBuilder();
+        $builder->setName($name, false);
+        $builder->setType('INT');
+
+        $valueObject = $builder->build();
+        Assert::assertSame(' ', $valueObject->getName());
+        Assert::assertSame('empty_name', $valueObject->getSanitizedName());
+    }
 }
