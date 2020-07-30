@@ -21,6 +21,7 @@ class SSLConnectionConfigTest extends TestCase
             'cipher' => 'testCipher',
             'cert' => 'testCertificate',
             'verifyServerCert' => false,
+            'ignoreCertificateCn' => true,
         ]);
 
         Assert::assertTrue($sslConnectionConfig->hasKey());
@@ -32,6 +33,7 @@ class SSLConnectionConfigTest extends TestCase
         Assert::assertEquals('testCertificate', $sslConnectionConfig->getCert());
         Assert::assertEquals('testCipher', $sslConnectionConfig->getCipher());
         Assert::assertFalse($sslConnectionConfig->isVerifyServerCert());
+        Assert::assertTrue($sslConnectionConfig->isIgnoreCertificateCn());
     }
 
     public function testMissingConfigProperty(): void
