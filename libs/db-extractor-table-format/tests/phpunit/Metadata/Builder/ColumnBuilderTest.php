@@ -254,4 +254,19 @@ class ColumnBuilderTest extends BaseBuilderTest
         Assert::assertSame(' ', $valueObject->getName());
         Assert::assertSame('empty_name', $valueObject->getSanitizedName());
     }
+
+    public function testNotEmptyName(): void
+    {
+        // empty("0") = true,
+        // but "0" is valid column name in MsSQL, so empty method cannot be used in code
+        $name = '0';
+
+        $builder = $this->createBuilder();
+        $builder->setName($name, false);
+        $builder->setType('INT');
+
+        $valueObject = $builder->build();
+        Assert::assertSame('0', $valueObject->getName());
+        Assert::assertSame('0', $valueObject->getSanitizedName());
+    }
 }

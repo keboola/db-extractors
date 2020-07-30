@@ -97,7 +97,7 @@ class ColumnBuilder implements Builder
         // Trim can be disabled, eg. in MsSQL is one space valid column name
         $name = $trim ? trim($name) : $name;
 
-        if (empty($name)) {
+        if ($name === '') {
             throw new InvalidArgumentException('Column\'s name cannot be empty.');
         }
 
@@ -112,7 +112,7 @@ class ColumnBuilder implements Builder
         $description = $description !== null ? trim($description) : null;
 
         // Normalize, empty string is not allowed
-        $this->description = empty($description) ? null : $description;
+        $this->description = $description === '' ? null : $description;
         return $this;
     }
 
@@ -137,7 +137,7 @@ class ColumnBuilder implements Builder
     public function setLength(?string $length): self
     {
         // Normalize, empty string is not allowed
-        $this->length = empty($length) ? null : $length;
+        $this->length = $length === '' ? null : $length;
         return $this;
     }
 
@@ -192,7 +192,7 @@ class ColumnBuilder implements Builder
     private static function sanitizeName(string $name): string
     {
         // In some databases, eg. MsSQL is one space valid column name, so we must it sanitize to non-empty string
-        if (empty(trim($name))) {
+        if (trim($name) === '') {
             // Name cannot start/end with special char, it is trim in ColumnNameSanitizer
             $name = 'empty' . preg_replace('~\s~', '_', $name) . 'name';
         }

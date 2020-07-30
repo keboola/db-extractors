@@ -58,7 +58,7 @@ class ForeignKeyBuilder implements Builder
     {
         $name = trim($name);
 
-        if (empty($name)) {
+        if ($name === '') {
             throw new InvalidArgumentException('ForeignKey\'s name cannot be empty string.');
         }
 
@@ -70,7 +70,7 @@ class ForeignKeyBuilder implements Builder
     {
         $refSchema = trim($refSchema);
 
-        if (empty($refSchema)) {
+        if ($refSchema === '') {
             throw new InvalidArgumentException('ForeignKey\'s refSchema cannot be empty string.');
         }
 
@@ -82,7 +82,7 @@ class ForeignKeyBuilder implements Builder
     {
         $refTable = trim($refTable);
 
-        if (empty($refTable)) {
+        if ($refTable === '') {
             throw new InvalidArgumentException('ForeignKey\'s refTable cannot be empty string.');
         }
 
@@ -94,7 +94,7 @@ class ForeignKeyBuilder implements Builder
     {
         $refColumn = trim($refColumn);
 
-        if (empty($refColumn)) {
+        if ($refColumn === '') {
             throw new InvalidArgumentException('ForeignKey\'s refColumn cannot be empty string.');
         }
 

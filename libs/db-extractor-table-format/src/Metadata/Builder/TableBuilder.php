@@ -114,7 +114,7 @@ class TableBuilder implements Builder
         // Trim
         $name = trim($name);
 
-        if (empty($name)) {
+        if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
         }
 
@@ -129,7 +129,7 @@ class TableBuilder implements Builder
         $description = $description !== null ? trim($description) : null;
 
         // Normalize, empty string is not allowed
-        $this->description = empty($description) ? null : $description;
+        $this->description = $description === '' ? null : $description;
         return $this;
     }
 
@@ -139,7 +139,7 @@ class TableBuilder implements Builder
         $schema = $schema !== null ? trim($schema) : null;
 
         // Normalize, empty string is not allowed
-        $this->schema = empty($schema) ? null : $schema;
+        $this->schema = $schema === '' ? null : $schema;
         return $this;
     }
 
@@ -149,7 +149,7 @@ class TableBuilder implements Builder
         $catalog = $catalog !== null ? trim($catalog) : null;
 
         // Normalize, empty string is not allowed
-        $this->catalog = empty($catalog) ? null : $catalog;
+        $this->catalog = $catalog === '' ? null : $catalog;
         return $this;
     }
 
@@ -159,7 +159,7 @@ class TableBuilder implements Builder
         $tablespaceName = $tablespaceName !== null ? trim($tablespaceName) : null;
 
         // Normalize, empty string is not allowed
-        $this->tablespaceName = empty($tablespaceName) ? null : $tablespaceName;
+        $this->tablespaceName = $tablespaceName === '' ? null : $tablespaceName;
         return $this;
     }
 
@@ -169,13 +169,13 @@ class TableBuilder implements Builder
         $owner = $owner !== null ? trim($owner) : null;
 
         // Normalize, empty string is not allowed
-        $this->owner = empty($owner) ? null : $owner;
+        $this->owner = $owner === '' ? null : $owner;
         return $this;
     }
 
     public function setType(string $type): self
     {
-        if (empty($type)) {
+        if ($type === '') {
             throw new InvalidArgumentException('Table\'s type cannot be empty string.');
         }
 
