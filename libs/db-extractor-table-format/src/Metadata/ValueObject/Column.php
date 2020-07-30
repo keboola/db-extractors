@@ -71,7 +71,7 @@ class Column implements ValueObject
             throw new InvalidArgumentException('Column\'s sanitized name cannot be empty.');
         }
 
-        if ($description !== null && $description === '') {
+        if ($description === '') {
             throw new InvalidArgumentException('Column\'s description cannot be empty string, use null.');
         }
 
@@ -79,7 +79,7 @@ class Column implements ValueObject
             throw new InvalidArgumentException('Column\'s type cannot be empty.');
         }
 
-        if ($length !== null && $length === '') {
+        if ($length === '') {
             throw new InvalidArgumentException('Column\'s length cannot be empty string, use null.');
         }
 

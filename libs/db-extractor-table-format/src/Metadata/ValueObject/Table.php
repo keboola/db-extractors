@@ -54,27 +54,27 @@ class Table implements ValueObject
             throw new InvalidArgumentException('Table\'s sanitized name cannot be empty.');
         }
 
-        if ($description !== null && $description === '') {
+        if ($description === '') {
             throw new InvalidArgumentException('Table\'s description cannot be empty string, use null.');
         }
 
-        if ($schema !== null && $schema === '') {
+        if ($schema === '') {
             throw new InvalidArgumentException('Table\'s schema cannot be empty string, use null.');
         }
 
-        if ($catalog !== null && $catalog === '') {
+        if ($catalog === '') {
             throw new InvalidArgumentException('Table\'s catalog cannot be empty string, use null.');
         }
 
-        if ($tablespaceName !== null && $tablespaceName === '') {
+        if ($tablespaceName === '') {
             throw new InvalidArgumentException('Table\'s tablespaceName cannot be empty string, use null.');
         }
 
-        if ($owner !== null && $owner === '') {
+        if ($owner === '') {
             throw new InvalidArgumentException('Table\'s owner cannot be empty string, use null.');
         }
 
-        if ($type !== null && $type === '') {
+        if ($type === '') {
             throw new InvalidArgumentException('Table\'s type cannot be empty string, use null.');
         }
 
