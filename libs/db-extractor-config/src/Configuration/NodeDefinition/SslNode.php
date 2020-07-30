@@ -61,6 +61,6 @@ class SslNode extends ArrayNodeDefinition
 
     protected function addIgnoreCertificateCn(NodeBuilder $nodeBuilder): void
     {
-        $nodeBuilder->scalarNode('ignoreCertificateCn');
+        $nodeBuilder->booleanNode('ignoreCertificateCn')->defaultFalse();
     }
 }
