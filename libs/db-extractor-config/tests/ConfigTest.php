@@ -98,6 +98,7 @@ class ConfigTest extends AbstractConfigTest
                         'cipher' => 'testCipher',
                         'verifyServerCert' => false,
                         'enabled' => false,
+                        'ignoreCertificateCn' => false,
                     ],
                 ],
                 'tables' => [
