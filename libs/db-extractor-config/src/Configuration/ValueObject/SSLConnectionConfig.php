@@ -18,6 +18,8 @@ class SSLConnectionConfig implements ValueObject
 
     private bool $verifyServerCert;
 
+    private bool $ignoreCertificateCn;
+
     public static function fromArray(array $data): self
     {
         return new self(
@@ -25,17 +27,25 @@ class SSLConnectionConfig implements ValueObject
             $data['cert'] ?? null,
             $data['ca'] ?? null,
             $data['cipher'] ?? null,
-            $data['verifyServerCert'] ?? true
+            $data['verifyServerCert'] ?? true,
+            $data['ignoreCertificateCn'] ?? false
         );
     }
 
-    public function __construct(?string $key, ?string $cert, ?string $ca, ?string $cipher, bool $verifyServerCert)
-    {
+    public function __construct(
+        ?string $key,
+        ?string $cert,
+        ?string $ca,
+        ?string $cipher,
+        bool $verifyServerCert,
+        bool $ignoreCertificateCn
+    ) {
         $this->key = $key;
         $this->cert = $cert;
         $this->ca = $ca;
         $this->cipher = $cipher;
         $this->verifyServerCert = $verifyServerCert;
+        $this->ignoreCertificateCn = $ignoreCertificateCn;
     }
 
     public function hasKey(): bool
@@ -93,5 +103,10 @@ class SSLConnectionConfig implements ValueObject
     public function isVerifyServerCert(): bool
     {
         return $this->verifyServerCert;
+    }
+
+    public function isIgnoreCertificateCn(): bool
+    {
+        return $this->ignoreCertificateCn;
     }
 }

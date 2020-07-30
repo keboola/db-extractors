@@ -26,6 +26,7 @@ class SslNode extends ArrayNodeDefinition
         $this->addCertNode($nodeBuilder);
         $this->addCipherNode($nodeBuilder);
         $this->addVerifyServerCertNode($nodeBuilder);
+        $this->addIgnoreCertificateCn($nodeBuilder);
     }
 
     protected function addEnabledNode(NodeBuilder $nodeBuilder): void
@@ -56,5 +57,10 @@ class SslNode extends ArrayNodeDefinition
     protected function addVerifyServerCertNode(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder->scalarNode('verifyServerCert');
+    }
+
+    protected function addIgnoreCertificateCn(NodeBuilder $nodeBuilder): void
+    {
+        $nodeBuilder->scalarNode('ignoreCertificateCn');
     }
 }
