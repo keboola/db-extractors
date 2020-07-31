@@ -40,7 +40,7 @@ abstract class AbstractMySQLTest extends ExtractorTest
         $options[PDO::MYSQL_ATTR_SSL_KEY] = realpath('/ssl-cert/client-key.pem');
         $options[PDO::MYSQL_ATTR_SSL_CERT] = realpath('/ssl-cert/client-cert.pem');
         $options[PDO::MYSQL_ATTR_SSL_CA] = realpath('/ssl-cert/ca.pem');
-        $options[PDO::MYSQL_ATTR_SSL_CIPHER] = MySQL::SSL_CIPHER_CONFIG;
+        $options[PDO::MYSQL_ATTR_SSL_CIPHER] = MySQL::SSL_DEFAULT_CIPHER_CONFIG;
 
         $config = $this->getConfig(self::DRIVER);
         $dbConfig = $config['parameters']['db'];

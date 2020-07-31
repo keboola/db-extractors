@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\CommonExceptions\UserExceptionInterface;
 use SplFileInfo;
 
 class MySQLSSLTest extends AbstractMySQLTest
@@ -73,5 +74,26 @@ class MySQLSSLTest extends AbstractMySQLTest
         $filename = $this->dataDir . '/out/tables/' . $result['imported'][1]['outputTable'] . '.csv.manifest';
         $this->assertFileExists($filename);
         $this->assertFileEquals((string) $csv2, $outputCsvFile);
+    }
+
+    public function testCipher(): void
+    {
+        $config = $this->getConfig();
+
+        $config['parameters']['db']['ssl'] = [
+            'enabled' => true,
+            'cipher' => 'DES', // required ciphers are not enabled
+            'ca' => file_get_contents('/ssl-cert/ca.pem'),
+            'cert' => file_get_contents('/ssl-cert/client-cert.pem'),
+            'key' => file_get_contents('/ssl-cert/client-key.pem'),
+        ];
+
+        $app = $this->createApplication($config);
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/sales.csv'));
+        $this->createTextTable(new SplFileInfo($this->dataDir . '/mysql/escaping.csv'));
+
+        $this->expectException(UserExceptionInterface::class);
+        $this->expectExceptionMessage('Cannot connect to MySQL by using SSL');
+        $app->run();
     }
 }

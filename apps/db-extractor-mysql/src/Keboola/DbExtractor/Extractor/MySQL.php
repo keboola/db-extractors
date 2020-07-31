@@ -24,7 +24,7 @@ class MySQL extends BaseExtractor
     // and has set "SECLEVEL", which in OpenSSL defaults to "1", to value "2".
     // See https://wiki.debian.org/ContinuousIntegration/TriagingTips/openssl-1.1.1
     // So we reset this value to OpenSSL default.
-    public const SSL_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
+    public const SSL_DEFAULT_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
     public const INCREMENTAL_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT', 'TIMESTAMP'];
 
     protected ?string $database = null;
@@ -64,12 +64,13 @@ class MySQL extends BaseExtractor
             }
             if ($sslConnection->hasCipher()) {
                 $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $sslConnection->getCipher();
+            } else {
+                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = self::SSL_DEFAULT_CIPHER_CONFIG;
             }
+
             if (!$sslConnection->isVerifyServerCert()) {
                 $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
             }
-
-            $options[PDO::MYSQL_ATTR_SSL_CIPHER] = self::SSL_CIPHER_CONFIG;
         }
 
         $port = $databaseConfig->hasPort() ? $databaseConfig->getPort() : '3306';
@@ -105,8 +106,15 @@ class MySQL extends BaseExtractor
             if ($previous !== null) {
                 $checkCnMismatch($previous);
             }
+
+            // SQLSTATE[HY000] is general error without message, so throw previous exception
+            if (strpos($e->getMessage(), 'SQLSTATE[HY000]') === 0 && $e->getPrevious() !== null) {
+                throw $e->getPrevious();
+            }
+
             throw $e;
         }
+
         $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
         try {
             $pdo->exec('SET NAMES utf8mb4;');
