@@ -255,6 +255,19 @@ class ColumnBuilderTest extends BaseBuilderTest
         Assert::assertSame('empty_name', $valueObject->getSanitizedName());
     }
 
+    public function testWhitespaceSanitizedName(): void
+    {
+        $name = "\u{2001}"; // white space - EM quad - not removed by trim
+
+        $builder = $this->createBuilder();
+        $builder->setName($name);
+        $builder->setType('INT');
+
+        $valueObject = $builder->build();
+        Assert::assertSame($name, $valueObject->getName());
+        Assert::assertSame('empty_name', $valueObject->getSanitizedName());
+    }
+
     public function testNotEmptyName(): void
     {
         // empty("0") = true,
