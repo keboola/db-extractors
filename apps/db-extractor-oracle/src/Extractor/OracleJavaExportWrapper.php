@@ -10,6 +10,7 @@ use Keboola\DbExtractor\Configuration\Serializer\OracleDatabaseConfigSerializer;
 use Keboola\DbExtractor\DbRetryProxy;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\OracleJavaExportException;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
 use Psr\Log\LoggerInterface;
@@ -137,6 +138,7 @@ class OracleJavaExportWrapper
             '/opt/table-exporter.jar',
             $action,
             $configFile,
+            $this->databaseConfig->hasTnsnames() ? $this->dataDir : '',
         ], $args);
     }
 
@@ -182,6 +184,13 @@ class OracleJavaExportWrapper
 
     private function writeConfig(string $configDesc, array $config): string
     {
+        if ($this->databaseConfig->hasTnsnames()) {
+            $this->writeTnsnames($this->databaseConfig->getTnsnames());
+            $config['parameters']['db']['tnsnamesService'] = $this->getTnsnamesService(
+                $this->databaseConfig->getTnsnames()
+            );
+        }
+
         $configPath = $this->dataDir . '/javaConfig.json';
         JsonHelper::writeFile($configPath, $config);
 
@@ -200,5 +209,26 @@ class OracleJavaExportWrapper
         }
 
         return $configPath;
+    }
+
+    private function writeTnsnames(string $tnsnameContent): void
+    {
+        file_put_contents(
+            sprintf('%s/%s', $this->dataDir, 'tnsnames.ora'),
+            $tnsnameContent
+        );
+
+        $this->logger->info('Created "tnsname.ora" file for "java-oracle-exporter" tool.');
+    }
+
+    private function getTnsnamesService(string $tnsnamesContent): string
+    {
+        preg_match('/\(SERVICE_NAME\s?=\s?(.+[^\)])\)/i', $tnsnamesContent, $match);
+
+        if (!isset($match[1])) {
+            throw  new UserException('Missing "SERVICE_NAME" in the tnsnames.');
+        }
+
+        return (string) $match[1];
     }
 }
