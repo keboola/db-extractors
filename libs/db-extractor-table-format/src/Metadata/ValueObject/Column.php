@@ -68,19 +68,31 @@ class Column implements ValueObject
         }
 
         if ($sanitizedName === '') {
-            throw new InvalidArgumentException('Column\'s sanitized name cannot be empty.');
+            throw new InvalidArgumentException(sprintf(
+                'Column\'s %s sanitized name cannot be empty.',
+                json_encode($name)
+            ));
         }
 
         if ($description === '') {
-            throw new InvalidArgumentException('Column\'s description cannot be empty string, use null.');
+            throw new InvalidArgumentException(sprintf(
+                'Column\'s %s description cannot be empty string, use null.',
+                json_encode($name)
+            ));
         }
 
         if ($type === '') {
-            throw new InvalidArgumentException('Column\'s type cannot be empty.');
+            throw new InvalidArgumentException(sprintf(
+                'Column\'s %s type cannot be empty.',
+                json_encode($name)
+            ));
         }
 
         if ($length === '') {
-            throw new InvalidArgumentException('Column\'s length cannot be empty string, use null.');
+            throw new InvalidArgumentException(sprintf(
+                'Column\'s %s length cannot be empty string, use null.',
+                json_encode($name)
+            ));
         }
 
         if (!$autoIncrement && $autoIncrementValue !== null) {
