@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Throwable;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
@@ -213,5 +214,10 @@ class Oracle extends BaseExtractor
     private function quote(string $obj): string
     {
         return "\"{$obj}\"";
+    }
+
+    protected function createDatabaseConfig(array $data): DatabaseConfig
+    {
+        return OracleDatabaseConfig::fromArray($data);
     }
 }

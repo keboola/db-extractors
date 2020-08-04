@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Csv\CsvReader;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Throwable;
 use Exception;
@@ -90,6 +91,14 @@ abstract class OracleBaseTest extends ExtractorTest
         # Close SSH tunnel if created
         $process = new Process(['sh', '-c', 'pgrep ssh | xargs -r kill']);
         $process->mustRun();
+
+        $fs = new Filesystem();
+        if ($fs->exists($this->dataDir . '/tnsnames.ora')) {
+            $fs->remove($this->dataDir . '/tnsnames.ora');
+        }
+        if ($fs->exists($this->dataDir . '/config.json')) {
+            $fs->remove($this->dataDir . '/config.json');
+        }
 
         parent::tearDown();
     }

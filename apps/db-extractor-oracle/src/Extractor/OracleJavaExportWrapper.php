@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Component\JsonHelper;
+use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
+use Keboola\DbExtractor\Configuration\Serializer\OracleDatabaseConfigSerializer;
 use Keboola\DbExtractor\DbRetryProxy;
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\OracleJavaExportException;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\Serializer\DatabaseConfigSerializer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -22,10 +25,13 @@ class OracleJavaExportWrapper
 
     private string $dataDir;
 
-    private DatabaseConfig $databaseConfig;
+    private OracleDatabaseConfig $databaseConfig;
 
     public function __construct(LoggerInterface $logger, string $dataDir, DatabaseConfig $databaseConfig)
     {
+        if (!($databaseConfig instanceof OracleDatabaseConfig)) {
+            throw new ApplicationException('Database config must be instance of the OracleDatabaseConfig');
+        }
         $this->logger = $logger;
         $this->dataDir = $dataDir;
         $this->databaseConfig = $databaseConfig;
@@ -132,6 +138,7 @@ class OracleJavaExportWrapper
             '/opt/table-exporter.jar',
             $action,
             $configFile,
+            $this->databaseConfig->hasTnsnames() ? $this->dataDir : '',
         ], $args);
     }
 
@@ -139,7 +146,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('test connection', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
             ],
         ]);
     }
@@ -151,7 +158,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('get tables', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
                 'outputFile' => $outputFile,
                 'tables' => array_map(function (InputTable $table) {
                     return [
@@ -168,7 +175,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('export', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
                 'query' => $query,
                 'outputFile' => $outputFile,
             ],
@@ -177,16 +184,51 @@ class OracleJavaExportWrapper
 
     private function writeConfig(string $configDesc, array $config): string
     {
+        if ($this->databaseConfig->hasTnsnames()) {
+            $this->writeTnsnames($this->databaseConfig->getTnsnames());
+            $config['parameters']['db']['tnsnamesService'] = $this->getTnsnamesService(
+                $this->databaseConfig->getTnsnames()
+            );
+        }
+
         $configPath = $this->dataDir . '/javaConfig.json';
         JsonHelper::writeFile($configPath, $config);
 
-        $this->logger->info(sprintf(
-            'Created "%s" configuration for "java-oracle-exporter" tool, host: "%s", port: "%d".',
-            $configDesc,
-            $this->databaseConfig->getHost(),
-            $this->databaseConfig->getPort(),
-        ));
+        if ($this->databaseConfig->hasHost()) {
+            $this->logger->info(sprintf(
+                'Created "%s" configuration for "java-oracle-exporter" tool, host: "%s", port: "%d".',
+                $configDesc,
+                $this->databaseConfig->getHost(),
+                $this->databaseConfig->getPort(),
+            ));
+        } else {
+            $this->logger->info(sprintf(
+                'Created "%s" configuration for "java-oracle-exporter" tool.',
+                $configDesc
+            ));
+        }
 
         return $configPath;
+    }
+
+    private function writeTnsnames(string $tnsnameContent): void
+    {
+        file_put_contents(
+            sprintf('%s/%s', $this->dataDir, 'tnsnames.ora'),
+            $tnsnameContent
+        );
+
+        $this->logger->info('Created "tnsname.ora" file for "java-oracle-exporter" tool.');
+    }
+
+    private function getTnsnamesService(string $tnsnamesContent): string
+    {
+        preg_match('/\(SERVICE_NAME\s?=\s?(.+[^\)])\)/i', $tnsnamesContent, $match);
+
+        if (!isset($match[1])) {
+            throw  new UserException('Missing "SERVICE_NAME" in the tnsnames.');
+        }
+
+        return (string) $match[1];
     }
 }

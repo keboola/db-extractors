@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor;
 
+use Keboola\DbExtractor\Configuration\NodeDefinition\OracleDbNode;
 use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
 use Psr\Log\LoggerInterface;
 use Keboola\DbExtractorConfig\Config;
@@ -29,12 +30,12 @@ class OracleApplication extends Application
             if ($this['action'] === 'run') {
                 $config['parameters']['id'] = 1;
                 $config['parameters']['name'] = $config['parameters']['outputTable'];
-                $this->config = new Config($config, new ConfigRowDefinition());
+                $this->config = new Config($config, new ConfigRowDefinition(new OracleDbNode()));
             } else {
-                $this->config = new Config($config, new ActionConfigRowDefinition());
+                $this->config = new Config($config, new ActionConfigRowDefinition(new OracleDbNode()));
             }
         } else {
-            $this->config = new Config($config, new ConfigDefinition());
+            $this->config = new Config($config, new ConfigDefinition(new OracleDbNode()));
         }
     }
 

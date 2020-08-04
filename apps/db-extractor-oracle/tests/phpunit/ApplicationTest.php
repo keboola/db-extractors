@@ -18,9 +18,9 @@ class ApplicationTest extends OracleBaseTest
         $config['action'] = 'testConnection';
         $this->putConfig($config);
 
-                $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
+        $process = Process::fromShellCommandline('php ' . $this->rootPath . '/src/run.php', null, [
             'KBC_DATADIR' => $this->dataDir,
-                ]);
+        ]);
         $process->setTimeout(300);
         $process->run();
 
