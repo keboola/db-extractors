@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Component\JsonHelper;
+use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
+use Keboola\DbExtractor\Configuration\Serializer\OracleDatabaseConfigSerializer;
 use Keboola\DbExtractor\DbRetryProxy;
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractor\Exception\OracleJavaExportException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\Serializer\DatabaseConfigSerializer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -22,10 +24,13 @@ class OracleJavaExportWrapper
 
     private string $dataDir;
 
-    private DatabaseConfig $databaseConfig;
+    private OracleDatabaseConfig $databaseConfig;
 
     public function __construct(LoggerInterface $logger, string $dataDir, DatabaseConfig $databaseConfig)
     {
+        if (!($databaseConfig instanceof OracleDatabaseConfig)) {
+            throw new ApplicationException('Database config must be instance of the OracleDatabaseConfig');
+        }
         $this->logger = $logger;
         $this->dataDir = $dataDir;
         $this->databaseConfig = $databaseConfig;
@@ -139,7 +144,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('test connection', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
             ],
         ]);
     }
@@ -151,7 +156,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('get tables', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
                 'outputFile' => $outputFile,
                 'tables' => array_map(function (InputTable $table) {
                     return [
@@ -168,7 +173,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('export', [
             'parameters' => [
-                'db' => DatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
                 'query' => $query,
                 'outputFile' => $outputFile,
             ],
@@ -180,12 +185,19 @@ class OracleJavaExportWrapper
         $configPath = $this->dataDir . '/javaConfig.json';
         JsonHelper::writeFile($configPath, $config);
 
-        $this->logger->info(sprintf(
-            'Created "%s" configuration for "java-oracle-exporter" tool, host: "%s", port: "%d".',
-            $configDesc,
-            $this->databaseConfig->getHost(),
-            $this->databaseConfig->getPort(),
-        ));
+        if ($this->databaseConfig->hasHost()) {
+            $this->logger->info(sprintf(
+                'Created "%s" configuration for "java-oracle-exporter" tool, host: "%s", port: "%d".',
+                $configDesc,
+                $this->databaseConfig->getHost(),
+                $this->databaseConfig->getPort(),
+            ));
+        } else {
+            $this->logger->info(sprintf(
+                'Created "%s" configuration for "java-oracle-exporter" tool.',
+                $configDesc
+            ));
+        }
 
         return $configPath;
     }
