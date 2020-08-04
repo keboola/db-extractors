@@ -1100,4 +1100,60 @@ class OracleTest extends OracleBaseTest
         $result = ($this->createApplication($config))->run();
         $this->assertEquals('success', $result['status']);
     }
+
+    public function testTnsnames(): void
+    {
+        $tnsnameTemplate = <<<EOL
+XE =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = tcp)(HOST=%s)(PORT = %s))
+    (CONNECT_DATA =
+      (SID=%s)
+      (SERVICE_NAME = XE)
+    )
+  )
+EOL;
+        $config = $this->getConfigRow('oracle');
+        $tnsnameContent = sprintf(
+            $tnsnameTemplate,
+            $config['parameters']['db']['host'],
+            $config['parameters']['db']['port'],
+            $config['parameters']['db']['database']
+        );
+        $config['parameters']['db']['tnsnames'] = $tnsnameContent;
+        unset($config['parameters']['db']['host'], $config['parameters']['db']['port']);
+
+        $this->createApplication($config)->run();
+
+        $this->assertFileExists($this->dataDir . '/tnsnames.ora');
+
+        $savedTnsname = file_get_contents($this->dataDir . '/tnsnames.ora');
+        $this->assertEquals($tnsnameContent, $savedTnsname);
+    }
+
+    public function testTnsnamesMissingServiceName(): void
+    {
+        $tnsnameTemplate = <<<EOL
+MYTNSNAME =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = tcp)(HOST=%s)(PORT = %s))
+    (CONNECT_DATA =
+      (SID=%s)
+    )
+  )
+EOL;
+        $config = $this->getConfigRow('oracle');
+        $tnsnameContent = sprintf(
+            $tnsnameTemplate,
+            $config['parameters']['db']['host'],
+            $config['parameters']['db']['port'],
+            $config['parameters']['db']['database']
+        );
+        $config['parameters']['db']['tnsnames'] = $tnsnameContent;
+        unset($config['parameters']['db']['host'], $config['parameters']['db']['port']);
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('DB query failed: Missing "SERVICE_NAME" in the tnsnames.');
+        $this->createApplication($config)->run();
+    }
 }
