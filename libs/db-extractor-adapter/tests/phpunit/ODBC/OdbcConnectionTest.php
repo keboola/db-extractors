@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\ODBC;
 
-use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
-use Keboola\DbExtractor\Adapter\Tests\BaseTest;
 use PHPUnit\Framework\Assert;
-use Keboola\DbExtractor\Adapter\ODBC\OdbcConnection;
+use Keboola\DbExtractor\Adapter\Tests\Traits\OdbcCreateConnectionTrait;
+use Keboola\DbExtractor\Adapter\Tests\BaseTest;
+use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 
 class OdbcConnectionTest extends BaseTest
 {
+    use OdbcCreateConnectionTrait;
+
     public function testInvalidHost(): void
     {
         try {
@@ -154,21 +156,5 @@ class OdbcConnectionTest extends BaseTest
         for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
-    }
-
-    private function createOdbcConnection(?string $host = null, ?int $port = null): OdbcConnection
-    {
-        $dns = sprintf(
-            'Driver={MariaDB ODBC Driver};SERVER=%s;PORT=%d;DATABASE=%s;',
-            $host ?? getenv('DB_HOST'),
-            $port ?? getenv('DB_PORT'),
-            getenv('DB_DATABASE'),
-        );
-        return new OdbcConnection(
-            $this->logger,
-            $dns,
-            (string) getenv('DB_USER'),
-            (string) getenv('DB_PASSWORD'),
-        );
     }
 }

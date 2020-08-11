@@ -38,7 +38,7 @@ class QueryResultCsvWriter
         if (!$iterator->valid()) {
             $incFetchingColMaxValue = $exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow']) ?
                 (string) $this->state['lastFetchedRow'] : null;
-            return new ExportResult(0, $incFetchingColMaxValue);
+            return new ExportResult($csvFilePath, 0, $incFetchingColMaxValue);
         }
 
         // Rows found, iterate!
@@ -79,7 +79,7 @@ class QueryResultCsvWriter
             $incFetchingColMaxValue = $lastRow[$incrementalColumn];
         }
 
-        return new ExportResult($numRows, $incFetchingColMaxValue);
+        return new ExportResult($csvFilePath, $numRows, $incFetchingColMaxValue);
     }
 
     protected function createCsvWriter(string $csvFilePath): CsvWriter

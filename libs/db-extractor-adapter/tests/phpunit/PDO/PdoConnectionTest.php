@@ -6,8 +6,8 @@ namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
 use PDO;
 use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
-use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Adapter\Tests\BaseTest;
+use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
 use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\CommonExceptions\UserExceptionInterface;
@@ -15,6 +15,8 @@ use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 
 class PdoConnectionTest extends BaseTest
 {
+    use PdoCreateConnectionTrait;
+
     public function testInvalidHost(): void
     {
         try {
@@ -154,22 +156,5 @@ class PdoConnectionTest extends BaseTest
         for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
-    }
-
-    private function createPdoConnection(?string $host = null, ?int $port = null): PdoConnection
-    {
-        $dns = sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
-            $host ?? getenv('DB_HOST'),
-            $port ?? getenv('DB_PORT'),
-            getenv('DB_DATABASE'),
-        );
-        return new PdoConnection(
-            $this->logger,
-            $dns,
-            (string) getenv('DB_USER'),
-            (string) getenv('DB_PASSWORD'),
-            [],
-        );
     }
 }
