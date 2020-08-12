@@ -28,9 +28,6 @@ abstract class BaseDbConnection implements DbConnection
      */
     abstract public function getConnection();
 
-    /**
-     * @throws UserRetriedException
-     */
     abstract public function testConnection(): void;
 
     abstract public function quote(string $str): string;

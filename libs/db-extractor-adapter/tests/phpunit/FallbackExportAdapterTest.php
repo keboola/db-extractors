@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests;
 
+use Keboola\DbExtractor\Adapter\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\Adapter\FallbackExportAdapter;
 use Keboola\DbExtractor\Adapter\Tests\Fixtures\FailingExportAdapter;
 use Keboola\DbExtractor\Adapter\Tests\Fixtures\FailingExportAdapterException;
@@ -13,6 +14,13 @@ use PHPUnit\Framework\Assert;
 
 class FallbackExportAdapterTest extends BaseTest
 {
+    public function testNoAdapter(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one adapter must be specified.');
+        new FallbackExportAdapter($this->logger, []);
+    }
+
     public function testPassing1(): void
     {
         $adapter1 = new PassingExportAdapter('Adapter1');
