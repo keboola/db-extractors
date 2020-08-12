@@ -44,6 +44,11 @@ abstract class BaseTest extends TestCase
         $this->dropAllTables();
     }
 
+    protected function getCsvFilePath(): string
+    {
+        return $this->temp->getTmpFolder() . '/out/tables/output.csv';
+    }
+
     protected function createExportConfig(array $data): ExportConfig
     {
         $data['id'] = 123;

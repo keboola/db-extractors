@@ -42,7 +42,7 @@ abstract class BaseExportAdapter implements ExportAdapter
         $this->state = $state;
     }
 
-    public function export(ExportConfig $exportConfig, string $csvFileName): ExportResult
+    public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
         $query = $exportConfig->hasQuery() ? $exportConfig->getQuery() : $this->createSimpleQuery($exportConfig);
 
@@ -50,9 +50,9 @@ abstract class BaseExportAdapter implements ExportAdapter
             return $this->connection->queryAndProcess(
                 $query,
                 $exportConfig->getMaxRetries(),
-                function (QueryResult $result) use ($exportConfig, $csvFileName) {
-                    $resultWriter = new QueryResultCsvWriter($this->dataDir, $this->state);
-                    return $resultWriter->writeToCsv($result, $exportConfig, $csvFileName);
+                function (QueryResult $result) use ($exportConfig, $csvFilePath) {
+                    $resultWriter = new QueryResultCsvWriter($this->state);
+                    return $resultWriter->writeToCsv($result, $exportConfig, $csvFilePath);
                 }
             );
         } catch (CsvException $e) {

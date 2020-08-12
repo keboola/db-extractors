@@ -24,10 +24,10 @@ class PassingExportAdapter implements ExportAdapter
         return $this->name;
     }
 
-    public function export(ExportConfig $exportConfig, string $csvFileName): ExportResult
+    public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
         $this->exportCallCount++;
-        return new ExportResult($csvFileName, 0, null);
+        return new ExportResult($csvFilePath, 0, null);
     }
 
     public function getExportCallCount(): int

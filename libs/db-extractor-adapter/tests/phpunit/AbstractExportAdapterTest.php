@@ -83,7 +83,7 @@ END;
         $this->makeProxyDown($proxy);
 
         try {
-            $exportAdapter->export($config, 'output.csv');
+            $exportAdapter->export($config, $this->getCsvFilePath());
             $this->fail('Exception expected');
         } catch (UserExceptionInterface $e) {
             Assert::assertStringContainsString('[output]: DB query failed:', $e->getMessage());
@@ -183,6 +183,6 @@ END;
 
     protected function runExport(ExportConfig $exportConfig, array $state = []): ExportResult
     {
-        return $this->createExportAdapter($state)->export($exportConfig, 'output.csv');
+        return $this->createExportAdapter($state)->export($exportConfig, $this->getCsvFilePath());
     }
 }

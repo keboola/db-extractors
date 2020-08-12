@@ -15,5 +15,5 @@ interface ExportAdapter
 {
     public function getName(): string;
 
-    public function export(ExportConfig $exportConfig, string $csvFileName): ExportResult;
+    public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult;
 }

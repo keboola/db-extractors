@@ -15,20 +15,16 @@ use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
  */
 class QueryResultCsvWriter
 {
-    protected string $dataDir;
-
     protected array $state;
 
-    public function __construct(string $dataDir, array $state)
+    public function __construct(array $state)
     {
-        $this->dataDir = $dataDir;
         $this->state = $state;
     }
 
-    public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFileName): ExportResult
+    public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
         // Create CSV writer
-        $csvFilePath = $this->getCsvFilePath($csvFileName);
         $csv = $this->createCsvWriter($csvFilePath);
 
         // With custom query are no metadata in manifest, so header must be present
@@ -86,18 +82,13 @@ class QueryResultCsvWriter
         return new ExportResult($csvFilePath, $numRows, $incFetchingColMaxValue);
     }
 
-    protected function getCsvFilePath(string $csvFileName): string
-    {
-        $outTablesDir = $this->dataDir . '/out/tables';
-        if (!is_dir($outTablesDir)) {
-            mkdir($outTablesDir, 0777, true);
-        }
-
-        return $outTablesDir . '/' . $csvFileName;
-    }
-
     protected function createCsvWriter(string $csvFilePath): CsvWriter
     {
+        $dir = dirname($csvFilePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
         return new CsvWriter($csvFilePath);
     }
 }

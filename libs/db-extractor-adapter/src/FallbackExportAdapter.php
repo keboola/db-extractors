@@ -41,7 +41,7 @@ class FallbackExportAdapter implements ExportAdapter
         return 'fallback';
     }
 
-    public function export(ExportConfig $exportConfig, string $csvFileName): ExportResult
+    public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
         $iterator = new ArrayIterator($this->adapters);
         while ($iterator->valid()) {
@@ -50,7 +50,7 @@ class FallbackExportAdapter implements ExportAdapter
 
             try {
                 $this->logger->info(sprintf('Exporting by "%s" adapter.', $adapter->getName()));
-                return $adapter->export($exportConfig, $csvFileName);
+                return $adapter->export($exportConfig, $csvFilePath);
             } catch (Throwable $e) {
                 $this->logger->warning(sprintf(
                     'Export by "%s" adapter failed: %s',

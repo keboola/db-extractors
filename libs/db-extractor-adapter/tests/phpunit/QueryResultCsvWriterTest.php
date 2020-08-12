@@ -25,7 +25,7 @@ class QueryResultCsvWriterTest extends BaseTest
 
         $result = $this
             ->createWriter()
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
@@ -51,7 +51,7 @@ END;
 
         $result = $this
             ->createWriter()
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
@@ -75,7 +75,7 @@ END;
 
         $result = $this
             ->createWriter()
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
@@ -102,7 +102,7 @@ END;
 
         $result = $this
             ->createWriter()
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
@@ -127,7 +127,7 @@ END;
 
         $result = $this
             ->createWriter([]) // no state
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame('5', $result->getIncFetchingColMaxValue());
@@ -157,7 +157,7 @@ END;
 
         $result = $this
             ->createWriter(['lastFetchedRow' => '3'])
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame('5', $result->getIncFetchingColMaxValue());
@@ -185,7 +185,7 @@ END;
 
         $result = $this
             ->createWriter(['lastFetchedRow' => $incFetchingLastValue])
-            ->writeToCsv($queryResult, $exportConfig, 'output.csv');
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
 
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame($incFetchingLastValue, $result->getIncFetchingColMaxValue());
@@ -215,6 +215,6 @@ END;
 
     private function createWriter(array $state = []): QueryResultCsvWriter
     {
-        return new QueryResultCsvWriter($this->temp->getTmpFolder(), $state);
+        return new QueryResultCsvWriter($state);
     }
 }
