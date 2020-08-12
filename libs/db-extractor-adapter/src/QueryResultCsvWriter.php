@@ -34,7 +34,7 @@ class QueryResultCsvWriter
         $iterator = $result->getIterator();
         if (!$iterator->valid()) {
             $result->closeCursor();
-            unlink($csvFilePath); // no rows, no file
+            @unlink($csvFilePath); // no rows, no file
 
             $incFetchingColMaxValue = $exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow']) ?
                 (string) $this->state['lastFetchedRow'] : null;

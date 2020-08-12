@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Adapter\Query;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
-class DefaultSimpleQueryFactory implements SimpleQueryFactory
+class DefaultQueryFactory implements QueryFactory
 {
     protected array $state;
 

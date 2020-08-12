@@ -6,14 +6,14 @@ namespace Keboola\DbExtractor\Adapter\PDO;
 
 use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\BaseExportAdapter;
-use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 
 class PdoExportAdapter extends BaseExportAdapter
 {
     public function __construct(
         LoggerInterface $logger,
         PdoConnection $connection,
-        SimpleQueryFactory $simpleQueryFactory,
+        QueryFactory $simpleQueryFactory,
         string $dataDir,
         array $state
     ) {

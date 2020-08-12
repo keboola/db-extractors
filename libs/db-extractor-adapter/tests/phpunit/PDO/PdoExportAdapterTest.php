@@ -6,8 +6,8 @@ namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
 use Keboola\DbExtractor\Adapter\PDO\PdoExportAdapter;
 use Keboola\DbExtractor\Adapter\Tests\AbstractExportAdapterTest;
-use Keboola\DbExtractor\Adapter\Query\DefaultSimpleQueryFactory;
-use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\DefaultQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
 use PHPUnit\Framework\Assert;
 
@@ -19,10 +19,10 @@ class PdoExportAdapterTest extends AbstractExportAdapterTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?SimpleQueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null
     ): PdoExportAdapter {
         $connection = $this->createPdoConnection($host, $port);
-        $queryFactory = $queryFactory ?? new DefaultSimpleQueryFactory($state);
+        $queryFactory = $queryFactory ?? new DefaultQueryFactory($state);
         return new PdoExportAdapter(
             $this->logger,
             $connection,

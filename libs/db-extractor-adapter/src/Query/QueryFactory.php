@@ -7,7 +7,7 @@ namespace Keboola\DbExtractor\Adapter\Query;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
-interface SimpleQueryFactory
+interface QueryFactory
 {
     public function create(ExportConfig $exportConfig, DbConnection $connection): string;
 }

@@ -6,14 +6,14 @@ namespace Keboola\DbExtractor\Adapter\ODBC;
 
 use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\BaseExportAdapter;
-use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 
 class OdbcExportAdapter extends BaseExportAdapter
 {
     public function __construct(
         LoggerInterface $logger,
         OdbcConnection $connection,
-        SimpleQueryFactory $simpleQueryFactory,
+        QueryFactory $simpleQueryFactory,
         string $dataDir,
         array $state
     ) {

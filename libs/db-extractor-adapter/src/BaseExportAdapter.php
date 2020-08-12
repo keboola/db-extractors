@@ -14,7 +14,7 @@ use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\Csv\Exception as CsvException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
-use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 
 abstract class BaseExportAdapter implements ExportAdapter
 {
@@ -22,7 +22,7 @@ abstract class BaseExportAdapter implements ExportAdapter
 
     protected DbConnection $connection;
 
-    protected SimpleQueryFactory $simpleQueryFactory;
+    protected QueryFactory $simpleQueryFactory;
 
     protected string $dataDir;
 
@@ -31,7 +31,7 @@ abstract class BaseExportAdapter implements ExportAdapter
     public function __construct(
         LoggerInterface $logger,
         DbConnection $connection,
-        SimpleQueryFactory $simpleQueryFactory,
+        QueryFactory $simpleQueryFactory,
         string $dataDir,
         array $state
     ) {

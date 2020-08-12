@@ -6,7 +6,7 @@ namespace Keboola\DbExtractor\Adapter\Tests;
 
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
-use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
+use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use PHPUnit\Framework\Assert;
@@ -18,7 +18,7 @@ abstract class AbstractExportAdapterTest extends BaseTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?SimpleQueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null
     ): ExportAdapter;
 
     public function testExportSimpleQuery(): void
