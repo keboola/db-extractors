@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
-use Keboola\DbExtractor\Adapter\Exception\InvalidStateException;
 use Throwable;
 use ArrayIterator;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Keboola\DbExtractor\Adapter\Exception\InvalidStateException;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 

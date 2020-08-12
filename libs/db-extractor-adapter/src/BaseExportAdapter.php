@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use Throwable;
+use Psr\Log\LoggerInterface;
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Exception\ApplicationException;
 use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
-use Throwable;
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\Csv\Exception as CsvException;
