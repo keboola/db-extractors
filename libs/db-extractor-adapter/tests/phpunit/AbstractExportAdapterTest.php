@@ -9,32 +9,17 @@ use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\SimpleQueryFactory;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Keboola\Temp\Temp;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\StringContains;
 
 abstract class AbstractExportAdapterTest extends BaseTest
 {
-    protected Temp $temp;
-
     abstract protected function createExportAdapter(
         array $state = [],
         ?string $host = null,
         ?int $port = null,
         ?SimpleQueryFactory $queryFactory = null
     ): ExportAdapter;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->temp = new Temp(self::class);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $this->temp->remove();
-    }
 
     public function testExportSimpleQuery(): void
     {
@@ -46,6 +31,7 @@ abstract class AbstractExportAdapterTest extends BaseTest
         $result = $this->runExport($config);
         Assert::assertSame(6, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         // Without header, header is part of manifest for simple query
         $expectedCsv = <<<END
@@ -70,6 +56,7 @@ END;
         $result = $this->runExport($config);
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         // With header, header is part of CSV for custom query
         $expectedCsv = <<<END
@@ -91,13 +78,12 @@ END;
             'retries' => $retries,
         ]);
 
-        $outputCsvFilePath = $this->getOutputCsvFilePath();
         $proxy = $this->createProxyToDb();
         $exportAdapter = $this->createExportAdapter([], self::TOXIPROXY_HOST, (int) $proxy->getListenPort());
         $this->makeProxyDown($proxy);
 
         try {
-            $exportAdapter->export($config, $outputCsvFilePath);
+            $exportAdapter->export($config, 'output.csv');
             $this->fail('Exception expected');
         } catch (UserExceptionInterface $e) {
             Assert::assertStringContainsString('[output]: DB query failed:', $e->getMessage());
@@ -126,6 +112,7 @@ END;
         $result = $this->runExport($config);
         Assert::assertSame(6, $result->getRowsCount());
         Assert::assertSame('6', $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         // Without header, header is part of manifest for simple query
         $expectedCsv = <<<END
@@ -145,6 +132,7 @@ END;
         $result = $this->runExport($config, ['lastFetchedRow' => '6']);
         Assert::assertSame(3, $result->getRowsCount());
         Assert::assertSame('8', $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         // Last fetched row must be part of next export
         $expectedCsv = <<<END
@@ -169,6 +157,7 @@ END;
         $result = $this->runExport($config);
         Assert::assertSame(2, $result->getRowsCount());
         Assert::assertSame('2', $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         $expectedCsv = <<<END
 "1","Praha","1165581"
@@ -181,6 +170,7 @@ END;
         $result = $this->runExport($config, ['lastFetchedRow' => '2']);
         Assert::assertSame(2, $result->getRowsCount());
         Assert::assertSame('3', $result->getIncFetchingColMaxValue());
+        Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
         // Last fetched row must be part of next export
         $expectedCsv = <<<END
@@ -191,27 +181,8 @@ END;
         Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
     }
 
-    private function createExportConfig(array $data): ExportConfig
-    {
-        $data['id'] = 123;
-        $data['name'] = 'name';
-        $data['outputTable'] = 'output';
-        $data['retries'] = $data['retries'] ?? 3;
-        $data['primaryKey'] = [];
-        $data['query'] = $data['query'] ?? null;
-        $data['columns'] = $data['columns'] ?? [];
-        return ExportConfig::fromArray($data);
-    }
-
     protected function runExport(ExportConfig $exportConfig, array $state = []): ExportResult
     {
-        $outputCsvFilePath = $this->getOutputCsvFilePath();
-        $exportAdapter = $this->createExportAdapter($state);
-        return $exportAdapter->export($exportConfig, $outputCsvFilePath);
-    }
-
-    protected function getOutputCsvFilePath(): string
-    {
-        return $this->temp->getTmpFolder() . '/output.csv';
+        return $this->createExportAdapter($state)->export($exportConfig, 'output.csv');
     }
 }

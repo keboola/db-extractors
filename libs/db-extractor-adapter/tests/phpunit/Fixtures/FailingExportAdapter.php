@@ -25,7 +25,7 @@ class FailingExportAdapter implements ExportAdapter
         return $this->name;
     }
 
-    public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult
+    public function export(ExportConfig $exportConfig, string $csvFileName): ExportResult
     {
         $this->exportCallCount++;
         throw new FailingExportAdapterException('Something went wrong.');

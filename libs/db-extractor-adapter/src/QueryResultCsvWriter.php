@@ -25,9 +25,10 @@ class QueryResultCsvWriter
         $this->state = $state;
     }
 
-    public function writeToCsv(QueryResult $result, string $csvFilePath, ExportConfig $exportConfig): ExportResult
+    public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFileName): ExportResult
     {
         // Create CSV writer
+        $csvFilePath = $this->getCsvFilePath($csvFileName);
         $csv = $this->createCsvWriter($csvFilePath);
 
         // With custom query are no metadata in manifest, so header must be present
@@ -36,6 +37,9 @@ class QueryResultCsvWriter
         // No rows found.  If incremental fetching is turned on, we need to preserve the last state
         $iterator = $result->getIterator();
         if (!$iterator->valid()) {
+            $result->closeCursor();
+            unlink($csvFilePath); // no rows, no file
+
             $incFetchingColMaxValue = $exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow']) ?
                 (string) $this->state['lastFetchedRow'] : null;
             return new ExportResult($csvFilePath, 0, $incFetchingColMaxValue);
@@ -76,18 +80,24 @@ class QueryResultCsvWriter
                     )
                 );
             }
-            $incFetchingColMaxValue = $lastRow[$incrementalColumn];
+            $incFetchingColMaxValue = (string) $lastRow[$incrementalColumn];
         }
 
         return new ExportResult($csvFilePath, $numRows, $incFetchingColMaxValue);
     }
 
-    protected function createCsvWriter(string $csvFilePath): CsvWriter
+    protected function getCsvFilePath(string $csvFileName): string
     {
         $outTablesDir = $this->dataDir . '/out/tables';
         if (!is_dir($outTablesDir)) {
             mkdir($outTablesDir, 0777, true);
         }
+
+        return $outTablesDir . '/' . $csvFileName;
+    }
+
+    protected function createCsvWriter(string $csvFilePath): CsvWriter
+    {
         return new CsvWriter($csvFilePath);
     }
 }

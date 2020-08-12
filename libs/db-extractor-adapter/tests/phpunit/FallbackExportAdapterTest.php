@@ -20,7 +20,7 @@ class FallbackExportAdapterTest extends BaseTest
             $adapter1,
         ]);
 
-        $result = $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+        $result = $fallbackAdapter->export($this->createDummyExportConfig(), '/some/path/output.csv');
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(1, $adapter1->getExportCallCount());
         Assert::assertTrue($this->logger->hasInfoThatContains('Exporting by "Adapter1" adapter.'));
@@ -34,10 +34,10 @@ class FallbackExportAdapterTest extends BaseTest
         $fallbackAdapter = new FallbackExportAdapter($this->logger, [
             $adapter1,
             $adapter2,
-            $adapter3
+            $adapter3,
         ]);
 
-        $result = $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+        $result = $fallbackAdapter->export($this->createDummyExportConfig(), '/some/path/output.csv');
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(1, $adapter1->getExportCallCount());
         Assert::assertSame(0, $adapter2->getExportCallCount());
@@ -53,10 +53,10 @@ class FallbackExportAdapterTest extends BaseTest
         $fallbackAdapter = new FallbackExportAdapter($this->logger, [
             $adapter1,
             $adapter2,
-            $adapter3
+            $adapter3,
         ]);
 
-        $result = $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+        $result = $fallbackAdapter->export($this->createDummyExportConfig(), '/some/path/output.csv');
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(1, $adapter1->getExportCallCount());
         Assert::assertSame(0, $adapter2->getExportCallCount());
@@ -72,7 +72,7 @@ class FallbackExportAdapterTest extends BaseTest
         ]);
 
         try {
-            $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+            $fallbackAdapter->export($this->createDummyExportConfig(), '/some/path/output.csv');
             Assert::fail('Exception expected.');
         } catch (FailingExportAdapterException $e) {
             Assert::assertSame('Something went wrong.', $e->getMessage());
@@ -95,11 +95,11 @@ class FallbackExportAdapterTest extends BaseTest
         $fallbackAdapter = new FallbackExportAdapter($this->logger, [
             $adapter1,
             $adapter2,
-            $adapter3
+            $adapter3,
         ]);
 
         try {
-            $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+            $fallbackAdapter->export($this->createDummyExportConfig(), '/some/path/output.csv');
             Assert::fail('Exception expected.');
         } catch (FailingExportAdapterException $e) {
             Assert::assertSame('Something went wrong.', $e->getMessage());
@@ -118,7 +118,8 @@ class FallbackExportAdapterTest extends BaseTest
             'Exporting by "Adapter2" adapter.'
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter2" adapter failed: Something went wrong.'));
+            'Export by "Adapter2" adapter failed: Something went wrong.'
+        ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
             'Exporting by "Adapter3" adapter.'
         ));
@@ -135,10 +136,10 @@ class FallbackExportAdapterTest extends BaseTest
         $fallbackAdapter = new FallbackExportAdapter($this->logger, [
             $adapter1,
             $adapter2,
-            $adapter3
+            $adapter3,
         ]);
 
-        $result = $fallbackAdapter->export($this->createExportConfig(), '/some/path/output.csv');
+        $result = $fallbackAdapter->export($this->createDummyExportConfig(), 'output.csv');
 
         Assert::assertSame(0, $result->getRowsCount());
         Assert::assertSame(1, $adapter1->getExportCallCount());
@@ -155,16 +156,10 @@ class FallbackExportAdapterTest extends BaseTest
         ));
     }
 
-    private function createExportConfig(): ExportConfig
+    private function createDummyExportConfig(): ExportConfig
     {
-        return ExportConfig::fromArray([
-            'id' => 123,
-            'name' => 'name',
-            'outputTable' => 'output',
-            'retries' => 3,
-            'primaryKey' => [],
+        return $this->createExportConfig([
             'query' => 'SELECT * FROM foo',
-            'columns' => []
         ]);
     }
 }
