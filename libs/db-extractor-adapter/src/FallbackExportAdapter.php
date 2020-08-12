@@ -48,18 +48,18 @@ class FallbackExportAdapter implements ExportAdapter
             $adapter = $iterator->current();
 
             try {
-                $this->logger->warning(sprintf('Exporting by "%s" adapter.', $adapter->getName()));
+                $this->logger->info(sprintf('Exporting by "%s" adapter.', $adapter->getName()));
                 return $adapter->export($exportConfig, $csvFilePath);
             } catch (Throwable $e) {
-                $iterator->next();
+                $this->logger->warning(sprintf(
+                    'Export by "%s" adapter failed: %s',
+                    $adapter->getName(),
+                    $e->getMessage()
+                ));
 
                 // If is fallback adapter present -> log msg and continue
+                $iterator->next();
                 if ($iterator->valid()) {
-                    $this->logger->warning(sprintf(
-                        'Export by "%s" adapter failed: %s',
-                        $adapter->getName(),
-                        $e->getMessage()
-                    ));
                     continue;
                 }
 
