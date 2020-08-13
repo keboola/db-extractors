@@ -1,6 +1,6 @@
 # DB extractor adapter
 
-This library contains a common interface for connecting and data extraction from various sources:
+This library contains a common interface for connecting to and data extracting from, various sources:
  - It is intended for use with [db-extractor-common](https://github.com/keboola/db-extractor-common).
  - It supports **PDO** and **ODBC** connections for now.
  - The interfaces defined in this library can be easily used to support other methods, e.g. cli BCP tool.
@@ -21,9 +21,9 @@ This library contains a common interface for connecting and data extraction from
     - Class [`PdoExportAdapter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/PDO/PdoExportAdapter.php) implements export for PDO connection.
     - Class [`OdbcExportAdapter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/ODBC/OdbcExportAdapter.php) implements export for ODBC connection.
     - Class [`FallbackExportAdapter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/FallbackExportAdapter.php) allows you to use multiple adapters. If one fails, then fallback adapter is used.
-- **Interface [`QueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/QueryFactory.php)** servers to generate SQL query from `ExportConfig`. It is used if query is not set in the config.
+- **Interface [`QueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/QueryFactory.php)** used to generate SQL query from `ExportConfig`. It is used if query is not set in the config.
     Class [`DefaultQueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/DefaultQueryFactory.php) is base implementation for MySQL/MariaDb compatible SQL dialects. 
-- **Class [`QueryResultCsvWriterTest`](https://github.com/keboola/db-extractor-adapter/blob/master/src/QueryResultCsvWriter.php)** servers to write rows from the `QueryResult` to the specified CSV file. 
+- **Class [`QueryResultCsvWriter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/QueryResultCsvWriter.php)** used to write rows from the `QueryResult` to the specified CSV file. 
 
 ## Development
 
