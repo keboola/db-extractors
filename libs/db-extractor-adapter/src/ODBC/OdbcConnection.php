@@ -42,13 +42,15 @@ class OdbcConnection extends BaseDbConnection
     {
         $this->logger->info(sprintf('Creating ODBC connection to "%s".', $this->dsn));
         try {
-            $connection = odbc_connect($this->dsn, $this->user, $this->password);
+            /** @var resource|false $connection */
+            $connection = @odbc_connect($this->dsn, $this->user, $this->password);
         } catch (Throwable $e) {
             throw new OdbcException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if (!is_resource($connection)) {
-            throw new OdbcException('No connection resource created.');
+        // "odbc_connect" can generate warning, if "set_error_handler" is not set, so we are checking it manually
+        if ($connection === false) {
+            throw new OdbcException(odbc_errormsg() . ' ' . odbc_error());
         }
 
         if ($this->init) {
@@ -84,9 +86,15 @@ class OdbcConnection extends BaseDbConnection
     protected function doQuery(string $query): QueryResult
     {
         try {
-            $stmt = odbc_exec($this->connection, $query);
+            /** @var resource|false $stmt */
+            $stmt = @odbc_exec($this->connection, $query);
         } catch (Throwable $e) {
             throw new OdbcException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        // "odbc_exec" can generate warning, if "set_error_handler" is not set, so we are checking it manually
+        if ($stmt === false) {
+            throw new OdbcException(odbc_errormsg($this->connection) . ' ' . odbc_error($this->connection));
         }
 
         return new OdbcQueryResult($stmt);

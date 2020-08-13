@@ -22,7 +22,7 @@ class OdbcConnectionTest extends BaseTest
             $this->createOdbcConnection('invalid');
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Error connecting to DB: odbc_connect():', $e->getMessage());
+            Assert::assertStringContainsString('Error connecting to DB: ', $e->getMessage());
             Assert::assertStringContainsString('Unknown MySQL server host \'invalid\'', $e->getMessage());
         }
 
