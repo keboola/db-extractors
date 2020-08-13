@@ -22,7 +22,7 @@ This library contains a common interface for connecting to and data extracting f
     - Class [`OdbcExportAdapter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/ODBC/OdbcExportAdapter.php) implements export for ODBC connection.
     - Class [`FallbackExportAdapter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/FallbackExportAdapter.php) allows you to use multiple adapters. If one fails, then fallback adapter is used.
 - **Interface [`QueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/QueryFactory.php)** used to generate SQL query from `ExportConfig`. It is used if query is not set in the config.
-    Class [`DefaultQueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/DefaultQueryFactory.php) is base implementation for MySQL/MariaDb compatible SQL dialects. 
+    - Class [`DefaultQueryFactory`](https://github.com/keboola/db-extractor-adapter/blob/master/src/Query/DefaultQueryFactory.php) is base implementation for MySQL/MariaDb compatible SQL dialects. 
 - **Class [`QueryResultCsvWriter`](https://github.com/keboola/db-extractor-adapter/blob/master/src/QueryResultCsvWriter.php)** used to write rows from the `QueryResult` to the specified CSV file. 
 
 ## Development
