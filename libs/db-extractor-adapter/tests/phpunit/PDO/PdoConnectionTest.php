@@ -31,6 +31,23 @@ class PdoConnectionTest extends BaseTest
         }
     }
 
+    public function testInvalidHostNoErrorHandler(): void
+    {
+        // Disable error handler, ... tests that PDO throws exception in this situation
+        set_error_handler(null);
+        try {
+            $this->createPdoConnection('invalid');
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+        }
+
+        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+            Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
+        }
+    }
+
+
     public function testTestConnection(): void
     {
         $connection = $this->createPdoConnection();
@@ -42,6 +59,22 @@ class PdoConnectionTest extends BaseTest
 
     public function testTestConnectionFailed(): void
     {
+        $proxy = $this->createProxyToDb();
+        $connection = $this->createPdoConnection(self::TOXIPROXY_HOST, (int) $proxy->getListenPort());
+        $this->makeProxyDown($proxy);
+
+        try {
+            $connection->testConnection();
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('MySQL server has gone away', $e->getMessage());
+        }
+    }
+
+    public function testTestConnectionFailedNoErrorHandler(): void
+    {
+        // Disable error handler, ... tests that PDO throws exception in this situation
+        set_error_handler(null);
         $proxy = $this->createProxyToDb();
         $connection = $this->createPdoConnection(self::TOXIPROXY_HOST, (int) $proxy->getListenPort());
         $this->makeProxyDown($proxy);

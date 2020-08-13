@@ -31,6 +31,23 @@ class OdbcConnectionTest extends BaseTest
         }
     }
 
+    public function testInvalidHostNoErrorHandler(): void
+    {
+        // Disable error handler, so "odbc_connect" generates warning and not exception, returns false;
+        set_error_handler(null);
+        try {
+            $this->createOdbcConnection('invalid');
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('Error connecting to DB: ', $e->getMessage());
+            Assert::assertStringContainsString('Unknown MySQL server host \'invalid\'', $e->getMessage());
+        }
+
+        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+            Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
+        }
+    }
+
     public function testTestConnection(): void
     {
         $connection = $this->createOdbcConnection();
@@ -42,6 +59,22 @@ class OdbcConnectionTest extends BaseTest
 
     public function testTestConnectionFailed(): void
     {
+        $proxy = $this->createProxyToDb();
+        $connection = $this->createOdbcConnection(self::TOXIPROXY_HOST, (int) $proxy->getListenPort());
+        $this->makeProxyDown($proxy);
+
+        try {
+            $connection->testConnection();
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('Lost connection to MySQL server during query', $e->getMessage());
+        }
+    }
+
+    public function testTestConnectionFailedNoErrorHandler(): void
+    {
+        // Disable error handler, so "odbc_exec" generates warning and not exception, returns false;
+        set_error_handler(null);
         $proxy = $this->createProxyToDb();
         $connection = $this->createOdbcConnection(self::TOXIPROXY_HOST, (int) $proxy->getListenPort());
         $this->makeProxyDown($proxy);
