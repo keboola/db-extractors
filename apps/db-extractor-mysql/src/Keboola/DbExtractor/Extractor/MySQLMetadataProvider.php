@@ -70,11 +70,17 @@ class MySQLMetadataProvider implements MetadataProvider
         if ($loadColumns) {
             foreach ($this->queryColumns($whitelist) as $data) {
                 $tableId = $data['TABLE_SCHEMA'] . '.' . $data['TABLE_NAME'];
-                $columnId = $tableId . '.' . $data['COLUMN_NAME'];
-                $columnBuilder = $tableBuilders[$tableId]->addColumn();
-                $columnBuilders[$columnId] = $columnBuilder;
-                $autoIncrement = isset($autoIncrements[$tableId]) ? (int) $autoIncrements[$tableId] : null;
-                $this->processColumnData($columnBuilder, $data, $autoIncrement);
+                // Tables and columns are loaded separately.
+                // In rare cases, a new table may be created between these requests,
+                // ... so the columns from the table are loaded but table not.
+                // This conditions prevents error.
+                if (isset($tableBuilders[$tableId])) {
+                    $columnId = $tableId . '.' . $data['COLUMN_NAME'];
+                    $columnBuilder = $tableBuilders[$tableId]->addColumn();
+                    $columnBuilders[$columnId] = $columnBuilder;
+                    $autoIncrement = isset($autoIncrements[$tableId]) ? (int) $autoIncrements[$tableId] : null;
+                    $this->processColumnData($columnBuilder, $data, $autoIncrement);
+                }
             }
 
             foreach ($this->queryConstraints($whitelist) as $data) {
