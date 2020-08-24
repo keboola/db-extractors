@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Configuration\ValueObject\MysqlDatabaseConfig;
+use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
-use Keboola\DbExtractorConfig\Tests\ValueObject\DatabaseConfigTest;
 use PDO;
 use PDOException;
 use Throwable;
@@ -36,6 +37,10 @@ class MySQL extends BaseExtractor
 
     public function createConnection(DatabaseConfig $databaseConfig): PDO
     {
+        if (!($databaseConfig instanceof MysqlDatabaseConfig)) {
+            throw new ApplicationException('MysqlDatabaseConfig expected.');
+        }
+
         $isSsl = false;
         $isCompression = !empty($params['networkCompression']) ? true :false;
 
@@ -113,6 +118,12 @@ class MySQL extends BaseExtractor
             }
 
             throw $e;
+        }
+
+        if ($databaseConfig->hasTransactionIsolationLevel()) {
+            $pdo->exec(
+                sprintf('SET TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
+            );
         }
 
         $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
@@ -268,6 +279,11 @@ class MySQL extends BaseExtractor
         }
 
         return implode(' ', $sql);
+    }
+
+    protected function createDatabaseConfig(array $data): DatabaseConfig
+    {
+        return MysqlDatabaseConfig::fromArray($data);
     }
 
     private function quote(string $obj): string
