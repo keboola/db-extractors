@@ -122,7 +122,7 @@ class MySQL extends BaseExtractor
 
         if ($databaseConfig->hasTransactionIsolationLevel()) {
             $pdo->exec(
-                sprintf('SET TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
+                sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
             );
         }
 
