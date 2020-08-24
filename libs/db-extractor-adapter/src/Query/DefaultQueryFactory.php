@@ -44,10 +44,16 @@ class DefaultQueryFactory implements QueryFactory
             );
         }
 
+        if ($exportConfig->isIncrementalFetching()) {
+            $sql[] = sprintf(
+                'ORDER BY %s',
+                $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
+            );
+        }
+
         if ($exportConfig->hasIncrementalFetchingLimit()) {
             $sql[] = sprintf(
-                'ORDER BY %s LIMIT %d',
-                $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
+                'LIMIT %d',
                 $exportConfig->getIncrementalFetchingLimit()
             );
         }
