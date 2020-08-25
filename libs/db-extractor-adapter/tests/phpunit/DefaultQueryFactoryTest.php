@@ -39,14 +39,14 @@ class DefaultQueryFactoryTest extends BaseTest
                 ],
             ],
             'incrementalFetchingNoState' => [
-                'SELECT * FROM `bar`.`foo`',
+                'SELECT * FROM `bar`.`foo` ORDER BY `col2`',
                 [
                     'table' => ['tableName' => 'foo', 'schema' => 'bar'],
                     'incrementalFetchingColumn' => 'col2',
                 ],
             ],
             'incrementalFetchingNoStateColumns' => [
-                'SELECT `col1`, `col2` FROM `bar`.`foo`',
+                'SELECT `col1`, `col2` FROM `bar`.`foo` ORDER BY `col2`',
                 [
                     'table' => ['tableName' => 'foo', 'schema' => 'bar'],
                     'columns' => ['col1', 'col2'],
@@ -54,7 +54,7 @@ class DefaultQueryFactoryTest extends BaseTest
                 ],
             ],
             'incrementalFetchingState' => [
-                'SELECT * FROM `bar`.`foo` WHERE `col2` >= \'123\'',
+                'SELECT * FROM `bar`.`foo` WHERE `col2` >= \'123\' ORDER BY `col2`',
                 [
                     'table' => ['tableName' => 'foo', 'schema' => 'bar'],
                     'incrementalFetchingColumn' => 'col2',
@@ -64,7 +64,7 @@ class DefaultQueryFactoryTest extends BaseTest
                 ],
             ],
             'incrementalFetchingStateColumns' => [
-                'SELECT `col1`, `col2` FROM `bar`.`foo` WHERE `col2` >= \'123\'',
+                'SELECT `col1`, `col2` FROM `bar`.`foo` WHERE `col2` >= \'123\' ORDER BY `col2`',
                 [
                     'table' => ['tableName' => 'foo', 'schema' => 'bar'],
                     'columns' => ['col1', 'col2'],
