@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Component\JsonHelper;
+use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\Constraint\StringContains;
 use SplFileInfo;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Nette\Utils;
 
 class MySQLTest extends AbstractMySQLTest
@@ -860,5 +861,50 @@ class MySQLTest extends AbstractMySQLTest
                 Assert::stringContains("Unknown database 'TesT'")
             ));
         }
+    }
+
+    /**
+     * @dataProvider transactionIsolationLevelProvider
+     */
+    public function testTransactionIsolationLevel(string $level): void
+    {
+        $this->createTextTable(
+            new SplFileInfo($this->dataDir . '/mysql/escaping.csv'),
+            'escaping',
+            'test'
+        );
+        $config = $this->getConfigRow();
+        $config['parameters']['db']['transactionIsolationLevel'] = $level;
+
+        $app = $this->createApplication($config);
+
+        $app->run();
+    }
+
+    public function transactionIsolationLevelProvider(): array
+    {
+        return [
+            [MysqlDbNode::TRANSACTION_LEVEL_REPEATABLE_READ],
+            [MysqlDbNode::TRANSACTION_LEVEL_READ_COMMITTED],
+            [MysqlDbNode::TRANSACTION_LEVEL_READ_UNCOMMITTED],
+            [MysqlDbNode::TRANSACTION_LEVEL_SERIALIZABLE],
+        ];
+    }
+
+    public function testInvalidTransactionIsolationLevel(): void
+    {
+        $this->createTextTable(
+            new SplFileInfo($this->dataDir . '/mysql/escaping.csv'),
+            'escaping',
+            'test'
+        );
+        $config = $this->getConfigRow();
+        $config['parameters']['db']['transactionIsolationLevel'] = 'invalid transaction level';
+
+        $expctedMessage = 'The value "invalid transaction level" is not allowed for path "root.parameters.db.transactionIsolationLevel". ';
+        $expctedMessage .= 'Permissible values: "REPEATABLE READ", "READ COMMITTED", "READ UNCOMMITTED", "SERIALIZABLE"';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($expctedMessage);
+        $this->createApplication($config);
     }
 }

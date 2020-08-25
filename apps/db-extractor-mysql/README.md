@@ -36,6 +36,7 @@ The configuration requires a `db` node with the following properties:
   - user string
   - sshHost string,
   - sshPort string
+- transactionIsolationLevel: enum (optional) - possible values `REPEATABLE READ`, `READ COMMITTED`, `READ UNCOMMITTED`, `SERIALIZABLE`
    
 There are 2 possible types of table extraction.  
 1. A table defined by `schema` and `tableName`, this option can also include a columns list.
