@@ -11,8 +11,11 @@ trait OdbcCreateConnectionTrait
 {
     protected TestLogger $logger;
 
-    protected function createOdbcConnection(?string $host = null, ?int $port = null): OdbcConnection
-    {
+    protected function createOdbcConnection(
+        ?string $host = null,
+        ?int $port = null,
+        int $connectRetries = OdbcConnection::CONNECT_DEFAULT_MAX_RETRIES
+    ): OdbcConnection {
         $dns = sprintf(
             'Driver={MariaDB ODBC Driver};SERVER=%s;PORT=%d;DATABASE=%s;',
             $host ?? getenv('DB_HOST'),
@@ -24,6 +27,8 @@ trait OdbcCreateConnectionTrait
             $dns,
             (string) getenv('DB_USER'),
             (string) getenv('DB_PASSWORD'),
+            null,
+            $connectRetries
         );
     }
 }

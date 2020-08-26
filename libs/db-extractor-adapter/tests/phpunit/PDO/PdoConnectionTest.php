@@ -19,14 +19,15 @@ class PdoConnectionTest extends BaseTest
 
     public function testInvalidHost(): void
     {
+        $retries = 2;
         try {
-            $this->createPdoConnection('invalid');
+            $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
             Assert::assertStringContainsString('Name or service not known', $e->getMessage());
         }
 
-        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+        for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
     }
@@ -35,16 +36,33 @@ class PdoConnectionTest extends BaseTest
     {
         // Disable error handler, ... tests that PDO throws exception in this situation
         set_error_handler(null);
+        $retries = 2;
         try {
-            $this->createPdoConnection('invalid');
+            $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
             Assert::assertStringContainsString('Name or service not known', $e->getMessage());
         }
 
-        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+        for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
+    }
+
+
+    public function testDisableConnectRetries(): void
+    {
+        // Disable error handler, ... tests that PDO throws exception in this situation
+        set_error_handler(null);
+        try {
+            $this->createPdoConnection('invalid', null, 1);
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+        }
+
+        // No retry in logs
+        Assert::assertFalse($this->logger->hasInfoThatContains('Retrying...'));
     }
 
 

@@ -8,7 +8,7 @@ use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 
 interface DbConnection
 {
-    public const CONNECT_MAX_RETRIES = 3;
+    public const CONNECT_DEFAULT_MAX_RETRIES = 3;
 
     public const DEFAULT_MAX_RETRIES = 5;
 

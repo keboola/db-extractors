@@ -18,6 +18,7 @@ class OdbcConnectionTest extends BaseTest
 
     public function testInvalidHost(): void
     {
+        $retries = 2;
         try {
             $this->createOdbcConnection('invalid');
             Assert::fail('Exception expected.');
@@ -26,7 +27,7 @@ class OdbcConnectionTest extends BaseTest
             Assert::assertStringContainsString('Unknown MySQL server host \'invalid\'', $e->getMessage());
         }
 
-        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+        for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
     }
@@ -35,17 +36,34 @@ class OdbcConnectionTest extends BaseTest
     {
         // Disable error handler, so "odbc_connect" generates warning and not exception, returns false;
         set_error_handler(null);
+        $retries = 2;
         try {
-            $this->createOdbcConnection('invalid');
+            $this->createOdbcConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
             Assert::assertStringContainsString('Error connecting to DB: ', $e->getMessage());
             Assert::assertStringContainsString('Unknown MySQL server host \'invalid\'', $e->getMessage());
         }
 
-        for ($attempt=1; $attempt < DbConnection::CONNECT_MAX_RETRIES; $attempt++) {
+        for ($attempt=1; $attempt < $retries; $attempt++) {
             Assert::assertTrue($this->logger->hasInfoThatContains("Retrying... [{$attempt}x]"));
         }
+    }
+
+    public function testDisableConnectRetries(): void
+    {
+        // Disable error handler, so "odbc_connect" generates warning and not exception, returns false;
+        set_error_handler(null);
+        try {
+            $this->createOdbcConnection('invalid', null, 1);
+            Assert::fail('Exception expected.');
+        } catch (UserExceptionInterface $e) {
+            Assert::assertStringContainsString('Error connecting to DB: ', $e->getMessage());
+            Assert::assertStringContainsString('Unknown MySQL server host \'invalid\'', $e->getMessage());
+        }
+
+        // No retry in logs
+        Assert::assertFalse($this->logger->hasInfoThatContains('Retrying... '));
     }
 
     public function testTestConnection(): void
