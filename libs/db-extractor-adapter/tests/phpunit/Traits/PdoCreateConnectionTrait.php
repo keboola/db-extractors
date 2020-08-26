@@ -11,8 +11,11 @@ trait PdoCreateConnectionTrait
 {
     protected TestLogger $logger;
 
-    protected function createPdoConnection(?string $host = null, ?int $port = null): PdoConnection
-    {
+    protected function createPdoConnection(
+        ?string $host = null,
+        ?int $port = null,
+        int $connectRetries = PdoConnection::CONNECT_DEFAULT_MAX_RETRIES
+    ): PdoConnection {
         $dns = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
             $host ?? getenv('DB_HOST'),
@@ -25,6 +28,8 @@ trait PdoCreateConnectionTrait
             (string) getenv('DB_USER'),
             (string) getenv('DB_PASSWORD'),
             [],
+            null,
+            $connectRetries
         );
     }
 }

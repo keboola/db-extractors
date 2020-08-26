@@ -29,13 +29,14 @@ class OdbcConnection extends BaseDbConnection
         string $dsn,
         string $user,
         string $password,
-        ?callable $init = null
+        ?callable $init = null,
+        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES
     ) {
         $this->dsn = $dsn;
         $this->user = $user;
         $this->password = $password;
         $this->init = $init;
-        parent::__construct($logger);
+        parent::__construct($logger, $connectMaxRetries);
     }
 
     protected function connect(): void

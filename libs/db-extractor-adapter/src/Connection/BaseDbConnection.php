@@ -22,6 +22,8 @@ abstract class BaseDbConnection implements DbConnection
 
     protected LoggerInterface $logger;
 
+    protected int $connectMaxRetries;
+
     /**
      * Returns low-level connection resource or object.
      * @return resource|object
@@ -40,9 +42,10 @@ abstract class BaseDbConnection implements DbConnection
 
     abstract protected function getExpectedExceptionClasses(): array;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES)
     {
         $this->logger = $logger;
+        $this->connectMaxRetries = max($connectMaxRetries, 1);
         $this->connectWithRetry();
     }
 
@@ -103,7 +106,7 @@ abstract class BaseDbConnection implements DbConnection
     {
         try {
             $this
-                ->createRetryProxy(self::CONNECT_MAX_RETRIES)
+                ->createRetryProxy($this->connectMaxRetries)
                 ->call(function (): void {
                     $this->connect();
                 });
