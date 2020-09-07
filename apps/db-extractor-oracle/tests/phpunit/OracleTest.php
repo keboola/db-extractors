@@ -415,7 +415,7 @@ class OracleTest extends OracleBaseTest
             'localPort' => '15212',
         ];
         $config['parameters']['columns'] = [];
-        $config['parameters']['outputTable'] =  'output';
+        $config['parameters']['outputTable'] = 'output';
         $config['parameters']['primaryKey'] = [];
         $config['parameters']['retries'] = 3;
 
@@ -452,7 +452,7 @@ class OracleTest extends OracleBaseTest
         $this->assertArrayHasKey('status', $result);
         $this->assertArrayHasKey('tables', $result);
         $this->assertEquals('success', $result['status']);
-        $this->assertCount(11, $result['tables']);
+        $this->assertCount(12, $result['tables']);
 
         $expectedTables = [
             [
@@ -541,6 +541,93 @@ class OracleTest extends OracleBaseTest
                         [
                             'name' => 'DEPARTMENT_ID',
                             'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                    ],
+            ],
+            [
+                'name' => 'EMP_DETAILS_VIEW',
+                'schema' => 'HR',
+                'columns' =>
+                    [
+                        [
+                            'name' => 'EMPLOYEE_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'JOB_ID',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'MANAGER_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'DEPARTMENT_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'LOCATION_ID',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COUNTRY_ID',
+                            'type' => 'CHAR',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'FIRST_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'LAST_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'SALARY',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COMMISSION_PCT',
+                            'type' => 'NUMBER',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'DEPARTMENT_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'JOB_TITLE',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'CITY',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'STATE_PROVINCE',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'COUNTRY_NAME',
+                            'type' => 'VARCHAR2',
+                            'primaryKey' => false,
+                        ],
+                        [
+                            'name' => 'REGION_NAME',
+                            'type' => 'VARCHAR2',
                             'primaryKey' => false,
                         ],
                     ],

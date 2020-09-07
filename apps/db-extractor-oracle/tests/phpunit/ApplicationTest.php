@@ -193,7 +193,7 @@ class ApplicationTest extends OracleBaseTest
         $process->mustRun();
 
         $data = json_decode($process->getOutput(), true);
-        self::assertCount(10, $data['tables']);
+        self::assertCount(11, $data['tables']);
         self::assertArrayNotHasKey('columns', $data['tables'][0]);
         self::assertEquals(0, $process->getExitCode());
         self::assertEquals('', $process->getErrorOutput());

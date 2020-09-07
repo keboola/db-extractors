@@ -3,7 +3,7 @@ FROM quay.io/keboola/aws-cli
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SESSION_TOKEN
-ARG TABLE_EXPORTER_VERSION=3.0.0
+ARG TABLE_EXPORTER_VERSION=3.1.0
 
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-jdk8/jdk-8u231-linux-x64.tar.gz /tmp/oracle-jdk.tar.gz
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-basiclite-linux.x64-12.2.0.1.0.zip /tmp/instantclient-basiclite.zip
