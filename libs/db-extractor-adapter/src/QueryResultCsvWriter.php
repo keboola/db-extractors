@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use Iterator;
 use Keboola\Component\UserException;
 use Keboola\Csv\CsvWriter;
+use Keboola\DbExtractor\Adapter\Exception\NoRowsException;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
@@ -15,7 +17,13 @@ use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
  */
 class QueryResultCsvWriter
 {
+    public const MAX_VALUE_STATE_KEY = 'lastFetchedRow';
+
     protected array $state;
+
+    protected int $rowsCount;
+
+    protected ?array $lastRow;
 
     public function __construct(array $state)
     {
@@ -24,22 +32,38 @@ class QueryResultCsvWriter
 
     public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
+        $this->rowsCount = 0;
+        $this->lastRow = null;
+
         // Create CSV writer
-        $csv = $this->createCsvWriter($csvFilePath);
+        $csvWriter = $this->createCsvWriter($csvFilePath);
+
+        // Get iterator
+        $iterator = $this->getIterator($result);
+
+        // Write rows
+        try {
+            $this->writeRows($exportConfig, $iterator, $csvWriter);
+        } catch (NoRowsException $e) {
+            @unlink($csvFilePath); // no rows, no file
+            return new ExportResult($csvFilePath, 0, $this->getMaxValueFromState($exportConfig));
+        } finally {
+            $result->closeCursor();
+        }
+
+        $incFetchingColMaxValue = $this->getIncrementalFetchingMaxValue($exportConfig, $this->lastRow);
+        return new ExportResult($csvFilePath, $this->rowsCount, $incFetchingColMaxValue);
+    }
+
+    protected function writeRows(ExportConfig $exportConfig, Iterator $iterator, CsvWriter $csvWriter): void
+    {
+        // No rows found ?
+        if (!$iterator->valid()) {
+            throw new NoRowsException();
+        }
 
         // With custom query are no metadata in manifest, so header must be present
         $includeHeader = $exportConfig->hasQuery();
-
-        // No rows found.  If incremental fetching is turned on, we need to preserve the last state
-        $iterator = $result->getIterator();
-        if (!$iterator->valid()) {
-            $result->closeCursor();
-            @unlink($csvFilePath); // no rows, no file
-
-            $incFetchingColMaxValue = $exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow']) ?
-                (string) $this->state['lastFetchedRow'] : null;
-            return new ExportResult($csvFilePath, 0, $incFetchingColMaxValue);
-        }
 
         // Rows found, iterate!
         $resultRow = $iterator->current();
@@ -47,28 +71,38 @@ class QueryResultCsvWriter
 
         // Write header and first line
         if ($includeHeader) {
-            $csv->writeRow(array_keys($resultRow));
+            $csvWriter->writeRow(array_keys($resultRow));
         }
-        $csv->writeRow($resultRow);
+        $csvWriter->writeRow($resultRow);
 
         // Write the rest
-        $numRows = 1;
-        $lastRow = $resultRow;
+        $this->rowsCount = 1;
+        $this->lastRow = $resultRow;
         while ($iterator->valid()) {
             $resultRow = $iterator->current();
-            $csv->writeRow($resultRow);
+            $csvWriter->writeRow($resultRow);
             $iterator->next();
 
-            $lastRow = $resultRow;
-            $numRows++;
+            $this->lastRow = $resultRow;
+            $this->rowsCount++;
         }
-        $result->closeCursor();
+    }
 
+    protected function getIterator(QueryResult $result): Iterator
+    {
+        return $result->getIterator();
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getIncrementalFetchingMaxValue(ExportConfig $exportConfig, ?array $lastRow)
+    {
         // Get/check maximum (last) value of incremental fetching column
         $incFetchingColMaxValue = null;
         if ($exportConfig->isIncrementalFetching()) {
             $incrementalColumn = $exportConfig->getIncrementalFetchingConfig()->getColumn();
-            if (!array_key_exists($incrementalColumn, $lastRow)) {
+            if (!$lastRow || !array_key_exists($incrementalColumn, $lastRow)) {
                 throw new UserException(
                     sprintf(
                         'The specified incremental fetching column %s not found in the table',
@@ -79,7 +113,7 @@ class QueryResultCsvWriter
             $incFetchingColMaxValue = (string) $lastRow[$incrementalColumn];
         }
 
-        return new ExportResult($csvFilePath, $numRows, $incFetchingColMaxValue);
+        return $incFetchingColMaxValue;
     }
 
     protected function createCsvWriter(string $csvFilePath): CsvWriter
@@ -90,5 +124,11 @@ class QueryResultCsvWriter
         }
 
         return new CsvWriter($csvFilePath);
+    }
+
+    protected function getMaxValueFromState(ExportConfig $exportConfig): ?string
+    {
+        return $exportConfig->isIncrementalFetching() && isset($this->state[self::MAX_VALUE_STATE_KEY]) ?
+            (string) $this->state[self::MAX_VALUE_STATE_KEY] : null;
     }
 }
