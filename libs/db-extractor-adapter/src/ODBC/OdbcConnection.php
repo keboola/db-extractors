@@ -18,33 +18,49 @@ class OdbcConnection extends BaseDbConnection
 
     protected string $password;
 
+    protected int $odbcCursorType;
+
+    protected int $odbcCursorMode;
+
     /** @var callable|null */
     protected $init;
 
     /** @var resource */
     protected $connection;
 
+    /**
+     * Note:
+     *     $odbcCursorType AND $odbcCursorMode can help solve the speed/cache problems with some ODBC drivers.
+     *     These default values are good for most drivers.
+     *     You can try $odbcCursorMode = SQL_CUR_USE_ODBC, if you have speed problems.
+     */
     public function __construct(
         LoggerInterface $logger,
         string $dsn,
         string $user,
         string $password,
         ?callable $init = null,
-        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES
+        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
+        int $odbcCursorType = SQL_CURSOR_FORWARD_ONLY,
+        int $odbcCursorMode = SQL_CUR_USE_DRIVER
     ) {
         $this->dsn = $dsn;
         $this->user = $user;
         $this->password = $password;
         $this->init = $init;
+        $this->odbcCursorType = $odbcCursorType;
+        $this->odbcCursorMode = $odbcCursorMode;
         parent::__construct($logger, $connectMaxRetries);
     }
 
     protected function connect(): void
     {
         $this->logger->info(sprintf('Creating ODBC connection to "%s".', $this->dsn));
+        ini_set('odbc.default_cursortype', (string) $this->odbcCursorType);
+
         try {
             /** @var resource|false $connection */
-            $connection = @odbc_connect($this->dsn, $this->user, $this->password);
+            $connection = @odbc_connect($this->dsn, $this->user, $this->password, $this->odbcCursorMode);
         } catch (Throwable $e) {
             throw new OdbcException($e->getMessage(), $e->getCode(), $e);
         }

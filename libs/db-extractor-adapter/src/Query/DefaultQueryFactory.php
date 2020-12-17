@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Query;
 
+use Generator;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
@@ -18,46 +19,66 @@ class DefaultQueryFactory implements QueryFactory
 
     public function create(ExportConfig $exportConfig, DbConnection $connection): string
     {
-        $sql = [];
+        $sql = array_merge(
+            iterator_to_array($this->createSelect($exportConfig, $connection)),
+            iterator_to_array($this->createFrom($exportConfig, $connection)),
+            iterator_to_array($this->createWhere($exportConfig, $connection)),
+            iterator_to_array($this->createOrderBy($exportConfig, $connection)),
+            iterator_to_array($this->createLimit($exportConfig, $connection))
+        );
+        return implode(' ', $sql);
+    }
 
+    protected function createSelect(ExportConfig $exportConfig, DbConnection $connection): Generator
+    {
         if ($exportConfig->hasColumns()) {
-            $sql[] = sprintf('SELECT %s', implode(', ', array_map(
+            yield sprintf('SELECT %s', implode(', ', array_map(
                 fn(string $c) => $connection->quoteIdentifier($c),
                 $exportConfig->getColumns()
             )));
         } else {
-            $sql[] = 'SELECT *';
+            yield 'SELECT *';
         }
+    }
 
-        $sql[] = sprintf(
+    protected function createFrom(ExportConfig $exportConfig, DbConnection $connection): Generator
+    {
+        yield sprintf(
             'FROM %s.%s',
             $connection->quoteIdentifier($exportConfig->getTable()->getSchema()),
             $connection->quoteIdentifier($exportConfig->getTable()->getName())
         );
+    }
 
+    protected function createWhere(ExportConfig $exportConfig, DbConnection $connection): Generator
+    {
         if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
-            $sql[] = sprintf(
+            yield sprintf(
                 // intentionally ">=" last row should be included, it is handled by storage deduplication process
                 'WHERE %s >= %s',
                 $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
                 $connection->quote($this->state['lastFetchedRow'])
             );
         }
+    }
 
+    protected function createOrderBy(ExportConfig $exportConfig, DbConnection $connection): Generator
+    {
         if ($exportConfig->isIncrementalFetching()) {
-            $sql[] = sprintf(
+            yield sprintf(
                 'ORDER BY %s',
                 $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
             );
         }
+    }
 
+    protected function createLimit(ExportConfig $exportConfig, DbConnection $connection): Generator
+    {
         if ($exportConfig->hasIncrementalFetchingLimit()) {
-            $sql[] = sprintf(
+            yield sprintf(
                 'LIMIT %d',
                 $exportConfig->getIncrementalFetchingLimit()
             );
         }
-
-        return implode(' ', $sql);
     }
 }
