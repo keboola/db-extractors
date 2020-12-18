@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\Tests;
 
 use ArrayIterator;
-use Keboola\DbExtractor\Adapter\QueryResultCsvWriter;
+use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use PHPUnit\Framework\Assert;
 
-class QueryResultCsvWriterTest extends BaseTest
+class DefaultResultWriterTest extends BaseTest
 {
     public function testSimpleQuery(): void
     {
@@ -213,8 +214,8 @@ END;
         return $queryResult;
     }
 
-    private function createWriter(array $state = []): QueryResultCsvWriter
+    private function createWriter(array $state = []): ResultWriter
     {
-        return new QueryResultCsvWriter($state);
+        return new DefaultResultWriter($state);
     }
 }

@@ -11,7 +11,6 @@ use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
 use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\CommonExceptions\UserExceptionInterface;
-use Keboola\DbExtractor\Adapter\Connection\DbConnection;
 
 class PdoConnectionTest extends BaseTest
 {

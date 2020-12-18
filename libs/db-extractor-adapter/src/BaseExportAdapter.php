@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Throwable;
 use Psr\Log\LoggerInterface;
 use Keboola\CommonExceptions\UserExceptionInterface;
@@ -24,6 +25,8 @@ abstract class BaseExportAdapter implements ExportAdapter
 
     protected QueryFactory $simpleQueryFactory;
 
+    protected ResultWriter $resultWriter;
+
     protected string $dataDir;
 
     protected array $state;
@@ -32,12 +35,14 @@ abstract class BaseExportAdapter implements ExportAdapter
         LoggerInterface $logger,
         DbConnection $connection,
         QueryFactory $simpleQueryFactory,
+        ResultWriter $resultWriter,
         string $dataDir,
         array $state
     ) {
         $this->logger = $logger;
         $this->connection = $connection;
         $this->simpleQueryFactory = $simpleQueryFactory;
+        $this->resultWriter = $resultWriter;
         $this->dataDir = $dataDir;
         $this->state = $state;
     }
@@ -51,8 +56,7 @@ abstract class BaseExportAdapter implements ExportAdapter
                 $query,
                 $exportConfig->getMaxRetries(),
                 function (QueryResult $result) use ($exportConfig, $csvFilePath) {
-                    $resultWriter = new QueryResultCsvWriter($this->state);
-                    return $resultWriter->writeToCsv($result, $exportConfig, $csvFilePath);
+                    return $this->resultWriter->writeToCsv($result, $exportConfig, $csvFilePath);
                 }
             );
         } catch (CsvException $e) {

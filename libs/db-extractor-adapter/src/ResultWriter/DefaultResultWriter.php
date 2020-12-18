@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Keboola\DbExtractor\Adapter;
+namespace Keboola\DbExtractor\Adapter\ResultWriter;
 
 use Iterator;
 use Keboola\Component\UserException;
@@ -13,9 +13,9 @@ use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
 /**
- * This class sequentially writes rows from the database to a CSV file + returns max value of inc. fetching column.
+ * Writes rows from the database to a CSV file + returns max value of inc. fetching column.
  */
-class QueryResultCsvWriter
+class DefaultResultWriter implements ResultWriter
 {
     public const MAX_VALUE_STATE_KEY = 'lastFetchedRow';
 
