@@ -21,13 +21,37 @@ class DefaultResultWriter implements ResultWriter
 
     protected array $state;
 
+    protected ?string $fromEncoding = null;
+
+    protected ?string $toEncoding = null;
+
     protected int $rowsCount;
 
     protected ?array $lastRow;
 
+    public static function convertEncodingInArray(array $row, string $from, string $to): array
+    {
+        return array_map(
+            fn($value) => iconv($from, $to, (string) $value),
+            $row
+        );
+    }
+
     public function __construct(array $state)
     {
         $this->state = $state;
+    }
+
+    public function setIgnoreInvalidUtf8(): self
+    {
+        return $this->setConvertEncoding('UTF-8', 'UTF-8//IGNORE');
+    }
+
+    public function setConvertEncoding(string $fromEncoding, string $toEncoding): self
+    {
+        $this->fromEncoding = $fromEncoding;
+        $this->toEncoding = $toEncoding;
+        return $this;
     }
 
     public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFilePath): ExportResult
@@ -90,11 +114,15 @@ class DefaultResultWriter implements ResultWriter
 
     protected function writeHeader(array $header, CsvWriter $csvWriter): void
     {
-        $csvWriter->writeRow($header);
+        $this->writeRow($header, $csvWriter);
     }
 
     protected function writeRow(array $row, CsvWriter $csvWriter): void
     {
+        if ($this->fromEncoding && $this->toEncoding) {
+            $row = self::convertEncodingInArray($row, $this->fromEncoding, $this->toEncoding);
+        }
+
         $csvWriter->writeRow($row);
     }
 
