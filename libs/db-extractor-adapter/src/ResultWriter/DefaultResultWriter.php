@@ -104,7 +104,7 @@ class DefaultResultWriter implements ResultWriter
         $this->lastRow = $resultRow;
         while ($iterator->valid()) {
             $resultRow = $iterator->current();
-            $csvWriter->writeRow($resultRow);
+            $this->writeRow($resultRow, $csvWriter);
             $iterator->next();
 
             $this->lastRow = $resultRow;
