@@ -204,6 +204,8 @@ END;
 
         $queryResult = $this->createQueryResultMock([
             ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+            ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
+            ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
         ]);
 
         $result = $this
@@ -212,6 +214,8 @@ END;
 
         $expectedCsv = <<<END
 "1","Ost\xa0\xa1rava","313088"
+"2","Plzen\xa0\xa1","164180"
+"3","\xa0\xa1Olomouc","101268"
 
 END;
         Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
@@ -225,6 +229,8 @@ END;
 
         $queryResult = $this->createQueryResultMock([
             ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+            ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
+            ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
         ]);
 
         $result = $this
@@ -234,6 +240,8 @@ END;
 
         $expectedCsv = <<<END
 "1","Ostrava","313088"
+"2","Plzen","164180"
+"3","Olomouc","101268"
 
 END;
         Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
@@ -247,6 +255,7 @@ END;
 
         $queryResult = $this->createQueryResultMock([
             ['id' => 1, 'name' => 'ABCÁÈÕ', 'population' => 313088],
+            ['id' => 2, 'name' => 'CDEÁÈÕ', 'population' => 164180],
         ]);
 
         $result = $this
@@ -256,6 +265,7 @@ END;
 
         $expectedCsv = <<<END
 "1","ABCAEO","313088"
+"2","CDEAEO","164180"
 
 END;
         Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
