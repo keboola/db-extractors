@@ -21,6 +21,7 @@
     },
     "require": {
         "php": ">=7.4",
+        "ext-iconv": "*",
         "keboola/db-extractor-config": "^1.4",
         "keboola/common-exceptions": "^1.0",
         "keboola/csv": "^2.2",

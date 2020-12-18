@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Keboola\DbExtractor\Adapter;
+namespace Keboola\DbExtractor\Adapter\ResultWriter;
 
 use Iterator;
 use Keboola\Component\UserException;
@@ -13,21 +13,45 @@ use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
 /**
- * This class sequentially writes rows from the database to a CSV file + returns max value of inc. fetching column.
+ * Writes rows from the database to a CSV file + returns max value of inc. fetching column.
  */
-class QueryResultCsvWriter
+class DefaultResultWriter implements ResultWriter
 {
     public const MAX_VALUE_STATE_KEY = 'lastFetchedRow';
 
     protected array $state;
 
+    protected ?string $fromEncoding = null;
+
+    protected ?string $toEncoding = null;
+
     protected int $rowsCount;
 
     protected ?array $lastRow;
 
+    public static function convertEncodingInArray(array $row, string $from, string $to): array
+    {
+        return array_map(
+            fn($value) => iconv($from, $to, (string) $value),
+            $row
+        );
+    }
+
     public function __construct(array $state)
     {
         $this->state = $state;
+    }
+
+    public function setIgnoreInvalidUtf8(): self
+    {
+        return $this->setConvertEncoding('UTF-8', 'UTF-8//IGNORE');
+    }
+
+    public function setConvertEncoding(string $fromEncoding, string $toEncoding): self
+    {
+        $this->fromEncoding = $fromEncoding;
+        $this->toEncoding = $toEncoding;
+        return $this;
     }
 
     public function writeToCsv(QueryResult $result, ExportConfig $exportConfig, string $csvFilePath): ExportResult
@@ -71,9 +95,9 @@ class QueryResultCsvWriter
 
         // Write header and first line
         if ($includeHeader) {
-            $csvWriter->writeRow(array_keys($resultRow));
+            $this->writeHeader(array_keys($resultRow), $csvWriter);
         }
-        $csvWriter->writeRow($resultRow);
+        $this->writeRow($resultRow, $csvWriter);
 
         // Write the rest
         $this->rowsCount = 1;
@@ -86,6 +110,20 @@ class QueryResultCsvWriter
             $this->lastRow = $resultRow;
             $this->rowsCount++;
         }
+    }
+
+    protected function writeHeader(array $header, CsvWriter $csvWriter): void
+    {
+        $this->writeRow($header, $csvWriter);
+    }
+
+    protected function writeRow(array $row, CsvWriter $csvWriter): void
+    {
+        if ($this->fromEncoding && $this->toEncoding) {
+            $row = self::convertEncodingInArray($row, $this->fromEncoding, $this->toEncoding);
+        }
+
+        $csvWriter->writeRow($row);
     }
 
     protected function getIterator(QueryResult $result): Iterator

@@ -7,6 +7,8 @@ namespace Keboola\DbExtractor\Adapter\Tests;
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
+use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use PHPUnit\Framework\Assert;
@@ -184,5 +186,10 @@ END;
     protected function runExport(ExportConfig $exportConfig, array $state = []): ExportResult
     {
         return $this->createExportAdapter($state)->export($exportConfig, $this->getCsvFilePath());
+    }
+
+    protected function createResultWriter(array $state): ResultWriter
+    {
+        return new DefaultResultWriter($state);
     }
 }

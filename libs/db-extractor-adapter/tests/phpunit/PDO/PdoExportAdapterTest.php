@@ -27,6 +27,7 @@ class PdoExportAdapterTest extends AbstractExportAdapterTest
             $this->logger,
             $connection,
             $queryFactory,
+            $this->createResultWriter($state),
             $this->temp->getTmpFolder(),
             $state
         );

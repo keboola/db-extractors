@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\Tests;
 
 use ArrayIterator;
-use Keboola\DbExtractor\Adapter\QueryResultCsvWriter;
+use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use PHPUnit\Framework\Assert;
 
-class QueryResultCsvWriterTest extends BaseTest
+class DefaultResultWriterTest extends BaseTest
 {
     public function testSimpleQuery(): void
     {
@@ -195,6 +196,98 @@ END;
         Assert::assertFalse(file_exists($result->getCsvPath()));
     }
 
+    public function testNotIgnoreBadUtf8ByDefault(): void
+    {
+        $exportConfig = $this->createExportConfig([
+            'table' => ['tableName' => 'foo', 'schema' => 'bar'],
+        ]);
+
+        $queryResult = $this->createQueryResultMock([
+            ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+        ]);
+
+        $result = $this
+            ->createWriter([])
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
+
+        $expectedCsv = <<<END
+"1","Ost\xa0\xa1rava","313088"
+
+END;
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
+    }
+
+    public function testIgnoreBadUtf8(): void
+    {
+        $exportConfig = $this->createExportConfig([
+            'table' => ['tableName' => 'foo', 'schema' => 'bar'],
+        ]);
+
+        $queryResult = $this->createQueryResultMock([
+            ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+        ]);
+
+        $result = $this
+            ->createWriter([])
+            ->setIgnoreInvalidUtf8() // <<<<<<<<<<<<<<<<<<<<
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
+
+        $expectedCsv = <<<END
+"1","Ostrava","313088"
+
+END;
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
+    }
+
+    public function testConvertEncoding(): void
+    {
+        $exportConfig = $this->createExportConfig([
+            'table' => ['tableName' => 'foo', 'schema' => 'bar'],
+        ]);
+
+        $queryResult = $this->createQueryResultMock([
+            ['id' => 1, 'name' => 'ABCÁÈÕ', 'population' => 313088],
+        ]);
+
+        $result = $this
+            ->createWriter([])
+            ->setConvertEncoding('UTF-8', 'ASCII//TRANSLIT') // <<<<<<<<<<<<<<<<<<<<
+            ->writeToCsv($queryResult, $exportConfig, $this->getCsvFilePath());
+
+        $expectedCsv = <<<END
+"1","ABCAEO","313088"
+
+END;
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
+    }
+
+    /**
+     * @dataProvider getUtf8Data
+     */
+    public function testConvertEncodingInArray(array $data, array $expected): void
+    {
+        $fixed = DefaultResultWriter::convertEncodingInArray($data, 'UTF-8', 'UTF-8//IGNORE');
+        Assert::assertSame($expected, $fixed);
+    }
+
+    public function getUtf8Data(): iterable
+    {
+        yield 'numbers' => [
+            [1, 2, 3],
+            ['1', '2', '3'],
+        ];
+
+        yield 'strings' => [
+            ['abc', 'def', 'xyz'],
+            ['abc', 'def', 'xyz'],
+        ];
+
+        yield 'invalid-utf-8' => [
+            ["aa\xa0\xa1bb", "\xa0\xa1"],
+            ['aabb', ''],
+        ];
+    }
+
     private function createQueryResultMock(array $rows): QueryResult
     {
         $queryResult = $this
@@ -213,8 +306,8 @@ END;
         return $queryResult;
     }
 
-    private function createWriter(array $state = []): QueryResultCsvWriter
+    private function createWriter(array $state = []): DefaultResultWriter
     {
-        return new QueryResultCsvWriter($state);
+        return new DefaultResultWriter($state);
     }
 }
