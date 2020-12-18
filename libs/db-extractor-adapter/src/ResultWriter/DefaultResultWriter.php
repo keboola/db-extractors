@@ -71,9 +71,9 @@ class DefaultResultWriter implements ResultWriter
 
         // Write header and first line
         if ($includeHeader) {
-            $csvWriter->writeRow(array_keys($resultRow));
+            $this->writeHeader(array_keys($resultRow), $csvWriter);
         }
-        $csvWriter->writeRow($resultRow);
+        $this->writeRow($resultRow, $csvWriter);
 
         // Write the rest
         $this->rowsCount = 1;
@@ -86,6 +86,16 @@ class DefaultResultWriter implements ResultWriter
             $this->lastRow = $resultRow;
             $this->rowsCount++;
         }
+    }
+
+    protected function writeHeader(array $header, CsvWriter $csvWriter): void
+    {
+        $csvWriter->writeRow($header);
+    }
+
+    protected function writeRow(array $row, CsvWriter $csvWriter): void
+    {
+        $csvWriter->writeRow($row);
     }
 
     protected function getIterator(QueryResult $result): Iterator
