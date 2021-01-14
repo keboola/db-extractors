@@ -1,5 +1,5 @@
 # MySQL DB Extractor
-[![Build Status](https://travis-ci.org/keboola/db-extractor-mysql.svg?branch=master)](https://travis-ci.org/keboola/db-extractor-mysql)
+[![Build Status](https://travis-ci.com/keboola/db-extractor-mysql.svg?branch=master)](https://travis-ci.com/keboola/db-extractor-mysql)
 
 ### Development
 

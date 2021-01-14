@@ -1,0 +1,17 @@
+{
+  "parameters": {
+    "name": "sales",
+    "query": "SELECT * FROM escaping",
+    "outputTable": "in.c-main.escaping",
+    "incremental": false,
+    "primaryKey": null,
+    "db": {
+      "host": "%env(string:MYSQL_DB_HOST)%",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%"
+    },
+    "extractor_class": "MYSQL"
+  }
+}

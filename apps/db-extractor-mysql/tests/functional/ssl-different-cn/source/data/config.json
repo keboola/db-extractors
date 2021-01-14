@@ -1,0 +1,19 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "host": "mysql-different-cn",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%",
+      "ssl": {
+        "enabled": true,
+        "ca": "ca.pem",
+        "cert": "client-cert.pem",
+        "key": "client-key.pem"
+      }
+    },
+    "extractor_class": "MYSQL"
+  }
+}

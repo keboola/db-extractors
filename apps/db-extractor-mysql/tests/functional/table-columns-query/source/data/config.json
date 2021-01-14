@@ -1,0 +1,32 @@
+{
+  "parameters": {
+    "tables": [
+      {
+        "id": 3,
+        "enabled": true,
+        "name": "tableColumns",
+        "outputTable": "in.c-main.tableColumns",
+        "incremental": false,
+        "primaryKey": null,
+        "table": {
+          "schema": "test",
+          "tableName": "sales"
+        },
+        "columns": [
+          "usergender",
+          "usercity",
+          "usersentiment",
+          "zipcode"
+        ]
+      }
+    ],
+    "db": {
+      "host": "%env(string:MYSQL_DB_HOST)%",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%"
+    },
+    "extractor_class": "MYSQL"
+  }
+}

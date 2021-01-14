@@ -1,0 +1,3 @@
+Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8'
+Exporting to in.c-main.auto-increment-timestamp
+Extractor finished successfully.

@@ -1,0 +1,47 @@
+{
+  "parameters": {
+    "tables": [
+      {
+        "id": 1,
+        "name": "sales",
+        "query": "SELECT * FROM escaping",
+        "outputTable": "in.c-main.escaping",
+        "incremental": false,
+        "primaryKey": null,
+        "enabled": true
+      },
+      {
+        "id": 2,
+        "enabled": true,
+        "name": "sales",
+        "outputTable": "in.c-main.sales",
+        "incremental": false,
+        "primaryKey": null,
+        "table": {
+          "schema": "test",
+          "tableName": "sales"
+        }
+      }
+    ],
+    "db": {
+      "host": "%env(string:MYSQL_DB_HOST)%",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%",
+      "ssh": {
+        "enabled": true,
+        "keys": {
+          "#private": "%env(string:SSH_PRIVATE_KEY)%",
+          "public": "%env(string:SSH_PUBLIC_KEY)%"
+        },
+        "user": "root",
+        "sshHost": "sshproxy",
+        "remoteHost": "MYSQL",
+        "remotePort": "1433",
+        "localPort": "1234"
+      }
+    },
+    "extractor_class": "MYSQL"
+  }
+}

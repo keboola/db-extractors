@@ -96,7 +96,7 @@ class MySQL extends BaseExtractor
             $this->database = $databaseConfig->getDatabase();
         }
 
-        $this->logger->info("Connecting to DSN '" . $dsn . "' " . ($isSsl ? 'Using SSL' : ''));
+        $this->logger->info("Connecting to DSN '" . $dsn . "'" . ($isSsl ? ' Using SSL' : ''));
 
         try {
             $pdo = new PDO($dsn, $databaseConfig->getUsername(), $databaseConfig->getPassword(), $options);
