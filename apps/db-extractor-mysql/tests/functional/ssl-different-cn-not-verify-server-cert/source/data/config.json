@@ -14,7 +14,6 @@
         "key": "%env(string:SSL_KEY)%",
         "verifyServerCert": false
       }
-    },
-    "extractor_class": "MYSQL"
+    }
   }
 }

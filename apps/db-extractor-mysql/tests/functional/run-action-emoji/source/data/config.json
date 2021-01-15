@@ -9,7 +9,6 @@
       "user": "%env(string:MYSQL_DB_USER)%",
       "#password": "%env(string:MYSQL_DB_PASSWORD)%",
       "database": "%env(string:MYSQL_DB_DATABASE)%"
-    },
-    "extractor_class": "MYSQL"
+    }
   }
 }
