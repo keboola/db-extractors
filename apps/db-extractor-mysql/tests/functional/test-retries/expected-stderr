@@ -1,0 +1,1 @@
+Error connecting to DB: PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known

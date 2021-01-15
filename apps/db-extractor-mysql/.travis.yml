@@ -8,8 +8,10 @@ services:
 before_install:
   - docker-compose -v
   - docker-compose build
+  - docker-compose run wait5
   - docker-compose run app5
   - docker-compose rm -s -f -v
+  - docker-compose run wait8
   - docker-compose run app8  
 
 script:

@@ -25,6 +25,7 @@
     },
     "require-dev": {
         "keboola/coding-standard": ">=9.0.0",
+        "keboola/datadir-tests": "^5.2",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.0"
     },
@@ -35,11 +36,20 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractor\\Tests\\": "tests/Keboola/DbExtractor"
+            "Keboola\\DbExtractor\\FunctionalTests\\": "tests/functional",
+            "Keboola\\DbExtractor\\TraitTests\\": "tests/traits/",
+            "Keboola\\DbExtractor\\Tests\\": "tests/phpunit"
         }
     },
     "scripts": {
-        "tests": "./wait-for-it.sh mysql:$MYSQL_DB_PORT -t 30 -- ./vendor/bin/phpunit",
+        "tests-phpunit": "phpunit --testsuite unit",
+        "tests-datadir": "phpunit --testsuite functional",
+        "tests-perf": "phpunit --testsuite perf",
+        "tests": [
+            "@tests-phpunit",
+            "@tests-datadir",
+            "@tests-perf"
+        ],
         "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",

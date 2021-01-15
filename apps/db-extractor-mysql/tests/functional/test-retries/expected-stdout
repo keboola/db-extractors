@@ -1,0 +1,9 @@
+Connecting to DSN 'mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8'
+PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [1x]
+Connecting to DSN 'mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8'
+PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [2x]
+Connecting to DSN 'mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8'
+PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [3x]
+Connecting to DSN 'mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8'
+PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [4x]
+Connecting to DSN 'mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8'
