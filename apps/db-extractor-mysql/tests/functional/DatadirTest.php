@@ -36,33 +36,15 @@ class DatadirTest extends DatadirTestCase
 
         putenv('SSH_PRIVATE_KEY=' . (string) file_get_contents('/root/.ssh/id_rsa'));
         putenv('SSH_PUBLIC_KEY=' . (string) file_get_contents('/root/.ssh/id_rsa.pub'));
+        putenv('SSL_CA=' . (string) file_get_contents('/ssl-cert/ca.pem'));
+        putenv('SSL_CERT=' . (string) file_get_contents('/ssl-cert/client-cert.pem'));
+        putenv('SSL_KEY=' . (string) file_get_contents('/ssl-cert/client-key.pem'));
     }
 
     public function assertDirectoryContentsSame(string $expected, string $actual): void
     {
         $this->prettifyAllManifests($actual);
         parent::assertDirectoryContentsSame($expected, $actual);
-    }
-
-    protected function modifyConfigJsonContent(string $content): string
-    {
-        $config = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-
-        $sslCa = $config['parameters']['db']['ssl']['ca'] ?? null;
-        $sslCert = $config['parameters']['db']['ssl']['cert'] ?? null;
-        $sslKey = $config['parameters']['db']['ssl']['key'] ?? null;
-
-        if ($sslCa) {
-            $config['parameters']['db']['ssl']['ca'] = $this->getCert($sslCa);
-        }
-        if ($sslCert) {
-            $config['parameters']['db']['ssl']['cert'] = $this->getCert($sslCert);
-        }
-        if ($sslKey) {
-            $config['parameters']['db']['ssl']['key'] = $this->getCert($sslKey);
-        }
-
-        return parent::modifyConfigJsonContent((string) json_encode($config));
     }
 
     protected function setUp(): void
@@ -96,16 +78,6 @@ class DatadirTest extends DatadirTestCase
         }
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $fs = new Filesystem();
-        if ($fs->exists('/usr/local/share/ca-certificates/mssql.crt')) {
-            $fs->remove('/usr/local/share/ca-certificates/mssql.crt');
-            Process::fromShellCommandline('update-ca-certificates --fresh')->mustRun();
-        }
-    }
-
     protected function prettifyAllManifests(string $actual): void
     {
         foreach ($this->findManifests($actual . '/tables') as $file) {
@@ -128,14 +100,5 @@ class DatadirTest extends DatadirTestCase
     {
         $finder = new Finder();
         return $finder->files()->in($dir)->name(['~.*\.manifest~']);
-    }
-
-    private function getCert(string $filename): string
-    {
-        $filepath = sprintf('/ssl-cert/%s', $filename);
-        if (file_exists($filepath)) {
-            return (string) file_get_contents($filepath);
-        }
-        return $filename;
     }
 }
