@@ -1,0 +1,24 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "host": "%env(string:ORACLE_DB_HOST)%",
+      "port": "%env(string:ORACLE_DB_PORT)%",
+      "user": "%env(string:ORACLE_DB_USER)%",
+      "#password": "%env(string:ORACLE_DB_PASSWORD)%",
+      "database": "%env(string:ORACLE_DB_DATABASE)%",
+      "ssh": {
+        "enabled": true,
+        "keys": {
+          "#private": "%env(string:SSH_PRIVATE_KEY)%",
+          "public": "%env(string:SSH_PUBLIC_KEY)%"
+        },
+        "user": "root",
+        "sshHost": "sshproxy",
+        "remoteHost": "ORACLE",
+        "remotePort": "1433",
+        "localPort": "1234"
+      }
+    }
+  }
+}

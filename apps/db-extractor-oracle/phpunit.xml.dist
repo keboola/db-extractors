@@ -13,8 +13,13 @@
         <const name="ROOT_PATH" value="/code/"/>
     </php>
 
-    <testsuite name="MSSQL Extractor Test Suite">
-        <directory>tests</directory>
-    </testsuite>
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/phpunit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>tests/functional</directory>
+        </testsuite>
+    </testsuites>
 
 </phpunit>
