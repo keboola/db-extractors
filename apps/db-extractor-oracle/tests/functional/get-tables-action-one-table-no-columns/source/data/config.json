@@ -1,0 +1,21 @@
+{
+  "action": "getTables",
+  "parameters": {
+    "tableListFilter": {
+      "listColumns": false,
+      "tablesToList": [
+        {
+          "schema": "TESTER",
+          "tableName": "escaping"
+        }
+      ]
+    },
+    "db": {
+      "host": "%env(string:ORACLE_DB_HOST)%",
+      "port": "%env(string:ORACLE_DB_PORT)%",
+      "user": "%env(string:ORACLE_DB_USER)%",
+      "#password": "%env(string:ORACLE_DB_PASSWORD)%",
+      "database": "%env(string:ORACLE_DB_DATABASE)%"
+    }
+  }
+}

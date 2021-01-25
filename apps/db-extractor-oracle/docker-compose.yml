@@ -25,6 +25,7 @@ services:
     volumes:
       - .:/code
       - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./data:/data
     tty: true
     stdin_open: true
     environment:
@@ -50,3 +51,11 @@ services:
       - "2222:22"
     links:
       - oracle
+
+  wait:
+    image: waisbrot/wait
+    depends_on:
+      - oracle
+    environment:
+      - TARGETS=oracle:8080
+      - TIMEOUT=200
