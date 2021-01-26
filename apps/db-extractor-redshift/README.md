@@ -51,7 +51,7 @@ AWS_S3_BUCKET=test-bucket
 ```
 3. Install composer dependencies locally and load test fixtures to S3
 ```$xslt
-docker-compose run --rm dev php ./tests/Keboola/loadS3.php
+docker-compose run --rm dev php ./tests/loadS3.php
 docker-compose run --rm dev composer install
 ```
 4. Run the tests:
