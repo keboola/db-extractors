@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.org/keboola/db-extractor-redshift)
+[![Build Status](https://travis-ci.com/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.com/keboola/db-extractor-redshift)
 
 # Redshift DB Extractor
 
