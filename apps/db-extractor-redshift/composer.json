@@ -10,33 +10,35 @@
         }
     ],
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "ext-PDO": "*",
-        "keboola/db-extractor-common": "^12.2",
-        "keboola/db-extractor-config": "^1.1",
-        "keboola/db-extractor-table-format": "^1.3"
+        "keboola/db-extractor-common": "^13.3",
+        "keboola/db-extractor-config": "^1.4",
+        "keboola/db-extractor-table-format": "^3.1"
     },
     "require-dev": {
-        "aws/aws-sdk-php": "^3.112",
-        "jakub-onderka/php-parallel-lint": "^1.0",
-        "keboola/coding-standard": ">=8.0",
-        "phpstan/phpstan-shim": "^0.11.15",
-        "phpunit/phpunit": "^8.3"
+        "aws/aws-sdk-php": "^3.172",
+        "keboola/coding-standard": "^9.0",
+        "keboola/datadir-tests": "^5.2",
+        "php-parallel-lint/php-parallel-lint": "^1.2",
+        "phpstan/phpstan": "^0.12.69",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
-            "Keboola\\": "src/Keboola/"
+            "Keboola\\DbExtractor\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Keboola\\DbExtractor\\Tests\\": "tests/Keboola/DbExtractor"
+            "Keboola\\DbExtractor\\Tests\\": "tests/phpunit/",
+            "Keboola\\DbExtractor\\TraitTests\\": "tests/traits/"
         }
     },
     "scripts": {
         "tests": "vendor/bin/phpunit",
-        "phpstan": "phpstan analyse --no-progress --level=max -c phpstan.neon src tests",
-        "phpcs": "phpcs --extensions=php src tests",
+        "phpstan": "phpstan analyse --no-progress --level=max -c phpstan.neon ./src ./tests",
+        "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf --extensions=php src tests",
         "phplint": "parallel-lint -j 10 --exclude vendor .",
         "build": [

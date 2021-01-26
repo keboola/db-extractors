@@ -1,10 +1,9 @@
 version: "2"
 services:
-  app:
-    build: .
+  app: &main
+    build:
+      context: .
     image: keboola/ex-db-redshift
-    tty: true
-    stdin_open: true
     environment:
       - REDSHIFT_DB_HOST
       - REDSHIFT_DB_PORT
@@ -16,34 +15,24 @@ services:
       - AWS_SECRET_KEY
       - AWS_REGION
       - AWS_S3_BUCKET
+    volumes:
+      - ssh-keys:/root/.ssh:ro
     links:
       - sshproxy
 
   dev:
-    build: .
-    image: keboola/ex-db-redshift
+    <<: *main
     volumes:
       - .:/code
-    tty: true
-    command: composer ci
-    stdin_open: true
-    environment:
-      - REDSHIFT_DB_HOST
-      - REDSHIFT_DB_PORT
-      - REDSHIFT_DB_DATABASE
-      - REDSHIFT_DB_USER
-      - REDSHIFT_DB_PASSWORD
-      - REDSHIFT_DB_SCHEMA
-      - AWS_ACCESS_KEY
-      - AWS_SECRET_KEY
-      - AWS_REGION
-      - AWS_S3_BUCKET
-    links:
-      - sshproxy
-
+      - ./data:/data
+      - ssh-keys:/root/.ssh:ro
 
   sshproxy:
     image: keboola/db-component-ssh-proxy:latest
     ports:
       - "2222:22"
+    volumes:
+      - ssh-keys:/root/.ssh
 
+volumes:
+  ssh-keys:

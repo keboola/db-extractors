@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 
 $basedir = dirname(__DIR__);
 
-require_once $basedir . '/../vendor/autoload.php';
+require_once $basedir . '/vendor/autoload.php';
 
 $client =  new \Aws\S3\S3Client([
     'region' => getenv('AWS_REGION'),
@@ -20,7 +20,7 @@ $client =  new \Aws\S3\S3Client([
 ]);
 
 // Where the files will be source from
-$source = $basedir . '/data/in/tables';
+$source = $basedir . '/tests/phpunit/data/in/tables';
 
 // Where the files will be transferred to
 $bucket = getenv('AWS_S3_BUCKET');

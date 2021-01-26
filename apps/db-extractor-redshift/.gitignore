@@ -4,7 +4,7 @@ vendor/
 composer.phar
 runtests.sh
 test.php
-tests/data/out
-tests/data/config.yml
+tests/phpunit/data/out
+tests/phpunit/data/config.yml
 .env
 .phpunit.result.cache

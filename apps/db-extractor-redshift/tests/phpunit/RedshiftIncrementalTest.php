@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Csv\CsvReader;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 
@@ -289,7 +289,7 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
 
         $result = ($this->createApplication($config))->run();
         $outputCsvFile = iterator_to_array(
-            new CsvFile(
+            new CsvReader(
                 $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv'
             )
         );
@@ -314,7 +314,10 @@ class RedshiftIncrementalTest extends AbstractRedshiftTest
         unset($config['parameters']['table']);
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('Incremental fetching is not supported for advanced queries.');
+        $this->expectExceptionMessage(
+            'The "incrementalFetchingColumn" is configured,' .
+            ' but incremental fetching is not supported for custom query.'
+        );
         $this->createApplication($config);
     }
 

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\Component\Logger;
 use Keboola\DbExtractor\Application;
-use Keboola\DbExtractorLogger\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 use Keboola\DbExtractor\Test\ExtractorTest;
+use PDO;
 
 abstract class AbstractRedshiftTest extends ExtractorTest
 {
@@ -15,8 +16,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
     protected const DRIVER = 'redshift';
 
-    /** @var string  */
-    protected $dataDir = __DIR__ . '/../../data';
+    protected string $dataDir = __DIR__ . '/data';
 
     public function setUp(): void
     {
@@ -92,7 +92,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
 
     public function createApplication(array $config, array $state = []): Application
     {
-        return new Application($config, new Logger('ex-db-redshift-tests'), $state);
+        return new Application($config, new Logger(), $state);
     }
 
     public function configProvider(): array
@@ -100,10 +100,10 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $this->dataDir = __DIR__ . '/../../data';
         return [
             [
-                $this->getConfig(self::DRIVER),
+                $this->getConfig(),
             ],
             [
-                $this->getConfigRow(self::DRIVER),
+                $this->getConfigRow(),
             ],
         ];
     }
@@ -165,7 +165,7 @@ abstract class AbstractRedshiftTest extends ExtractorTest
         $pdo->exec($query);
     }
 
-    private function getPdoConnection(array $config): \PDO
+    private function getPdoConnection(array $config): PDO
     {
         $dsn = sprintf(
             'pgsql:dbname=%s;port=5439;host=%s',
@@ -173,12 +173,12 @@ abstract class AbstractRedshiftTest extends ExtractorTest
             $config['parameters']['db']['host']
         );
 
-        $pdo = new \PDO(
+        $pdo = new PDO(
             $dsn,
             $config['parameters']['db']['user'],
             $config['parameters']['db']['#password']
         );
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     }
 }
