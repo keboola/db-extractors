@@ -64,6 +64,9 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         /** @var ColumnBuilder[] $columnBuilders */
         $columnBuilders = [];
 
+        /** @var int[] $ordinalPosition */
+        $ordinalPosition = [];
+
         // Process tables
         $tableRequiredProperties = ['type'];
         $columnRequiredProperties= [];
@@ -95,14 +98,15 @@ class OdbcNativeMetadataProvider implements MetadataProvider
                     $columnBuilders[$columnId] = $columnBuilder;
                 }
 
-                $this->processColumnData($columnBuilder, $data);
+                $ordinalPosition[$tableId] = ($ordinalPosition[$tableId] ?? 0) + 1;
+                $this->processColumnData($columnBuilder, $data, $ordinalPosition[$tableId]);
             }
         }
 
         return $builder->build();
     }
 
-    protected function processColumnData(ColumnBuilder $builder, array $data): void
+    protected function processColumnData(ColumnBuilder $builder, array $data, int $ordinalPosition): void
     {
         $type = $data['TYPE_NAME'];
         if (!in_array(strtolower($type), $this->typesWithoutLength)) {
@@ -116,6 +120,8 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         if (isset($data['ORDINAL_POSITION'])) {
             $builder->setOrdinalPosition((int) $data['ORDINAL_POSITION']);
+        } else {
+            $builder->setOrdinalPosition($ordinalPosition);
         }
 
         if (isset($data['NULLABLE'])) {
@@ -154,6 +160,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         $whitelist = empty($whitelist) ? [null] : $whitelist;
         $columns = [];
 
+        $i = 0;
         foreach ($whitelist as $whitelistedTable) {
             $result = odbc_columns(
                 $this->connection->getConnection(),
@@ -166,6 +173,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
                 if ($this->isTableIgnored($column)) {
                     continue;
                 }
+                $column['_index'] = $i++;
                 $columns[] = $column;
             }
             odbc_free_result($result);
@@ -173,8 +181,9 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         // Sort
         usort($columns, function (array $a, array $b) {
-            $aId = $this->getTableId($a) . '_' . ($a['ORDINAL_POSITION'] ?? '');
-            $bId = $this->getTableId($b) . '_' . ($b['ORDINAL_POSITION'] ?? '');
+            // If not ordinal_position is not set, then the order in which the values were read is taken.
+            $aId = $this->getTableId($a) . '_' . ($a['ORDINAL_POSITION'] ?? $a['_index']);
+            $bId = $this->getTableId($b) . '_' . ($b['ORDINAL_POSITION'] ?? $b['_index']);
             return strnatcmp($aId, $bId);
         });
 
