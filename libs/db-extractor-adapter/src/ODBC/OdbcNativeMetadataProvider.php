@@ -20,7 +20,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 {
     private OdbcConnection $connection;
 
-    private string $onlyFromCatalog;
+    private ?string $onlyFromCatalog;
 
     private string $onlyFromSchema;
 
@@ -39,7 +39,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         array $typesWithoutLength = []
     ) {
         $this->connection = $connection;
-        $this->onlyFromCatalog = $onlyFromCatalog ?? '';
+        $this->onlyFromCatalog = $onlyFromCatalog;
         $this->onlyFromSchema = $onlyFromSchema ?? '';
         $this->ignoredCatalogs = $ignoredCatalogs;
         $this->ignoredSchemas = $ignoredSchemas;
@@ -66,7 +66,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         // Process tables
         $tableRequiredProperties = ['type'];
-        $columnRequiredProperties= ['ordinalPosition', 'nullable'];
+        $columnRequiredProperties= [];
         $builder = MetadataBuilder::create($tableRequiredProperties, $columnRequiredProperties);
         foreach ($this->queryTables($whitelist) as $data) {
             $tableId = $this->getTableId($data);
@@ -114,20 +114,29 @@ class OdbcNativeMetadataProvider implements MetadataProvider
             $length = null;
         }
 
-        $builder->setOrdinalPosition((int) $data['ORDINAL_POSITION']);
+        if (isset($data['ORDINAL_POSITION'])) {
+            $builder->setOrdinalPosition((int) $data['ORDINAL_POSITION']);
+        }
+
+        if (isset($data['NULLABLE'])) {
+            $builder->setNullable((int) $data['NULLABLE'] === 1);
+        }
+
+        if (array_key_exists('COLUMN_DEF', $data)) {
+            $builder->setDefault($data['COLUMN_DEF']);
+        }
+
         $builder->setName($data['COLUMN_NAME']);
         $builder->setType($type);
         $builder->setLength($length);
-        $builder->setNullable((int) $data['NULLABLE'] === 1);
-        $builder->setDefault($data['COLUMN_DEF']);
     }
 
 
     protected function processTableData(TableBuilder $builder, array $data): void
     {
         $builder->setName($data['TABLE_NAME']);
-        $builder->setCatalog($data['TABLE_CAT'] ?? null);
-        $builder->setSchema($data['TABLE_SCHEM'] ?? null);
+        $builder->setCatalog($data['TABLE_CAT'] ?? $data['TABLE_QUALIFIER'] ?? null);
+        $builder->setSchema($data['TABLE_SCHEM'] ?? $data['TABLE_OWNER'] ?? null);
         $builder->setType(strpos($data['TABLE_TYPE'], 'VIEW') !== false ? 'view' : 'table');
     }
 
@@ -164,8 +173,8 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         // Sort
         usort($columns, function (array $a, array $b) {
-            $aId = $this->getTableId($a) . '_' . $a['ORDINAL_POSITION'];
-            $bId = $this->getTableId($b) . '_' . $b['ORDINAL_POSITION'];
+            $aId = $this->getTableId($a) . '_' . ($a['ORDINAL_POSITION'] ?? '');
+            $bId = $this->getTableId($b) . '_' . ($b['ORDINAL_POSITION'] ?? '');
             return strnatcmp($aId, $bId);
         });
 
