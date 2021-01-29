@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.org/keboola/db-extractor-redshift)
+[![Build Status](https://travis-ci.com/keboola/db-extractor-redshift.svg?branch=master)](https://travis-ci.com/keboola/db-extractor-redshift)
 
 # Redshift DB Extractor
 
@@ -44,6 +44,7 @@ REDSHIFT_DB_PORT=5439
 REDSHIFT_DB_DATABASE=testdb
 REDSHIFT_DB_USER=testuser
 REDSHIFT_DB_PASSWORD=testpassword
+REDSHIFT_DB_SCHEMA=testschema
 AWS_ACCESS_KEY=aws_access_key
 AWS_SECRET_KEY=aws_secret_key
 AWS_REGION=eu-west-1
@@ -51,7 +52,7 @@ AWS_S3_BUCKET=test-bucket
 ```
 3. Install composer dependencies locally and load test fixtures to S3
 ```$xslt
-docker-compose run --rm dev php ./tests/Keboola/loadS3.php
+docker-compose run --rm dev php ./tests/loadS3.php
 docker-compose run --rm dev composer install
 ```
 4. Run the tests:

@@ -6,11 +6,11 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false"
+         stopOnFailure="true"
          bootstrap="vendor/autoload.php">
 
     <testsuite name="DB Extractor Redshift Test Suite">
-        <directory>tests/Keboola/DbExtractor</directory>
+        <directory>tests/phpunit</directory>
     </testsuite>
 
 </phpunit>

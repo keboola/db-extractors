@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Csv\CsvReader;
+use Keboola\DbExtractor\TraitTests\CloseSshTunnelsTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class RedshiftApplicationTest extends AbstractRedshiftTest
 {
-    protected const ROOT_PATH = __DIR__ . '/../../..';
+    use CloseSshTunnelsTrait;
+
+    protected const ROOT_PATH = '/code/src';
+
+    public function setUp(): void
+    {
+        $this->closeSshTunnels();
+        parent::setUp();
+    }
 
     private function prepareConfig(array $config): void
     {
@@ -24,11 +33,11 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $config['action'] = 'testConnection';
         $this->prepareConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
-
-        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals(0, $process->getExitCode(), $process->getErrorOutput() . $process->getOutput());
         $this->assertJson($process->getOutput());
         $this->assertEquals('', $process->getErrorOutput());
     }
@@ -50,11 +59,12 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
 
         $this->prepareConfig($config);
 
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 
-        $this->assertEquals(0, $process->getExitCode());
+        $this->assertEquals(0, $process->getExitCode(), $process->getErrorOutput() . $process->getOutput());
         $this->assertStringContainsString(
             'Creating SSH tunnel to \'sshproxy\' on local port \'33308\'',
             $process->getOutput()
@@ -69,7 +79,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->prepareConfig($config);
 
         // run entrypoint
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 
@@ -86,7 +97,6 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
 
         $this->assertFileExists($outputCsvFile);
         $this->assertFileExists($outputManifestFile);
-        ;
         $this->assertEquals(file_get_contents($expectedCsvFile), file_get_contents($outputCsvFile));
         $this->assertEquals('in.c-main.escaping', $manifest['destination']);
         $this->assertEquals(true, $manifest['incremental']);
@@ -111,7 +121,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->prepareConfig($config);
 
         // run entrypoint
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 
@@ -134,13 +145,13 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->assertFileExists($outputCsvFile2);
         $this->assertFileExists($outputManifestFile1);
         $this->assertFileExists($outputManifestFile2);
-        $outputArr1 = iterator_to_array(new CsvFile($outputCsvFile1));
-        $expectedArr1 = iterator_to_array(new CsvFile($expectedCsvFile1));
+        $outputArr1 = iterator_to_array(new CsvReader($outputCsvFile1));
+        $expectedArr1 = iterator_to_array(new CsvReader($expectedCsvFile1));
         foreach ($expectedArr1 as $row) {
             $this->assertContains($row, $outputArr1);
         }
-        $outputArr2 = iterator_to_array(new CsvFile($outputCsvFile2));
-        $expectedArr2 = iterator_to_array(new CsvFile($expectedCsvFile2));
+        $outputArr2 = iterator_to_array(new CsvReader($outputCsvFile2));
+        $expectedArr2 = iterator_to_array(new CsvReader($expectedCsvFile2));
         // simple queries don't have headers
         array_shift($expectedArr2);
 
@@ -168,7 +179,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         $this->prepareConfig($config);
 
         // run entrypoint
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 
@@ -202,7 +214,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
 
         file_put_contents($this->dataDir . '/config.json', json_encode($config));
 
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 
@@ -217,7 +230,8 @@ class RedshiftApplicationTest extends AbstractRedshiftTest
         file_put_contents($inputStateFile, file_get_contents($outputStateFile));
 
         // run the config again
-        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php --data=' . $this->dataDir);
+        $process = Process::fromShellCommandline('php ' . self::ROOT_PATH . '/run.php');
+        $process->setEnv(['KBC_DATADIR' => $this->dataDir]);
         $process->setTimeout(300);
         $process->run();
 

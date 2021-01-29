@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Csv\CsvFile;
+use Keboola\Component\Logger;
+use Keboola\Csv\CsvReader;
 use Keboola\DbExtractor\Application;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Extractor\Redshift;
-use Keboola\DbExtractorLogger\Logger;
+use Keboola\DbExtractor\TraitTests\CloseSshTunnelsTrait;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 
 class RedshiftTest extends AbstractRedshiftTest
 {
+    use CloseSshTunnelsTrait;
+
+    public function setUp(): void
+    {
+        $this->closeSshTunnels();
+        parent::setUp();
+    }
+
     private function runApp(Application $app): void
     {
         $result = $app->run();
@@ -38,9 +49,9 @@ class RedshiftTest extends AbstractRedshiftTest
         $app = $this->createApplication($this->getConfigRow(self::DRIVER));
 
         $result = $app->run();
-        $expectedOutput = iterator_to_array(new CsvFile($this->dataDir .  '/in/tables/escaping.csv'));
+        $expectedOutput = iterator_to_array(new CsvReader($this->dataDir .  '/in/tables/escaping.csv'));
         array_shift($expectedOutput);
-        $outputArray = iterator_to_array(new CsvFile(
+        $outputArray = iterator_to_array(new CsvReader(
             sprintf('%s/out/tables/%s.csv', $this->dataDir, strtolower($result['imported']['outputTable']))
         ));
         $outputManifestFile = sprintf(
@@ -198,7 +209,7 @@ class RedshiftTest extends AbstractRedshiftTest
         try {
             $this->runApp($this->createApplication($config));
             $this->fail('Failing query must raise exception.');
-        } catch (\Keboola\DbExtractor\Exception\UserException $e) {
+        } catch (UserException $e) {
             // test that the error message contains the query name
             $this->assertStringContainsString('[dummy]: DB query failed: SQLSTATE[42P01]:', $e->getMessage());
         }
@@ -247,52 +258,29 @@ class RedshiftTest extends AbstractRedshiftTest
 
         $this->assertCount(1, $result['tables']);
 
-        $expectedData = array (
-                array (
-                    'name' => 'escaping',
-                    'schema' => self::TESTING_SCHEMA_NAME,
-                    'type' => 'BASE TABLE',
-                    'catalog' => $config['parameters']['db']['database'],
-                    'columns' =>
-                        array (
-                            0 =>
-                                array (
-                                    'name' => 'col1',
-                                    'type' => 'character varying',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'length' => '256',
-                                    'nullable' => false,
-                                    'default' => 'a',
-                                    'ordinalPosition' => 1,
-                                    'sanitizedName' => 'col1',
-                                ),
-                            1 =>
-                                array (
-                                    'name' => 'col2',
-                                    'type' => 'character varying',
-                                    'primaryKey' => true,
-                                    'uniqueKey' => false,
-                                    'length' => '256',
-                                    'nullable' => false,
-                                    'default' => 'b',
-                                    'ordinalPosition' => 2,
-                                    'sanitizedName' => 'col2',
-                                ),
-                            2 =>
-                                array (
-                                    'name' => 'col3',
-                                    'type' => 'character varying',
-                                    'primaryKey' => false,
-                                    'uniqueKey' => false,
-                                    'length' => '256',
-                                    'nullable' => true,
-                                    'ordinalPosition' => 3,
-                                    'sanitizedName' => 'col3',
-                                ),
-                        ),
-                ),
-        );
+        $expectedData = [
+            [
+                'name' => 'escaping',
+                'schema' => self::TESTING_SCHEMA_NAME,
+                'columns' => [
+                    [
+                        'name' => 'col1',
+                        'type' => 'character varying',
+                        'primaryKey' => true,
+                    ],
+                    [
+                        'name' => 'col2',
+                        'type' => 'character varying',
+                        'primaryKey' => true,
+                    ],
+                    [
+                        'name' => 'col3',
+                        'type' => 'character varying',
+                        'primaryKey' => false,
+                    ],
+                ],
+            ],
+        ];
         $this->assertEquals($expectedData, $result['tables']);
     }
 
@@ -319,139 +307,117 @@ class RedshiftTest extends AbstractRedshiftTest
         $this->assertArrayHasKey('incremental', $outputManifest);
         $this->assertArrayHasKey('metadata', $outputManifest);
 
-        $expectedTableMetadata = array (
-            0 =>
-                array (
-                    'key' => 'KBC.name',
-                    'value' => 'escaping',
-                ),
-            1 =>
-                array (
-                    'key' => 'KBC.schema',
-                    'value' => self::TESTING_SCHEMA_NAME,
-                ),
-            2 =>
-                array (
-                    'key' => 'KBC.catalog',
-                    'value' => $config['parameters']['db']['database'],
-                ),
-            3 =>
-                array (
-                    'key' => 'KBC.type',
-                    'value' => 'BASE TABLE',
-                ),
-        );
+        $expectedTableMetadata = [
+            [
+                'key' => 'KBC.name',
+                'value' => 'escaping',
+            ],
+            [
+                'key' => 'KBC.sanitizedName',
+                'value' => 'escaping',
+            ],
+            [
+                'key' => 'KBC.schema',
+                'value' => self::TESTING_SCHEMA_NAME,
+            ],
+            [
+                'key' => 'KBC.catalog',
+                'value' => $config['parameters']['db']['database'],
+            ],
+            [
+                'key' => 'KBC.type',
+                'value' => 'BASE TABLE',
+            ],
+        ];
 
         $this->assertEquals($expectedTableMetadata, $outputManifest['metadata']);
 
-        $expectedColumnMetadata = array (
-            'col1' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'character varying',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => false,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => 256,
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.datatype.default',
-                            'value' => 'a',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'col1',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'col1',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => true,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                    9 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => 1,
-                        ),
-                ),
-            'col2' =>
-                array (
-                    0 =>
-                        array (
-                            'key' => 'KBC.datatype.type',
-                            'value' => 'character varying',
-                        ),
-                    1 =>
-                        array (
-                            'key' => 'KBC.datatype.nullable',
-                            'value' => false,
-                        ),
-                    2 =>
-                        array (
-                            'key' => 'KBC.datatype.basetype',
-                            'value' => 'STRING',
-                        ),
-                    3 =>
-                        array (
-                            'key' => 'KBC.datatype.length',
-                            'value' => 256,
-                        ),
-                    4 =>
-                        array (
-                            'key' => 'KBC.datatype.default',
-                            'value' => 'b',
-                        ),
-                    5 =>
-                        array (
-                            'key' => 'KBC.sourceName',
-                            'value' => 'col2',
-                        ),
-                    6 =>
-                        array (
-                            'key' => 'KBC.sanitizedName',
-                            'value' => 'col2',
-                        ),
-                    7 =>
-                        array (
-                            'key' => 'KBC.primaryKey',
-                            'value' => true,
-                        ),
-                    8 =>
-                        array (
-                            'key' => 'KBC.uniqueKey',
-                            'value' => false,
-                        ),
-                    9 =>
-                        array (
-                            'key' => 'KBC.ordinalPosition',
-                            'value' => 2,
-                        ),
-                ),
-        );
+        $expectedColumnMetadata = [
+            'col1' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'character varying',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => 256,
+                ],
+                [
+                    'key' => 'KBC.datatype.default',
+                    'value' => 'a',
+                ],
+                [
+                    'key' => 'KBC.sourceName',
+                    'value' => 'col1',
+                ],
+                [
+                    'key' => 'KBC.sanitizedName',
+                    'value' => 'col1',
+                ],
+                [
+                    'key' => 'KBC.primaryKey',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.uniqueKey',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.ordinalPosition',
+                    'value' => 1,
+                ],
+            ],
+            'col2' => [
+                [
+                    'key' => 'KBC.datatype.type',
+                    'value' => 'character varying',
+                ],
+                [
+                    'key' => 'KBC.datatype.nullable',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.datatype.basetype',
+                    'value' => 'STRING',
+                ],
+                [
+                    'key' => 'KBC.datatype.length',
+                    'value' => 256,
+                ],
+                [
+                    'key' => 'KBC.datatype.default',
+                    'value' => 'b',
+                ],
+                [
+                    'key' => 'KBC.sourceName',
+                    'value' => 'col2',
+                ],
+                [
+                    'key' => 'KBC.sanitizedName',
+                    'value' => 'col2',
+                ],
+                [
+                    'key' => 'KBC.primaryKey',
+                    'value' => true,
+                ],
+                [
+                    'key' => 'KBC.uniqueKey',
+                    'value' => false,
+                ],
+                [
+                    'key' => 'KBC.ordinalPosition',
+                    'value' => 2,
+                ],
+            ],
+        ];
         $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
     }
 
@@ -460,6 +426,11 @@ class RedshiftTest extends AbstractRedshiftTest
      */
     public function testGetSimplifiedPdoQuery(array $params, array $state, string $expected): void
     {
+        $params['outputTable'] = 'test';
+        $params['query'] = '';
+        $params['primaryKey'] = [];
+        $params['retries'] = 3;
+        $exportConfig = ExportConfig::fromArray($params);
         if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
             $config = $this->getConfigRow();
             $config['parameters']['incrementalFetchingColumn'] = '_weird-i-d';
@@ -467,29 +438,21 @@ class RedshiftTest extends AbstractRedshiftTest
             $config['parameters']['outputTable'] = 'in.c-main.auto-increment-timestamp';
             $config['parameters']['columns'] = [];
             $this->createAutoIncrementAndTimestampTable($config);
-            $extractor = new Redshift($config['parameters'], $state, new Logger('mssql-extractor-test'));
-            $extractor->validateIncrementalFetching(
-                $params['table'],
-                $params['incrementalFetchingColumn'],
-                isset($params['incrementalFetchingLimit']) ? $params['incrementalFetchingLimit'] : null
-            );
+            $extractor = new Redshift($config['parameters'], $state, new Logger());
+            $extractor->validateIncrementalFetching($exportConfig);
         } else {
             $config = $this->getConfig();
-            $extractor = new Redshift($config['parameters'], $state, new Logger('mssql-extractor-test'));
+            $extractor = new Redshift($config['parameters'], $state, new Logger());
         }
-        $query = $extractor->simpleQuery($params['table'], $params['columns']);
+        $query = $extractor->simpleQuery($exportConfig);
         $this->assertEquals($expected, $query);
 
         $config = $this->getConfig();
-        $extractor = new Redshift($config['parameters'], $state, new Logger('redshift-extractor-test'));
+        $extractor = new Redshift($config['parameters'], $state, new Logger());
         if (isset($params['incrementalFetchingColumn']) && $params['incrementalFetchingColumn'] !== '') {
-            $extractor->validateIncrementalFetching(
-                $params['table'],
-                $params['incrementalFetchingColumn'],
-                isset($params['incrementalFetchingLimit']) ? $params['incrementalFetchingLimit'] : null
-            );
+            $extractor->validateIncrementalFetching($exportConfig);
         }
-        $query = $extractor->simpleQuery($params['table'], $params['columns']);
+        $query = $extractor->simpleQuery($exportConfig);
         $this->assertEquals($expected, $query);
     }
 
@@ -583,29 +546,6 @@ class RedshiftTest extends AbstractRedshiftTest
                 'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
                 ' FROM "testing"."auto_increment_timestamp"' .
                 ' ORDER BY "timestamp"',
-            ],
-            'test simplePDO query id column and previos state and no limit' => [
-                [
-                    'table' => [
-                        'tableName' => 'auto_increment_timestamp',
-                        'schema' => 'testing',
-                    ],
-                    'columns' => [
-                        '_weird-i-d',
-                        'weird-name',
-                        'decimalcolumn',
-                        'timestamp',
-                    ],
-                    'incrementalFetchingLimit' => 0,
-                    'incrementalFetchingColumn' => '_weird-i-d',
-                ],
-                [
-                    'lastFetchedRow' => 4,
-                ],
-                'SELECT "_weird-i-d", "weird-name", "decimalcolumn", "timestamp"' .
-                ' FROM "testing"."auto_increment_timestamp"' .
-                ' WHERE "_weird-i-d" >= 4' .
-                ' ORDER BY "_weird-i-d"',
             ],
             'test simplePDO query datetime column and previos state and limit' => [
                 [
