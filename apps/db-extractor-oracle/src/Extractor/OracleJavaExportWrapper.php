@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\Component\JsonHelper;
+use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
 use Keboola\DbExtractor\Configuration\Serializer\OracleDatabaseConfigSerializer;
 use Keboola\DbExtractor\DbRetryProxy;
@@ -74,7 +75,7 @@ class OracleJavaExportWrapper
         int $maxRetries,
         string $outputFile,
         bool $includeHeader
-    ): int {
+    ): ExportResult {
         $process = $this->runAction(
             'export',
             $this->writeExportConfig($query, $outputFile),
@@ -88,7 +89,7 @@ class OracleJavaExportWrapper
         $fetchedPos = (int) strpos($output, 'Fetched');
         $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
         $linesWritten = (int) filter_var($rowCountStr, FILTER_SANITIZE_NUMBER_INT);
-        return $linesWritten;
+        return new ExportResult($outputFile, $linesWritten, null);
     }
 
     private function runAction(

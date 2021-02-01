@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Adapter\ExportAdapter;
+use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
+use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
 use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
-use Throwable;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
-use function Keboola\Utils\formatDateTime;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Keboola\Datatype\Definition\Exception\InvalidLengthException;
@@ -25,6 +26,10 @@ class Oracle extends BaseExtractor
 
     private ?string $incrementalFetchingType = null;
 
+    private OracleQueryFactory $queryFactory;
+
+    private OracleDbConnection $connection;
+
     public function createConnection(DatabaseConfig $databaseConfig): void
     {
         // OracleJavaExportWrapper must be created after parent constructor,
@@ -37,59 +42,20 @@ class Oracle extends BaseExtractor
         return new OracleMetadataProvider($this->exportWrapper);
     }
 
-    public function export(ExportConfig $exportConfig): array
+    protected function createExportAdapter(): ExportAdapter
     {
-        if ($exportConfig->isIncrementalFetching()) {
-            $this->validateIncrementalFetching($exportConfig);
-        }
-
-        $this->logger->info('Exporting to ' . $exportConfig->getOutputTable());
-
-        // Max value
-        $maxValue = $exportConfig->hasTable() && $exportConfig->isIncrementalFetching() ?
-            $this->getMaxOfIncrementalFetchingColumn($exportConfig) : null;
-
-        // Query
-        $query = $exportConfig->hasQuery() ?
-            rtrim($exportConfig->getQuery(), ' ;') :
-            $this->simpleQuery($exportConfig);
-
-        // Export
-        try {
-            $linesWritten = $this->exportWrapper->export(
-                $query,
-                $exportConfig->getMaxRetries(),
-                $this->getOutputFilename($exportConfig->getOutputTable()),
-                $exportConfig->hasQuery()
-            );
-        } catch (Throwable $e) {
-            $logPrefix = $exportConfig->hasConfigName() ?
-                $exportConfig->getConfigName() : $exportConfig->getOutputTable();
-            throw $this->handleDbError($e, $exportConfig->getMaxRetries(), $logPrefix);
-        }
-
-        $rowCount = $linesWritten - 1;
-        if ($rowCount > 0) {
-            $this->createManifest($exportConfig);
-        } else {
-            @unlink($this->getOutputFilename($exportConfig->getOutputTable())); // no rows, no file
-            $this->logger->warning(sprintf(
-                'Query returned empty result. Nothing was imported to [%s]',
-                $exportConfig->getOutputTable()
-            ));
-        }
-
-        $output = [
-            'outputTable' => $exportConfig->getOutputTable(),
-            'rows' => $rowCount,
-        ];
-
-        // output state
-        if ($maxValue) {
-            $output['state']['lastFetchedRow'] = $maxValue;
-        }
-
-        return $output;
+        $this->queryFactory = new OracleQueryFactory($this->state);
+        $resultWriter = new DefaultResultWriter($this->state);
+        $this->connection = new OracleDbConnection();
+        return new OracleExportAdapter(
+            $this->logger,
+            $this->queryFactory,
+            $resultWriter,
+            $this->connection,
+            $this->exportWrapper,
+            $this->dataDir,
+            $this->state
+        );
     }
 
     public function validateIncrementalFetching(ExportConfig $exportConfig): void
@@ -126,13 +92,14 @@ class Oracle extends BaseExtractor
                 )
             );
         }
+        $this->queryFactory->setIncrementalFetchingColType($this->incrementalFetchingType);
     }
 
     public function getMaxOfIncrementalFetchingColumn(ExportConfig $exportConfig): ?string
     {
         $outputFile = $this->getOutputFilename('last_row');
         $this->exportWrapper->export(
-            $this->getLastRowQuery($exportConfig),
+            $this->queryFactory->createLastRowQuery($exportConfig, $this->connection),
             $exportConfig->getMaxRetries(),
             $outputFile,
             false
@@ -143,81 +110,20 @@ class Oracle extends BaseExtractor
         return $value;
     }
 
-
     public function testConnection(): void
     {
         $this->exportWrapper->testConnection();
     }
 
-
-    public function simpleQuery(ExportConfig $exportConfig): string
-    {
-        $sql = [];
-        $where = [];
-
-        if ($exportConfig->hasColumns()) {
-            $sql[] = sprintf('SELECT %s', implode(', ', array_map(
-                fn(string $c) => $this->quote($c),
-                $exportConfig->getColumns()
-            )));
-        } else {
-            $sql[] = 'SELECT *';
-        }
-
-        $sql[] = sprintf(
-            'FROM %s.%s',
-            $this->quote($exportConfig->getTable()->getSchema()),
-            $this->quote($exportConfig->getTable()->getName())
-        );
-
-        if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
-            if ($this->incrementalFetchingType === self::INCREMENT_TYPE_NUMERIC) {
-                $lastFetchedRow = $this->state['lastFetchedRow'];
-            } else if ($this->incrementalFetchingType === self::INCREMENT_TYPE_DATE) {
-                $lastFetchedRow = sprintf(
-                    "DATE '%s'",
-                    formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
-                );
-            } else {
-                $lastFetchedRow = $this->quote((string) $this->state['lastFetchedRow']);
-            }
-
-            // intentionally ">=" last row should be included, it is handled by storage deduplication process
-            $where[] = sprintf(
-                '%s >= %s',
-                $this->quote($exportConfig->getIncrementalFetchingColumn()),
-                $lastFetchedRow
-            );
-        }
-
-        if ($exportConfig->hasIncrementalFetchingLimit()) {
-            $where[] = sprintf('ROWNUM <= %d', $exportConfig->getIncrementalFetchingLimit());
-        }
-
-        if ($where) {
-            $sql[] = sprintf('WHERE %s', implode(' AND ', $where));
-        }
-
-        return implode(' ', $sql);
-    }
-
-    private function getLastRowQuery(ExportConfig $exportConfig): string
-    {
-        return sprintf(
-            'SELECT %s FROM (SELECT * FROM (%s) ORDER BY %s DESC) WHERE ROWNUM = 1',
-            $this->quote($exportConfig->getIncrementalFetchingColumn()),
-            $this->simpleQuery($exportConfig),
-            $this->quote($exportConfig->getIncrementalFetchingColumn()),
-        );
-    }
-
-    private function quote(string $obj): string
-    {
-        return "\"{$obj}\"";
-    }
-
     protected function createDatabaseConfig(array $data): DatabaseConfig
     {
         return OracleDatabaseConfig::fromArray($data);
+    }
+
+    protected function canFetchMaxIncrementalValueSeparately(ExportConfig $exportConfig): bool
+    {
+        return
+            !$exportConfig->hasQuery() &&
+            $exportConfig->isIncrementalFetching();
     }
 }
