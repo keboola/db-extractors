@@ -4,33 +4,30 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
-use Keboola\DbExtractor\Adapter\BaseExportAdapter;
+use Keboola\CommonExceptions\UserExceptionInterface;
+use Keboola\DbExtractor\Adapter\Connection\DbConnection;
+use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
+use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
-use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
-class OracleExportAdapter extends BaseExportAdapter
+class OracleExportAdapter implements ExportAdapter
 {
+
+    protected DbConnection $connection;
+
+    protected QueryFactory $simpleQueryFactory;
 
     protected OracleJavaExportWrapper $exportWrapper;
 
     public function __construct(
-        LoggerInterface $logger,
         QueryFactory $simpleQueryFactory,
-        ResultWriter $resultWriter,
         OracleDbConnection $connection,
-        OracleJavaExportWrapper $exportWrapper,
-        string $dataDir,
-        array $state
+        OracleJavaExportWrapper $exportWrapper
     ) {
-        $this->logger = $logger;
         $this->simpleQueryFactory = $simpleQueryFactory;
-        $this->resultWriter = $resultWriter;
-        $this->dataDir = $dataDir;
-        $this->state = $state;
         $this->connection = $connection;
         $this->exportWrapper = $exportWrapper;
     }
@@ -57,8 +54,26 @@ class OracleExportAdapter extends BaseExportAdapter
         }
     }
 
+    protected function createSimpleQuery(ExportConfig $exportConfig): string
+    {
+        return $this->simpleQueryFactory->create($exportConfig, $this->connection);
+    }
+
     public function getName(): string
     {
         return 'Oracle';
+    }
+
+    protected function handleDbError(Throwable $e, int $maxRetries, ?string $outputTable = null): UserExceptionInterface
+    {
+        $message = $outputTable ? sprintf('[%s]: ', $outputTable) : '';
+        $message .= sprintf('DB query failed: %s', $e->getMessage());
+
+        // Retry mechanism can be disabled
+        if ($maxRetries > 1) {
+            $message .= sprintf(' Tried %d times.', $maxRetries);
+        }
+
+        return new UserRetriedException($message, 0, $e);
     }
 }

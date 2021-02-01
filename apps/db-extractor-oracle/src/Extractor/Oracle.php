@@ -43,16 +43,11 @@ class Oracle extends BaseExtractor
     protected function createExportAdapter(): ExportAdapter
     {
         $this->queryFactory = new OracleQueryFactory($this->state);
-        $resultWriter = new DefaultResultWriter($this->state);
         $this->connection = new OracleDbConnection();
         return new OracleExportAdapter(
-            $this->logger,
             $this->queryFactory,
-            $resultWriter,
             $this->connection,
-            $this->exportWrapper,
-            $this->dataDir,
-            $this->state
+            $this->exportWrapper
         );
     }
 
