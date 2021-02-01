@@ -24,8 +24,6 @@ class Oracle extends BaseExtractor
 
     private OracleJavaExportWrapper $exportWrapper;
 
-    private ?string $incrementalFetchingType = null;
-
     private OracleQueryFactory $queryFactory;
 
     private OracleDbConnection $connection;
@@ -76,11 +74,11 @@ class Oracle extends BaseExtractor
         try {
             $datatype = new GenericStorage($column->getType());
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
-                $this->incrementalFetchingType = self::INCREMENT_TYPE_NUMERIC;
+                $incrementalFetchingType = self::INCREMENT_TYPE_NUMERIC;
             } else if ($datatype->getBasetype() === 'TIMESTAMP') {
-                $this->incrementalFetchingType = self::INCREMENT_TYPE_TIMESTAMP;
+                $incrementalFetchingType = self::INCREMENT_TYPE_TIMESTAMP;
             } else if ($datatype->getBasetype() === 'DATE') {
-                $this->incrementalFetchingType = self::INCREMENT_TYPE_DATE;
+                $incrementalFetchingType = self::INCREMENT_TYPE_DATE;
             } else {
                 throw new UserException('invalid incremental fetching column type');
             }
@@ -92,7 +90,7 @@ class Oracle extends BaseExtractor
                 )
             );
         }
-        $this->queryFactory->setIncrementalFetchingColType($this->incrementalFetchingType);
+        $this->queryFactory->setIncrementalFetchingColType($incrementalFetchingType);
     }
 
     public function getMaxOfIncrementalFetchingColumn(ExportConfig $exportConfig): ?string
