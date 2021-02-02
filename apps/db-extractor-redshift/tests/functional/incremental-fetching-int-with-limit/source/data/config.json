@@ -1,0 +1,23 @@
+{
+  "parameters": {
+    "id": 3,
+    "enabled": true,
+    "name": "auto-increment-timestamp",
+    "outputTable": "in.c-main.auto-increment-timestamp",
+    "incremental": true,
+    "incrementalFetchingColumn": "_weir%d i-d",
+    "incrementalFetchingLimit": 2,
+    "primaryKey": ["_weir%d i-d"],
+    "table": {
+      "schema": "%env(string:REDSHIFT_DB_SCHEMA)%",
+      "tableName": "auto increment timestamp"
+    },
+    "db": {
+      "host": "%env(string:REDSHIFT_DB_HOST)%",
+      "port": "%env(string:REDSHIFT_DB_PORT)%",
+      "user": "%env(string:REDSHIFT_DB_USER)%",
+      "#password": "%env(string:REDSHIFT_DB_PASSWORD)%",
+      "database": "%env(string:REDSHIFT_DB_DATABASE)%"
+    }
+  }
+}

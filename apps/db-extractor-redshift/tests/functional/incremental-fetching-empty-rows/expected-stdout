@@ -1,0 +1,3 @@
+Connecting to pgsql:dbname=%s;port=%d;host=%s.redshift.amazonaws.com
+Exporting to in.c-main.auto-increment-timestamp
+Extractor finished successfully.
