@@ -20,7 +20,10 @@ ENV TZ=UTC
 WORKDIR /code
 
 RUN apt-get update -q \
-  && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr --no-install-recommends
+  && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr libicu-dev --no-install-recommends
+
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
 
 # Table exporter
 COPY --from=1 /tmp/table-exporter.jar /opt/table-exporter.jar
