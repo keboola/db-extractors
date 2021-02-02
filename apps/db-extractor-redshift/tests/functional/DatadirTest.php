@@ -38,8 +38,33 @@ class DatadirTest extends DatadirTestCase
 
     public function assertDirectoryContentsSame(string $expected, string $actual): void
     {
+        $this->replaceEnvInManifest($actual);
         $this->prettifyAllManifests($actual);
         parent::assertDirectoryContentsSame($expected, $actual);
+    }
+
+    protected function replaceEnvInManifest(string $actual): void
+    {
+        foreach ($this->findManifests($actual . '/tables') as $file) {
+            $filePath = (string) $file->getRealPath();
+            $json = (string) file_get_contents($filePath);
+            try {
+                file_put_contents(
+                    $filePath,
+                    str_ireplace(
+                        [
+                            sprintf('"%s"', getenv('REDSHIFT_DB_DATABASE')),
+                            sprintf('"%s"', getenv('REDSHIFT_DB_USER')),
+                        ],
+                        '"replaceEnv"',
+                        $json
+                    )
+                );
+            } catch (Throwable $e) {
+                // If a problem occurs, preserve the original contents
+                file_put_contents($filePath, $json);
+            }
+        }
     }
 
     protected function setUp(): void

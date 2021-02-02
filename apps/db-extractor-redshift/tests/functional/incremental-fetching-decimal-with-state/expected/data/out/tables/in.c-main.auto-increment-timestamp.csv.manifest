@@ -19,7 +19,7 @@
         },
         {
             "key": "KBC.catalog",
-            "value": "keboola"
+            "value": "replaceEnv"
         },
         {
             "key": "KBC.type",
