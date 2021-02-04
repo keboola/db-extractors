@@ -6,11 +6,15 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="true"
-         bootstrap="vendor/autoload.php">
+         stopOnFailure="false"
+         bootstrap="tests/bootstrap.php">
 
-    <testsuite name="DB Extractor Redshift Test Suite">
-        <directory>tests/phpunit</directory>
-    </testsuite>
-
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/phpunit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>tests/functional</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>

@@ -1,0 +1,4 @@
+Connecting to pgsql:dbname=%s;port=5439;host=%s.redshift.amazonaws.com
+Exporting to in.c-main.escaping
+Exporting to in.c-main.sales
+Extractor finished successfully.
