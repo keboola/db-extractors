@@ -28,6 +28,8 @@ class OracleJavaExportWrapper
 
     private OracleDatabaseConfig $databaseConfig;
 
+    private array $javaDbConfig;
+
     public function __construct(LoggerInterface $logger, string $dataDir, DatabaseConfig $databaseConfig)
     {
         if (!($databaseConfig instanceof OracleDatabaseConfig)) {
@@ -36,6 +38,7 @@ class OracleJavaExportWrapper
         $this->logger = $logger;
         $this->dataDir = $dataDir;
         $this->databaseConfig = $databaseConfig;
+        $this->javaDbConfig = OracleDatabaseConfigSerializer::serialize($this->logger, $this->databaseConfig);
     }
 
     public function testConnection(): void
@@ -147,7 +150,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('test connection', [
             'parameters' => [
-                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => $this->javaDbConfig,
             ],
         ]);
     }
@@ -159,7 +162,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('get tables', [
             'parameters' => [
-                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => $this->javaDbConfig,
                 'outputFile' => $outputFile,
                 'tables' => array_map(function (InputTable $table) {
                     return [
@@ -176,7 +179,7 @@ class OracleJavaExportWrapper
     {
         return $this->writeConfig('export', [
             'parameters' => [
-                'db' => OracleDatabaseConfigSerializer::serialize($this->databaseConfig),
+                'db' => $this->javaDbConfig,
                 'query' => $query,
                 'outputFile' => $outputFile,
             ],

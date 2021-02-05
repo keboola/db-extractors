@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\FunctionalTests;
 
 use Keboola\DatadirTests\DatadirTestCase;
+use Keboola\DatadirTests\Exception\DatadirTestsException;
 use Keboola\DbExtractor\TraitTests\CloseSshTunnelsTrait;
 use Keboola\DbExtractor\TraitTests\RemoveAllTablesTrait;
 use PDO;
@@ -25,9 +26,16 @@ class DatadirTest extends DatadirTestCase
 
     protected string $testTempDir;
 
+    protected ?string $kbcRealuser = null;
+
     public function getConnection(): TestConnection
     {
         return $this->connection;
+    }
+
+    public function setKbcRealUser(?string $realUser): void
+    {
+        $this->kbcRealuser = $realUser;
     }
 
     public static function setUpBeforeClass(): void
@@ -47,6 +55,9 @@ class DatadirTest extends DatadirTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Clear KBC_REALUSER env
+        $this->kbcRealuser = null;
 
         // Test dir, eg. "/code/tests/functional/full-load-ok"
         $this->testProjectDir = $this->getTestFileDir() . '/' . $this->dataName();
@@ -92,5 +103,31 @@ class DatadirTest extends DatadirTestCase
     {
         $finder = new Finder();
         return $finder->files()->in($dir)->name(['~.*\.manifest~']);
+    }
+
+    protected function runScript(string $datadirPath): Process
+    {
+        $fs = new Filesystem();
+
+        $script = $this->getScript();
+        if (!$fs->exists($script)) {
+            throw new DatadirTestsException(sprintf(
+                'Cannot open script file "%s"',
+                $script
+            ));
+        }
+
+        $runCommand = [
+            'php',
+            $script,
+        ];
+        $runProcess = new Process($runCommand);
+        $runProcess->setEnv([
+            'KBC_DATADIR' => $datadirPath,
+            'KBC_REALUSER' => $this->kbcRealuser,
+        ]);
+        $runProcess->setTimeout(0.0);
+        $runProcess->run();
+        return $runProcess;
     }
 }

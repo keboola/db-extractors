@@ -9,6 +9,13 @@ The configuration `config.json` contains following properties in `parameters` ke
     - `database` - string (required)
     - `user` - string (required)
     - `\#password` - string (required)
+    - `connectThrough` - bool (optional, default `false`)
+        - If enabled:
+            - Value from the `KBC_REALUSER` environment variable is used as the `OracleConnection.PROXY_USER_NAME`.
+            - if `KBC_REALUSER` is not set, a `UserException` is thrown.
+        - To use this feature:
+            - The SAML login to the Keboola Connection must be used.
+            - The SAML token must contain the required data and the stack must be set correctly.
     - `ssh` - array (optional, but if present, enabled, keys/public, user, and sshHost are required)
         - `enabled` - boolean
         - `keys` - array
