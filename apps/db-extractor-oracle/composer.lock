@@ -225,16 +225,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "14.1.0",
+            "version": "14.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "3385d064d284a5f9a0fbd998ea83a04592ebac43"
+                "reference": "daacd8832e9b788eb24a878ce6313ebca79d5c5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/3385d064d284a5f9a0fbd998ea83a04592ebac43",
-                "reference": "3385d064d284a5f9a0fbd998ea83a04592ebac43",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/daacd8832e9b788eb24a878ce6313ebca79d5c5a",
+                "reference": "daacd8832e9b788eb24a878ce6313ebca79d5c5a",
                 "shasum": ""
             },
             "require": {
@@ -284,9 +284,9 @@
             "description": "Common library from Keboola Database Extractors",
             "support": {
                 "issues": "https://github.com/keboola/db-extractor-common/issues",
-                "source": "https://github.com/keboola/db-extractor-common/tree/14.1.0"
+                "source": "https://github.com/keboola/db-extractor-common/tree/14.2.1"
             },
-            "time": "2021-01-28T10:29:38+00:00"
+            "time": "2021-02-05T07:34:27+00:00"
         },
         {
             "name": "keboola/db-extractor-config",
