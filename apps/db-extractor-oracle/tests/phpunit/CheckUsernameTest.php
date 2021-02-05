@@ -14,9 +14,14 @@ class CheckUsernameTest extends TestCase
 {
     public function testValidCheckUsername(): void
     {
-        putenv('KBC_REALUSER=' . (string) getEnv('ORACLE_DB_USER'));
-        new Application($this->createConfig(), new TestLogger());
-        $this->expectNotToPerformAssertions();
+        $user = (string) getEnv('ORACLE_DB_USER');
+        putenv('KBC_REALUSER=' . $user);
+        $logger = new TestLogger();
+        new Application($this->createConfig(), $logger);
+
+        Assert::assertTrue(
+            $logger->hasInfoThatContains(sprintf('Username "%s" has been verified.', $user))
+        );
     }
 
     public function testInvalidCheckUsername(): void
@@ -41,7 +46,7 @@ class CheckUsernameTest extends TestCase
         new Application($config, $logger);
 
         Assert::assertTrue(
-            $logger->hasInfoThatContains('Starting export data with a technical username "_technicalUsername".')
+            $logger->hasInfoThatContains('Starting export data with a service account "_technicalUsername".')
         );
     }
 
