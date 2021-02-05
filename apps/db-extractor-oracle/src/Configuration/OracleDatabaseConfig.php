@@ -14,6 +14,8 @@ class OracleDatabaseConfig extends DatabaseConfig
 
     private ?string $tnsnames;
 
+    private bool $connectThrough;
+
     public static function fromArray(array $data): self
     {
         $sslEnabled = !empty($data['ssl']) && !empty($data['ssl']['enabled']);
@@ -26,7 +28,8 @@ class OracleDatabaseConfig extends DatabaseConfig
             $data['database'] ?? null,
             $data['schema'] ?? null,
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
-            $data['tnsnames'] ?? null
+            $data['tnsnames'] ?? null,
+            $data['connectThrough'] ?? false
         );
     }
 
@@ -38,7 +41,8 @@ class OracleDatabaseConfig extends DatabaseConfig
         ?string $database,
         ?string $schema,
         ?SSLConnectionConfig $sslConnectionConfig,
-        ?string $tnsnames
+        ?string $tnsnames,
+        bool $connectThrough
     ) {
         parent::__construct(
             '',
@@ -52,6 +56,7 @@ class OracleDatabaseConfig extends DatabaseConfig
 
         $this->host = $host;
         $this->tnsnames = $tnsnames;
+        $this->connectThrough = $connectThrough;
     }
 
     public function hasHost(): bool
@@ -78,5 +83,10 @@ class OracleDatabaseConfig extends DatabaseConfig
             throw new PropertyNotSetException('Property "tnsnames" is not set.');
         }
         return $this->tnsnames;
+    }
+
+    public function isConnectThroughEnabled(): bool
+    {
+        return $this->connectThrough;
     }
 }

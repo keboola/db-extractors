@@ -423,16 +423,16 @@
         },
         {
             "name": "keboola/php-component",
-            "version": "8.1.2",
+            "version": "8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-component.git",
-                "reference": "49af27d934f09be2e11ea1becb2c98e75032b36b"
+                "reference": "efee48865567d2c7b59d130f0f3f7c0624769a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-component/zipball/49af27d934f09be2e11ea1becb2c98e75032b36b",
-                "reference": "49af27d934f09be2e11ea1becb2c98e75032b36b",
+                "url": "https://api.github.com/repos/keboola/php-component/zipball/efee48865567d2c7b59d130f0f3f7c0624769a0e",
+                "reference": "efee48865567d2c7b59d130f0f3f7c0624769a0e",
                 "shasum": ""
             },
             "require": {
@@ -477,9 +477,9 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-component/issues",
-                "source": "https://github.com/keboola/php-component/tree/8.1.2"
+                "source": "https://github.com/keboola/php-component/tree/8.2.0"
             },
-            "time": "2020-04-30T11:08:47+00:00"
+            "time": "2021-02-02T12:40:10+00:00"
         },
         {
             "name": "keboola/php-datatypes",
@@ -1695,16 +1695,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.1",
+            "version": "9.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "e7bdf4085de85a825f4424eae52c99a1cec2f360"
+                "reference": "f661659747f2f87f9e72095bb207bceb0f151cb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e7bdf4085de85a825f4424eae52c99a1cec2f360",
-                "reference": "e7bdf4085de85a825f4424eae52c99a1cec2f360",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f661659747f2f87f9e72095bb207bceb0f151cb4",
+                "reference": "f661659747f2f87f9e72095bb207bceb0f151cb4",
                 "shasum": ""
             },
             "require": {
@@ -1782,7 +1782,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.1"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.2"
             },
             "funding": [
                 {
@@ -1794,7 +1794,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-17T07:42:25+00:00"
+            "time": "2021-02-02T14:45:58+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -2981,7 +2981,7 @@
         },
         {
             "name": "symfony/config",
-            "version": "v5.2.2",
+            "version": "v5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
@@ -3039,7 +3039,7 @@
             "description": "Helps you find, load, combine, autofill and validate configuration values of any kind",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/config/tree/v5.2.2"
+                "source": "https://github.com/symfony/config/tree/v5.2.3"
             },
             "funding": [
                 {
@@ -3126,7 +3126,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v5.2.2",
+            "version": "v5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
@@ -3168,7 +3168,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v5.2.2"
+                "source": "https://github.com/symfony/filesystem/tree/v5.2.3"
             },
             "funding": [
                 {
@@ -3188,16 +3188,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v5.2.2",
+            "version": "v5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "196f45723b5e618bf0e23b97e96d11652696ea9e"
+                "reference": "4adc8d172d602008c204c2e16956f99257248e03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/196f45723b5e618bf0e23b97e96d11652696ea9e",
-                "reference": "196f45723b5e618bf0e23b97e96d11652696ea9e",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/4adc8d172d602008c204c2e16956f99257248e03",
+                "reference": "4adc8d172d602008c204c2e16956f99257248e03",
                 "shasum": ""
             },
             "require": {
@@ -3229,7 +3229,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v5.2.2"
+                "source": "https://github.com/symfony/finder/tree/v5.2.3"
             },
             "funding": [
                 {
@@ -3245,7 +3245,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T10:01:46+00:00"
+            "time": "2021-01-28T22:06:19+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -3411,7 +3411,7 @@
         },
         {
             "name": "symfony/process",
-            "version": "v5.2.2",
+            "version": "v5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
@@ -3453,7 +3453,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v5.2.2"
+                "source": "https://github.com/symfony/process/tree/v5.2.3"
             },
             "funding": [
                 {
@@ -3473,16 +3473,16 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v5.2.2",
+            "version": "v5.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "4218dd0902543dc454b2eac0db37044f187283d7"
+                "reference": "70c5aa59ab0642033391a5591c9771ee417e7cef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/4218dd0902543dc454b2eac0db37044f187283d7",
-                "reference": "4218dd0902543dc454b2eac0db37044f187283d7",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/70c5aa59ab0642033391a5591c9771ee417e7cef",
+                "reference": "70c5aa59ab0642033391a5591c9771ee417e7cef",
                 "shasum": ""
             },
             "require": {
@@ -3555,7 +3555,7 @@
             "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/serializer/tree/v5.2.2"
+                "source": "https://github.com/symfony/serializer/tree/v5.2.3"
             },
             "funding": [
                 {
@@ -3571,7 +3571,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T11:32:03+00:00"
+            "time": "2021-02-03T04:42:09+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -3807,20 +3807,20 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.30",
+            "version": "0.12.71",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "1f2c16d3fbb5eec6e55fbe2358e32570cefa20e5"
+                "reference": "d508fa3b0ecc5fc91ac70c6c7ac2862f968ba2b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1f2c16d3fbb5eec6e55fbe2358e32570cefa20e5",
-                "reference": "1f2c16d3fbb5eec6e55fbe2358e32570cefa20e5",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/d508fa3b0ecc5fc91ac70c6c7ac2862f968ba2b5",
+                "reference": "d508fa3b0ecc5fc91ac70c6c7ac2862f968ba2b5",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1"
+                "php": "^7.1|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -3847,7 +3847,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.30"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.71"
             },
             "funding": [
                 {
@@ -3863,7 +3863,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-06-21T14:08:19+00:00"
+            "time": "2021-02-01T18:24:00+00:00"
         },
         {
             "name": "slevomat/coding-standard",
@@ -3910,16 +3910,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.5.5",
+            "version": "3.5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6"
+                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
-                "reference": "73e2e7f57d958e7228fce50dc0c61f58f017f9f6",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
+                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4",
                 "shasum": ""
             },
             "require": {
@@ -3962,7 +3962,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2020-04-17T01:09:41+00:00"
+            "time": "2020-10-23T02:01:07+00:00"
         }
     ],
     "aliases": [],
