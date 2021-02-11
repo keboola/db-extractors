@@ -6,7 +6,6 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Application;
 use Keboola\DbExtractor\Exception\BadUsernameException;
-use Keboola\Temp\Temp;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
