@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\DbExtractor\Application;
 use Keboola\DbExtractor\Exception\BadUsernameException;
+use Keboola\Temp\Temp;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
@@ -14,50 +15,122 @@ class CheckUsernameTest extends TestCase
 {
     public function testValidCheckUsername(): void
     {
-        $user = (string) getEnv('ORACLE_DB_USER');
-        putenv('KBC_REALUSER=' . $user);
         $logger = new TestLogger();
-        new Application($this->createConfig(), $logger);
+        $config = $this->createConfig();
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+        ];
+        putenv('KBC_REALUSER=' . (string) getEnv('ORACLE_DB_USER'));
+        new Application($config, $logger);
 
         Assert::assertTrue(
-            $logger->hasInfoThatContains(sprintf('Username "%s" has been verified.', $user))
+            $logger->hasInfoThatContains(sprintf(
+                'Your username "%s" and database username are same. Running allowed.',
+                (string) getEnv('ORACLE_DB_USER')
+            ))
         );
     }
 
     public function testInvalidCheckUsername(): void
     {
-        putenv('KBC_REALUSER=invalidUsername');
+        $logger = new TestLogger();
+        $config = $this->createConfig();
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+        ];
+        putenv('KBC_REALUSER=dbUsername');
 
         $this->expectException(BadUsernameException::class);
-        $this->expectExceptionMessage(
-            'Your username "invalidUsername" does not have permission ' .
-            'to run configuration with the database username "tester"'
-        );
-        new Application($this->createConfig(), new TestLogger());
+        $this->expectExceptionMessage(sprintf(
+            'Your username "dbUsername" does not have permission ' .
+            'to run configuration with the database username "%s"',
+            (string) getEnv('ORACLE_DB_USER')
+        ));
+        new Application($config, $logger);
     }
 
-    public function testTechnicalUsername(): void
+    public function testServiceAccountRegexpMatch(): void
     {
-        putenv('KBC_REALUSER=invalidUsername');
-        $config = $this->createConfig();
-        $config['parameters']['db']['user'] = '_technicalUsername';
-
         $logger = new TestLogger();
+        $config = $this->createConfig();
+        $config['parameters']['db']['user'] = 'service__abc';
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+            'serviceAccountRegexp' => '~^service__~i',
+        ];
+        putenv('KBC_REALUSER=dbUsername');
+
         new Application($config, $logger);
 
         Assert::assertTrue(
-            $logger->hasInfoThatContains('Starting export data with a service account "_technicalUsername".')
+            $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
         );
     }
 
-    public function testDisableChecking(): void
+    public function testServiceAccountRegexpDontMatch(): void
     {
-        putenv('KBC_REALUSER=invalidUsername');
+        $logger = new TestLogger();
         $config = $this->createConfig();
-        $config['image_parameters']['check_kbc_realuser'] = false;
-        new Application($config, new TestLogger());
+        $config['parameters']['db']['user'] = 'user123';
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+            'serviceAccountRegexp' => '~^service__~i',
+        ];
+        putenv('KBC_REALUSER=dbUsername');
 
-        $this->expectNotToPerformAssertions();
+        $this->expectException(BadUsernameException::class);
+        $this->expectExceptionMessage(
+            'Your username "dbUsername" does not have permission ' .
+            'to run configuration with the database username "user123"'
+        );
+        new Application($config, $logger);
+    }
+
+    public function testUserAccountRegexpMatch(): void
+    {
+        $logger = new TestLogger();
+        $config = $this->createConfig();
+        $config['parameters']['db']['user'] = 'user_abc';
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+            'userAccountRegexp' => '~^user_~i',
+        ];
+        putenv('KBC_REALUSER=dbUsername');
+
+        $this->expectException(BadUsernameException::class);
+        $this->expectExceptionMessage(
+            'Your username "dbUsername" does not have permission ' .
+            'to run configuration with the database username "user_abc"'
+        );
+        new Application($config, $logger);
+    }
+
+    public function testUserAccountRegexpDontMatch(): void
+    {
+        $logger = new TestLogger();
+        $config = $this->createConfig();
+        $config['parameters']['db']['user'] = 'service__abc';
+        $config['image_parameters']['checkUsername'] = [
+            'enabled' => true,
+            'userAccountRegexp' => '~^user_~i',
+        ];
+        putenv('KBC_REALUSER=dbUsername');
+
+        new Application($config, $logger);
+
+        Assert::assertTrue(
+            $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
+        );
+    }
+
+    public function testDisabledChecking(): void
+    {
+        $logger = new TestLogger();
+        $config = $this->createConfig();
+        putenv('KBC_REALUSER=' . (string) getEnv('ORACLE_DB_USER'));
+        new Application($config, $logger);
+
+        Assert::assertEquals([], $logger->records);
     }
 
     private function createConfig(string $action = 'run'): array
@@ -81,9 +154,7 @@ class CheckUsernameTest extends TestCase
                 ],
                 'outputTable' => 'output',
             ],
-            'image_parameters' => [
-                'check_kbc_realuser' => true,
-            ],
+            'image_parameters' => [],
         ];
 
         if ($action !== 'run') {
