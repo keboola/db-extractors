@@ -25,7 +25,7 @@ class OracleApplication extends Application
     public function buildConfig(array $config): void
     {
         if ($this['action'] === 'getTables') {
-            $this->config = new Config($config, new GetTablesListFilterDefinition());
+            $this->config = new Config($config, new GetTablesListFilterDefinition(new OracleDbNode()));
         } elseif ($this->isRowConfiguration($config)) {
             if ($this['action'] === 'run') {
                 $config['parameters']['id'] = 1;
