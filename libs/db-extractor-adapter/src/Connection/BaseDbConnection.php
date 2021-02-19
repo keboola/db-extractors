@@ -120,13 +120,12 @@ abstract class BaseDbConnection implements DbConnection
      */
     protected function callWithRetry(int $maxRetries, callable $callback)
     {
+        $proxy = $this->createRetryProxy($maxRetries);
         try {
-            return $this
-                ->createRetryProxy($maxRetries)
-                ->call($callback);
+            return $proxy->call($callback);
         } catch (Throwable $e) {
             throw in_array(get_class($e), $this->getExpectedExceptionClasses(), true) ?
-                new UserRetriedException($e->getMessage(), 0, $e) :
+                new UserRetriedException($proxy->getTryCount(), $e->getMessage(), 0, $e) :
                 $e;
         }
     }

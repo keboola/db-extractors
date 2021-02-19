@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use Keboola\DbExtractor\Adapter\Exception\UserException;
 use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
 use Throwable;
 use Psr\Log\LoggerInterface;
@@ -76,11 +77,12 @@ abstract class BaseExportAdapter implements ExportAdapter
         $message = $outputTable ? sprintf('[%s]: ', $outputTable) : '';
         $message .= sprintf('DB query failed: %s', $e->getMessage());
 
-        // Retry mechanism can be disabled
-        if ($maxRetries > 1) {
+        // Retry mechanism can be disabled or modified, ... we need to print real count
+        if ($e instanceof UserRetriedException && $e->getTryCount() > 1) {
             $message .= sprintf(' Tried %d times.', $maxRetries);
+            return new UserRetriedException($e->getTryCount(), $message, 0, $e);
         }
 
-        return new UserRetriedException($message, 0, $e);
+        return new UserException($message, 0, $e);
     }
 }

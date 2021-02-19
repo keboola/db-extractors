@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\Tests;
 
 use Keboola\CommonExceptions\UserExceptionInterface;
+use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
 use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
@@ -87,9 +88,10 @@ END;
         try {
             $exportAdapter->export($config, $this->getCsvFilePath());
             $this->fail('Exception expected');
-        } catch (UserExceptionInterface $e) {
+        } catch (UserRetriedException $e) {
             Assert::assertStringContainsString('[output]: DB query failed:', $e->getMessage());
             Assert::assertStringContainsString("Tried $retries times.", $e->getMessage());
+            Assert::assertSame($e->getTryCount(), $retries);
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Msg differs between PDO and ODBC
                 new StringContains('Connection not open'),
