@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Exception;
 
-class DeadConnectionException extends UserRetriedException
+class DeadConnectionException extends UserException
 {
 
 }
