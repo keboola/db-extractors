@@ -83,6 +83,22 @@ class ConfigTest extends TestCase
                     ],
                 ],
             ],
+            [
+                [
+                    'parameters' => [
+                        'db' => [
+                            'user' => 'testUser',
+                            '#password' => 'testPassword',
+                            'tnsnames' => 'tnsnames file',
+                            'defaultRowPrefetch' => '1000',
+                        ],
+                        'data_dir' => 'test',
+                        'extractor_class' => 'test',
+                        'outputTable' => 'test',
+                        'query' => 'test',
+                    ],
+                ],
+            ],
         ];
     }
 
