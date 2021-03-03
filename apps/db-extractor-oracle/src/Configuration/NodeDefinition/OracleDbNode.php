@@ -15,6 +15,7 @@ class OracleDbNode extends DbNode
         parent::init($builder);
         $this->addTnsnamesNode($builder);
         $this->addConnectThrough($builder);
+        $this->addDefaultRowPrefetch($builder);
 
         $this->validate()->always(function ($v) {
             if (empty($v['host']) && empty($v['tnsnames'])) {
@@ -37,5 +38,10 @@ class OracleDbNode extends DbNode
     protected function addConnectThrough(NodeBuilder $builder): void
     {
         $builder->booleanNode('connectThrough')->defaultFalse();
+    }
+
+    protected function addDefaultRowPrefetch(NodeBuilder $builder): void
+    {
+        $builder->scalarNode('defaultRowPrefetch');
     }
 }

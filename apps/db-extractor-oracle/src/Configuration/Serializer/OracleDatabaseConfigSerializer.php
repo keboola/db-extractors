@@ -49,6 +49,9 @@ class OracleDatabaseConfigSerializer
         if ($databaseConfig->hasSSLConnection()) {
             $config['ssl'] = SSLConnectionConfigSerializer::serialize($databaseConfig->getSslConnectionConfig());
         }
+        if ($databaseConfig->hasDefaultRowPrefetch()) {
+            $config['defaultRowPrefetch'] = $databaseConfig->getDefaultRowPrefetch();
+        }
         return $config;
     }
 }

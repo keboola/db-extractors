@@ -14,6 +14,8 @@ class OracleDatabaseConfig extends DatabaseConfig
 
     private ?string $tnsnames;
 
+    private ?string $defaultRowPrefetch;
+
     private bool $connectThrough;
 
     public static function fromArray(array $data): self
@@ -29,7 +31,8 @@ class OracleDatabaseConfig extends DatabaseConfig
             $data['schema'] ?? null,
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
             $data['tnsnames'] ?? null,
-            $data['connectThrough'] ?? false
+            $data['connectThrough'] ?? false,
+            $data['defaultRowPrefetch'] ?? null
         );
     }
 
@@ -42,7 +45,8 @@ class OracleDatabaseConfig extends DatabaseConfig
         ?string $schema,
         ?SSLConnectionConfig $sslConnectionConfig,
         ?string $tnsnames,
-        bool $connectThrough
+        bool $connectThrough,
+        ?string $defaultRowPrefetch
     ) {
         parent::__construct(
             '',
@@ -57,6 +61,7 @@ class OracleDatabaseConfig extends DatabaseConfig
         $this->host = $host;
         $this->tnsnames = $tnsnames;
         $this->connectThrough = $connectThrough;
+        $this->defaultRowPrefetch = $defaultRowPrefetch;
     }
 
     public function hasHost(): bool
@@ -88,5 +93,18 @@ class OracleDatabaseConfig extends DatabaseConfig
     public function isConnectThroughEnabled(): bool
     {
         return $this->connectThrough;
+    }
+
+    public function hasDefaultRowPrefetch(): bool
+    {
+        return $this->defaultRowPrefetch !== null;
+    }
+
+    public function getDefaultRowPrefetch(): string
+    {
+        if ($this->defaultRowPrefetch === null) {
+            throw new PropertyNotSetException('Property "defaultRowPrefetch" is not set.');
+        }
+        return $this->defaultRowPrefetch;
     }
 }
