@@ -18,6 +18,9 @@ class OracleApplication extends Application
     {
         $config['parameters']['data_dir'] = $dataDir;
         $config['parameters']['extractor_class'] = 'Oracle';
+        if (isset($config['image_parameters']['db']['defaultRowPrefetch'])) {
+            $config['parameters']['db']['defaultRowPrefetch'] = $config['image_parameters']['db']['defaultRowPrefetch'];
+        }
 
         parent::__construct($config, $logger, $state);
     }
