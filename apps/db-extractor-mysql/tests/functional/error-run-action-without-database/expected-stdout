@@ -1,11 +1,11 @@
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
-Exporting to in.c-main.escaping
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+Exporting "sales" to "in.c-main.escaping".
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
 SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [1x]
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
 SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [2x]
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
 SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [3x]
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
 SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [4x]
-Connecting to DSN 'mysql:host=mysql;port=3306;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".

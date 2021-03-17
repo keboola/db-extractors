@@ -1,1 +1,1 @@
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8'
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".

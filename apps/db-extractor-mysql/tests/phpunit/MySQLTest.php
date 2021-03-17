@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\Component\Logger;
 use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
 use Keboola\DbExtractor\FunctionalTests\PdoTestConnection;
@@ -611,7 +612,7 @@ class MySQLTest extends TestCase
         try {
             $app->run();
             Assert::fail('Exception expected.');
-        } catch (UserException $e) {
+        } catch (UserExceptionInterface $e) {
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Message differs between MySQL versions
                 Assert::stringContains(

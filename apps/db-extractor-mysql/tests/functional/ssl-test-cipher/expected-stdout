@@ -1,9 +1,10 @@
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8' Using SSL
+Using SSL Connection
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
 PDO::__construct(): Cannot connect to MySQL by using SSL. Retrying... [1x]
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8' Using SSL
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
 PDO::__construct(): Cannot connect to MySQL by using SSL. Retrying... [2x]
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8' Using SSL
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
 PDO::__construct(): Cannot connect to MySQL by using SSL. Retrying... [3x]
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8' Using SSL
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
 PDO::__construct(): Cannot connect to MySQL by using SSL. Retrying... [4x]
-Connecting to DSN 'mysql:host=mysql;port=3306;dbname=test;charset=utf8' Using SSL
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
