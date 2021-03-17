@@ -12,6 +12,8 @@ use Throwable;
 
 class MySQLDbConnection extends PdoConnection
 {
+    public const CONNECT_MAX_RETRIES = 5;
+
     protected function connect(): void
     {
         $this->logger->info(sprintf('Creating PDO connection to "%s".', $this->dsn));

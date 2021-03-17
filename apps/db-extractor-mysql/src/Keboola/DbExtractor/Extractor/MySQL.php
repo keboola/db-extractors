@@ -136,7 +136,7 @@ class MySQL extends BaseExtractor
                     $pdo->exec('SET NAMES utf8;');
                 }
             },
-            $this->isSyncAction() ? 1 : PdoConnection::CONNECT_DEFAULT_MAX_RETRIES
+            $this->isSyncAction() ? 1 : MySQLDbConnection::CONNECT_MAX_RETRIES
         );
 
         if ($databaseConfig->hasTransactionIsolationLevel()) {
