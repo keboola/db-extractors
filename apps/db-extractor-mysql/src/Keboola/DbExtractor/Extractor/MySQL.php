@@ -146,9 +146,9 @@ class MySQL extends BaseExtractor
         }
 
         if ($isSsl) {
-            $status = $this->connection->getConnection()
+            $status = $this->connection
                 ->query("SHOW STATUS LIKE 'Ssl_cipher';")
-                ->fetch(PDO::FETCH_ASSOC)
+                ->fetch()
             ;
 
             if (empty($status['Value'])) {
@@ -159,9 +159,9 @@ class MySQL extends BaseExtractor
         }
 
         if ($isCompression) {
-            $status = $this->connection->getConnection()
+            $status = $this->connection
                 ->query("SHOW SESSION STATUS LIKE 'Compression';")
-                ->fetch(PDO::FETCH_ASSOC)
+                ->fetch()
             ;
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
