@@ -16,15 +16,10 @@ class MySQLDbConnection extends PdoConnection
 
     protected function connect(): void
     {
-        $this->logger->info(sprintf('Creating PDO connection to "%s".', $this->dsn));
         try {
-            $this->pdo = new PDO($this->dsn, $this->user, $this->password, $this->options);
+            parent::connect();
         } catch (PDOException $e) {
             $this->handleException($e);
-        }
-
-        if ($this->init) {
-            ($this->init)($this->pdo);
         }
     }
 
