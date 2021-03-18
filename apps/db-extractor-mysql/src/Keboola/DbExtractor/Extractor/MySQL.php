@@ -243,12 +243,7 @@ class MySQL extends BaseExtractor
             $this->quote($exportConfig->getTable()->getName())
         );
 
-        try {
-            $result = $this->connection->query($sql)->fetchAll();
-        } catch (PDOException $e) {
-            throw $this->handleDbError($e, 0);
-        }
-
+        $result = $this->connection->query($sql)->fetchAll();
         return $result ? $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;
     }
 
@@ -294,19 +289,6 @@ class MySQL extends BaseExtractor
     protected function createDatabaseConfig(array $data): DatabaseConfig
     {
         return MysqlDatabaseConfig::fromArray($data);
-    }
-
-    protected function handleDbError(Throwable $e, int $maxRetries, ?string $outputTable = null): UserException
-    {
-        $message = $outputTable ? sprintf('[%s]: ', $outputTable) : '';
-        $message .= sprintf('DB query failed: %s', $e->getMessage());
-
-        // Retry mechanism can be disabled if maxRetries = 0
-        if ($maxRetries > 0) {
-            $message .= sprintf(' Tried %d times.', $maxRetries);
-        }
-
-        return new UserException($message, 0, $e);
     }
 
     private function quote(string $obj): string
