@@ -267,6 +267,25 @@ class TableBuilderTest extends BaseBuilderTest
         $builder->addColumn();
     }
 
+    public function testTrimDisabled(): void
+    {
+        $name = ' '; // in MsSQL is one space valid column name
+
+        $builder = TableBuilder::create();
+        $builder->setName($name, false);
+        $columnBuilder = $builder->addColumn();
+
+        // Set some values
+        $columnBuilder
+            ->setOrdinalPosition(123)
+            ->setName('Col 1')
+            ->setType('integer');
+
+        $table = $builder->build();
+        Assert::assertSame(' ', $table->getName());
+        Assert::assertSame('empty_name', $table->getSanitizedName());
+    }
+
     protected function modifyBuilder(Builder $builder): void
     {
         parent::modifyBuilder($builder);

@@ -109,17 +109,17 @@ class TableBuilder implements Builder
         return $builder;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name, bool $trim = true): self
     {
-        // Trim
-        $name = trim($name);
+        // Trim can be disabled, eg. in MsSQL is one space valid column name
+        $name = $trim ? trim($name) : $name;
 
         if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
         }
 
         $this->name = $name;
-        $this->sanitizedName = ColumnNameSanitizer::sanitize($name);
+        $this->sanitizedName = BuilderHelper::sanitizeName($name);
         return $this;
     }
 
