@@ -269,7 +269,7 @@ class TableBuilderTest extends BaseBuilderTest
 
     public function testTrimDisabled(): void
     {
-        $name = ' '; // in MsSQL is one space valid column name
+        $name = ' '; // in MsSQL is one space valid table name
 
         $builder = TableBuilder::create();
         $builder->setName($name, false);
