@@ -102,7 +102,7 @@ class ColumnBuilder implements Builder
         }
 
         $this->name = $name;
-        $this->sanitizedName = self::sanitizeName($name);
+        $this->sanitizedName = BuilderHelper::sanitizeName($name);
         return $this;
     }
 
@@ -187,20 +187,5 @@ class ColumnBuilder implements Builder
     {
         $this->constraints[] = $constraint;
         return $this;
-    }
-
-    private static function sanitizeName(string $name): string
-    {
-        $sanitized = ColumnNameSanitizer::sanitize($name);
-
-        // In some databases, eg. MsSQL is one space valid column name, so we must it sanitize to non-empty string
-        if ($sanitized === '') {
-            // Name cannot start/end with special char, it is trim in ColumnNameSanitizer
-            $sanitized = ColumnNameSanitizer::sanitize(
-                'empty' . preg_replace('~\s~', '_', $name) . 'name'
-            );
-        }
-
-        return $sanitized;
     }
 }
