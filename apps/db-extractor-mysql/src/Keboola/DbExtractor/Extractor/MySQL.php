@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Adapter\ExportAdapter;
+use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
+use Keboola\DbExtractor\Adapter\PDO\PdoExportAdapter;
+use Keboola\DbExtractor\Adapter\Query\DefaultQueryFactory;
+use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
 use Keboola\DbExtractor\Configuration\ValueObject\MysqlDatabaseConfig;
 use Keboola\DbExtractor\Exception\ApplicationException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
@@ -30,12 +36,28 @@ class MySQL extends BaseExtractor
 
     protected ?string $database = null;
 
+    protected MySQLDbConnection $connection;
+
     public function getMetadataProvider(): MetadataProvider
     {
-        return new MySQLMetadataProvider($this->db, $this->database);
+        return new MySQLMetadataProvider($this->connection, $this->database);
     }
 
-    public function createConnection(DatabaseConfig $databaseConfig): PDO
+    protected function createExportAdapter(): ExportAdapter
+    {
+        $resultWriter = new DefaultResultWriter($this->state);
+        $simpleQueryFactory = new DefaultQueryFactory($this->state);
+        return new PdoExportAdapter(
+            $this->logger,
+            $this->connection,
+            $simpleQueryFactory,
+            $resultWriter,
+            $this->dataDir,
+            $this->state
+        );
+    }
+
+    public function createConnection(DatabaseConfig $databaseConfig): void
     {
         if (!($databaseConfig instanceof MysqlDatabaseConfig)) {
             throw new ApplicationException('MysqlDatabaseConfig expected.');
@@ -96,46 +118,38 @@ class MySQL extends BaseExtractor
             $this->database = $databaseConfig->getDatabase();
         }
 
-        $this->logger->info("Connecting to DSN '" . $dsn . "'" . ($isSsl ? ' Using SSL' : ''));
-
-        try {
-            $pdo = new PDO($dsn, $databaseConfig->getUsername(), $databaseConfig->getPassword(), $options);
-        } catch (PDOException $e) {
-            $checkCnMismatch = function (Throwable $exception): void {
-                if (strpos($exception->getMessage(), 'did not match expected CN') !== false) {
-                    throw new UserException($exception->getMessage());
-                }
-            };
-            $checkCnMismatch($e);
-            $previous = $e->getPrevious();
-            if ($previous !== null) {
-                $checkCnMismatch($previous);
-            }
-
-            // SQLSTATE[HY000] is general error without message, so throw previous exception
-            if (strpos($e->getMessage(), 'SQLSTATE[HY000]') === 0 && $e->getPrevious() !== null) {
-                throw $e->getPrevious();
-            }
-
-            throw $e;
+        if ($isSsl) {
+            $this->logger->info('Using SSL Connection');
         }
+        $this->connection = new MySQLDbConnection(
+            $this->logger,
+            $dsn,
+            $databaseConfig->getUsername(),
+            $databaseConfig->getPassword(),
+            $options,
+            function (PDO $pdo): void {
+                $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+                try {
+                    $pdo->exec('SET NAMES utf8mb4;');
+                } catch (PDOException $exception) {
+                    $this->logger->info('Falling back to "utf8" charset');
+                    $pdo->exec('SET NAMES utf8;');
+                }
+            },
+            $this->isSyncAction() ? 1 : MySQLDbConnection::CONNECT_MAX_RETRIES
+        );
 
         if ($databaseConfig->hasTransactionIsolationLevel()) {
-            $pdo->exec(
+            $this->connection->query(
                 sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
             );
         }
 
-        $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        try {
-            $pdo->exec('SET NAMES utf8mb4;');
-        } catch (PDOException $exception) {
-            $this->logger->info('Falling back to "utf8" charset');
-            $pdo->exec('SET NAMES utf8;');
-        }
-
         if ($isSsl) {
-            $status = $pdo->query("SHOW STATUS LIKE 'Ssl_cipher';")->fetch(PDO::FETCH_ASSOC);
+            $status = $this->connection
+                ->query("SHOW STATUS LIKE 'Ssl_cipher';")
+                ->fetch()
+            ;
 
             if (empty($status['Value'])) {
                 throw new UserException(sprintf('Connection is not encrypted'));
@@ -145,7 +159,10 @@ class MySQL extends BaseExtractor
         }
 
         if ($isCompression) {
-            $status = $pdo->query("SHOW SESSION STATUS LIKE 'Compression';")->fetch(PDO::FETCH_ASSOC);
+            $status = $this->connection
+                ->query("SHOW SESSION STATUS LIKE 'Compression';")
+                ->fetch()
+            ;
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
                 throw new UserException(sprintf('Network communication is not compressed'));
@@ -153,18 +170,11 @@ class MySQL extends BaseExtractor
                 $this->logger->info('Using network communication compression');
             }
         }
-
-        return $pdo;
-    }
-
-    public function getConnection(): PDO
-    {
-        return $this->db;
     }
 
     public function testConnection(): void
     {
-        $this->db->query('SELECT NOW();')->execute();
+        $this->connection->testConnection();
     }
 
     public function export(ExportConfig $exportConfig): array
@@ -233,12 +243,7 @@ class MySQL extends BaseExtractor
             $this->quote($exportConfig->getTable()->getName())
         );
 
-        try {
-            $result = $this->db->query($sql)->fetchAll();
-        } catch (PDOException $e) {
-            throw $this->handleDbError($e, 0);
-        }
-
+        $result = $this->connection->query($sql)->fetchAll();
         return $result ? $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;
     }
 
@@ -266,7 +271,7 @@ class MySQL extends BaseExtractor
             // intentionally ">=" last row should be included, it is handled by storage deduplication process
                 'WHERE %s >= %s',
                 $this->quote($exportConfig->getIncrementalFetchingColumn()),
-                $this->db->quote((string) $this->state['lastFetchedRow'])
+                $this->connection->quote((string) $this->state['lastFetchedRow'])
             );
         }
 

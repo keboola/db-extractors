@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
-use PDO;
-use PDOStatement;
 use Keboola\DbExtractor\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
@@ -17,13 +17,13 @@ use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
 
 class MySQLMetadataProvider implements MetadataProvider
 {
-    private PDO $db;
+    private PdoConnection $connection;
 
     private ?string $database;
 
-    public function __construct(PDO $db, ?string $database)
+    public function __construct(PdoConnection $connection, ?string $database)
     {
-        $this->db = $db;
+        $this->connection = $connection;
         $this->database = $database; // database is optional
     }
 
@@ -220,7 +220,7 @@ class MySQLMetadataProvider implements MetadataProvider
         if ($this->database !== null) {
             $sql[] = sprintf(
                 'WHERE LOWER(c.TABLE_SCHEMA) = %s',
-                $this->db->quote(mb_strtolower($this->database))
+                $this->connection->quote(mb_strtolower($this->database))
             );
         } else {
             $sql[] = 'WHERE c.TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys")';
@@ -233,9 +233,8 @@ class MySQLMetadataProvider implements MetadataProvider
 
     private function queryAndFetchAll(string $sql): iterable
     {
-        /** @var PDOStatement $result */
-        $result = $this->db->query($sql);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $result = $this->connection->query($sql);
+        while ($row = $result->fetch()) {
             yield $row;
         }
     }
@@ -253,7 +252,7 @@ class MySQLMetadataProvider implements MetadataProvider
                     ));
                 }
 
-                return $this->db->quote(mb_strtolower($table->getName()));
+                return $this->connection->quote(mb_strtolower($table->getName()));
             }, $whitelist)
         );
     }
