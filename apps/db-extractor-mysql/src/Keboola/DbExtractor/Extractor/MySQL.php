@@ -140,7 +140,7 @@ class MySQL extends BaseExtractor
         );
 
         if ($databaseConfig->hasTransactionIsolationLevel()) {
-            $this->connection->getConnection()->exec(
+            $this->connection->query(
                 sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
             );
         }
