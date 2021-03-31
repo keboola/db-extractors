@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Keboola\DbExtractor\Traits;
+namespace Keboola\DbExtractor\Extractor;
 
-trait QuoteTrait
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
+
+class RedshiftPdoConnection extends PdoConnection
 {
     public function quoteIdentifier(string $value): string
     {
