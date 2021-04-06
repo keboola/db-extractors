@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\TableCollection;
-use Keboola\DbExtractor\Traits\QuoteTrait;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
-use PDO;
 use PDOStatement;
 
 class RedshiftMetadataProvider implements MetadataProvider
 {
-    use QuoteTrait;
+    private RedshiftPdoConnection $db;
 
-    private PDO $db;
-
-    public function __construct(PDO $db)
+    public function __construct(RedshiftPdoConnection $db)
     {
         $this->db = $db;
     }
@@ -190,7 +187,7 @@ SQL;
     {
         /** @var PDOStatement $result */
         $result = $this->db->query($sql);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $result->fetch()) {
             yield $row;
         }
     }

@@ -6,6 +6,8 @@ namespace Keboola\DbExtractor\Tests;
 
 use Keboola\Component\Logger;
 use Keboola\DbExtractor\Extractor\Redshift;
+use Keboola\DbExtractor\Extractor\RedshiftPdoConnection;
+use Keboola\DbExtractor\Extractor\RedshiftQueryFactory;
 use Keboola\DbExtractor\FunctionalTests\PdoTestConnection;
 use Keboola\DbExtractor\Tests\Traits\ConfigTrait;
 use Keboola\DbExtractor\TraitTests\RemoveAllTablesTrait;
@@ -13,6 +15,7 @@ use Keboola\DbExtractor\TraitTests\Tables\AutoIncrementTableTrait;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 class GenerateQueryTest extends TestCase
 {
@@ -44,11 +47,29 @@ class GenerateQueryTest extends TestCase
         $config['parameters'] = array_merge($config['parameters'], $params);
 
         $exportConfig = ExportConfig::fromArray($config['parameters']);
-        $extractor = new Redshift($config['parameters'], $state, new Logger());
-        if ($exportConfig->isIncrementalFetching()) {
-            $extractor->validateIncrementalFetching($exportConfig);
+
+        $queryFactory = new RedshiftQueryFactory($state);
+        if (isset($state['lastFetchedRow']) && is_numeric($state['lastFetchedRow'])) {
+            $queryFactory->setIncrementalFetchingColType(Redshift::INCREMENT_TYPE_NUMERIC);
         }
-        $query = $extractor->simpleQuery($exportConfig);
+
+        $dsn = sprintf(
+            'pgsql:dbname=%s;port=%s;host=%s',
+            getenv('REDSHIFT_DB_DATABASE'),
+            getenv('REDSHIFT_DB_PORT'),
+            getenv('REDSHIFT_DB_HOST')
+        );
+
+        $query = $queryFactory->create(
+            $exportConfig,
+            new RedshiftPdoConnection(
+                new NullLogger(),
+                $dsn,
+                (string) getenv('REDSHIFT_DB_USER'),
+                (string) getenv('REDSHIFT_DB_PASSWORD'),
+                []
+            )
+        );
         $this->assertEquals($expected, $query);
     }
 

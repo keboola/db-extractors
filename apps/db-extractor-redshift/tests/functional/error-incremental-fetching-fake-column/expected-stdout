@@ -1,1 +1,1 @@
-Connecting to pgsql:dbname=%s;port=%d;host=%s.redshift.amazonaws.com
+Creating PDO connection to "pgsql:dbname=%s;port=%d;host=%s.redshift.amazonaws.com".
