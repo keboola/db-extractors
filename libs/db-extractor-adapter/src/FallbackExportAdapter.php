@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use Keboola\DbExtractor\Adapter\Exception\AdapterSkippedException;
 use Keboola\DbExtractor\Adapter\Exception\InvalidArgumentException;
 use Throwable;
 use ArrayIterator;
@@ -52,11 +53,19 @@ class FallbackExportAdapter implements ExportAdapter
                 $this->logger->info(sprintf('Exporting by "%s" adapter.', $adapter->getName()));
                 return $adapter->export($exportConfig, $csvFilePath);
             } catch (Throwable $e) {
-                $this->logger->warning(sprintf(
-                    'Export by "%s" adapter failed: %s',
-                    $adapter->getName(),
-                    $e->getMessage()
-                ));
+                if ($e instanceof AdapterSkippedException) {
+                    $this->logger->info(sprintf(
+                        'Adapter "%s" skipped: %s',
+                        $adapter->getName(),
+                        $e->getMessage()
+                    ));
+                } else {
+                    $this->logger->warning(sprintf(
+                        'Export by "%s" adapter failed: %s',
+                        $adapter->getName(),
+                        $e->getMessage()
+                    ));
+                }
 
                 // If is fallback adapter present -> log msg and continue
                 $iterator->next();

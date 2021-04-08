@@ -9,6 +9,8 @@ use Keboola\DbExtractor\Adapter\FallbackExportAdapter;
 use Keboola\DbExtractor\Adapter\Tests\Fixtures\FailingExportAdapter;
 use Keboola\DbExtractor\Adapter\Tests\Fixtures\FailingExportAdapterException;
 use Keboola\DbExtractor\Adapter\Tests\Fixtures\PassingExportAdapter;
+use Keboola\DbExtractor\Adapter\Tests\Fixtures\SkippedExportAdapter;
+use Keboola\DbExtractor\Adapter\Tests\Fixtures\SkippedExportAdapterException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use PHPUnit\Framework\Assert;
 
@@ -158,6 +160,31 @@ class FallbackExportAdapterTest extends BaseTest
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
             'Export by "Adapter1" adapter failed: Something went wrong.'
+        ));
+        Assert::assertTrue($this->logger->hasInfoThatContains(
+            'Exporting by "Adapter2" adapter.'
+        ));
+    }
+
+    public function testSkipped(): void
+    {
+        $adapter1 = new SkippedExportAdapter('Adapter1');
+        $adapter2 = new PassingExportAdapter('Adapter2');
+        $fallbackAdapter = new FallbackExportAdapter($this->logger, [
+            $adapter1,
+            $adapter2,
+        ]);
+
+        $result = $fallbackAdapter->export($this->createDummyExportConfig(), 'output.csv');
+
+        Assert::assertSame(0, $result->getRowsCount());
+        Assert::assertSame(1, $adapter1->getExportCallCount());
+        Assert::assertSame(1, $adapter2->getExportCallCount());
+        Assert::assertTrue($this->logger->hasInfoThatContains(
+            'Exporting by "Adapter1" adapter.'
+        ));
+        Assert::assertTrue($this->logger->hasInfoThatContains(
+            'Adapter "Adapter1" skipped: skipped message'
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
             'Exporting by "Adapter2" adapter.'

@@ -53,7 +53,7 @@ abstract class BaseExportAdapter implements ExportAdapter
         $query = $exportConfig->hasQuery() ? $exportConfig->getQuery() : $this->createSimpleQuery($exportConfig);
 
         try {
-            return $this->connection->queryAndProcess(
+            return $this->queryAndProcess(
                 $query,
                 $exportConfig->getMaxRetries(),
                 function (QueryResult $result) use ($exportConfig, $csvFilePath) {
@@ -65,6 +65,11 @@ abstract class BaseExportAdapter implements ExportAdapter
         } catch (UserExceptionInterface $e) {
             throw $this->handleDbError($e, $exportConfig->getMaxRetries(), $exportConfig->getOutputTable());
         }
+    }
+
+    protected function queryAndProcess(string $query, int $maxRetries, callable $processor): ExportResult
+    {
+        return $this->connection->queryAndProcess($query, $maxRetries, $processor);
     }
 
     protected function createSimpleQuery(ExportConfig $exportConfig): string
