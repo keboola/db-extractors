@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\PDO;
 
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use PDO;
 use PDOStatement;
 use PDOException;
@@ -76,12 +77,18 @@ class PdoConnection extends BaseDbConnection
         return '`' . str_replace('`', '``', $str) . '`';
     }
 
+    protected function getQueryMetadata(string $query, PDOStatement $stmt): QueryMetadata
+    {
+        return new PdoQueryMetadata($stmt);
+    }
+
     protected function doQuery(string $query): QueryResult
     {
         /** @var PDOStatement $stmt */
         $stmt = $this->pdo->prepare($query);
         $stmt->execute();
-        return new PdoQueryResult($stmt);
+        $queryMetadata = $this->getQueryMetadata($query, $stmt);
+        return new PdoQueryResult($query, $queryMetadata, $stmt);
     }
 
     protected function getExpectedExceptionClasses(): array

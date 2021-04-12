@@ -6,8 +6,10 @@ namespace Keboola\DbExtractor\Adapter\Tests;
 
 use ArrayIterator;
 use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
-use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
+use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
+use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ColumnCollection;
 use PHPUnit\Framework\Assert;
 
 class DefaultResultWriterTest extends BaseTest
@@ -18,11 +20,14 @@ class DefaultResultWriterTest extends BaseTest
             'table' => ['tableName' => 'foo', 'schema' => 'bar'],
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
-            ['id' => 2, 'name' => 'Brno', 'population' => 369559],
-            ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
+                ['id' => 2, 'name' => 'Brno', 'population' => 369559],
+                ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
+            ]
+        );
 
         $result = $this
             ->createWriter()
@@ -48,7 +53,7 @@ END;
             'table' => ['tableName' => 'foo', 'schema' => 'bar'],
         ]);
 
-        $queryResult = $this->createQueryResultMock([]);
+        $queryResult = $this->createQueryResultMock(['id' => 'integer', 'name' => 'string'], []);
 
         $result = $this
             ->createWriter()
@@ -58,8 +63,10 @@ END;
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
         Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
-        // No rows, no CSV file
-        Assert::assertFalse(file_exists($result->getCsvPath()));
+        // No rows, but CSV file must exists
+        Assert::assertTrue(file_exists($result->getCsvPath()));
+        $expectedCsv = '';
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
     }
 
     public function testCustomQuery(): void
@@ -68,11 +75,14 @@ END;
             'query' => 'SELECT * FROM `foo`',
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
-            ['id' => 2, 'name' => 'Brno', 'population' => 369559],
-            ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string', 'population' => 'integer'],
+            [
+                ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
+                ['id' => 2, 'name' => 'Brno', 'population' => 369559],
+                ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
+            ]
+        );
 
         $result = $this
             ->createWriter()
@@ -99,7 +109,7 @@ END;
             'query' => 'SELECT * FROM `foo`',
         ]);
 
-        $queryResult = $this->createQueryResultMock([]);
+        $queryResult = $this->createQueryResultMock(['id' => 'integer', 'name' => 'string'], []);
 
         $result = $this
             ->createWriter()
@@ -109,8 +119,10 @@ END;
         Assert::assertSame(null, $result->getIncFetchingColMaxValue());
         Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
-        // No rows, no CSV file
-        Assert::assertFalse(file_exists($result->getCsvPath()));
+        // No rows, but CSV file must exists
+        Assert::assertTrue(file_exists($result->getCsvPath()));
+        $expectedCsv = "\"id\",\"name\"\n";
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
     }
 
     public function testIncrementalFetching(): void
@@ -120,11 +132,14 @@ END;
             'incrementalFetchingColumn' => 'id',
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-            ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
-            ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
+                ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
+                ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
+            ]
+        );
 
         $result = $this
             ->createWriter([]) // no state
@@ -150,11 +165,14 @@ END;
             'incrementalFetchingColumn' => 'id',
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-            ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
-            ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
+                ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
+                ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
+            ]
+        );
 
         $result = $this
             ->createWriter(['lastFetchedRow' => '3'])
@@ -182,7 +200,7 @@ END;
 
         $incFetchingLastValue = '3';
 
-        $queryResult = $this->createQueryResultMock([]);
+        $queryResult = $this->createQueryResultMock(['id' => 'integer', 'name' => 'string'], []);
 
         $result = $this
             ->createWriter(['lastFetchedRow' => $incFetchingLastValue])
@@ -192,8 +210,10 @@ END;
         Assert::assertSame($incFetchingLastValue, $result->getIncFetchingColMaxValue());
         Assert::assertSame($this->temp->getTmpFolder() . '/out/tables/output.csv', $result->getCsvPath());
 
-        // No rows, no CSV file
-        Assert::assertFalse(file_exists($result->getCsvPath()));
+        // No rows, but CSV file must exists
+        Assert::assertTrue(file_exists($result->getCsvPath()));
+        $expectedCsv = '';
+        Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
     }
 
     public function testNotIgnoreBadUtf8ByDefault(): void
@@ -202,11 +222,14 @@ END;
             'table' => ['tableName' => 'foo', 'schema' => 'bar'],
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
-            ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
-            ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+                ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
+                ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
+            ]
+        );
 
         $result = $this
             ->createWriter([])
@@ -227,11 +250,14 @@ END;
             'table' => ['tableName' => 'foo', 'schema' => 'bar'],
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
-            ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
-            ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
+                ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
+                ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
+            ]
+        );
 
         $result = $this
             ->createWriter([])
@@ -253,10 +279,13 @@ END;
             'table' => ['tableName' => 'foo', 'schema' => 'bar'],
         ]);
 
-        $queryResult = $this->createQueryResultMock([
-            ['id' => 1, 'name' => 'ABCÁÈÕ', 'population' => 313088],
-            ['id' => 2, 'name' => 'CDEÁÈÕ', 'population' => 164180],
-        ]);
+        $queryResult = $this->createQueryResultMock(
+            ['id' => 'integer', 'name' => 'string'],
+            [
+                ['id' => 1, 'name' => 'ABCÁÈÕ', 'population' => 313088],
+                ['id' => 2, 'name' => 'CDEÁÈÕ', 'population' => 164180],
+            ]
+        );
 
         $result = $this
             ->createWriter([])
@@ -298,12 +327,32 @@ END;
         ];
     }
 
-    private function createQueryResultMock(array $rows): QueryResult
+    private function createQueryResultMock(array $columns, array $rows): QueryResult
     {
+        $columnsMetadata = [];
+        foreach ($columns as $name => $type) {
+            $builder = ColumnBuilder::create();
+            $builder->setName($name);
+            $builder->setType($type);
+            $columnsMetadata[] = $builder->build();
+        }
+        $metadata  = $this
+            ->getMockBuilder(QueryMetadata::class)
+            ->disableAutoReturnValueGeneration()
+            ->getMock();
+        $metadata
+            ->expects($this->any())
+            ->method('getColumns')
+            ->willReturn(new ColumnCollection($columnsMetadata));
+
         $queryResult = $this
             ->getMockBuilder(QueryResult::class)
             ->disableAutoReturnValueGeneration()
             ->getMock();
+        $queryResult
+            ->expects($this->any())
+            ->method('getMetadata')
+            ->willReturn($metadata);
         $queryResult
             ->expects($this->once())
             ->id('getIteratorCall')

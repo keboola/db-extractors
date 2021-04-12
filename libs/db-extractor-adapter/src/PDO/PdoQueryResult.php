@@ -5,24 +5,41 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\PDO;
 
 use Iterator;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use PDO;
 use PDOStatement;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 
 class PdoQueryResult implements QueryResult
 {
+    protected string $query;
+
+    protected QueryMetadata $queryMetadata;
+
     protected PDOStatement $stmt;
 
     protected bool $closed = false;
 
-    public function __construct(PDOStatement $stmt)
+    public function __construct(string $query, QueryMetadata $queryMetadata, PDOStatement $stmt)
     {
+        $this->query = $query;
+        $this->queryMetadata = $queryMetadata;
         $this->stmt = $stmt;
     }
 
     public function __destruct()
     {
         $this->closeCursor();
+    }
+
+    public function getQuery(): string
+    {
+        return $this->query;
+    }
+
+    public function getMetadata(): QueryMetadata
+    {
+        return $this->queryMetadata;
     }
 
     /**

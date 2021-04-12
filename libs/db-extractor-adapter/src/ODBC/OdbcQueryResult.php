@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\ODBC;
 
 use Iterator;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 
 class OdbcQueryResult implements QueryResult
 {
+    protected string $query;
+
+    protected QueryMetadata $queryMetadata;
+
     /** @var resource */
     protected $stmt;
 
@@ -17,8 +22,10 @@ class OdbcQueryResult implements QueryResult
     /**
      * @param resource $stmt
      */
-    public function __construct($stmt)
+    public function __construct(string $query, QueryMetadata $queryMetadata, $stmt)
     {
+        $this->query = $query;
+        $this->queryMetadata = $queryMetadata;
         $this->stmt = $stmt;
     }
 
@@ -27,6 +34,15 @@ class OdbcQueryResult implements QueryResult
         $this->closeCursor();
     }
 
+    public function getQuery(): string
+    {
+        return $this->query;
+    }
+
+    public function getMetadata(): QueryMetadata
+    {
+        return $this->queryMetadata;
+    }
     /**
      * @return Iterator<array>
      */
