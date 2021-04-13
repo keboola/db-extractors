@@ -17,6 +17,10 @@ use IteratorAggregate;
  */
 interface QueryResult extends IteratorAggregate
 {
+    public function getQuery(): string;
+
+    public function getMetadata(): QueryMetadata;
+
     /**
      * @return Iterator<array>
      */

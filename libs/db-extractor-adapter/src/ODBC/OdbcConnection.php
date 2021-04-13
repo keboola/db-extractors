@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\ODBC;
 
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Throwable;
 use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
@@ -100,6 +101,14 @@ class OdbcConnection extends BaseDbConnection
         return '`' . str_replace('`', '``', $str) . '`';
     }
 
+    /**
+     * @param resource $stmt
+     */
+    protected function getQueryMetadata(string $query, $stmt): QueryMetadata
+    {
+        return new OdbcQueryMetadata($stmt);
+    }
+
     protected function doQuery(string $query): QueryResult
     {
         try {
@@ -114,7 +123,8 @@ class OdbcConnection extends BaseDbConnection
             throw new OdbcException(odbc_errormsg($this->connection) . ' ' . odbc_error($this->connection));
         }
 
-        return new OdbcQueryResult($stmt);
+        $queryMetadata = $this->getQueryMetadata($query, $stmt);
+        return new OdbcQueryResult($query, $queryMetadata, $stmt);
     }
 
     protected function getExpectedExceptionClasses(): array
