@@ -10,12 +10,19 @@ class ExportResult
 
     protected int $rowsCount;
 
+    protected QueryMetadata $queryMetadata;
+
     protected ?string $incFetchingColMaxValue;
 
-    public function __construct(string $csvPath, int $rowsCount, ?string $incFetchingColMaxValue)
-    {
+    public function __construct(
+        string $csvPath,
+        int $rowsCount,
+        QueryMetadata $queryMetadata,
+        ?string $incFetchingColMaxValue
+    ) {
         $this->csvPath = $csvPath;
         $this->rowsCount = $rowsCount;
+        $this->queryMetadata = $queryMetadata;
         $this->incFetchingColMaxValue = $incFetchingColMaxValue;
     }
 
@@ -27,6 +34,11 @@ class ExportResult
     public function getRowsCount(): int
     {
         return $this->rowsCount;
+    }
+
+    public function getQueryMetadata(): QueryMetadata
+    {
+        return $this->queryMetadata;
     }
 
     public function getIncFetchingColMaxValue(): ?string

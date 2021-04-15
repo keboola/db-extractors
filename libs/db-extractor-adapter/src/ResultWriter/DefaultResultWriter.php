@@ -78,7 +78,7 @@ class DefaultResultWriter implements ResultWriter
         $incFetchingColMaxValue = $this->lastRow ?
             $this->getIncrementalFetchingValueFromLastRow($exportConfig) :
             $this->getIncrementalFetchingValueFromState($exportConfig);
-        return new ExportResult($csvFilePath, $this->rowsCount, $incFetchingColMaxValue);
+        return new ExportResult($csvFilePath, $this->rowsCount, $result->getMetadata(), $incFetchingColMaxValue);
     }
 
     protected function writeRows(

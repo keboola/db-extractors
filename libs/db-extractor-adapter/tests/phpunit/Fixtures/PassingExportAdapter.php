@@ -6,7 +6,9 @@ namespace Keboola\DbExtractor\Adapter\Tests\Fixtures;
 
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use PHPUnit\Framework\MockObject\Generator;
 
 class PassingExportAdapter implements ExportAdapter
 {
@@ -27,7 +29,10 @@ class PassingExportAdapter implements ExportAdapter
     public function export(ExportConfig $exportConfig, string $csvFilePath): ExportResult
     {
         $this->exportCallCount++;
-        return new ExportResult($csvFilePath, 0, null);
+        $mockGenerator = new Generator();
+        /** @var QueryMetadata $queryMetadata */
+        $queryMetadata = $mockGenerator->getMock(QueryMetadata::class);
+        return new ExportResult($csvFilePath, 0, $queryMetadata, null);
     }
 
     public function getExportCallCount(): int
