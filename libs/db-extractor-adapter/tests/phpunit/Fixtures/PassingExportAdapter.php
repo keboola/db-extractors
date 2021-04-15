@@ -32,7 +32,7 @@ class PassingExportAdapter implements ExportAdapter
         $mockGenerator = new Generator();
         /** @var QueryMetadata $queryMetadata */
         $queryMetadata = $mockGenerator->getMock(QueryMetadata::class);
-        return new ExportResult($csvFilePath, 0, $queryMetadata, null);
+        return new ExportResult($csvFilePath, 0, $queryMetadata, false, null);
     }
 
     public function getExportCallCount(): int
