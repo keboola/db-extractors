@@ -78,7 +78,19 @@ class DefaultResultWriter implements ResultWriter
         $incFetchingColMaxValue = $this->lastRow ?
             $this->getIncrementalFetchingValueFromLastRow($exportConfig) :
             $this->getIncrementalFetchingValueFromState($exportConfig);
-        return new ExportResult($csvFilePath, $this->rowsCount, $result->getMetadata(), $incFetchingColMaxValue);
+        return new ExportResult(
+            $csvFilePath,
+            $this->rowsCount,
+            $result->getMetadata(),
+            $this->hasCsvHeader($exportConfig),
+            $incFetchingColMaxValue
+        );
+    }
+
+    protected function hasCsvHeader(ExportConfig $exportConfig): bool
+    {
+        // If header is present in the CSV file, there are no columns metadata in the manifest.
+        return $exportConfig->hasQuery();
     }
 
     protected function writeRows(
@@ -87,11 +99,8 @@ class DefaultResultWriter implements ResultWriter
         ExportConfig $exportConfig,
         CsvWriter $csvWriter
     ): void {
-        // With custom query are no metadata in manifest, so header must be present
-        $includeHeader = $exportConfig->hasQuery();
-
         // Write header
-        if ($includeHeader) {
+        if ($this->hasCsvHeader($exportConfig)) {
             $this->writeHeader($queryMetadata->getColumns()->getNames(), $csvWriter);
         }
 
