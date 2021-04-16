@@ -77,7 +77,8 @@ class PdoQueryResult implements QueryResult
         if ($this->closed === false) {
             try {
                 $this->stmt->closeCursor();
-            } catch (PDOException $e) {}
+            } catch (PDOException $e) {
+            }
             $this->closed = true;
         }
     }
