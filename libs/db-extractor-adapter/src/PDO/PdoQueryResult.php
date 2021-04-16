@@ -7,6 +7,7 @@ namespace Keboola\DbExtractor\Adapter\PDO;
 use Iterator;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 
@@ -74,7 +75,9 @@ class PdoQueryResult implements QueryResult
     public function closeCursor(): void
     {
         if ($this->closed === false) {
-            $this->stmt->closeCursor();
+            try {
+                $this->stmt->closeCursor();
+            } catch (PDOException $e) {}
             $this->closed = true;
         }
     }
