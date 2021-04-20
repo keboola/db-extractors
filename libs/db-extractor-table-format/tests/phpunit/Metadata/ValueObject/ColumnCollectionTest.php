@@ -52,4 +52,88 @@ class ColumnCollectionTest extends TestCase
         Assert::assertSame('aBC', $collection->getByName('abc')->getName());
         Assert::assertSame('aBC', $collection->getBySanitizedName('abc')->getName());
     }
+
+    public function testSortByOrdinalPosition(): void
+    {
+        $builder = TableBuilder::create();
+        $builder->setName('testTable');
+
+        $builder
+            ->addColumn()
+            ->setName('D')
+            ->setType('integer')
+            ->setOrdinalPosition(4);
+
+        $builder
+            ->addColumn()
+            ->setName('B')
+            ->setType('integer')
+            ->setOrdinalPosition(2);
+
+        $builder
+            ->addColumn()
+            ->setName('A')
+            ->setType('integer')
+            ->setOrdinalPosition(1);
+
+        $builder
+            ->addColumn()
+            ->setName('C')
+            ->setType('integer')
+            ->setOrdinalPosition(3);
+
+        $table = $builder->build();
+        $collection = $table->getColumns();
+        Assert::assertSame(['A', 'B', 'C', 'D'], $collection->getNames());
+    }
+
+    public function testSortOrdinalPositionNull(): void
+    {
+        $builder = TableBuilder::create();
+        $builder->setName('testTable');
+
+        $builder
+            ->addColumn()
+            ->setName('A')
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('B')
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('C')
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('D')
+            ->setType('integer');
+
+        $table = $builder->build();
+        $collection = $table->getColumns();
+        Assert::assertSame(['A', 'B', 'C', 'D'], $collection->getNames());
+    }
+
+    public function testSortOrdinalPositionNullMultiple(): void
+    {
+        $builder = TableBuilder::create();
+        $builder->setName('testTable');
+
+        $expectedOrder = [];
+        for ($i=0; $i<100; $i++) {
+            $name = 'COL' . $i;
+            $expectedOrder[] = $name;
+            $builder
+                ->addColumn()
+                ->setName($name)
+                ->setType('integer');
+        }
+
+        $table = $builder->build();
+        $collection = $table->getColumns();
+        Assert::assertSame($expectedOrder, $collection->getNames());
+    }
 }
