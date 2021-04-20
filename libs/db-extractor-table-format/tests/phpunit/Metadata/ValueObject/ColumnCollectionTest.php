@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 
-use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
+use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -135,5 +135,64 @@ class ColumnCollectionTest extends TestCase
         $table = $builder->build();
         $collection = $table->getColumns();
         Assert::assertSame($expectedOrder, $collection->getNames());
+    }
+
+    public function testOrdinalPositionMustBeSetToAllOrNone(): void
+    {
+        $builder = TableBuilder::create();
+        $builder->setName('testTable');
+
+        $builder
+            ->addColumn()
+            ->setName('A')
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('B')
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('C')
+            ->setOrdinalPosition(2)
+            ->setType('integer');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Set "ordinalPosition" to all columns, or none. ' .
+            'Column "C" has hasOrdinalPosition = "true", but the previous value is "false".'
+        );
+        $builder->build();
+    }
+
+    public function testOrdinalPositionMustBeSetToAllOrNone2(): void
+    {
+        $builder = TableBuilder::create();
+        $builder->setName('testTable');
+
+        $builder
+            ->addColumn()
+            ->setName('A')
+            ->setOrdinalPosition(1)
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('B')
+            ->setOrdinalPosition(2)
+            ->setType('integer');
+
+        $builder
+            ->addColumn()
+            ->setName('B')
+            ->setType('integer');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Set "ordinalPosition" to all columns, or none. ' .
+            'Column "B" has hasOrdinalPosition = "false", but the previous value is "true".'
+        );
+        $builder->build();
     }
 }
