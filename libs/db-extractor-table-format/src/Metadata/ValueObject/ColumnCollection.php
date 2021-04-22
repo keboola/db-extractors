@@ -27,21 +27,34 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
     public function __construct(array $columns)
     {
         // Check columns type
-        array_walk($columns, function ($column): void {
+        $allHaveOrdinalPosSet = null;
+        array_walk($columns, function ($column) use (&$allHaveOrdinalPosSet): void {
             if (!$column instanceof Column) {
                 throw new InvalidArgumentException(sprintf(
                     'All columns must by of type Column, given "%s".',
                     is_object($column) ? get_class($column) : gettype($column)
                 ));
             }
+
+            if ($allHaveOrdinalPosSet !== null && $allHaveOrdinalPosSet !== $column->hasOrdinalPosition()) {
+                throw new InvalidArgumentException(sprintf(
+                    'Set "ordinalPosition" to all columns, or none. ' .
+                    'Column "%s" has hasOrdinalPosition = "%s", but the previous value is "%s".',
+                    $column->getName(),
+                    $column->hasOrdinalPosition() ? 'true' : 'false',
+                    $allHaveOrdinalPosSet ? 'true' : 'false',
+                ));
+            }
+
+            $allHaveOrdinalPosSet = $column->hasOrdinalPosition();
         });
 
         // Sort by ordinalPosition if present
-        usort($columns, function (Column $a, Column $b): int {
-            $aPos = $a->hasOrdinalPosition() ? $a->getOrdinalPosition() : null;
-            $bPos = $b->hasOrdinalPosition() ? $b->getOrdinalPosition() : null;
-            return $aPos <=> $bPos;
-        });
+        if ($allHaveOrdinalPosSet) {
+            usort($columns, function (Column $a, Column $b): int {
+                return $a->getOrdinalPosition() <=> $b->getOrdinalPosition();
+            });
+        }
 
         $this->columns =  $columns;
     }
