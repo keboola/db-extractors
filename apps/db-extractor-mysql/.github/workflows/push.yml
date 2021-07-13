@@ -17,7 +17,7 @@ jobs:
       - name: Print Docker version
         run: |
           docker -v
-      - name:
+      - name: Build image
         run: |
           docker build -t $APP_IMAGE .
       - name: Run tests on MySQL 5
