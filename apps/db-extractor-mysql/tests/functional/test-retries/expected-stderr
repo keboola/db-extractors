@@ -1,1 +1,1 @@
-Error connecting to DB: PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known
+Error connecting to DB: SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES)

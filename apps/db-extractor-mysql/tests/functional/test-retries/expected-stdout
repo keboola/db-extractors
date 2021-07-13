@@ -1,9 +1,9 @@
-Creating PDO connection to "mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8".
-PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [1x]
-Creating PDO connection to "mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8".
-PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [2x]
-Creating PDO connection to "mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8".
-PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [3x]
-Creating PDO connection to "mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8".
-PDO::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known. Retrying... [4x]
-Creating PDO connection to "mysql:host=unexistsHost;port=3306;dbname=test;charset=utf8".
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [1x]
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [2x]
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [3x]
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [4x]
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
