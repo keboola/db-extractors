@@ -26,6 +26,7 @@ jobs:
           docker-compose run app5
           docker-compose rm -s -f -v
       - name: Run test on MySQL 8
+        run: |
           docker-compose run wait8
           docker-compose run app8
           docker-compose rm -s -f -v
