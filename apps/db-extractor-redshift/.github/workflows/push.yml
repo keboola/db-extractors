@@ -17,6 +17,8 @@ env:
   REDSHIFT_DB_USER: "gh_actions_db_ex_tests"
   REDSHIFT_DB_PASSWORD: ${{ secrets.REDSHIFT_DB_PASSWORD }}
   REDSHIFT_DB_DATABASE: "gh_actions_db_ex_tests"
+  DOCKERHUB_USER: "keboolabot"
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 jobs:
   Build:
     runs-on: ubuntu-latest
@@ -28,6 +30,7 @@ jobs:
           docker -v
       - name: Build image and run tests
         run: |
+          docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
           docker build -t $APP_IMAGE .
           docker-compose run --rm app composer ci
       - name: Push image to ECR
