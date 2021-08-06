@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\Builder;
 
-use RuntimeException;
-use LogicException;
-use TypeError;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
-use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\Builder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
+use LogicException;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use TypeError;
 
 /**
  * This class tests that values set by a Builder set* methods
@@ -404,7 +404,6 @@ abstract class BaseBuilderTest extends TestCase
     }
 
     /**
-     * @param string $property
      * @return mixed
      */
     public function getDefaultValue(string $property)
@@ -414,8 +413,6 @@ abstract class BaseBuilderTest extends TestCase
     }
 
     /**
-     * @param Builder $builder
-     * @param string $property
      * @param mixed $value
      */
     protected function callSet(Builder $builder, string $property, $value): void
@@ -440,8 +437,6 @@ abstract class BaseBuilderTest extends TestCase
     }
 
     /**
-     * @param ValueObject $valueObject
-     * @param string $property
      * @return mixed
      */
     protected function callGet(ValueObject $valueObject, string $property)

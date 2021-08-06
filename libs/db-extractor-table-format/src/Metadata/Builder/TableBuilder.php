@@ -8,7 +8,6 @@ use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ColumnCollection;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
-use Keboola\Utils\Sanitizer\ColumnNameSanitizer;
 
 class TableBuilder implements Builder
 {
@@ -49,7 +48,6 @@ class TableBuilder implements Builder
      * Table can be build without columns if buildColumns = false, see method "setColumnsNotExpected".
      * It is useful when there are a lot of tables and in first step are loaded only tables without columns.
      * Than, in second step, is loaded selected table with columns.
-     * @var bool
      */
     private bool $buildColumns = true;
 

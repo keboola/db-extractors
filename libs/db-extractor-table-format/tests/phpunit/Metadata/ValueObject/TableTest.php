@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
+use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ColumnCollection;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
-use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
 class TableTest extends BaseValueObjectTest
 {

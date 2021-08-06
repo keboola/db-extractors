@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
+use ArrayIterator;
 use Countable;
 use Iterator;
 use IteratorAggregate;
-use ArrayIterator;
 use Keboola\DbExtractor\TableResultFormat\Exception\TableNotFoundException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
 
