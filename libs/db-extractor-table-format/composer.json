@@ -28,7 +28,7 @@
         "keboola/php-utils": "^4.1"
     },
     "require-dev": {
-        "keboola/coding-standard": ">=9.0",
+        "keboola/coding-standard": "^11.0",
         "phpstan/phpstan": "^0.12.2",
         "phpunit/phpunit": "^9.1"
     },
