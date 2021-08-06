@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 
-use TypeError;
-use RuntimeException;
-use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
-use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
+use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use TypeError;
 
 /**
  * This class tests a ValueObject constructor, has* and get* methods.
@@ -184,8 +184,6 @@ abstract class BaseValueObjectTest extends TestCase
     }
 
     /**
-     * @param ValueObject $valueObject
-     * @param string $property
      * @return mixed
      */
     protected function callGet(ValueObject $valueObject, string $property)

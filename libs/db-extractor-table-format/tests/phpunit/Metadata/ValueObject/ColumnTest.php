@@ -7,8 +7,8 @@ namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException;
 use Keboola\DbExtractor\TableResultFormat\Exception\PropertyNotSetException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ForeignKeyBuilder;
-use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Column;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
+use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Column;
 use PHPUnit\Framework\Assert;
 
 class ColumnTest extends BaseValueObjectTest

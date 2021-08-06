@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 
-use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ForeignKey;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject;
+use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ForeignKey;
 
 class ForeignKeyTest extends BaseValueObjectTest
 {
