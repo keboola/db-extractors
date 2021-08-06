@@ -12,11 +12,9 @@ use Symfony\Component\Config\Definition\Processor;
 
 class Config
 {
-    /** @var mixed[] */
-    protected $config;
+    protected array $config;
 
-    /** @var ConfigurationInterface */
-    private $configDefinition;
+    private ConfigurationInterface $configDefinition;
 
     public function __construct(
         array $config,
