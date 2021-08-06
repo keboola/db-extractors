@@ -271,7 +271,7 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('The child node "tableName" at path "root.parameters.table" must be configured.');
+        $this->expectExceptionMessage('The child config "tableName" under "root.parameters.table" must be configured.');
 
         new Config($configurationArray, new ConfigRowDefinition());
     }
@@ -290,7 +290,7 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $this->expectException(ConfigUserException::class);
-        $this->expectExceptionMessage('The child node "schema" at path "root.parameters.table" must be configured.');
+        $this->expectExceptionMessage('The child config "schema" under "root.parameters.table" must be configured.');
 
         new Config($configurationArray, new ConfigRowDefinition());
     }
