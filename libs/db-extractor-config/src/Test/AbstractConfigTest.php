@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorConfig\Test;
 
+use Exception;
 use Keboola\DbExtractorConfig\Exception\UserException;
 use PHPUnit\Framework\TestCase;
 
@@ -62,7 +63,7 @@ abstract class AbstractConfigTest extends TestCase
         $env = strtoupper($driver) . '_' . $suffix;
         if ($required) {
             if (getenv($env) === false) {
-                throw new \Exception($env . ' environment variable must be set.');
+                throw new Exception($env . ' environment variable must be set.');
             }
         }
         return (string) getenv($env);

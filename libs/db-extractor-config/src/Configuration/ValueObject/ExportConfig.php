@@ -24,7 +24,6 @@ class ExportConfig implements ValueObject
      * If enabled, new rows are added and existing (same PK value) are updated.
      * If disabled, full load is performed and the storage table is overwritten.
      * It's a different feature from incrementalFetching!
-     * @var bool
      */
     private bool $incrementalLoading;
 

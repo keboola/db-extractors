@@ -10,7 +10,7 @@
     },
     "require-dev": {
         "php-parallel-lint/php-parallel-lint": "^1.2",
-        "keboola/coding-standard": "^11.0",
+        "keboola/coding-standard": ">=13.0",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.1",
         "ext-json": "*"
