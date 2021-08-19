@@ -36,7 +36,18 @@ class SslNode extends ArrayNodeDefinition
 
     protected function addKeyNode(NodeBuilder $nodeBuilder): void
     {
-        $nodeBuilder->scalarNode('key');
+        // Backward compatibility: allow unencrypted "key"
+        $this
+            ->beforeNormalization()
+            ->always(function (array $v) {
+                if (isset($v['key'])) {
+                    $v['#key'] = $v['key'];
+                    unset($v['key']);
+                }
+                return $v;
+            });
+
+        $nodeBuilder->scalarNode('#key');
     }
 
     protected function addCaNode(NodeBuilder $nodeBuilder): void
