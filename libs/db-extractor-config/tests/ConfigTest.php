@@ -30,7 +30,7 @@ class ConfigTest extends AbstractConfigTest
                     'database' => 'test',
                     'port' => 3306,
                     'ssl' => [
-                        'key' => 'testKey',
+                        '#key' => 'testKey',
                         'ca' => 'testCa',
                         'cert' => 'testCert',
                         'cipher' => 'testCipher',
@@ -92,7 +92,7 @@ class ConfigTest extends AbstractConfigTest
                     'database' => 'test',
                     'port' => 3306,
                     'ssl' => [
-                        'key' => 'testKey',
+                        '#key' => 'testKey',
                         'ca' => 'testCa',
                         'cert' => 'testCert',
                         'cipher' => 'testCipher',
@@ -216,8 +216,34 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $config = new Config($configurationArray, new ActionConfigRowDefinition());
-
         $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testUnencryptedSslKey(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'ssl' => [
+                        'key' => 'testKey',
+                        'ca' => 'testCa',
+                        'cert' => 'testCert',
+                        'cipher' => 'testCipher',
+                        'verifyServerCert' => false,
+                    ],
+                ],
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+        $this->assertEquals('testKey', $config->getData()['parameters']['db']['ssl']['#key']);
     }
 
     public function testInvalidConfigQueryIncremental(): void

@@ -24,7 +24,7 @@ class DatabaseConfigTest extends TestCase
             'schema' => 'schema',
             'ssl' => [
                 'enabled' => true,
-                'key' => 'testKey',
+                '#key' => 'testKey',
                 'ca' => 'testCa',
                 'cert' => 'testCert',
             ],
@@ -54,7 +54,7 @@ class DatabaseConfigTest extends TestCase
 
     public function testDatabaseConfigSerializer(): void
     {
-        $config = [
+        $input = [
             'host' => 'testHost.local',
             'port' => '12345',
             'user' => 'username',
@@ -63,18 +63,29 @@ class DatabaseConfigTest extends TestCase
             'schema' => 'schema',
             'ssl' => [
                 'enabled' => true,
-                'key' => 'testKey',
+                '#key' => 'testKey',
                 'ca' => 'testCa',
                 'cert' => 'testCert',
             ],
         ];
 
-        $serialize = DatabaseConfigSerializer::serialize(DatabaseConfig::fromArray($config));
+        $expected = [
+            'host' => 'testHost.local',
+            'port' => '12345',
+            'user' => 'username',
+            '#password' => 'secretPassword',
+            'database' => 'database',
+            'schema' => 'schema',
+            'ssl' => [
+                'enabled' => true,
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+                'key' => 'testKey',
+            ],
+        ];
 
-        sort($config);
-        sort($serialize);
-
-        Assert::assertEquals($config, $serialize);
+        $serialize = DatabaseConfigSerializer::serialize(DatabaseConfig::fromArray($input));
+        Assert::assertEquals($expected, $serialize);
     }
 
     public function testNotEnabledSslConnection(): void

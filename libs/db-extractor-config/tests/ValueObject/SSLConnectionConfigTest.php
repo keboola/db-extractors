@@ -16,7 +16,7 @@ class SSLConnectionConfigTest extends TestCase
     public function testValid(): void
     {
         $sslConnectionConfig = SSLConnectionConfig::fromArray([
-            'key' => 'testKey',
+            '#key' => 'testKey',
             'ca' => 'testCa',
             'cipher' => 'testCipher',
             'cert' => 'testCertificate',
@@ -75,18 +75,21 @@ class SSLConnectionConfigTest extends TestCase
 
     public function testSSLConnectionConfigSerializer(): void
     {
-        $config = [
+        $input = [
             'enabled' => true,
-            'key' => 'testKey',
+            '#key' => 'testKey',
             'ca' => 'testCa',
             'cert' => 'testCert',
         ];
 
-        $serialize = SSLConnectionConfigSerializer::serialize(SSLConnectionConfig::fromArray($config));
+        $expected = [
+            'enabled' => true,
+            'ca' => 'testCa',
+            'cert' => 'testCert',
+            'key' => 'testKey',
+        ];
 
-        sort($config);
-        sort($serialize);
-
-        Assert::assertEquals($config, $serialize);
+        $serialize = SSLConnectionConfigSerializer::serialize(SSLConnectionConfig::fromArray($input));
+        Assert::assertEquals($expected, $serialize);
     }
 }
