@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\FunctionalTests;
 
-use Keboola\DbExtractor\Extractor\MySQL;
 use Keboola\DbExtractor\Configuration\ValueObject\MysqlDatabaseConfig;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\Extractor\MySQL;
 use Keboola\DbExtractor\Extractor\SslHelper;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\Temp\Temp;
 use PDO;
 use PDOException;
-use \Throwable;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
+use Throwable;
 
 class PdoTestConnection
 {

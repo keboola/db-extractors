@@ -9,7 +9,7 @@ use Keboola\DbExtractor\TraitTests\Tables\EmojiTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\EscapingTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SalesTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SimpleTableTrait;
-use \PDO;
+use PDO;
 
 class DatabaseManager
 {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\Datatype\Definition\Exception\InvalidLengthException;
+use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
@@ -12,16 +14,14 @@ use Keboola\DbExtractor\Adapter\Query\DefaultQueryFactory;
 use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
 use Keboola\DbExtractor\Configuration\ValueObject\MysqlDatabaseConfig;
 use Keboola\DbExtractor\Exception\ApplicationException;
+use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Keboola\Temp\Temp;
 use PDO;
 use PDOException;
 use Throwable;
-use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
-use Keboola\Datatype\Definition\Exception\InvalidLengthException;
-use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
-use Keboola\DbExtractor\Exception\UserException;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Keboola\Temp\Temp;
 
 class MySQL extends BaseExtractor
 {

@@ -12,7 +12,7 @@ use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
-use \Throwable;
+use Throwable;
 
 class DatadirTest extends DatadirTestCase
 {
