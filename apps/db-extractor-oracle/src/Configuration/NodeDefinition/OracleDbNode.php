@@ -44,4 +44,9 @@ class OracleDbNode extends DbNode
     {
         $builder->scalarNode('defaultRowPrefetch');
     }
+
+    protected function addSslNode(NodeBuilder $builder): void
+    {
+        // not implemented
+    }
 }
