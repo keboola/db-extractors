@@ -8,7 +8,6 @@ use Keboola\Datatype\Definition\Exception\InvalidLengthException;
 use Keboola\Datatype\Definition\MySQL as MysqlDatatype;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
-use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Adapter\PDO\PdoExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\DefaultQueryFactory;
 use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
@@ -21,7 +20,6 @@ use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Keboola\Temp\Temp;
 use PDO;
 use PDOException;
-use Throwable;
 
 class MySQL extends BaseExtractor
 {
@@ -38,7 +36,7 @@ class MySQL extends BaseExtractor
 
     protected MySQLDbConnection $connection;
 
-    public function getMetadataProvider(): MetadataProvider
+    public function createMetadataProvider(): MetadataProvider
     {
         return new MySQLMetadataProvider($this->connection, $this->database);
     }
