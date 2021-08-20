@@ -55,7 +55,8 @@ class DatadirTest extends DatadirTestCase
         $this->testProjectDir = $this->getTestFileDir() . '/' . $this->dataName();
         $this->testTempDir = $this->temp->getTmpFolder();
 
-        $this->connection = PdoTestConnection::createConnection();
+        $isSsl = strpos((string) $this->dataName(), 'ssl-') === 0;
+        $this->connection = PdoTestConnection::createConnection($isSsl);
         $this->removeAllTables();
         $this->closeSshTunnels();
 

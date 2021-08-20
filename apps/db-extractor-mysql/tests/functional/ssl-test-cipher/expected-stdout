@@ -1,4 +1,4 @@
-Using SSL Connection
+SSL enabled.
 Creating PDO connection to "mysql:%a".
 PDO::__construct(): Cannot connect to MySQL by using SSL. Retrying... [1x]
 Creating PDO connection to "mysql:%a".

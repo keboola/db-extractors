@@ -23,13 +23,6 @@ use PDOException;
 
 class MySQL extends BaseExtractor
 {
-    // Some SSL keys who worked in Debian Stretch (OpenSSL 1.1.0) stopped working in Debian Buster (OpenSSL 1.1.1).
-    // Eg. "Signature Algorithm: sha1WithRSAEncryption" used in mysql5 tests in this repo.
-    // This is because Debian wants to be "more secure"
-    // and has set "SECLEVEL", which in OpenSSL defaults to "1", to value "2".
-    // See https://wiki.debian.org/ContinuousIntegration/TriagingTips/openssl-1.1.1
-    // So we reset this value to OpenSSL default.
-    public const SSL_DEFAULT_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
     public const INCREMENTAL_TYPES = ['INTEGER', 'NUMERIC', 'FLOAT', 'TIMESTAMP'];
 
     protected ?string $database = null;
@@ -61,105 +54,38 @@ class MySQL extends BaseExtractor
             throw new ApplicationException('MysqlDatabaseConfig expected.');
         }
 
-        $isSsl = false;
-
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
-            PDO::MYSQL_ATTR_COMPRESS => $databaseConfig->isNetworkCompressionEnabled(), // network compression
-        ];
-
-        // ssl encryption
-        if ($databaseConfig->hasSSLConnection()) {
-            $sslConnection = $databaseConfig->getSslConnectionConfig();
-
-            $temp = new Temp('myslq-ssl');
-
-            if ($sslConnection->hasKey()) {
-                $options[PDO::MYSQL_ATTR_SSL_KEY] = SslHelper::createSSLFile($temp, $sslConnection->getKey());
-                $isSsl = true;
-            }
-            if ($sslConnection->getCert()) {
-                $options[PDO::MYSQL_ATTR_SSL_CERT] = SslHelper::createSSLFile($temp, $sslConnection->getCert());
-                $isSsl = true;
-            }
-            if ($sslConnection->getCa()) {
-                $options[PDO::MYSQL_ATTR_SSL_CA] = SslHelper::createSSLFile($temp, $sslConnection->getCa());
-                $isSsl = true;
-            }
-            if ($sslConnection->hasCipher()) {
-                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = $sslConnection->getCipher();
-            } else {
-                $options[PDO::MYSQL_ATTR_SSL_CIPHER] = self::SSL_DEFAULT_CIPHER_CONFIG;
-            }
-
-            if (!$sslConnection->isVerifyServerCert()) {
-                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
-            }
-        }
-
-        $port = $databaseConfig->hasPort() ? $databaseConfig->getPort() : '3306';
-
-        $dsn = sprintf(
-            'mysql:host=%s;port=%s;charset=utf8',
-            $databaseConfig->getHost(),
-            $port
-        );
-
+        // Set database
         if ($databaseConfig->hasDatabase()) {
-            $dsn = sprintf(
-                'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
-                $databaseConfig->getHost(),
-                $port,
-                $databaseConfig->getDatabase()
-            );
             $this->database = $databaseConfig->getDatabase();
         }
 
-        if ($isSsl) {
-            $this->logger->info('Using SSL Connection');
-        }
-        $this->connection = new MySQLDbConnection(
-            $this->logger,
-            $dsn,
-            $databaseConfig->getUsername(),
-            $databaseConfig->getPassword(),
-            $options,
-            function (PDO $pdo): void {
-                $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-                try {
-                    $pdo->exec('SET NAMES utf8mb4;');
-                } catch (PDOException $exception) {
-                    $this->logger->info('Falling back to "utf8" charset');
-                    $pdo->exec('SET NAMES utf8;');
-                }
-            },
-            $this->isSyncAction() ? 1 : MySQLDbConnection::CONNECT_MAX_RETRIES
-        );
-
-        if ($databaseConfig->hasTransactionIsolationLevel()) {
-            $this->connection->query(
-                sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s', $databaseConfig->getTransactionIsolationLevel())
-            );
+        // Log SSL status
+        if ($databaseConfig->hasSSLConnection()) {
+            $this->logger->info('SSL enabled.');
         }
 
-        if ($isSsl) {
+        // Create connection
+        $connectMaxTries = $this->isSyncAction() ? 1 : MySQLDbConnection::CONNECT_MAX_RETRIES;
+        $this->connection = MySQLDbConnectionFactory::create($databaseConfig, $this->logger, $connectMaxTries);
+
+        // Check SSL
+        if ($databaseConfig->hasSSLConnection()) {
             $status = $this->connection
                 ->query("SHOW STATUS LIKE 'Ssl_cipher';")
-                ->fetch()
-            ;
+                ->fetch();
 
             if (empty($status['Value'])) {
-                throw new UserException(sprintf('Connection is not encrypted'));
+                throw new UserException('Connection is not encrypted');
             } else {
                 $this->logger->info('Using SSL cipher: ' . $status['Value']);
             }
         }
 
+        // Check network compression
         if ($databaseConfig->isNetworkCompressionEnabled()) {
             $status = $this->connection
                 ->query("SHOW SESSION STATUS LIKE 'Compression';")
-                ->fetch()
-            ;
+                ->fetch();
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
                 throw new UserException('Network communication is not compressed.');

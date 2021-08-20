@@ -7,71 +7,49 @@ namespace Keboola\DbExtractor\FunctionalTests;
 use Keboola\DbExtractor\Configuration\ValueObject\MysqlDatabaseConfig;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Extractor\MySQL;
+use Keboola\DbExtractor\Extractor\MySQLDbConnectionFactory;
 use Keboola\DbExtractor\Extractor\SslHelper;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\Temp\Temp;
 use PDO;
 use PDOException;
+use Psr\Log\NullLogger;
 use Throwable;
 
 class PdoTestConnection
 {
-    public static function getDbConfigArray(): array
+    public static function getDbConfigArray(bool $ssl = false): array
     {
-        return [
-            'host' => (string) getenv('MYSQL_DB_HOST'),
+        $config = [
+            'host' => $ssl ? (string) getenv('MYSQL_DB_SSL_HOST') : (string) getenv('MYSQL_DB_HOST'),
             'port' => (string) getenv('MYSQL_DB_PORT'),
             'user' => (string) getenv('MYSQL_DB_USER'),
             '#password' => (string) getenv('MYSQL_DB_PASSWORD'),
             'database' => (string) getenv('MYSQL_DB_DATABASE'),
             'networkCompression' => false,
         ];
+
+        if ($ssl) {
+            $config['ssl'] = [
+                'enabled' => true,
+                'ca' => (string) getenv('SSL_CA'),
+                'cert' => (string) getenv('SSL_CERT'),
+                '#key' => (string) getenv('SSL_KEY'),
+            ];
+        }
+
+        return $config;
     }
 
-    public static function createDbConfig(): MysqlDatabaseConfig
+    public static function createDbConfig(bool $ssl = false): MysqlDatabaseConfig
     {
-        $dbConfig = self::getDbConfigArray();
+        $dbConfig = self::getDbConfigArray($ssl);
         return MysqlDatabaseConfig::fromArray($dbConfig);
     }
 
-    public static function createConnection(): PDO
+    public static function createConnection(bool $ssl = false): PDO
     {
-        $databaseConfig = self::createDbConfig();
-
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
-        ];
-
-        $port = $databaseConfig->hasPort() ? $databaseConfig->getPort() : '3306';
-
-        $dsn = sprintf(
-            'mysql:host=%s;port=%s;charset=utf8',
-            $databaseConfig->getHost(),
-            $port
-        );
-
-        if ($databaseConfig->hasDatabase()) {
-            $dsn = sprintf(
-                'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
-                $databaseConfig->getHost(),
-                $port,
-                $databaseConfig->getDatabase()
-            );
-        }
-
-        try {
-            $pdo = new PDO($dsn, $databaseConfig->getUsername(), $databaseConfig->getPassword(), $options);
-        } catch (PDOException $e) {
-            throw $e;
-        }
-
-        $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
-        try {
-            $pdo->exec('SET NAMES utf8mb4;');
-        } catch (PDOException $exception) {
-            $pdo->exec('SET NAMES utf8;');
-        }
-
-        return $pdo;
+        $dbConfig = self::createDbConfig($ssl);
+        return MySQLDbConnectionFactory::create($dbConfig, new NullLogger(), 1)->getConnection();
     }
 }
