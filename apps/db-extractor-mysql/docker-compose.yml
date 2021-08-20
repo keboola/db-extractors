@@ -6,15 +6,18 @@ services:
     command: composer ci
     environment:
       MYSQL_DB_HOST: mysql
+      MYSQL_DB_SSL_HOST: mysql-ssl
+      MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
       MYSQL_DB_USER: root
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
     volumes:
-      - ./tests/ssl-certs/mysql5:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
     links:
       - mysql5:mysql
+      - mysql5:mysql-ssl
       - mysql5:mysql-different-cn
       - sshproxy5:sshproxy
 
@@ -25,14 +28,17 @@ services:
     environment:
       MYSQL_DB_HOST: mysql
       MYSQL_DB_USER: root
+      MYSQL_DB_SSL_HOST: mysql-ssl
+      MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
       MYSQL_DB_PASSWORD: rootpassword
       MYSQL_DB_DATABASE: test
       MYSQL_DB_PORT: 3306
     volumes:
-      - ./tests/ssl-certs/mysql8:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
     links:
       - mysql8:mysql
+      - mysql8:mysql-ssl
       - mysql8:mysql-different-cn
       - sshproxy8:sshproxy
 
@@ -41,7 +47,7 @@ services:
     volumes:
       - .:/code
       - ./data:/data
-      - ./tests/ssl-certs/mysql5:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
   dev8:
@@ -49,13 +55,13 @@ services:
     volumes:
       - .:/code
       - ./data:/data
-      - ./tests/ssl-certs/mysql8:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
   mysql5:
     image: mysql:5.6
     volumes:
-      - ./tests/ssl-certs/mysql5:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_DATABASE: test
@@ -64,7 +70,7 @@ services:
   mysql8:
     image: mysql:8
     volumes:
-      - ./tests/ssl-certs/mysql8:/ssl-cert
+      - ./docker/ssl/certificates:/ssl-cert
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     environment:
       MYSQL_DATABASE: test
