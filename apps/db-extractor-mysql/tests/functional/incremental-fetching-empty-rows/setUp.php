@@ -10,4 +10,5 @@ return function (DatadirTest $test): void {
 
     // Auto increment table
     $manager->createAITable();
+    $manager->addAIConstraint();
 };

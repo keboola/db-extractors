@@ -112,11 +112,15 @@
             },
             {
                 "key": "KBC.uniqueKey",
-                "value": false
+                "value": true
             },
             {
                 "key": "KBC.ordinalPosition",
                 "value": 2
+            },
+            {
+                "key": "KBC.constraintName",
+                "value": "UNI_KEY_1"
             }
         ],
         "someInteger": [
