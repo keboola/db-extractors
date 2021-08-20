@@ -62,11 +62,10 @@ class MySQL extends BaseExtractor
         }
 
         $isSsl = false;
-        $isCompression = !empty($params['networkCompression']) ? true :false;
 
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
-            PDO::MYSQL_ATTR_COMPRESS => $isCompression, // network compression
+            PDO::MYSQL_ATTR_COMPRESS => $databaseConfig->isNetworkCompressionEnabled(), // network compression
         ];
 
         // ssl encryption
@@ -156,16 +155,16 @@ class MySQL extends BaseExtractor
             }
         }
 
-        if ($isCompression) {
+        if ($databaseConfig->isNetworkCompressionEnabled()) {
             $status = $this->connection
                 ->query("SHOW SESSION STATUS LIKE 'Compression';")
                 ->fetch()
             ;
 
             if (empty($status['Value']) || $status['Value'] !== 'ON') {
-                throw new UserException(sprintf('Network communication is not compressed'));
+                throw new UserException('Network communication is not compressed.');
             } else {
-                $this->logger->info('Using network communication compression');
+                $this->logger->info('Using network compression.');
             }
         }
     }
