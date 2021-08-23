@@ -1,8 +1,8 @@
 version: "3"
 services:
-  app5: &app5
+  app: &app
     build: .
-    image: keboola/ex-db-mysql
+    image: keboola/db-extractor-mysql
     command: composer ci
     environment:
       MYSQL_DB_HOST: mysql
@@ -16,95 +16,50 @@ services:
       - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
     links:
-      - mysql5:mysql
-      - mysql5:mysql-ssl
-      - mysql5:mysql-different-cn
-      - sshproxy5:sshproxy
-
-  app8: &app8
-    build: .
-    image: keboola/ex-db-mysql
-    command: composer ci
-    environment:
-      MYSQL_DB_HOST: mysql
-      MYSQL_DB_USER: root
-      MYSQL_DB_SSL_HOST: mysql-ssl
-      MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
-      MYSQL_DB_PASSWORD: rootpassword
-      MYSQL_DB_DATABASE: test
-      MYSQL_DB_PORT: 3306
-    volumes:
-      - ./docker/ssl/certificates:/ssl-cert
-      - ssh-keys:/root/.ssh:ro
-    links:
-      - mysql8:mysql
-      - mysql8:mysql-ssl
-      - mysql8:mysql-different-cn
-      - sshproxy8:sshproxy
+      - mysql
+      - mysql-ssl
+      - mysql-ssl:mysql-different-cn
+      - sshproxy
 
   dev:
-    <<: *app5
+    <<: *app
     volumes:
       - .:/code
       - ./data:/data
       - ./docker/ssl/certificates:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
-  dev8:
-    <<: *app8
-    volumes:
-      - .:/code
-      - ./data:/data
-      - ./docker/ssl/certificates:/ssl-cert
-      - ssh-keys:/root/.ssh:ro
-
-  mysql5:
-    image: mysql:5.6
-    volumes:
-      - ./docker/ssl/certificates:/ssl-cert
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d
-    environment:
-      MYSQL_DATABASE: test
-      MYSQL_ROOT_PASSWORD: rootpassword
-
-  mysql8:
-    image: mysql:8
-    volumes:
-      - ./docker/ssl/certificates:/ssl-cert
-      - ./docker/mysql/conf.d:/etc/mysql/conf.d
-    environment:
-      MYSQL_DATABASE: test
-      MYSQL_ROOT_PASSWORD: rootpassword
+  mysql:
+    image: mysql:${MYSQL_VERSION}
     command: mysqld --local-infile --port=3306 --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: rootpassword
 
-  sshproxy5:
+  mysql-ssl:
+    image: mysql:${MYSQL_VERSION}
+    command: mysqld --local-infile --port=3306 --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./docker/ssl/certificates:/ssl-cert
+      - ./docker/mysql-ssl/${MYSQL_VERSION}/conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: rootpassword
+
+  sshproxy:
     image: keboola/db-component-ssh-proxy:latest
     volumes:
       - ssh-keys:/root/.ssh
     links:
-      - mysql5:mysql
+      - mysql
 
-  sshproxy8:
-    image: keboola/db-component-ssh-proxy:latest
-    volumes:
-      - ssh-keys:/root/.ssh
-    links:
-      - mysql8:mysql
-
-  wait5:
+  wait:
     image: waisbrot/wait
     depends_on:
-      - mysql5
+      - mysql
+      - mysql-ssl
     environment:
-      - TARGETS=mysql5:3306
-      - TIMEOUT=200
-
-  wait8:
-    image: waisbrot/wait
-    depends_on:
-      - mysql8
-    environment:
-      - TARGETS=mysql8:3306
+      - TARGETS=mysql:3306,mysql-ssl:3306
       - TIMEOUT=200
 
 volumes:

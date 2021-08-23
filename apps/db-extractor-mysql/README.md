@@ -3,8 +3,9 @@
 
 ### Development
 
-- clone the repository
-- `docker-compose build`
+- Clone the repository.
+- Create `.env` file with `MYSQL_VERSION=latest`.
+- Run `docker-compose build`.
 
 #### Tools
 
