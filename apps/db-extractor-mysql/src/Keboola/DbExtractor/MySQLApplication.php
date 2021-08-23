@@ -6,10 +6,10 @@ namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
 use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlTableNodesDecorator;
+use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Keboola\DbExtractorConfig\Config;
 use Psr\Log\LoggerInterface;
 
 class MySQLApplication extends Application

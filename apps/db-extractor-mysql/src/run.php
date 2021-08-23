@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Keboola\DbExtractor\Exception\UserException;
-use Keboola\Component\Logger;
-use Keboola\Component\JsonHelper;
-use \Keboola\DbExtractor\MySQLApplication;
 use Keboola\CommonExceptions\UserExceptionInterface;
+use Keboola\Component\JsonHelper;
+use Keboola\Component\Logger;
+use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\MySQLApplication;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -35,7 +35,7 @@ try {
     if ($app['action'] !== 'run') {
         // Print sync action result
         echo JsonHelper::encode($result);
-    } else if (!empty($result['state'])) {
+    } elseif (!empty($result['state'])) {
         // Write state if present
         $outputStateFile = $dataFolder . '/out/state.json';
         JsonHelper::writeFile($outputStateFile, $result['state']);
@@ -45,7 +45,7 @@ try {
 } catch (UserExceptionInterface $e) {
     $logger->error($e->getMessage());
     exit(1);
-} catch (\Throwable $e) {
+} catch (Throwable $e) {
     $logger->critical(
         get_class($e) . ':' . $e->getMessage(),
         [

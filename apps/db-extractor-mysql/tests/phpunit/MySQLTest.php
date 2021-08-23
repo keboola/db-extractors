@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
+use Generator;
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\Component\Logger;
 use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\FunctionalTests\PdoTestConnection;
 use Keboola\DbExtractor\MySQLApplication;
 use Keboola\DbExtractor\Tests\Traits\ConfigTrait;
@@ -19,13 +21,12 @@ use Keboola\DbExtractor\TraitTests\Tables\AutoIncrementTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\EmojiTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\EscapingTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SalesTableTrait;
-use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\TestCase;
-use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Exception\UserException as ConfigUserException;
 use Nette\Utils;
-use \PDO;
-use \Generator;
+use PDO;
+use PDOException;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
 class MySQLTest extends TestCase
 {
@@ -564,7 +565,7 @@ class MySQLTest extends TestCase
     {
         try {
             $this->connection->query("DROP USER 'user_no_perms'");
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             // ignore, the user does not have to exist
         }
         $this->connection->query(

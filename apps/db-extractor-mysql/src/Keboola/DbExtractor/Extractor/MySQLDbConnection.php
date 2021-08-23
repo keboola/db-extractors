@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Exception\UserException;
 use PDO;
-use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use PDOException;
 use Throwable;
 

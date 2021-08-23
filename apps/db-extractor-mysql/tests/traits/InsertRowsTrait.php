@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\TraitTests;
 
 use Keboola\DbExtractor\Exception\UserException;
-use Throwable;
 use PDO;
+use Throwable;
 
 trait InsertRowsTrait
 {

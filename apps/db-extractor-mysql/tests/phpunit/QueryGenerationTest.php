@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\DbExtractor\Extractor\MySQL;
 use Keboola\Component\Logger;
+use Keboola\DbExtractor\Extractor\MySQL;
 use Keboola\DbExtractor\FunctionalTests\PdoTestConnection;
 use Keboola\DbExtractor\Tests\Traits\ConfigTrait;
 use Keboola\DbExtractor\TraitTests\RemoveAllTablesTrait;
 use Keboola\DbExtractor\TraitTests\Tables\AutoIncrementTableTrait;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use PDO;
 use PHPUnit\Framework\TestCase;
-use \PDO;
 
 class QueryGenerationTest extends TestCase
 {

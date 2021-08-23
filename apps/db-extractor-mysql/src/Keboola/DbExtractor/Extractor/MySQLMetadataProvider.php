@@ -6,8 +6,8 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
-use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
 use Keboola\DbExtractor\Exception\InvalidArgumentException;
+use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
