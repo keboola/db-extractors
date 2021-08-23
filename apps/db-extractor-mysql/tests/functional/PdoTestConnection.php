@@ -24,6 +24,7 @@ class PdoTestConnection
             'user' => (string) getenv('MYSQL_DB_USER'),
             '#password' => (string) getenv('MYSQL_DB_PASSWORD'),
             'database' => (string) getenv('MYSQL_DB_DATABASE'),
+            'networkCompression' => false,
         ];
     }
 

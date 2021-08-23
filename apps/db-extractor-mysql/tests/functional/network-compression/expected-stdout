@@ -1,0 +1,5 @@
+Creating PDO connection to "mysql:host=mysql;port=3306;dbname=test;charset=utf8".
+Using network compression.
+Exporting "simple" to "in.c-main.simple".
+Exported "1" rows to "in.c-main.simple".
+Extractor finished successfully.
