@@ -82,6 +82,7 @@ jobs:
         uses: keboola/action-run-configs-parallel@implementation
         with:
           token: ${{ env.KBC_STORAGE_TOKEN }}
+          componentId: ${{ env.KBC_DEVELOPERPORTAL_APP }}
           tag: ${{ needs.build.outputs.app_image_tag }}
           configs: ${{ env.KBC_TEST_PROJECT_CONFIGS }}
 
