@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4471d70343f78656c94aac9b28eca871",
+    "content-hash": "2091c43dd2bba95397f0fb70adeee2f2",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -167,16 +167,16 @@
         },
         {
             "name": "keboola/db-extractor-adapter",
-            "version": "1.5.2",
+            "version": "1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-adapter.git",
-                "reference": "ca7a74b14948ee72426ba5c0d6d96e2c7bdff0d4"
+                "reference": "ab2f714aed4787a125d39f541346bd2a05b0c19d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/ca7a74b14948ee72426ba5c0d6d96e2c7bdff0d4",
-                "reference": "ca7a74b14948ee72426ba5c0d6d96e2c7bdff0d4",
+                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/ab2f714aed4787a125d39f541346bd2a05b0c19d",
+                "reference": "ab2f714aed4787a125d39f541346bd2a05b0c19d",
                 "shasum": ""
             },
             "require": {
@@ -219,9 +219,9 @@
             ],
             "description": "Set of connection adapters for DB extractors.",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.5.2"
+                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.5.3"
             },
-            "time": "2021-04-16T10:25:31+00:00"
+            "time": "2021-08-26T11:20:28+00:00"
         },
         {
             "name": "keboola/db-extractor-common",
@@ -4200,5 +4200,5 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
