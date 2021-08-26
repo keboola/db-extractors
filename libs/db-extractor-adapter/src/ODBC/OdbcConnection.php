@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\ODBC;
 
-use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
-use Throwable;
-use Psr\Log\LoggerInterface;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractor\Adapter\Connection\BaseDbConnection;
 use Keboola\DbExtractor\Adapter\Exception\OdbcException;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 class OdbcConnection extends BaseDbConnection
 {

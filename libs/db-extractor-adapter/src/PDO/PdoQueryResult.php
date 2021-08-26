@@ -6,10 +6,10 @@ namespace Keboola\DbExtractor\Adapter\PDO;
 
 use Iterator;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 
 class PdoQueryResult implements QueryResult
 {

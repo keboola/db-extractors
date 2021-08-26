@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\PDO;
 
-use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\BaseExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
+use Psr\Log\LoggerInterface;
 
 class PdoExportAdapter extends BaseExportAdapter
 {

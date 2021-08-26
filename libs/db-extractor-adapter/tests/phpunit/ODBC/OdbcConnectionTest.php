@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\ODBC;
 
-use PHPUnit\Framework\Assert;
-use Keboola\DbExtractor\Adapter\Tests\Traits\OdbcCreateConnectionTrait;
-use Keboola\DbExtractor\Adapter\Tests\BaseTest;
-use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
+use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
+use Keboola\DbExtractor\Adapter\Tests\BaseTest;
+use Keboola\DbExtractor\Adapter\Tests\Traits\OdbcCreateConnectionTrait;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
+use PHPUnit\Framework\Assert;
 
 class OdbcConnectionTest extends BaseTest
 {

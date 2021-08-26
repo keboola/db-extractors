@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\ODBC;
 
-use PHPUnit\Framework\Assert;
-use Keboola\DbExtractor\Adapter\Tests\AbstractExportAdapterTest;
 use Keboola\DbExtractor\Adapter\ODBC\OdbcExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\DefaultQueryFactory;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
+use Keboola\DbExtractor\Adapter\Tests\AbstractExportAdapterTest;
 use Keboola\DbExtractor\Adapter\Tests\Traits\OdbcCreateConnectionTrait;
+use PHPUnit\Framework\Assert;
 
 class OdbcExportAdapterTest extends AbstractExportAdapterTest
 {

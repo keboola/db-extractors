@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
-use PDO;
+use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Adapter\Tests\BaseTest;
 use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
-use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
-use Keboola\CommonExceptions\UserExceptionInterface;
+use PDO;
+use PHPUnit\Framework\Assert;
 
 class PdoConnectionTest extends BaseTest
 {
@@ -23,7 +23,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
@@ -40,7 +40,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
@@ -57,7 +57,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, 1);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         // No retry in logs

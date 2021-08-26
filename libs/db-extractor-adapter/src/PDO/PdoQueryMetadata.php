@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\PDO;
 
 use Keboola\DbExtractor\Adapter\Exception\InvalidStateException;
-use PDOStatement;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ColumnCollection;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
+use PDOStatement;
 
 class PdoQueryMetadata implements QueryMetadata
 {
@@ -39,7 +39,7 @@ class PdoQueryMetadata implements QueryMetadata
             $columnMetadata = $this->stmt->getColumnMeta($i);
 
             // Method getColumnMeta may not be supported by a PDO driver
-            $missingKeys = array_diff(['name', 'native_type'], array_keys($columnMetadata));
+            $missingKeys = array_diff(['name'], array_keys($columnMetadata));
             if ($missingKeys) {
                 throw new InvalidStateException(sprintf(
                     'Missing key "%s" in PDO query column\'s metadata.',
@@ -49,7 +49,7 @@ class PdoQueryMetadata implements QueryMetadata
 
             $builder = ColumnBuilder::create();
             $builder->setName($columnMetadata['name']);
-            $builder->setType($columnMetadata['native_type']);
+            $builder->setType($columnMetadata['native_type'] ?? 'string');
             $columns[] = $builder->build();
         }
 
