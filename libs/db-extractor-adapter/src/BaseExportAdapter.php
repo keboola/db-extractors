@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
-use Keboola\DbExtractor\Adapter\Exception\UserException;
-use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
-use Throwable;
-use Psr\Log\LoggerInterface;
 use Keboola\CommonExceptions\UserExceptionInterface;
-use Keboola\DbExtractor\Adapter\Exception\ApplicationException;
-use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
-use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\Csv\Exception as CsvException;
-use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use Keboola\DbExtractor\Adapter\Connection\DbConnection;
+use Keboola\DbExtractor\Adapter\Exception\ApplicationException;
+use Keboola\DbExtractor\Adapter\Exception\UserException;
+use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
+use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
+use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 abstract class BaseExportAdapter implements ExportAdapter
 {

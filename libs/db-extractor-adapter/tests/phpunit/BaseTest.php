@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\Tests;
 
 use Ihsw\Toxiproxy\Toxiproxy;
+use Keboola\DbExtractor\Adapter\Tests\Traits\TestDataTrait;
+use Keboola\DbExtractor\Adapter\Tests\Traits\ToxiProxyTrait;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Keboola\Temp\Temp;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
-use Keboola\Temp\Temp;
-use Keboola\DbExtractor\Adapter\Tests\Traits\ToxiProxyTrait;
-use Keboola\DbExtractor\Adapter\Tests\Traits\TestDataTrait;
 
 abstract class BaseTest extends TestCase
 {

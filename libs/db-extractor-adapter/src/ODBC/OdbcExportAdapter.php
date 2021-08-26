@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\ODBC;
 
-use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\BaseExportAdapter;
 use Keboola\DbExtractor\Adapter\Query\QueryFactory;
+use Keboola\DbExtractor\Adapter\ResultWriter\ResultWriter;
+use Psr\Log\LoggerInterface;
 
 class OdbcExportAdapter extends BaseExportAdapter
 {

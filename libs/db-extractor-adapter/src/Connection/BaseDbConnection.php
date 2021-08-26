@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Connection;
 
+use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Adapter\Exception\UserException;
-use Throwable;
-use Retry\RetryProxy;
+use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
-use Keboola\DbExtractor\Adapter\Exception\UserRetriedException;
-use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
+use Retry\RetryProxy;
+use Throwable;
 
 abstract class BaseDbConnection implements DbConnection
 {

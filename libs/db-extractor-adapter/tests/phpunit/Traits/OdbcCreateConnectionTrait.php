@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\Traits;
 
-use Psr\Log\Test\TestLogger;
 use Keboola\DbExtractor\Adapter\ODBC\OdbcConnection;
+use Psr\Log\Test\TestLogger;
 
 trait OdbcCreateConnectionTrait
 {

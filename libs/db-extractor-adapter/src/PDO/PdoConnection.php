@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\PDO;
 
-use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
-use PDO;
-use PDOStatement;
-use PDOException;
 use ErrorException;
-use Psr\Log\LoggerInterface;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
 use Keboola\DbExtractor\Adapter\Connection\BaseDbConnection;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
+use PDO;
+use PDOException;
+use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class PdoConnection extends BaseDbConnection
 {

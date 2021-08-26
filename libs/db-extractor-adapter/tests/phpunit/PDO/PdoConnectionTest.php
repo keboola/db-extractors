@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
-use PDO;
+use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
 use Keboola\DbExtractor\Adapter\Tests\BaseTest;
 use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
-use PHPUnit\Framework\Assert;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
-use Keboola\CommonExceptions\UserExceptionInterface;
+use PDO;
+use PHPUnit\Framework\Assert;
 
 class PdoConnectionTest extends BaseTest
 {

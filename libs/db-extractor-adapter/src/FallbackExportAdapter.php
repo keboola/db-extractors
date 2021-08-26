@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Adapter;
 
+use ArrayIterator;
 use Keboola\DbExtractor\Adapter\Exception\AdapterSkippedException;
 use Keboola\DbExtractor\Adapter\Exception\InvalidArgumentException;
-use Throwable;
-use ArrayIterator;
-
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractor\Adapter\Exception\InvalidStateException;
 use Keboola\DbExtractor\Adapter\ValueObject\ExportResult;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
+use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * This class allows you to use multiple adapters (eg. BCP and PDO as a fallback) if one fails, next is tried.

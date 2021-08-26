@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\Adapter\PDO;
 
 use Keboola\DbExtractor\Adapter\Exception\InvalidStateException;
-use PDOStatement;
+use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\ColumnCollection;
-use Keboola\DbExtractor\Adapter\ValueObject\QueryMetadata;
+use PDOStatement;
 
 class PdoQueryMetadata implements QueryMetadata
 {
