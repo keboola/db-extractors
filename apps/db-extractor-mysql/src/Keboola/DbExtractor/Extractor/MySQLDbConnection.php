@@ -6,7 +6,6 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Exception\UserException;
-use PDO;
 use PDOException;
 use Throwable;
 
