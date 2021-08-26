@@ -1,7 +1,7 @@
 {
   "parameters": {
     "name": "simple",
-    "query": "SELECT *, \"abc\" AS custom FROM simple WHERE name = \"foo\"",
+    "query": "SELECT id, name as user_name, \"abc\" AS custom, CONCAT('A', 'B') AS concat FROM simple WHERE name = \"foo\"",
     "outputTable": "in.c-main.simple",
     "incremental": false,
     "primaryKey": null,
