@@ -23,7 +23,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
@@ -40,7 +40,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
@@ -57,7 +57,7 @@ class PdoConnectionTest extends BaseTest
             $this->createPdoConnection('invalid', null, 1);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Name or service not known', $e->getMessage());
+            Assert::assertStringContainsString('Temporary failure in name resolution', $e->getMessage());
         }
 
         // No retry in logs
