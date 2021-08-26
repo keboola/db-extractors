@@ -1,7 +1,7 @@
 {
   "parameters": {
     "name": "simple",
-    "query": "SELECT * FROM simple WHERE name = \"foo\"",
+    "query": "SELECT *, \"abc\" AS custom FROM simple WHERE name = \"foo\"",
     "outputTable": "in.c-main.simple",
     "incremental": false,
     "primaryKey": null,
