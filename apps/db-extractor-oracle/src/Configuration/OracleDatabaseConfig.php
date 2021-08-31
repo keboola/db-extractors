@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Configuration;
 
+use Keboola\DbExtractor\Configuration\NodeDefinition\OracleDbNode;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\SSLConnectionConfig;
 use Keboola\DbExtractorConfig\Exception\PropertyNotSetException;
@@ -14,7 +15,7 @@ class OracleDatabaseConfig extends DatabaseConfig
 
     private ?string $tnsnames;
 
-    private ?string $defaultRowPrefetch;
+    private int $defaultRowPrefetch;
 
     private bool $connectThrough;
 
@@ -32,7 +33,7 @@ class OracleDatabaseConfig extends DatabaseConfig
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
             $data['tnsnames'] ?? null,
             $data['connectThrough'] ?? false,
-            $data['defaultRowPrefetch'] ?? null
+            (int) ($data['defaultRowPrefetch'] ?? OracleDbNode::DEFAULT_ROWS_PREFETCH)
         );
     }
 
@@ -46,7 +47,7 @@ class OracleDatabaseConfig extends DatabaseConfig
         ?SSLConnectionConfig $sslConnectionConfig,
         ?string $tnsnames,
         bool $connectThrough,
-        ?string $defaultRowPrefetch
+        int $defaultRowPrefetch
     ) {
         parent::__construct(
             '',
@@ -95,16 +96,8 @@ class OracleDatabaseConfig extends DatabaseConfig
         return $this->connectThrough;
     }
 
-    public function hasDefaultRowPrefetch(): bool
+    public function getDefaultRowPrefetch(): int
     {
-        return $this->defaultRowPrefetch !== null;
-    }
-
-    public function getDefaultRowPrefetch(): string
-    {
-        if ($this->defaultRowPrefetch === null) {
-            throw new PropertyNotSetException('Property "defaultRowPrefetch" is not set.');
-        }
         return $this->defaultRowPrefetch;
     }
 }

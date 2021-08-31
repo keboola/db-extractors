@@ -10,6 +10,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class OracleDbNode extends DbNode
 {
+    public const DEFAULT_ROWS_PREFETCH = 5000;
+
     protected function init(NodeBuilder $builder): void
     {
         parent::init($builder);
@@ -42,7 +44,7 @@ class OracleDbNode extends DbNode
 
     protected function addDefaultRowPrefetch(NodeBuilder $builder): void
     {
-        $builder->scalarNode('defaultRowPrefetch');
+        $builder->scalarNode('defaultRowPrefetch')->defaultValue(self::DEFAULT_ROWS_PREFETCH);
     }
 
     protected function addSslNode(NodeBuilder $builder): void
