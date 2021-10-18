@@ -34,7 +34,8 @@ trait InsertRowsTrait
                         if ($value === null) {
                             return 'NULL';
                         }
-                        if (substr((string) $value, 0, 7) === 'TO_DATE') {
+                        if (substr((string) $value, 0, 7) === 'TO_DATE' ||
+                            substr((string) $value, 0, 12) === 'TO_TIMESTAMP') {
                             return $value;
                         }
                         return $this->quote((string) $value);
