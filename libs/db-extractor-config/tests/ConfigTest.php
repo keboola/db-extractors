@@ -100,6 +100,7 @@ class ConfigTest extends AbstractConfigTest
                         'enabled' => false,
                         'ignoreCertificateCn' => false,
                     ],
+                    'initQueries' => [],
                 ],
                 'tables' => [
                     [
@@ -211,6 +212,7 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'initQueries' => [],
                 ],
             ],
         ];
@@ -378,6 +380,7 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'initQueries' => [],
                 ],
                 'tables' => [],
                 'advancedMode' => true,
@@ -400,6 +403,7 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'initQueries' => [],
                 ],
                 'query' => 'SELECT 1 FROM test',
                 'outputTable' => 'testOutput',
@@ -429,6 +433,7 @@ class ConfigTest extends AbstractConfigTest
                     '#password' => 'rootpassword',
                     'database' => 'test',
                     'port' => 3306,
+                    'initQueries' => [],
                 ],
                 'advancedMode' => true,
             ],
