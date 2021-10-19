@@ -35,7 +35,8 @@ class PdoConnection extends BaseDbConnection
         string $password,
         array $options,
         ?callable $init = null,
-        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES
+        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
+        array $userInitQueries = []
     ) {
         // Convert errors to PDOExceptions
         $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
@@ -45,7 +46,7 @@ class PdoConnection extends BaseDbConnection
         $this->password = $password;
         $this->options = $options;
         $this->init = $init;
-        parent::__construct($logger, $connectMaxRetries);
+        parent::__construct($logger, $connectMaxRetries, $userInitQueries);
     }
 
     protected function connect(): void
@@ -55,6 +56,8 @@ class PdoConnection extends BaseDbConnection
         if ($this->init) {
             ($this->init)($this->pdo);
         }
+
+        $this->runUserInitQueries();
     }
 
     public function testConnection(): void

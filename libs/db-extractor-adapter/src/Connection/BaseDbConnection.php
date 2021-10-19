@@ -24,6 +24,8 @@ abstract class BaseDbConnection implements DbConnection
 
     protected int $connectMaxRetries;
 
+    protected array $userInitQueries;
+
     /**
      * Returns low-level connection resource or object.
      * @return resource|object
@@ -42,10 +44,14 @@ abstract class BaseDbConnection implements DbConnection
 
     abstract protected function getExpectedExceptionClasses(): array;
 
-    public function __construct(LoggerInterface $logger, int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
+        array $userInitQueries = []
+    ) {
         $this->logger = $logger;
         $this->connectMaxRetries = max($connectMaxRetries, 1);
+        $this->userInitQueries = $userInitQueries;
         $this->connectWithRetry();
     }
 
@@ -135,5 +141,13 @@ abstract class BaseDbConnection implements DbConnection
         $retryPolicy = new SimpleRetryPolicy($maxRetries, $this->getExpectedExceptionClasses());
         $backoffPolicy = new ExponentialBackOffPolicy(1000);
         return new RetryProxy($retryPolicy, $backoffPolicy, $this->logger);
+    }
+
+    protected function runUserInitQueries(): void
+    {
+        foreach ($this->userInitQueries as $userInitQuery) {
+            $this->logger->info(sprintf('Run init query "%s".', $userInitQuery));
+            $this->doQuery($userInitQuery);
+        }
     }
 }
