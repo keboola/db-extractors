@@ -21,6 +21,18 @@
           "schema": "TESTER",
           "tableName": "sales"
         }
+      },
+      {
+        "id": 3,
+        "enabled": true,
+        "name": "types",
+        "outputTable": "in.c-main.types",
+        "incremental": false,
+        "primaryKey": null,
+        "table": {
+          "schema": "TESTER",
+          "tableName": "types"
+        }
       }
     ],
     "db": {
