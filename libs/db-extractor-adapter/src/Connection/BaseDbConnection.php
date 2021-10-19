@@ -146,7 +146,7 @@ abstract class BaseDbConnection implements DbConnection
     protected function runUserInitQueries(): void
     {
         foreach ($this->userInitQueries as $userInitQuery) {
-            $this->logger->info(sprintf('Run init query "%s".', $userInitQuery));
+            $this->logger->info(sprintf('Running query "%s".', $userInitQuery));
             $this->doQuery($userInitQuery);
         }
     }
