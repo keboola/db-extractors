@@ -84,6 +84,6 @@ class DbNode extends ArrayNodeDefinition
 
     protected function addInitQueriesNode(NodeBuilder $builder): void
     {
-        $builder->arrayNode('initQueries');
+        $builder->arrayNode('initQueries')->prototype('scalar');
     }
 }
