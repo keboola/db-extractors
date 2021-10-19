@@ -30,6 +30,9 @@ class DatabaseConfigSerializer implements IDatabaseConfigSerializer
         if ($databaseConfig->hasSSLConnection()) {
             $config['ssl'] = SSLConnectionConfigSerializer::serialize($databaseConfig->getSslConnectionConfig());
         }
+
+        $config['initQueries'] = $databaseConfig->getInitQueries();
+
         return $config;
     }
 }

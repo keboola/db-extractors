@@ -28,6 +28,9 @@ class DatabaseConfigTest extends TestCase
                 'ca' => 'testCa',
                 'cert' => 'testCert',
             ],
+            'initQueries' => [
+                'test init query',
+            ],
         ];
 
         $exportDatabaseConfig = DatabaseConfig::fromArray($config);
@@ -42,6 +45,7 @@ class DatabaseConfigTest extends TestCase
         Assert::assertEquals('secretPassword', $exportDatabaseConfig->getPassword());
         Assert::assertEquals('database', $exportDatabaseConfig->getDatabase());
         Assert::assertEquals('schema', $exportDatabaseConfig->getSchema());
+        Assert::assertEquals('test init query', $exportDatabaseConfig->getInitQueries()[0]);
 
         $sslConnectionConfig = $exportDatabaseConfig->getSslConnectionConfig();
         Assert::assertInstanceOf(SSLConnectionConfig::class, $sslConnectionConfig);
@@ -82,6 +86,7 @@ class DatabaseConfigTest extends TestCase
                 'cert' => 'testCert',
                 'key' => 'testKey',
             ],
+            'initQueries' => [],
         ];
 
         $serialize = DatabaseConfigSerializer::serialize(DatabaseConfig::fromArray($input));
