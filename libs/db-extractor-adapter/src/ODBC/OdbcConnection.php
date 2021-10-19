@@ -43,7 +43,8 @@ class OdbcConnection extends BaseDbConnection
         ?callable $init = null,
         int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
         int $odbcCursorType = SQL_CURSOR_FORWARD_ONLY,
-        int $odbcCursorMode = SQL_CUR_USE_DRIVER
+        int $odbcCursorMode = SQL_CUR_USE_DRIVER,
+        array $initQueries = []
     ) {
         $this->dsn = $dsn;
         $this->user = $user;
@@ -51,7 +52,7 @@ class OdbcConnection extends BaseDbConnection
         $this->init = $init;
         $this->odbcCursorType = $odbcCursorType;
         $this->odbcCursorMode = $odbcCursorMode;
-        parent::__construct($logger, $connectMaxRetries);
+        parent::__construct($logger, $connectMaxRetries, $initQueries);
     }
 
     protected function connect(): void

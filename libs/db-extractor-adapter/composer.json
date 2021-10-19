@@ -22,10 +22,10 @@
     "require": {
         "php": ">=7.4",
         "ext-iconv": "*",
-        "keboola/db-extractor-config": "^1.4",
-        "keboola/db-extractor-table-format": "^3.0",
         "keboola/common-exceptions": "^1.0",
         "keboola/csv": "^2.2",
+        "keboola/db-extractor-config": "^1.7",
+        "keboola/db-extractor-table-format": "^3.0",
         "keboola/retry": "^0.5",
         "psr/log": "^1.1"
     },
