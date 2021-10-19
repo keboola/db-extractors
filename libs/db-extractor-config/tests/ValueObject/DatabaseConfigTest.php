@@ -28,6 +28,9 @@ class DatabaseConfigTest extends TestCase
                 'ca' => 'testCa',
                 'cert' => 'testCert',
             ],
+            'initQueries' => [
+                'test init query',
+            ],
         ];
 
         $exportDatabaseConfig = DatabaseConfig::fromArray($config);
@@ -36,12 +39,14 @@ class DatabaseConfigTest extends TestCase
         Assert::assertTrue($exportDatabaseConfig->hasDatabase());
         Assert::assertTrue($exportDatabaseConfig->hasSchema());
         Assert::assertTrue($exportDatabaseConfig->hasSSLConnection());
+        Assert::assertTrue($exportDatabaseConfig->hasInitQueries());
 
         Assert::assertEquals('testHost.local', $exportDatabaseConfig->getHost());
         Assert::assertEquals(12345, $exportDatabaseConfig->getPort());
         Assert::assertEquals('secretPassword', $exportDatabaseConfig->getPassword());
         Assert::assertEquals('database', $exportDatabaseConfig->getDatabase());
         Assert::assertEquals('schema', $exportDatabaseConfig->getSchema());
+        Assert::assertEquals('test init query', $exportDatabaseConfig->getInitQueries()[0]);
 
         $sslConnectionConfig = $exportDatabaseConfig->getSslConnectionConfig();
         Assert::assertInstanceOf(SSLConnectionConfig::class, $sslConnectionConfig);

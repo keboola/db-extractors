@@ -38,6 +38,7 @@ class DbNode extends ArrayNodeDefinition
         $this->addPasswordNode($builder);
         $this->addSshNode($builder);
         $this->addSslNode($builder);
+        $this->addInitQueriesNode($builder);
     }
 
     protected function addDriverNode(NodeBuilder $builder): void
@@ -79,5 +80,10 @@ class DbNode extends ArrayNodeDefinition
     protected function addSslNode(NodeBuilder $builder): void
     {
         $builder->append($this->sslNode);
+    }
+
+    protected function addInitQueriesNode(NodeBuilder $builder): void
+    {
+        $builder->arrayNode('initQueries');
     }
 }

@@ -23,6 +23,8 @@ class DatabaseConfig
 
     private ?string $schema;
 
+    private array $initQueries;
+
     public static function fromArray(array $data): self
     {
         $sslEnabled = !empty($data['ssl']) && !empty($data['ssl']['enabled']);
@@ -34,7 +36,8 @@ class DatabaseConfig
             $data['#password'],
             $data['database'] ?? null,
             $data['schema'] ?? null,
-            $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null
+            $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
+            $data['initQueries'] ?? []
         );
     }
 
@@ -45,7 +48,8 @@ class DatabaseConfig
         string $password,
         ?string $database,
         ?string $schema,
-        ?SSLConnectionConfig $sslConnectionConfig
+        ?SSLConnectionConfig $sslConnectionConfig,
+        array $initQueries
     ) {
         $this->host = $host;
         $this->port = $port;
@@ -54,6 +58,7 @@ class DatabaseConfig
         $this->database = $database;
         $this->schema = $schema;
         $this->sslConnectionConfig = $sslConnectionConfig;
+        $this->initQueries = $initQueries;
     }
 
     public function hasPort(): bool
@@ -74,6 +79,11 @@ class DatabaseConfig
     public function hasSSLConnection(): bool
     {
         return $this->sslConnectionConfig !== null;
+    }
+
+    public function hasInitQueries(): bool
+    {
+        return $this->initQueries !== [];
     }
 
     public function getSslConnectionConfig(): SSLConnectionConfig
@@ -121,5 +131,10 @@ class DatabaseConfig
             throw new PropertyNotSetException('Property "schema" is not set.');
         }
         return $this->schema;
+    }
+
+    public function getInitQueries(): array
+    {
+        return $this->initQueries;
     }
 }
