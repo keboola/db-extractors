@@ -81,11 +81,6 @@ class DatabaseConfig
         return $this->sslConnectionConfig !== null;
     }
 
-    public function hasInitQueries(): bool
-    {
-        return $this->initQueries !== [];
-    }
-
     public function getSslConnectionConfig(): SSLConnectionConfig
     {
         if ($this->sslConnectionConfig === null) {

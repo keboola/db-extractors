@@ -39,7 +39,6 @@ class DatabaseConfigTest extends TestCase
         Assert::assertTrue($exportDatabaseConfig->hasDatabase());
         Assert::assertTrue($exportDatabaseConfig->hasSchema());
         Assert::assertTrue($exportDatabaseConfig->hasSSLConnection());
-        Assert::assertTrue($exportDatabaseConfig->hasInitQueries());
 
         Assert::assertEquals('testHost.local', $exportDatabaseConfig->getHost());
         Assert::assertEquals(12345, $exportDatabaseConfig->getPort());
@@ -87,6 +86,7 @@ class DatabaseConfigTest extends TestCase
                 'cert' => 'testCert',
                 'key' => 'testKey',
             ],
+            'initQueries' => [],
         ];
 
         $serialize = DatabaseConfigSerializer::serialize(DatabaseConfig::fromArray($input));
