@@ -33,7 +33,8 @@ class OracleDatabaseConfig extends DatabaseConfig
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
             $data['tnsnames'] ?? null,
             $data['connectThrough'] ?? false,
-            (int) ($data['defaultRowPrefetch'] ?? OracleDbNode::DEFAULT_ROWS_PREFETCH)
+            (int) ($data['defaultRowPrefetch'] ?? OracleDbNode::DEFAULT_ROWS_PREFETCH),
+            $data['initQueries'] ?? []
         );
     }
 
@@ -47,7 +48,8 @@ class OracleDatabaseConfig extends DatabaseConfig
         ?SSLConnectionConfig $sslConnectionConfig,
         ?string $tnsnames,
         bool $connectThrough,
-        int $defaultRowPrefetch
+        int $defaultRowPrefetch,
+        array $userQueries
     ) {
         parent::__construct(
             '',
@@ -56,7 +58,8 @@ class OracleDatabaseConfig extends DatabaseConfig
             $password,
             $database,
             $schema,
-            $sslConnectionConfig
+            $sslConnectionConfig,
+            $userQueries
         );
 
         $this->host = $host;

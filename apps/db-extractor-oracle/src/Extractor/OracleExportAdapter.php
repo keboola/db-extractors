@@ -74,6 +74,6 @@ class OracleExportAdapter implements ExportAdapter
             $message .= sprintf(' Tried %d times.', $maxRetries);
         }
 
-        return new UserRetriedException($message, 0, $e);
+        return new UserRetriedException($maxRetries, $message, 0, $e);
     }
 }

@@ -6,8 +6,9 @@ namespace Keboola\DbExtractor\Extractor;
 
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
-use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
 use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
+use Keboola\DbExtractor\Manifest\ManifestGenerator;
+use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\DefaultManifestSerializer;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\DbExtractor\Exception\UserException;
@@ -35,9 +36,17 @@ class Oracle extends BaseExtractor
         $this->exportWrapper = new OracleJavaExportWrapper($this->logger, $this->dataDir, $databaseConfig);
     }
 
-    public function getMetadataProvider(): MetadataProvider
+    protected function createMetadataProvider(): MetadataProvider
     {
         return new OracleMetadataProvider($this->exportWrapper);
+    }
+
+    protected function createManifestGenerator(): ManifestGenerator
+    {
+        return new OracleManifestGenerator(
+            $this->getMetadataProvider(),
+            new DefaultManifestSerializer()
+        );
     }
 
     protected function createExportAdapter(): ExportAdapter
