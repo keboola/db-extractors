@@ -4,4 +4,5 @@ Created "export" configuration for "java-oracle-exporter" tool.
 executing action export%sProcessing configuration file /tmp/run-%s.%s/javaConfig.json%sConnecting user tester. Using service name XE from tnsnames.ora.%sFetching data%sExecuting query: SELECT * FROM "TESTER"."sales" Fetched %d rows in %d seconds The output data file was created successfully. All done%s
 Created "tnsname.ora" file for "java-oracle-exporter" tool.
 Created "get tables" configuration for "java-oracle-exporter" tool.
+Exported "11" rows to "in.c-main.sales".
 Extractor finished successfully.
