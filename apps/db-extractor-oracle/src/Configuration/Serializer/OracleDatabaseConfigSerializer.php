@@ -50,6 +50,8 @@ class OracleDatabaseConfigSerializer
             $config['ssl'] = SSLConnectionConfigSerializer::serialize($databaseConfig->getSslConnectionConfig());
         }
 
+        $config['initQueries'] = $databaseConfig->getInitQueries();
+
         // Java tool expects string value
         $config['defaultRowPrefetch'] = (string) $databaseConfig->getDefaultRowPrefetch();
 

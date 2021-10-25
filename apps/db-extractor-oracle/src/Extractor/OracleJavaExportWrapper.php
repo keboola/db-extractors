@@ -92,7 +92,7 @@ class OracleJavaExportWrapper
         $fetchedPos = (int) strpos($output, 'Fetched');
         $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
         $linesWritten = (int) filter_var($rowCountStr, FILTER_SANITIZE_NUMBER_INT);
-        return new ExportResult($outputFile, $linesWritten, null);
+        return new ExportResult($outputFile, $linesWritten, new OracleQueryMetadata(), false, null);
     }
 
     private function runAction(
