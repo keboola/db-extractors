@@ -37,10 +37,10 @@ class MySQLDbConnectionFactory
             if ($sslConnection->hasKey()) {
                 $options[PDO::MYSQL_ATTR_SSL_KEY] = SslHelper::createSSLFile($temp, $sslConnection->getKey());
             }
-            if ($sslConnection->getCert()) {
+            if ($sslConnection->hasCert()) {
                 $options[PDO::MYSQL_ATTR_SSL_CERT] = SslHelper::createSSLFile($temp, $sslConnection->getCert());
             }
-            if ($sslConnection->getCa()) {
+            if ($sslConnection->hasCa()) {
                 $options[PDO::MYSQL_ATTR_SSL_CA] = SslHelper::createSSLFile($temp, $sslConnection->getCa());
             }
             if ($sslConnection->hasCipher()) {
