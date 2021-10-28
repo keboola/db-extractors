@@ -28,7 +28,8 @@ class MysqlDatabaseConfig extends DatabaseConfig
             $data['schema'] ?? null,
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
             $data['transactionIsolationLevel'] ?? null,
-            $data['networkCompression'] ?? false
+            $data['networkCompression'] ?? false,
+            $data['initQueries'] ?? []
         );
     }
 
@@ -41,12 +42,13 @@ class MysqlDatabaseConfig extends DatabaseConfig
         ?string $schema,
         ?SSLConnectionConfig $sslConnectionConfig,
         ?string $transactionIsolationLevel,
-        bool $networkCompression
+        bool $networkCompression,
+        array $initQueries
     ) {
         $this->transactionIsolationLevel = $transactionIsolationLevel;
         $this->networkCompression = $networkCompression;
 
-        parent::__construct($host, $port, $username, $password, $database, $schema, $sslConnectionConfig);
+        parent::__construct($host, $port, $username, $password, $database, $schema, $sslConnectionConfig, $initQueries);
     }
 
     public function isNetworkCompressionEnabled(): bool
