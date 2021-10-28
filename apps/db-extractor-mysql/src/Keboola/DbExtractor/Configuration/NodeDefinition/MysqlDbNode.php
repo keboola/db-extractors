@@ -22,6 +22,11 @@ class MysqlDbNode extends DbNode
         $this->addTransactionIsolationLevel($builder);
     }
 
+    protected function addSslNode(NodeBuilder $builder): void
+    {
+        $builder->append(new MysqlSslNode());
+    }
+
     protected function addDatabaseNode(NodeBuilder $builder): void
     {
         // Database can be empty

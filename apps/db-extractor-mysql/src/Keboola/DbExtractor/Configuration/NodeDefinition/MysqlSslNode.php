@@ -4,32 +4,24 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Configuration\NodeDefinition;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
+use Keboola\DbExtractorConfig\Configuration\NodeDefinition\SslNode;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-class MysqlSslNode extends ArrayNodeDefinition
+class MysqlSslNode extends SslNode
 {
-    public const NODE_NAME = 'ssl';
 
-    public function __construct(?NodeParentInterface $parent = null)
+    public function init(NodeBuilder $nodeBuilder): void
     {
-        parent::__construct(self::NODE_NAME, $parent);
+        parent::init($nodeBuilder);
 
-        $this->init();
-    }
-
-    protected function init(): void
-    {
         // @formatter:off
         $this
-            ->children()
-                ->booleanNode('enabled')->end()
-                ->scalarNode('ca')->end()
-                ->scalarNode('cert')->end()
-                ->scalarNode('key')->end()
-                ->scalarNode('cipher')->end()
-                ->booleanNode('verifyServerCert')->defaultTrue()->end()
+            ->validate()
+                ->ifTrue(function ($v) {
+                    // either both or none must be specified
+                    return isset($v['cert']) xor isset($v['#key']);
+                })
+                ->thenInvalid('Both "#key" and "cert" must be specified')
             ->end()
         ;
         // @formatter:on
