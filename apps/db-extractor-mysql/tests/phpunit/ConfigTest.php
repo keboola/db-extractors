@@ -133,7 +133,7 @@ class ConfigTest extends TestCase
                             'port' => 3306,
                             'ssl' => [
                                 'enabled' => true,
-                                'bogus' => '42'
+                                'bogus' => '42',
                             ],
                         ],
                         'query' => 'SELECT * FROM escaping',
