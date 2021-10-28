@@ -21,9 +21,8 @@ class SslNode extends ArrayNodeDefinition
     public function init(NodeBuilder $nodeBuilder): void
     {
         $this->addEnabledNode($nodeBuilder);
-        $this->addKeyNode($nodeBuilder);
         $this->addCaNode($nodeBuilder);
-        $this->addCertNode($nodeBuilder);
+        $this->addCertAndKeyNode($nodeBuilder);
         $this->addCipherNode($nodeBuilder);
         $this->addVerifyServerCertNode($nodeBuilder);
         $this->addIgnoreCertificateCn($nodeBuilder);
@@ -34,7 +33,7 @@ class SslNode extends ArrayNodeDefinition
         $nodeBuilder->booleanNode('enabled')->defaultFalse();
     }
 
-    protected function addKeyNode(NodeBuilder $nodeBuilder): void
+    protected function addCertAndKeyNode(NodeBuilder $nodeBuilder): void
     {
         // Backward compatibility: allow unencrypted "key"
         $this
@@ -47,17 +46,20 @@ class SslNode extends ArrayNodeDefinition
                 return $v;
             });
 
+        $nodeBuilder->scalarNode('cert');
         $nodeBuilder->scalarNode('#key');
+        $this
+            ->validate()
+            ->ifTrue(function ($v) {
+                // either both or none must be specified
+                return isset($v['cert']) xor isset($v['#key']);
+            })
+            ->thenInvalid('Both "#key" and "cert" must be specified.');
     }
 
     protected function addCaNode(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder->scalarNode('ca');
-    }
-
-    protected function addCertNode(NodeBuilder $nodeBuilder): void
-    {
-        $nodeBuilder->scalarNode('cert');
     }
 
     protected function addCipherNode(NodeBuilder $nodeBuilder): void

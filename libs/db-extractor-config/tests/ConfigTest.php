@@ -248,6 +248,88 @@ class ConfigTest extends AbstractConfigTest
         $this->assertEquals('testKey', $config->getData()['parameters']['db']['ssl']['#key']);
     }
 
+    public function testSslOnlyCa(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'ssl' => [
+                        'enabled' => true,
+                        'ca' => 'abs',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectNotToPerformAssertions();
+        new Config($configurationArray, new ActionConfigRowDefinition());
+    }
+
+    public function testMissingSslKey(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'ssl' => [
+                        'enabled' => true,
+                        'cert' => 'abs',
+                    ],
+                ],
+            ],
+        ];
+
+        $exceptionMessage =
+            'Invalid configuration for path "root.parameters.db.ssl": ' .
+            'Both "#key" and "cert" must be specified.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    public function testMissingSslCert(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'ssl' => [
+                        'enabled' => true,
+                        '#key' => 'abs',
+                    ],
+                ],
+            ],
+        ];
+
+        $exceptionMessage =
+            'Invalid configuration for path "root.parameters.db.ssl": ' .
+            'Both "#key" and "cert" must be specified.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
     public function testInvalidConfigQueryIncremental(): void
     {
         $configurationArray = [
