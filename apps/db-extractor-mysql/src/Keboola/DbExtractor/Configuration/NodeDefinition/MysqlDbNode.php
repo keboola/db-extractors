@@ -21,7 +21,7 @@ class MysqlDbNode extends DbNode
         $this->addNetworkCompression($builder);
         $this->addTransactionIsolationLevel($builder);
     }
-
+    
     protected function addInitQueriesNode(NodeBuilder $builder): void
     {
        // not implemented
