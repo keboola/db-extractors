@@ -88,7 +88,9 @@ class OracleJavaExportWrapper
         );
 
         $output = $process->getOutput();
-        $this->logger->info($output); // log the process output
+        foreach (explode("\n", trim($output)) as $logRow) {
+            $this->logger->info($logRow); // log the process output
+        }
         $fetchedPos = (int) strpos($output, 'Fetched');
         $rowCountStr = substr($output, $fetchedPos, strpos($output, 'rows in') - $fetchedPos);
         $linesWritten = (int) filter_var($rowCountStr, FILTER_SANITIZE_NUMBER_INT);
