@@ -40,10 +40,10 @@ class SSLConnectionConfig implements ValueObject
         bool $verifyServerCert,
         bool $ignoreCertificateCn
     ) {
-        $this->key = $key;
-        $this->cert = $cert;
-        $this->ca = $ca;
-        $this->cipher = $cipher;
+        $this->key = $key ?: null;
+        $this->cert = $cert  ?: null;
+        $this->ca = $ca  ?: null;
+        $this->cipher = $cipher  ?: null;
         $this->verifyServerCert = $verifyServerCert;
         $this->ignoreCertificateCn = $ignoreCertificateCn;
     }
