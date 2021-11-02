@@ -36,6 +36,25 @@ class SSLConnectionConfigTest extends TestCase
         Assert::assertTrue($sslConnectionConfig->isIgnoreCertificateCn());
     }
 
+    public function testEmptyStrings(): void
+    {
+        $sslConnectionConfig = SSLConnectionConfig::fromArray([
+            '#key' => '',
+            'ca' => '',
+            'cipher' => '',
+            'cert' => '',
+            'verifyServerCert' => false,
+            'ignoreCertificateCn' => false,
+        ]);
+
+        Assert::assertFalse($sslConnectionConfig->hasKey());
+        Assert::assertFalse($sslConnectionConfig->hasCa());
+        Assert::assertFalse($sslConnectionConfig->hasCert());
+        Assert::assertFalse($sslConnectionConfig->hasCipher());
+        Assert::assertFalse($sslConnectionConfig->isVerifyServerCert());
+        Assert::assertFalse($sslConnectionConfig->isIgnoreCertificateCn());
+    }
+
     public function testMissingConfigProperty(): void
     {
         $sslConnectionConfig = SSLConnectionConfig::fromArray([]);
