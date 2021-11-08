@@ -103,4 +103,9 @@ class OracleDatabaseConfig extends DatabaseConfig
     {
         return $this->defaultRowPrefetch;
     }
+
+    public function getInitQueries(): array
+    {
+        return array_map(fn($item) => rtrim($item, ';'), parent::getInitQueries());
+    }
 }
