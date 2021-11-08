@@ -2,6 +2,7 @@ Exporting "in.c-main.sales" to "in.c-main.sales".
 Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
 Connecting user "tester" to database "xe" at "oracle" on port "1521"
 Executing query "select sysdate from dual"
+Executing query "select sysdate from dual"
 Executing query "SELECT * FROM "TESTER"."sales""
 Fetched 11 rows in %d seconds
 Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
