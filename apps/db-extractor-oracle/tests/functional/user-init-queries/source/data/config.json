@@ -13,6 +13,7 @@
       "#password": "%env(string:ORACLE_DB_PASSWORD)%",
       "database": "%env(string:ORACLE_DB_DATABASE)%",
       "initQueries": [
+        "select sysdate from dual;",
         "select sysdate from dual"
       ]
     }
