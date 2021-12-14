@@ -64,12 +64,15 @@ class OdbcConnection extends BaseDbConnection
             /** @var resource|false $connection */
             $connection = @odbc_connect($this->dsn, $this->user, $this->password, $this->odbcCursorMode);
         } catch (Throwable $e) {
+            $this->handleConnectionError($e->getMessage(), $e->getCode(), $e);
             throw new OdbcException($e->getMessage(), $e->getCode(), $e);
         }
 
         // "odbc_connect" can generate warning, if "set_error_handler" is not set, so we are checking it manually
         if ($connection === false) {
-            throw new OdbcException(odbc_errormsg() . ' ' . odbc_error());
+            $message = odbc_errormsg() . ' ' . odbc_error();
+            $this->handleConnectionError($message);
+            throw new OdbcException($message);
         }
 
         if ($this->init) {
@@ -133,5 +136,12 @@ class OdbcConnection extends BaseDbConnection
         return array_merge(self::BASE_RETRIED_EXCEPTIONS, [
             OdbcException::class,
         ]);
+    }
+
+    protected function handleConnectionError(
+        string $error,
+        int $code = 0,
+        ?Throwable $previousException = null
+    ): void {
     }
 }
