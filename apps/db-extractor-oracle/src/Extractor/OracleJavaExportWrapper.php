@@ -30,6 +30,10 @@ class OracleJavaExportWrapper
 
     private array $javaDbConfig;
 
+    private const MAX_TRIES_TEST_CONNECTION = 1;
+
+    private const MAX_TRIES_GET_TABLES = 1;
+
     public function __construct(LoggerInterface $logger, string $dataDir, DatabaseConfig $databaseConfig)
     {
         if (!($databaseConfig instanceof OracleDatabaseConfig)) {
@@ -47,7 +51,7 @@ class OracleJavaExportWrapper
             'testConnection',
             $this->writeTestConnectionConfig(),
             [],
-            DbRetryProxy::DEFAULT_MAX_TRIES,
+            self::MAX_TRIES_TEST_CONNECTION,
             'Failed connecting to DB'
         );
     }
@@ -63,7 +67,7 @@ class OracleJavaExportWrapper
                 'getTables',
                 $this->writeTestGetTablesConfig($whitelist, $loadColumns, $outputFile),
                 [],
-                DbRetryProxy::DEFAULT_MAX_TRIES,
+                self::MAX_TRIES_GET_TABLES,
                 'Error fetching table listing'
             );
 
