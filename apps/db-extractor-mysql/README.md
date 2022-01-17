@@ -35,8 +35,9 @@ The configuration requires a `db` node with the following properties:
     - \#private: string
     - public: string                
   - user string
-  - sshHost string,
+  - sshHost string
   - sshPort string
+  - maxRetries integer
 - transactionIsolationLevel: enum (optional) - possible values `REPEATABLE READ`, `READ COMMITTED`, `READ UNCOMMITTED`, `SERIALIZABLE`
    
 There are 2 possible types of table extraction.  
