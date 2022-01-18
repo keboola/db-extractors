@@ -221,6 +221,35 @@ class ConfigTest extends AbstractConfigTest
         $this->assertEquals($configurationArray, $config->getData());
     }
 
+    public function testConfigWithSshTunnel(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'initQueries' => [],
+                    'ssh' => [
+                        'user' => 'root',
+                        'sshHost' => 'sshproxy',
+                        'sshPort' => '22',
+                        'localPort' => '33306',
+                        'keys' => ['public' => 'anyKey'],
+                        'maxRetries' => 10,
+                        'compression' => false,
+                    ],
+                ],
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
     public function testUnencryptedSslKey(): void
     {
         $configurationArray = [

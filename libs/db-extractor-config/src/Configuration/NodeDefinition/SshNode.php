@@ -29,6 +29,7 @@ class SshNode extends ArrayNodeDefinition
         $this->addLocalPortNode($builder);
         $this->addUserNode($builder);
         $this->addCompressionNode($builder);
+        $this->addMaxRetriesNode($builder);
     }
 
     protected function addEnabledNode(NodeBuilder $builder): void
@@ -79,5 +80,10 @@ class SshNode extends ArrayNodeDefinition
     protected function addCompressionNode(NodeBuilder $builder): void
     {
         $builder->booleanNode('compression')->defaultValue(false);
+    }
+
+    protected function addMaxRetriesNode(NodeBuilder $builder): void
+    {
+        $builder->scalarNode('maxRetries');
     }
 }
