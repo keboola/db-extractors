@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8d465a99c11d371ae23c01a3a42bf430",
+    "content-hash": "ad51c99c954102f3f8a89b6d4819c140",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -290,16 +290,16 @@
         },
         {
             "name": "keboola/db-extractor-config",
-            "version": "1.7.2",
+            "version": "1.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-config.git",
-                "reference": "2f1b73c0f7defb5007306bb99585a6df6d89d7b4"
+                "reference": "fa7edcd24c9af6951a05886d951f8f6789cf52bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-config/zipball/2f1b73c0f7defb5007306bb99585a6df6d89d7b4",
-                "reference": "2f1b73c0f7defb5007306bb99585a6df6d89d7b4",
+                "url": "https://api.github.com/repos/keboola/db-extractor-config/zipball/fa7edcd24c9af6951a05886d951f8f6789cf52bc",
+                "reference": "fa7edcd24c9af6951a05886d951f8f6789cf52bc",
                 "shasum": ""
             },
             "require": {
@@ -326,9 +326,9 @@
             ],
             "description": "Config definition for database extractor",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-config/tree/1.7.2"
+                "source": "https://github.com/keboola/db-extractor-config/tree/1.7.3"
             },
-            "time": "2021-11-02T11:27:47+00:00"
+            "time": "2022-01-18T09:20:38+00:00"
         },
         {
             "name": "keboola/db-extractor-ssh-tunnel",
@@ -4205,5 +4205,5 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
