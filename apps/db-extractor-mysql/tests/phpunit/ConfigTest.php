@@ -69,6 +69,34 @@ class ConfigTest extends TestCase
                     ],
                 ],
             ],
+            'with-ssh-tunnel' => [
+                [
+                    'parameters' => [
+                        'db' => [
+                            'host' => 'mysql',
+                            'user' => 'root',
+                            '#password' => 'rootpassword',
+                            'database' => '',
+                            'port' => 3306,
+                            'ssh' => [
+                                'enabled' => true,
+                                'keys' => [
+                                    '#private' => 'anyKey',
+                                    'public' => 'anyKey',
+                                ],
+                                'user' => 'root',
+                                'sshHost' => 'sshproxy',
+                                'remoteHost' => 'mysql',
+                                'remotePort' => '1433',
+                                'localPort' => '1234',
+                                'maxRetries' => 10,
+                            ],
+                        ],
+                        'query' => 'SELECT * FROM escaping',
+                        'outputTable' => 'in.c-main.escaping',
+                    ],
+                ],
+            ],
         ];
     }
 
