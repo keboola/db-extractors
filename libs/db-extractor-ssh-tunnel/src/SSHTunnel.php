@@ -63,7 +63,7 @@ class SSHTunnel
             $sshConfig['privateKey'] = $sshConfig['keys']['#private'];
         } else {
             $sshConfig['privateKey'] = $sshConfig['keys']['private'];
-            $this->logger->warning('Using unecrypted private key');
+            $this->logger->warning('Using unencrypted private key');
         }
 
         $tunnelParams = array_intersect_key(
@@ -82,7 +82,7 @@ class SSHTunnel
         );
 
         $simplyRetryPolicy = new SimpleRetryPolicy(
-            self::DEFAULT_MAX_TRIES,
+            $sshConfig['maxRetries'] ?? self::DEFAULT_MAX_TRIES,
             [SSHException::class,\Throwable::class]
         );
 
@@ -99,7 +99,7 @@ class SSHTunnel
                 $ssh->openTunnel($tunnelParams);
             });
         } catch (SSHException $e) {
-            throw new UserException($e->getMessage(), 0, $e);
+            throw new UserException($e->getMessage() . 'Retries count: ' . $proxy->getTryCount() , 0, $e);
         }
 
         $dbConfig['host'] = '127.0.0.1';

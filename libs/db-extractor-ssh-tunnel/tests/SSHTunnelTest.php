@@ -74,6 +74,32 @@ class SSHTunnelTest extends TestCase
         $tunnel->createSshTunnel($dbConfig);
     }
 
+    public function testMaxSshTunnelConnectionRetriesConfig(): void
+    {
+        $maxRetries = 3;
+        $dbConfig = [
+            'ssh' => [
+                'user' => 'root',
+                'sshHost' => 'sshproxy',
+                'sshPort' => '222', //wrong port
+                'localPort' => '33306',
+                'keys' => ['private' => $this->getPrivateKey()],
+                'maxRetries' => $maxRetries,
+            ],
+            'host' => 'mysql',
+            'port' => '3306',
+        ];
+
+        $logger = new Logger('test');
+        $tunnel = new SSHTunnel($logger);
+
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage("Unable to create ssh tunnel. Output:  ErrorOutput: ssh: connect to host " .
+        "sshproxy port 222: Connection refused\r\nRetries count: " . $maxRetries);
+
+        $tunnel->createSshTunnel($dbConfig);
+    }
+
     public function getPrivateKey(): string
     {
         return (string) file_get_contents('/root/.ssh/id_rsa');
