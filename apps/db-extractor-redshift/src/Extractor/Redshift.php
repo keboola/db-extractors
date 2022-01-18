@@ -35,7 +35,7 @@ class Redshift extends BaseExtractor
     /**
      * @return RedshiftMetadataProvider
      */
-    public function getMetadataProvider(): MetadataProvider
+    protected function createMetadataProvider(): MetadataProvider
     {
         return new RedshiftMetadataProvider($this->connection);
     }
