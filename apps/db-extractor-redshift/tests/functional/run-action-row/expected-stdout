@@ -1,3 +1,4 @@
 Creating PDO connection to "pgsql:dbname=%s;port=5439;host=%s.redshift.amazonaws.com".
 Exporting "sales" to "in.c-main.escaping".
+Exported "7" rows to "in.c-main.escaping".
 Extractor finished successfully.
