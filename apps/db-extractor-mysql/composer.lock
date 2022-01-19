@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad51c99c954102f3f8a89b6d4819c140",
+    "content-hash": "03e77e3db4b55e1d3b06158041af7948",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -167,23 +167,23 @@
         },
         {
             "name": "keboola/db-extractor-adapter",
-            "version": "1.5.3",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-adapter.git",
-                "reference": "ab2f714aed4787a125d39f541346bd2a05b0c19d"
+                "reference": "5678a9faeeae4923e346dd4adac832b3f79185f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/ab2f714aed4787a125d39f541346bd2a05b0c19d",
-                "reference": "ab2f714aed4787a125d39f541346bd2a05b0c19d",
+                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/5678a9faeeae4923e346dd4adac832b3f79185f0",
+                "reference": "5678a9faeeae4923e346dd4adac832b3f79185f0",
                 "shasum": ""
             },
             "require": {
                 "ext-iconv": "*",
                 "keboola/common-exceptions": "^1.0",
                 "keboola/csv": "^2.2",
-                "keboola/db-extractor-config": "^1.4",
+                "keboola/db-extractor-config": "^1.7",
                 "keboola/db-extractor-table-format": "^3.0",
                 "keboola/retry": "^0.5",
                 "php": ">=7.4",
@@ -219,22 +219,22 @@
             ],
             "description": "Set of connection adapters for DB extractors.",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.5.3"
+                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.7.0"
             },
-            "time": "2021-08-26T11:20:28+00:00"
+            "time": "2021-12-14T11:58:34+00:00"
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "14.5.3",
+            "version": "15.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "81b8273c759bd9d1ccc231a952510a76d94f311f"
+                "reference": "d69d10a904db5779b3b8558572836d0d5184f623"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/81b8273c759bd9d1ccc231a952510a76d94f311f",
-                "reference": "81b8273c759bd9d1ccc231a952510a76d94f311f",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/d69d10a904db5779b3b8558572836d0d5184f623",
+                "reference": "d69d10a904db5779b3b8558572836d0d5184f623",
                 "shasum": ""
             },
             "require": {
@@ -242,9 +242,9 @@
                 "ext-pdo": "*",
                 "keboola/common-exceptions": "^1.1",
                 "keboola/csv": "^2.2",
-                "keboola/db-extractor-adapter": "^1.5.1",
-                "keboola/db-extractor-config": "^1.4",
-                "keboola/db-extractor-ssh-tunnel": "^1.1.4",
+                "keboola/db-extractor-adapter": "^1.6",
+                "keboola/db-extractor-config": "^1.7",
+                "keboola/db-extractor-ssh-tunnel": "^1.1.5",
                 "keboola/db-extractor-table-format": "^3.2",
                 "keboola/php-component": "^8.1",
                 "keboola/php-datatypes": "^4.7",
@@ -284,9 +284,9 @@
             "description": "Common library from Keboola Database Extractors",
             "support": {
                 "issues": "https://github.com/keboola/db-extractor-common/issues",
-                "source": "https://github.com/keboola/db-extractor-common/tree/14.5.3"
+                "source": "https://github.com/keboola/db-extractor-common/tree/15.0.1"
             },
-            "time": "2021-10-18T07:51:08+00:00"
+            "time": "2022-01-19T08:57:07+00:00"
         },
         {
             "name": "keboola/db-extractor-config",
@@ -332,16 +332,16 @@
         },
         {
             "name": "keboola/db-extractor-ssh-tunnel",
-            "version": "1.1.4",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-ssh-tunnel.git",
-                "reference": "9c0cc0737ab6cb176beb291b08164f6bb93be5cd"
+                "reference": "6662696f5f8273d4a3743786b117fd1d0ea594c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-ssh-tunnel/zipball/9c0cc0737ab6cb176beb291b08164f6bb93be5cd",
-                "reference": "9c0cc0737ab6cb176beb291b08164f6bb93be5cd",
+                "url": "https://api.github.com/repos/keboola/db-extractor-ssh-tunnel/zipball/6662696f5f8273d4a3743786b117fd1d0ea594c8",
+                "reference": "6662696f5f8273d4a3743786b117fd1d0ea594c8",
                 "shasum": ""
             },
             "require": {
@@ -368,9 +368,9 @@
             "description": "Create SSH tunnel for DB Extractors",
             "support": {
                 "issues": "https://github.com/keboola/db-extractor-ssh-tunnel/issues",
-                "source": "https://github.com/keboola/db-extractor-ssh-tunnel/tree/1.1.4"
+                "source": "https://github.com/keboola/db-extractor-ssh-tunnel/tree/1.1.5"
             },
-            "time": "2021-10-18T06:57:54+00:00"
+            "time": "2022-01-18T09:20:24+00:00"
         },
         {
             "name": "keboola/db-extractor-table-format",

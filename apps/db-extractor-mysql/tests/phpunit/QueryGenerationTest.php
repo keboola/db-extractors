@@ -45,7 +45,7 @@ class QueryGenerationTest extends TestCase
             $config['parameters']['query'] : null;
 
         $exportConfig = ExportConfig::fromArray($config['parameters']);
-        $extractor = new MySQL($config['parameters'], $state, new Logger());
+        $extractor = new MySQL($config['parameters'], $state, new Logger(), $config['action'] ?? 'run');
         if ($exportConfig->isIncrementalFetching()) {
             $extractor->validateIncrementalFetching($exportConfig);
         }
