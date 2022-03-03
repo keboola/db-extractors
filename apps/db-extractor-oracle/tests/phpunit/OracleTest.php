@@ -23,7 +23,7 @@ class OracleTest extends TestCase
         $config = $this->getConfigConnection();
 
         // Create extractor: SSH tunnel is created
-        $extractor = new Oracle($config['parameters'], [], new Logger());
+        $extractor = new Oracle($config['parameters'], [], new Logger(), 'run');
 
         // Kill SSH tunnel
         $this->closeSshTunnels();
@@ -41,7 +41,7 @@ class OracleTest extends TestCase
         $config = $this->getConfig();
 
         // Create extractor: SSH tunnel is created
-        $extractor = new Oracle($config['parameters'], [], new Logger());
+        $extractor = new Oracle($config['parameters'], [], new Logger(), 'run');
 
         // Kill SSH tunnel
         $this->closeSshTunnels();

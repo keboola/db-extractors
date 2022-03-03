@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "935053f1a954b7d37d8bd84233ab6d7e",
+    "content-hash": "c831f50a8f85ef36433369806b860664",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -225,16 +225,16 @@
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "14.6.0",
+            "version": "15.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "7022eb39dab38791da0eac71e6290c80191f20bd"
+                "reference": "648a9b5356509d4bf461b1ac5f91edd32fc90ccf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/7022eb39dab38791da0eac71e6290c80191f20bd",
-                "reference": "7022eb39dab38791da0eac71e6290c80191f20bd",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/648a9b5356509d4bf461b1ac5f91edd32fc90ccf",
+                "reference": "648a9b5356509d4bf461b1ac5f91edd32fc90ccf",
                 "shasum": ""
             },
             "require": {
@@ -284,9 +284,9 @@
             "description": "Common library from Keboola Database Extractors",
             "support": {
                 "issues": "https://github.com/keboola/db-extractor-common/issues",
-                "source": "https://github.com/keboola/db-extractor-common/tree/14.6.0"
+                "source": "https://github.com/keboola/db-extractor-common/tree/15.0.0"
             },
-            "time": "2021-10-19T11:18:28+00:00"
+            "time": "2021-12-13T08:24:09+00:00"
         },
         {
             "name": "keboola/db-extractor-config",
@@ -4067,5 +4067,5 @@
         "ext-mbstring": "*",
         "ext-oci8": "*"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
