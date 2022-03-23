@@ -7,6 +7,7 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Exception\InvalidArgumentException;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\ColumnBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
@@ -14,6 +15,7 @@ use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\TableCollection;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\InputTable;
+use PDOException;
 
 class MySQLMetadataProvider implements MetadataProvider
 {
@@ -231,11 +233,19 @@ class MySQLMetadataProvider implements MetadataProvider
         }
     }
 
+    /**
+     * @throws \Keboola\DbExtractor\Exception\UserException
+     */
     private function queryAndFetchAll(string $sql): iterable
     {
         $result = $this->connection->query($sql);
-        while ($row = $result->fetch()) {
-            yield $row;
+
+        try {
+            while ($row = $result->fetch()) {
+                yield $row;
+            }
+        } catch (PDOException $e) {
+            throw new UserException(sprintf('Cannot load DB metadata: %s', $e->getMessage()));
         }
     }
 
