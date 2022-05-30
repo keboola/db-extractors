@@ -60,3 +60,7 @@ The extraction has the following configuration options:
 - incrementalFetchingLimit: integer (optional)
 - enabled: boolean (optional)
 - retries: integer (optional) number of times to retry failures
+
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
