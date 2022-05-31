@@ -22,3 +22,6 @@ Clone repository, install dependencies and run tests:
     docker-compose run app composer install
     docker-compose run app
 ```
+## License
+
+MIT licensed, see [LICENSE](./LICENSE) file.
