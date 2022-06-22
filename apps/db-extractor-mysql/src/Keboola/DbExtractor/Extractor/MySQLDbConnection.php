@@ -7,11 +7,16 @@ namespace Keboola\DbExtractor\Extractor;
 use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Exception\UserException;
 use PDOException;
+use Retry\BackOff\ExponentialBackOffPolicy;
+use Retry\Policy\SimpleRetryPolicy;
+use Retry\RetryProxy;
 use Throwable;
 
 class MySQLDbConnection extends PdoConnection
 {
     public const CONNECT_MAX_RETRIES = 5;
+
+    private const RETRY_MAX_INTERVAL = 2 * 60 * 1000; // 2 minutes in miliseconds
 
     protected function connect(): void
     {
@@ -40,5 +45,12 @@ class MySQLDbConnection extends PdoConnection
             throw $e->getPrevious();
         }
         throw $e;
+    }
+
+    protected function createRetryProxy(int $maxRetries): RetryProxy
+    {
+        $retryPolicy = new SimpleRetryPolicy($maxRetries, $this->getExpectedExceptionClasses());
+        $backoffPolicy = new ExponentialBackOffPolicy(2000, null, self::RETRY_MAX_INTERVAL);
+        return new RetryProxy($retryPolicy, $backoffPolicy, $this->logger);
     }
 }
