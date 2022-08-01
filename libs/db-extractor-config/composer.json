@@ -47,6 +47,7 @@
         ]
     },
     "config": {
+        "allow-plugins": true,
         "sort-packages": true,
         "optimize-autoloader": true
     }
