@@ -58,6 +58,7 @@
         ]
     },
     "config": {
+        "allow-plugins": true,
         "sort-packages": true
     }
 }
