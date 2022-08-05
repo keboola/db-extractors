@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=7.4",
-        "keboola/php-component": "^8.1",
+        "keboola/php-component": "^9.0",
         "symfony/config": "^5.0"
     },
     "require-dev": {
@@ -47,6 +47,7 @@
         ]
     },
     "config": {
+        "allow-plugins": true,
         "sort-packages": true,
         "optimize-autoloader": true
     }
