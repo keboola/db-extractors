@@ -24,7 +24,7 @@
         "ext-mbstring": "*",
         "ext-json": "*",
         "keboola/common-exceptions": "^1.0",
-        "keboola/php-datatypes": "^4.7",
+        "keboola/php-datatypes": "^6.0",
         "keboola/php-utils": "^4.1"
     },
     "require-dev": {
