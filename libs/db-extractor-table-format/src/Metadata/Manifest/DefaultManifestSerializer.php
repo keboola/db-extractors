@@ -24,6 +24,7 @@ class DefaultManifestSerializer implements ManifestSerializer
             'owner' => $table->hasOwner() ? $table->getOwner() : null,
             'type' => $table->hasType() ? $table->getType() : null,
             'rowCount' => $table->hasRowCount() ? $table->getRowCount() : null,
+            'datatype.backend' => $table->hasDatatypeBackend() ? $table->getDatatypeBackend() : null,
         ];
 
         $metadata = [];

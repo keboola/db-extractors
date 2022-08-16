@@ -44,6 +44,8 @@ class TableBuilder implements Builder
 
     private ?int $rowCount = null;
 
+    private ?string $datatypeBackend = null;
+
     /**
      * Table can be build without columns if buildColumns = false, see method "setColumnsNotExpected".
      * It is useful when there are a lot of tables and in first step are loaded only tables without columns.
@@ -84,7 +86,8 @@ class TableBuilder implements Builder
             $this->rowCount,
             $this->buildColumns ?
                 new ColumnCollection(array_map(fn(ColumnBuilder $col) => $col->build(), $this->columns)) :
-                null
+                null,
+            $this->datatypeBackend
         );
     }
 
@@ -184,6 +187,12 @@ class TableBuilder implements Builder
     public function setRowCount(?int $rowsCount): self
     {
         $this->rowCount = $rowsCount;
+        return $this;
+    }
+
+    public function setDatatypeBackend(string $datatypeBackend): self
+    {
+        $this->datatypeBackend = $datatypeBackend;
         return $this;
     }
 }
