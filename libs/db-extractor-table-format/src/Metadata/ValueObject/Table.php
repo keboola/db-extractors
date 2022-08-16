@@ -29,6 +29,8 @@ class Table implements ValueObject
 
     private ?int $rowCount;
 
+    private ?string $datatypeBackend;
+
     private ?ColumnCollection $columns;
 
     /**
@@ -44,7 +46,8 @@ class Table implements ValueObject
         ?string $owner,
         ?string $type,
         ?int $rowCount,
-        ?ColumnCollection $columns
+        ?ColumnCollection $columns,
+        ?string $datatypeBackend = null
     ) {
         if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
@@ -91,6 +94,7 @@ class Table implements ValueObject
         $this->owner = $owner;
         $this->type = $type;
         $this->rowCount = $rowCount;
+        $this->datatypeBackend = $datatypeBackend;
         $this->columns = $columns;
     }
 
@@ -206,5 +210,18 @@ class Table implements ValueObject
             throw new PropertyNotSetException('Columns are not set.');
         }
         return $this->columns;
+    }
+
+    public function hasDatatypeBackend()
+    {
+        return $this->datatypeBackend !== null;
+    }
+
+    public function getDatatypeBackend(): string
+    {
+        if ($this->datatypeBackend === null) {
+            throw new PropertyNotSetException('Datatype backend is not set.');
+        }
+        return $this->datatypeBackend;
     }
 }

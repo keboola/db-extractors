@@ -60,7 +60,8 @@ class DefaultManifestSerializerTest extends TestCase
             ->setTablespaceName('my_tablespace')
             ->setOwner('db_owner')
             ->setType('BASE TABLE')
-            ->setRowCount(2);
+            ->setRowCount(2)
+            ->setDatatypeBackend('snowflake');
 
         $tableBuilder
             ->addColumn()
@@ -101,6 +102,10 @@ class DefaultManifestSerializerTest extends TestCase
             [
                 'key' => 'KBC.rowCount',
                 'value' => '2',
+            ],
+            [
+                'key' => 'KBC.datatype.backend',
+                'value' => 'snowflake',
             ],
         ];
         Assert::assertEquals($expectedOutput, $this->serializer->serializeTable($table));
