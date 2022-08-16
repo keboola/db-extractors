@@ -212,7 +212,7 @@ class Table implements ValueObject
         return $this->columns;
     }
 
-    public function hasDatatypeBackend()
+    public function hasDatatypeBackend(): bool
     {
         return $this->datatypeBackend !== null;
     }
