@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=7.4",
-        "keboola/php-component": "dev-ondra-config-change-access-level",
+        "keboola/php-component": "^9.1",
         "symfony/config": "^5.0"
     },
     "require-dev": {
