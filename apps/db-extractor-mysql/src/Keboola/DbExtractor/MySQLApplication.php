@@ -10,22 +10,20 @@ use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Psr\Log\LoggerInterface;
 
 class MySQLApplication extends Application
 {
-    public function __construct(array $config, LoggerInterface $logger, array $state = [], string $dataDir = '/data/')
+    protected function loadConfig(): void
     {
-        $config['parameters']['data_dir'] = $dataDir;
-        $config['parameters']['extractor_class'] = 'MySQL';
-        parent::__construct($config, $logger, $state);
-    }
+        $config = $this->getRawConfig();
+        $action = $config['action'] ?? 'run';
 
-    protected function buildConfig(array $config): void
-    {
+        $config['parameters']['extractor_class'] = 'MySQL';
+        $config['parameters']['data_dir'] = $this->getDataDir();
         $dbNode = new MysqlDbNode();
+
         if ($this->isRowConfiguration($config)) {
-            if ($this['action'] === 'run') {
+            if ($action === 'run') {
                 $this->config = new Config(
                     $config,
                     new ConfigRowDefinition($dbNode, null, null, new MysqlTableNodesDecorator())
