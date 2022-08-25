@@ -6,7 +6,7 @@ namespace Keboola\DbExtractor\Tests;
 
 use Generator;
 use Keboola\CommonExceptions\UserExceptionInterface;
-use Keboola\Component\Logger;
+use Keboola\Component\JsonHelper;
 use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
 use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\FunctionalTests\PdoTestConnection;
@@ -27,6 +27,9 @@ use PDO;
 use PDOException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 class MySQLTest extends TestCase
 {
@@ -48,6 +51,13 @@ class MySQLTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        putenv('KBC_DATADIR=' . $this->dataDir);
+
+        $fs = new Filesystem();
+        if ($fs->exists($this->dataDir . '/out')) {
+            $fs->remove($this->dataDir . '/out');
+        }
+
         $this->connection = PdoTestConnection::createConnection();
         $this->removeAllTables();
     }
@@ -97,21 +107,14 @@ class MySQLTest extends TestCase
             unset($config['parameters']['tables'][2]);
         }
 
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
 
-        $result = $app->run();
+        $app->execute();
+        $finder = new Finder();
+        $manifests = $finder->in($this->dataDir . '/out/tables/')->name('*.manifest')->files();
 
-        $importedTable = ($isConfigRow) ? $result['imported']['outputTable'] : $result['imported'][0]['outputTable'];
-
-        $sanitizedTable = Utils\Strings::webalize($importedTable, '._');
-        $outputManifest = json_decode(
-            (string) file_get_contents($this->dataDir . '/out/tables/' . $sanitizedTable . '.csv.manifest'),
-            true
-        );
-
-        $this->assertArrayHasKey('destination', $outputManifest);
-        $this->assertArrayHasKey('incremental', $outputManifest);
-        $this->assertArrayHasKey('metadata', $outputManifest);
         $expectedMetadata = [
             'KBC.name' => 'auto Increment Timestamp FK',
             'KBC.sanitizedName' => 'auto_Increment_Timestamp_FK',
@@ -119,17 +122,6 @@ class MySQLTest extends TestCase
             'KBC.type' => 'BASE TABLE',
             'KBC.rowCount' => 1,
         ];
-        $tableMetadata = [];
-        foreach ($outputManifest['metadata'] as $i => $metadata) {
-            $this->assertArrayHasKey('key', $metadata);
-            $this->assertArrayHasKey('value', $metadata);
-            $tableMetadata[$metadata['key']] = $metadata['value'];
-        }
-        $this->assertEquals($expectedMetadata, $tableMetadata);
-
-        $this->assertArrayHasKey('column_metadata', $outputManifest);
-        $this->assertCount(4, $outputManifest['column_metadata']);
-
         $expectedColumnMetadata = [
             'some_primary_key' =>
                 [
@@ -345,7 +337,30 @@ class MySQLTest extends TestCase
                     ],
                 ],
         ];
-        $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
+        foreach ($manifests as $manifest) {
+            $outputManifest = json_decode(
+                (string) file_get_contents($manifest->getPathname()),
+                true
+            );
+
+            $this->assertArrayHasKey('destination', $outputManifest);
+            $this->assertArrayHasKey('incremental', $outputManifest);
+            $this->assertArrayHasKey('metadata', $outputManifest);
+
+            $tableMetadata = [];
+            foreach ($outputManifest['metadata'] as $i => $metadata) {
+                $this->assertArrayHasKey('key', $metadata);
+                $this->assertArrayHasKey('value', $metadata);
+                $tableMetadata[$metadata['key']] = $metadata['value'];
+            }
+
+            $this->assertEquals($expectedMetadata, $tableMetadata);
+
+            $this->assertArrayHasKey('column_metadata', $outputManifest);
+            $this->assertCount(4, $outputManifest['column_metadata']);
+
+            $this->assertEquals($expectedColumnMetadata, $outputManifest['column_metadata']);
+        }
     }
 
     public function testSchemaNotEqualToDatabase(): void
@@ -359,9 +374,11 @@ class MySQLTest extends TestCase
         unset($config['parameters']['tables'][0]);
         unset($config['parameters']['tables'][1]);
 
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
         try {
-            $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-            $app->run();
+            $app = new MySQLApplication($logger);
+            $app->execute();
             $this->fail('table schema and database mismatch');
         } catch (UserException $e) {
             $this->assertStringStartsWith('Invalid Configuration', $e->getMessage());
@@ -377,9 +394,15 @@ class MySQLTest extends TestCase
 
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
 
-        $result = $app->run();
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        ob_start();
+        $app->execute();
+        $result = json_decode((string) ob_get_contents(), true);
+        ob_end_clean();
+
         Assert::assertCount($countTables, $result['tables']);
     }
 
@@ -390,18 +413,14 @@ class MySQLTest extends TestCase
 
         $config = $this->getIncrementalConfig();
 
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
 
-        $this->assertEquals('success', $result['status']);
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 6,
-            ],
-            $result['imported']
-        );
-        $outputManifestFile = $this->dataDir . '/out/tables/' . $result['imported']['outputTable'] . '.csv.manifest';
+        Assert::assertTrue($logger->hasInfo('Exported "6" rows to "in.c-main.auto-increment-timestamp".'));
+
+        $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.auto-increment-timestamp.csv.manifest';
         $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
         $expectedColumns = ['Weir_d_I_D', 'Weir_d_Na_me', 'someInteger', 'someDecimal', 'type', 'datetime'];
         $this->assertEquals($expectedColumns, $manifest['columns']);
@@ -415,20 +434,17 @@ class MySQLTest extends TestCase
 
         $config = $this->getIncrementalConfig();
         $config['parameters']['db']['networkCompression'] = true;
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
-        $this->assertEquals(
-            [
-                'outputTable' => 'in.c-main.auto-increment-timestamp',
-                'rows' => 6,
-            ],
-            $result['imported']
-        );
+
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
+
+        $state = JsonHelper::readFile($this->dataDir . '/out/state.json');
 
         //check that output state contains expected information
-        $this->assertArrayHasKey('state', $result);
-        $this->assertArrayHasKey('lastFetchedRow', $result['state']);
-        $this->assertEquals(6, $result['state']['lastFetchedRow']);
+        $this->assertArrayHasKey('lastFetchedRow', $state);
+        $this->assertEquals(6, $state['lastFetchedRow']);
     }
 
     public function testDBSchemaMismatchConfigRowWithNoName(): void
@@ -440,9 +456,12 @@ class MySQLTest extends TestCase
             'tableName' => 'ext_sales',
             'schema' => 'temp_schema',
         ];
+
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
         try {
-            $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-            $app->run();
+            $app = new MySQLApplication($logger);
+            $app->execute();
             $this->fail('Should throw a user exception.');
         } catch (UserException $e) {
             $this->assertStringStartsWith('Invalid Configuration [ext_sales]', $e->getMessage());
@@ -455,10 +474,13 @@ class MySQLTest extends TestCase
         $this->generateEscapingRows();
         $config = $this->getRowConfig();
         $config['parameters']['someExtraKey'] = 'test';
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
 
-        $this->assertEquals('success', $result['status']);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
+
+        Assert::assertTrue($logger->hasInfo('Exported "7" rows to "in.c-main.escaping".'));
     }
 
     public function testIncrementalNotPresentNoResults(): void
@@ -469,10 +491,16 @@ class MySQLTest extends TestCase
         $config = $this->getRowConfig();
         unset($config['parameters']['incremental']);
         $config['parameters']['query'] = 'SELECT * FROM sales WHERE 1 = 2;'; // no results
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
 
-        $this->assertEquals('success', $result['status']);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
+
+        Assert::assertTrue($logger->hasInfo('Exporting to "in.c-main.escaping".'));
+        Assert::assertTrue(
+            $logger->hasWarning('Query result set is empty. Exported "0" rows to "in.c-main.escaping".')
+        );
     }
 
     public function testMultipleForeignKeysOnOneColumn(): void
@@ -508,8 +536,15 @@ class MySQLTest extends TestCase
 
         $config = $this->getConfig();
         $config['action'] = 'getTables';
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
+
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+
+        ob_start();
+        $app->execute();
+        $result = json_decode((string) ob_get_contents(), true);
+        ob_end_clean();
 
         $this->assertEquals([
             [
@@ -584,9 +619,15 @@ class MySQLTest extends TestCase
         $config['parameters']['db']['user'] = 'user_no_perms';
         $config['parameters']['db']['#password'] = 'password';
         $config['action'] = 'getTables';
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
 
-        $result = $app->run();
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+
+        ob_start();
+        $app->execute();
+        $result = json_decode((string) ob_get_contents(), true);
+        ob_end_clean();
 
         $this->assertEquals('success', $result['status']);
         $this->assertEquals([], $result['tables']);
@@ -604,14 +645,16 @@ class MySQLTest extends TestCase
             'tableName' => 'Auto_INCREMENT_TimestamP',
         ];
 
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
 
         // The export should crash on a database error
         // MySQL case sensitive settings vary by platform: https://stackoverflow.com/a/6134059
         // "Database and table names are not case sensitive in Windows, and case sensitive in most varieties of Unix."
         // So in PHP all check must be done case-insensitive
         try {
-            $app->run();
+            $app->execute();
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
@@ -635,11 +678,12 @@ class MySQLTest extends TestCase
         $config = $this->getRowConfig();
         $config['parameters']['db']['transactionIsolationLevel'] = $level;
 
-        $app = new MySQLApplication($config, new Logger(), [], $this->dataDir);
-        $result = $app->run();
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
 
-        Assert::assertArrayHasKey('status', $result);
-        Assert::assertEquals('success', $result['status']);
+        Assert::assertTrue($logger->hasInfo('Exported "7" rows to "in.c-main.escaping".'));
     }
 
     public function transactionIsolationLevelProvider(): array
@@ -664,7 +708,11 @@ class MySQLTest extends TestCase
         $expctedMessage .= 'Permissible values: "REPEATABLE READ", "READ COMMITTED", "READ UNCOMMITTED", "SERIALIZABLE"';
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($expctedMessage);
-        new MySQLApplication($config, new Logger(), [], $this->dataDir);
+
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+        $logger = new TestLogger();
+        $app = new MySQLApplication($logger);
+        $app->execute();
     }
 
     public function configProvider(): Generator

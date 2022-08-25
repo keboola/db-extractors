@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\DbExtractor\MySQLApplication;
+use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlDbNode;
+use Keboola\DbExtractor\Configuration\NodeDefinition\MysqlTableNodesDecorator;
+use Keboola\DbExtractorConfig\Config;
+use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\Test\TestLogger;
 
 class ConfigTest extends TestCase
 {
@@ -15,7 +17,12 @@ class ConfigTest extends TestCase
      */
     public function testValid(array $config): void
     {
-        new MySQLApplication($config, new TestLogger());
+        new Config($config, new ConfigRowDefinition(
+            new MysqlDbNode(),
+            null,
+            null,
+            new MysqlTableNodesDecorator()
+        ));
         $this->expectNotToPerformAssertions();
     }
 
@@ -33,6 +40,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -48,6 +57,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -66,6 +77,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -94,6 +107,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -106,7 +121,12 @@ class ConfigTest extends TestCase
     public function testInvalid(string $expectedErrorMessage, array $config): void
     {
         $this->expectExceptionMessage($expectedErrorMessage);
-        new MySQLApplication($config, new TestLogger());
+        new Config($config, new ConfigRowDefinition(
+            new MysqlDbNode(),
+            null,
+            null,
+            new MysqlTableNodesDecorator()
+        ));
     }
 
     public function invalidConfigProvider(): array
@@ -128,6 +148,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -147,6 +169,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],
@@ -166,6 +190,8 @@ class ConfigTest extends TestCase
                         ],
                         'query' => 'SELECT * FROM escaping',
                         'outputTable' => 'in.c-main.escaping',
+                        'data_dir' => '/tmp/testDatadir',
+                        'extractor_class' => 'MySQL',
                     ],
                 ],
             ],

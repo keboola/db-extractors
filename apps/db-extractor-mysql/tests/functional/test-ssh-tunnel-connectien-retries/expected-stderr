@@ -1,1 +1,1 @@
-Connection failed: 'Unable to create ssh tunnel. Output:  ErrorOutput: ssh: Could not resolve hostname nonexisthost: Temporary failure in name resolution Retries count: 10'
+Unable to create ssh tunnel. Output:  ErrorOutput: ssh: Could not resolve hostname nonexisthost: Temporary failure in name resolution Retries count: 10
