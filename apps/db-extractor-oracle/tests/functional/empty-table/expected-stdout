@@ -5,4 +5,3 @@ Executing query "SELECT * FROM "TESTER"."escaping""
 Fetched 1 rows in %d seconds
 Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
 Exported "1" rows to "in.c-main.escaping".
-Extractor finished successfully.

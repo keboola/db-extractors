@@ -10,4 +10,3 @@ Executing query "SELECT * FROM "TESTER"."auto Increment Timestamp" ORDER BY "_We
 Fetched 1 rows in 0 seconds
 Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
 Exported "1" rows to "in.c-main.auto-increment-timestamp".
-Extractor finished successfully.

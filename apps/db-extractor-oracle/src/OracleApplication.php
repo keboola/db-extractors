@@ -14,23 +14,22 @@ use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
 
 class OracleApplication extends Application
 {
-    public function __construct(array $config, LoggerInterface $logger, array $state, string $dataDir)
+    public function loadConfig(): void
     {
-        $config['parameters']['data_dir'] = $dataDir;
+        $config = $this->getRawConfig();
+        $action = $config['action'] ?? 'run';
+
         $config['parameters']['extractor_class'] = 'Oracle';
+        $config['parameters']['data_dir'] = $this->getDataDir();
+
         if (isset($config['image_parameters']['db']['defaultRowPrefetch'])) {
             $config['parameters']['db']['defaultRowPrefetch'] = $config['image_parameters']['db']['defaultRowPrefetch'];
         }
 
-        parent::__construct($config, $logger, $state);
-    }
-
-    public function buildConfig(array $config): void
-    {
-        if ($this['action'] === 'getTables') {
+        if ($action === 'getTables') {
             $this->config = new Config($config, new GetTablesListFilterDefinition(new OracleDbNode()));
         } elseif ($this->isRowConfiguration($config)) {
-            if ($this['action'] === 'run') {
+            if ($action === 'run') {
                 $config['parameters']['id'] = 1;
                 $config['parameters']['name'] = $config['parameters']['outputTable'];
                 $this->config = new Config($config, new ConfigRowDefinition(new OracleDbNode()));

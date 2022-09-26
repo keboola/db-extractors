@@ -18,4 +18,3 @@ Executing query "SELECT * FROM "TESTER"."types""
 Fetched 2 rows in %d seconds
 Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
 Exported "2" rows to "in.c-main.types".
-Extractor finished successfully.
