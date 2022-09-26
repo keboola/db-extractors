@@ -7,4 +7,3 @@ Executing query "SELECT * FROM "TESTER"."sales""
 Fetched 11 rows in %d seconds
 Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
 Exported "11" rows to "in.c-main.sales".
-Extractor finished successfully.

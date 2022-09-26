@@ -7,4 +7,3 @@ Fetched 11 rows in %d seconds
 Created "tnsname.ora" file for "java-oracle-exporter" tool.
 Created "get tables" configuration for "java-oracle-exporter" tool.
 Exported "11" rows to "in.c-main.sales".
-Extractor finished successfully.

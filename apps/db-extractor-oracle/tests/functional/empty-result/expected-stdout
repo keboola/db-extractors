@@ -4,4 +4,3 @@ Connecting user "tester" to database "xe" at "oracle" on port "1521"
 Executing query "SELECT * FROM HR.REGIONS WHERE REGION_ID > 5"
 Fetched 1 rows in %d seconds
 Exported "1" rows to "in.c-main.regions".
-Extractor finished successfully.

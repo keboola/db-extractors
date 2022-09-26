@@ -124,7 +124,7 @@ class DatadirTest extends DatadirTestCase
         $runProcess = new Process($runCommand);
         $runProcess->setEnv([
             'KBC_DATADIR' => $datadirPath,
-            'KBC_REALUSER' => $this->kbcRealuser,
+            'KBC_REALUSER' => (string) $this->kbcRealuser,
         ]);
         $runProcess->setTimeout(0.0);
         $runProcess->run();
