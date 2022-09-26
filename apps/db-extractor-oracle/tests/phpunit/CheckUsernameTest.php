@@ -4,14 +4,24 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\DbExtractor\Application;
+use Keboola\Component\JsonHelper;
 use Keboola\DbExtractor\Exception\BadUsernameException;
+use Keboola\DbExtractor\OracleApplication;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
 class CheckUsernameTest extends TestCase
 {
+    protected string $dataDir = __DIR__ . '/data';
+
+    protected function setUp(): void
+    {
+        putenv('KBC_DATADIR=' . $this->dataDir);
+
+        parent::setUp();
+    }
+
     public function testValidCheckUsername(): void
     {
         $logger = new TestLogger();
@@ -20,7 +30,10 @@ class CheckUsernameTest extends TestCase
             'enabled' => true,
         ];
         putenv('KBC_REALUSER=' . (string) getEnv('ORACLE_DB_USER'));
-        new Application($config, $logger);
+
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
+        new OracleApplication($logger);
 
         Assert::assertTrue(
             $logger->hasInfoThatContains(sprintf(
@@ -39,13 +52,15 @@ class CheckUsernameTest extends TestCase
         ];
         putenv('KBC_REALUSER=dbUsername');
 
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
         $this->expectException(BadUsernameException::class);
         $this->expectExceptionMessage(sprintf(
             'Your username "dbUsername" does not have permission ' .
             'to run configuration with the database username "%s"',
             (string) getEnv('ORACLE_DB_USER')
         ));
-        new Application($config, $logger);
+        new OracleApplication($logger);
     }
 
     public function testServiceAccountRegexpMatch(): void
@@ -59,7 +74,9 @@ class CheckUsernameTest extends TestCase
         ];
         putenv('KBC_REALUSER=dbUsername');
 
-        new Application($config, $logger);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
+        new OracleApplication($logger);
 
         Assert::assertTrue(
             $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
@@ -77,12 +94,14 @@ class CheckUsernameTest extends TestCase
         ];
         putenv('KBC_REALUSER=dbUsername');
 
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
         $this->expectException(BadUsernameException::class);
         $this->expectExceptionMessage(
             'Your username "dbUsername" does not have permission ' .
             'to run configuration with the database username "user123"'
         );
-        new Application($config, $logger);
+        new OracleApplication($logger);
     }
 
     public function testUserAccountRegexpMatch(): void
@@ -96,12 +115,14 @@ class CheckUsernameTest extends TestCase
         ];
         putenv('KBC_REALUSER=dbUsername');
 
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
         $this->expectException(BadUsernameException::class);
         $this->expectExceptionMessage(
             'Your username "dbUsername" does not have permission ' .
             'to run configuration with the database username "user_abc"'
         );
-        new Application($config, $logger);
+        new OracleApplication($logger);
     }
 
     public function testUserAccountRegexpDontMatch(): void
@@ -115,7 +136,9 @@ class CheckUsernameTest extends TestCase
         ];
         putenv('KBC_REALUSER=dbUsername');
 
-        new Application($config, $logger);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
+        new OracleApplication($logger);
 
         Assert::assertTrue(
             $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
@@ -127,9 +150,18 @@ class CheckUsernameTest extends TestCase
         $logger = new TestLogger();
         $config = $this->createConfig();
         putenv('KBC_REALUSER=' . (string) getEnv('ORACLE_DB_USER'));
-        new Application($config, $logger);
 
-        Assert::assertEquals([], $logger->records);
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
+        new OracleApplication($logger);
+
+        Assert::assertEquals([
+            [
+                'level' => 'debug',
+                'message' => 'Component initialization completed',
+                'context' => [],
+            ],
+        ], $logger->records);
     }
 
     private function createConfig(string $action = 'run'): array
