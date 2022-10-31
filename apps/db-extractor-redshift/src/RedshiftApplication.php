@@ -9,22 +9,19 @@ use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
-use Psr\Log\LoggerInterface;
 
 class RedshiftApplication extends Application
 {
-    public function __construct(array $config, LoggerInterface $logger, array $state, string $dataDir)
+    protected function loadConfig(): void
     {
-        $config['parameters']['data_dir'] = $dataDir;
+        $config = $this->getRawConfig();
+        $action = $config['action'] ?? 'run';
+
         $config['parameters']['extractor_class'] = 'Redshift';
+        $config['parameters']['data_dir'] = $this->getDataDir();
 
-        parent::__construct($config, $logger, $state);
-    }
-
-    protected function buildConfig(array $config): void
-    {
         if ($this->isRowConfiguration($config)) {
-            if ($this['action'] === 'run') {
+            if ($action === 'run') {
                 $configDefinition = new ConfigRowDefinition(
                     null,
                     null,
