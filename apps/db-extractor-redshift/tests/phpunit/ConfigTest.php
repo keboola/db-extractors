@@ -6,18 +6,29 @@ namespace Keboola\DbExtractor\Tests;
 
 use Generator;
 use Keboola\CommonExceptions\UserExceptionInterface;
+use Keboola\Component\JsonHelper;
 use Keboola\DbExtractor\RedshiftApplication;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 
 class ConfigTest extends TestCase
 {
+    protected string $dataDir = __DIR__ . '/data';
+
+    protected function setUp(): void
+    {
+        putenv('KBC_DATADIR=' . $this->dataDir);
+        parent::setUp();
+    }
+
     /**
      * @dataProvider validConfigProvider
      */
     public function testValid(array $config): void
     {
-        new RedshiftApplication($config, new TestLogger(), [], 'testDataDir');
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
+        new RedshiftApplication(new TestLogger());
         $this->expectNotToPerformAssertions();
     }
 
@@ -26,9 +37,11 @@ class ConfigTest extends TestCase
      */
     public function testInvalid(array $config, string $expectedMessage): void
     {
+        JsonHelper::writeFile($this->dataDir . '/config.json', $config);
+
         $this->expectException(UserExceptionInterface::class);
         $this->expectExceptionMessage($expectedMessage);
-        new RedshiftApplication($config, new TestLogger(), [], 'testDataDir');
+        new RedshiftApplication(new TestLogger());
     }
 
     public function validConfigProvider(): Generator
