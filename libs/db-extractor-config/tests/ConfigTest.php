@@ -23,20 +23,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
-                'db' => [
-                    'host' => 'mysql',
-                    'user' => 'root',
-                    '#password' => 'rootpassword',
-                    'database' => 'test',
-                    'port' => 3306,
-                    'ssl' => [
-                        '#key' => 'testKey',
-                        'ca' => 'testCa',
-                        'cert' => 'testCert',
-                        'cipher' => 'testCipher',
-                        'verifyServerCert' => false,
-                    ],
-                ],
+                'db' => $this->getDbConfigurationArray(),
                 'tables' => [
                     [
                         'id' => 1,
@@ -85,23 +72,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
-                'db' => [
-                    'host' => 'mysql',
-                    'user' => 'root',
-                    '#password' => 'rootpassword',
-                    'database' => 'test',
-                    'port' => 3306,
-                    'ssl' => [
-                        '#key' => 'testKey',
-                        'ca' => 'testCa',
-                        'cert' => 'testCert',
-                        'cipher' => 'testCipher',
-                        'verifyServerCert' => false,
-                        'enabled' => false,
-                        'ignoreCertificateCn' => false,
-                    ],
-                    'initQueries' => [],
-                ],
+                'db' => $this->getExpectedDbConfigArray(),
                 'tables' => [
                     [
                         'id' => 1,
@@ -165,6 +136,7 @@ class ConfigTest extends AbstractConfigTest
                 'incremental' => true,
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'auto_increment_timestamp',
                     'schema' => 'test',
@@ -182,6 +154,7 @@ class ConfigTest extends AbstractConfigTest
                 'incremental' => true,
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getExpectedDbConfigArray(),
                 'table' => [
                     'tableName' => 'auto_increment_timestamp',
                     'schema' => 'test',
@@ -366,6 +339,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'fake.output',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'query' => 'select 1 from test',
                 'incrementalFetchingColumn' => 'test',
             ],
@@ -387,6 +361,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'fake.output',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
             ],
         ];
 
@@ -403,6 +378,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'fake.output',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'schema' => 'test',
                 ],
@@ -422,6 +398,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'auto_increment_timestamp',
                 ],
@@ -441,6 +418,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'fake.output',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'test',
                     'schema' => 'test',
@@ -464,6 +442,7 @@ class ConfigTest extends AbstractConfigTest
                 'outputTable' => 'fake.output',
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'incrementalFetchingColumn' => 'abc',
                 'query' => 'select 1 limit 0',
             ],
@@ -584,6 +563,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'auto_increment_timestamp',
                     'schema' => '',
@@ -603,6 +583,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => '',
                     'schema' => 'schema',
@@ -622,6 +603,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'name',
                     'schema' => 'schema',
@@ -636,6 +618,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getExpectedDbConfigArray(),
                 'table' => [
                     'tableName' => 'name',
                     'schema' => 'schema',
@@ -658,6 +641,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'name',
                     'schema' => 'schema',
@@ -673,6 +657,7 @@ class ConfigTest extends AbstractConfigTest
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
+                'db' => $this->getExpectedDbConfigArray(),
                 'table' => [
                     'tableName' => 'name',
                     'schema' => 'schema',
@@ -694,6 +679,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
                 'table' => [
                     'tableName' => 'name',
@@ -717,6 +703,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
                 'table' => [
                     'tableName' => 'name',
@@ -739,6 +726,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'outputTable' => 'in.c-main.auto-increment-timestamp',
                 'table' => [
                     'tableName' => 'name',
@@ -761,6 +749,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'table',
                     'schema' => 'schema',
@@ -777,6 +766,7 @@ class ConfigTest extends AbstractConfigTest
 
         // Normalized
         $expected = $configurationArray;
+        $expected['parameters']['db'] = $this->getExpectedDbConfigArray();
         $expected['parameters']['query'] = null;
         $expected['parameters']['enabled'] = true;
 
@@ -790,6 +780,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'table',
                     'schema' => 'schema',
@@ -806,6 +797,7 @@ class ConfigTest extends AbstractConfigTest
 
         // Normalized
         $expected = $configurationArray;
+        $expected['parameters']['db'] = $this->getExpectedDbConfigArray();
         $expected['parameters']['incrementalFetchingLimit'] = null;
         $expected['parameters']['query'] = null;
         $expected['parameters']['enabled'] = true;
@@ -819,6 +811,7 @@ class ConfigTest extends AbstractConfigTest
         $configurationArray = [
             'action' => 'getTables',
             'parameters' => [
+                'db' => $this->getDbConfigurationArray(),
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
             ],
@@ -835,6 +828,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'tableListFilter' => [
                     'listColumns' => true,
                     'tablesToList' => [
@@ -861,6 +855,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'table',
                     'schema' => 'schema',
@@ -884,6 +879,7 @@ class ConfigTest extends AbstractConfigTest
             'parameters' => [
                 'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
                 'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
                 'table' => [
                     'tableName' => 'table',
                     'schema' => 'schema',
@@ -899,5 +895,66 @@ class ConfigTest extends AbstractConfigTest
 
         $config = new Config($configurationArray, new ConfigRowDefinition());
         Assert::assertSame(null, $config->getData()['incrementalFetchingColumn']);
+    }
+
+    public function testMissingDbNode(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+            ],
+        ];
+
+        $exceptionMessage = 'The child config "db" under "root.parameters" must be configured.';
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        new Config($configurationArray, new ConfigRowDefinition());
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDbConfigurationArray(): array
+    {
+        return [
+            'host' => 'mysql',
+            'user' => 'root',
+            '#password' => 'rootpassword',
+            'database' => 'test',
+            'port' => 3306,
+            'ssl' => [
+                '#key' => 'testKey',
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+                'cipher' => 'testCipher',
+                'verifyServerCert' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExpectedDbConfigArray(): array
+    {
+        return [
+            'host' => 'mysql',
+            'user' => 'root',
+            '#password' => 'rootpassword',
+            'database' => 'test',
+            'port' => 3306,
+            'ssl' => [
+                '#key' => 'testKey',
+                'ca' => 'testCa',
+                'cert' => 'testCert',
+                'cipher' => 'testCipher',
+                'verifyServerCert' => false,
+                'enabled' => false,
+                'ignoreCertificateCn' => false,
+            ],
+            'initQueries' => [],
+        ];
     }
 }
