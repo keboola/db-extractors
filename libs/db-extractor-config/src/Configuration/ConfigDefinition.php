@@ -48,7 +48,7 @@ class ConfigDefinition extends BaseConfigDefinition
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
-                ->append($this->dbNode)
+                ->append($this->dbNode->isRequired())
             ->end();
         // @formatter:on
 
