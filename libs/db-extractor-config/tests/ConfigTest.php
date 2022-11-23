@@ -849,6 +849,53 @@ class ConfigTest extends AbstractConfigTest
         $this->expectNotToPerformAssertions(); // no error expected
     }
 
+    public function testGetTablesListFilterMissingTables(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The path "root.parameters.tableListFilter.tablesToList" should have at least ' .
+            '1 element(s) defined.');
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+    }
+
+    public function testGetTablesListFilterMissingTableName(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [
+                        [
+                            'wrongIndex' => 'table1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('Unrecognized option "wrongIndex" under "root.parameters.tableListFilter.' .
+            'tablesToList.0". Available options are "schema", "tableName".');
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+    }
+
+
     public function testIncrementalFetchingLimitNull(): void
     {
         $configurationArray = [

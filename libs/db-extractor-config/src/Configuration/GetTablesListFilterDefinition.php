@@ -20,6 +20,7 @@ class GetTablesListFilterDefinition extends ActionConfigRowDefinition
                     ->children()
                         ->booleanNode('listColumns')->defaultTrue()->end()
                         ->arrayNode('tablesToList')
+                            ->requiresAtLeastOneElement()
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('tableName')->end()
