@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\FunctionalTests;
 
 use Keboola\DbExtractor\TraitTests\Tables\AutoIncrementTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\EscapingTableTrait;
+use Keboola\DbExtractor\TraitTests\Tables\SalesLateBindViewTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SalesTableTrait;
 use \PDO;
 
@@ -13,6 +14,7 @@ class DatabaseManager
 {
     use AutoIncrementTableTrait;
     use SalesTableTrait;
+    use SalesLateBindViewTrait;
     use EscapingTableTrait;
 
     protected PDO $connection;

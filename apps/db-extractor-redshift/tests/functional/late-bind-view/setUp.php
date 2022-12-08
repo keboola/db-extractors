@@ -7,13 +7,7 @@ use Keboola\DbExtractor\FunctionalTests\DatabaseManager;
 
 return function (DatadirTest $test): void {
     $manager = new DatabaseManager($test->getConnection());
-
-    // sales table
-    $manager->createSalesTable();
-
     // escaping table
-    $manager->createEscapingTable();
-
-    // late-bind view table
-    $manager->createSalesLateBindView('sales2', ['usercity', 'zipcode']);
+    $manager->createSalesLateBindView('sales', ['usercity', 'zipcode']);
+    $manager->generateSalesRows();
 };
