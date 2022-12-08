@@ -90,7 +90,7 @@ class RedshiftMetadataProvider implements MetadataProvider
             ->setSchema($data['table_schema'])
             ->setName($data['table_name'])
             ->setCatalog($data['table_catalog'] ?? null)
-            ->setType($data['table_type'] ?? 'view')
+            ->setType($data['table_type'] ?? null)
         ;
     }
 
