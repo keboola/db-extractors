@@ -11,6 +11,7 @@ use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\Adapter\PDO\PdoExportAdapter;
 use Keboola\DbExtractor\Adapter\ResultWriter\DefaultResultWriter;
 use Keboola\DbExtractor\Exception\UserException;
+use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
 use PDO;
@@ -90,15 +91,11 @@ class Redshift extends BaseExtractor
 
     public function validateIncrementalFetching(ExportConfig $exportConfig): void
     {
-        $query = sprintf(
-            'SELECT * FROM information_schema.columns 
-                            WHERE table_schema = %s AND table_name = %s AND column_name = %s',
-            $this->connection->quote($exportConfig->getTable()->getSchema()),
-            $this->connection->quote($exportConfig->getTable()->getName()),
-            $this->connection->quote($exportConfig->getIncrementalFetchingConfig()->getColumn())
-        );
-        $columns = $this->connection->query($query)->fetchAll();
-        if (count($columns) === 0) {
+        $table = $this->metadataProvider->getTable($exportConfig->getTable());
+
+        try {
+            $column = $table->getColumns()->getByName($exportConfig->getIncrementalFetchingConfig()->getColumn());
+        } catch (ColumnNotFoundException $e) {
             throw new UserException(
                 sprintf(
                     'Column [%s] specified for incremental fetching was not found in the table',
@@ -108,7 +105,7 @@ class Redshift extends BaseExtractor
         }
 
         try {
-            $datatype = new RedshiftDatatype(strtoupper($columns[0]['data_type']));
+            $datatype = new RedshiftDatatype(strtoupper($column->getType()));
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
                 $this
                     ->getQueryFactory()

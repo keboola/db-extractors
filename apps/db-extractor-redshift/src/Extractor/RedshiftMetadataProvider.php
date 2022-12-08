@@ -65,6 +65,20 @@ class RedshiftMetadataProvider implements MetadataProvider
                 $columnBuilder = $tableBuilders[$tableId]->addColumn();
                 $this->processColumnData($columnBuilder, $column);
             }
+
+            foreach ($this->queryLateBindViewsColumns() as $column) {
+                $tableId = $column['view_schema'] . '.' . $column['view_name'];
+                if (!isset($tableBuilders[$tableId])) {
+                    continue;
+                }
+                $columnBuilder = $tableBuilders[$tableId]->addColumn();
+
+                $columnBuilder
+                    ->setName($column['col_name'])
+                    ->setType($column['col_type'])
+                    ->setNullable(false)
+                    ->setOrdinalPosition($column['col_num']);
+            }
         }
 
         return $builder->build();
@@ -124,6 +138,16 @@ SQL;
                 return $this->db->quote($tableName);
             }, $nameTables))
         );
+
+        return $this->queryAndFetchAll($sql);
+    }
+
+    private function queryLateBindViewsColumns(): iterable
+    {
+        $sql = <<<SQL
+select * from pg_get_late_binding_view_cols()
+    cols(view_schema name, view_name name, col_name name, col_type varchar, col_num int);
+SQL;
 
         return $this->queryAndFetchAll($sql);
     }

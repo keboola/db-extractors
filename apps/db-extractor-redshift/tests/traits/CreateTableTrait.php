@@ -28,4 +28,17 @@ trait CreateTableTrait
             implode(', ', $columnsSql)
         ))->execute();
     }
+
+    public function createLateBindView(string $tableName, array $columns, array $columnsInView): void
+    {
+        $this->createTable($tableName, $columns);
+
+        $this->connection->prepare(sprintf(
+            'CREATE VIEW %s AS SELECT %s FROM %s.%s WITH NO SCHEMA BINDING;',
+            $this->quoteIdentifier($tableName . '_view'),
+            implode(', ', $columnsInView),
+            $this->quoteIdentifier((string) getenv('REDSHIFT_DB_SCHEMA')),
+            $this->quoteIdentifier($tableName)
+        ))->execute();
+    }
 }
