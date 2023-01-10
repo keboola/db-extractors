@@ -14,7 +14,7 @@
         "ext-filter": "*",
         "ext-json": "*",
         "keboola/db-extractor-common": "^16.0",
-        "keboola/db-extractor-config": "^1.9",
+        "keboola/db-extractor-config": "^1.11",
         "keboola/db-extractor-table-format": "^3.5",
         "keboola/php-component": "^9.2",
         "symfony/config": "^5.0",
