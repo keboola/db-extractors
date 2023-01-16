@@ -82,8 +82,6 @@ class OracleQueryFactory extends DefaultQueryFactory
             $where[] = sprintf('ROWNUM <= %d', $exportConfig->getIncrementalFetchingLimit());
         }
 
-        var_dump($where);
-
         if ($where) {
             yield sprintf('WHERE %s', implode(' AND ', $where));
         }
