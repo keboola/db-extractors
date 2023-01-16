@@ -17,14 +17,14 @@ trait AutoIncrementTableTrait
 
     protected TestConnection $connection;
 
-    public function createAITable(string $name = 'auto Increment Timestamp'): void
+    public function createAITable(string $name = 'auto Increment Timestamp', bool $includeTSColumn = false): void
     {
-        $this->createTable($name, $this->getAIColumns());
+        $this->createTable($name, $this->getAIColumns($includeTSColumn));
     }
 
-    public function generateAIRows(string $tableName = 'auto Increment Timestamp'): void
+    public function generateAIRows(string $tableName = 'auto Increment Timestamp', bool $includeTSColumn = false): void
     {
-        $data = $this->getAIRows();
+        $data = $this->getAIRows($includeTSColumn);
         $this->insertRows($tableName, $data['columns'], $data['data']);
     }
 
@@ -33,9 +33,9 @@ trait AutoIncrementTableTrait
         $this->addConstraint($tableName, 'UNI_KEY_1', 'UNIQUE', '"Weir%d Na-me"');
     }
 
-    private function getAIRows(): array
+    private function getAIRows(bool $includeTSColumn = false): array
     {
-        return [
+        $rows = [
             'columns' => ['_Weir%d I-D', 'Weir%d Na-me', 'type', 'someInteger', 'someDecimal', 'date'],
             'data' => [
                 [1, 'mario', 'plumber', 1, 1.1, 'TO_DATE(\'2021-01-05\', \'yyyy-mm-dd\')'],
@@ -46,11 +46,20 @@ trait AutoIncrementTableTrait
                 [6, 'yoshi', 'horse?', 6, 6.6, 'TO_DATE(\'2021-01-10\', \'yyyy-mm-dd\')'],
             ],
         ];
+
+        if ($includeTSColumn) {
+            $rows['columns'][] = 'timestamp';
+            foreach ($rows['data'] as $key => $row) {
+                $rows['data'][$key][] = sprintf('TO_TIMESTAMP(\'%02d-JAN-21 11:20:30.45 AM\')', $key + 5);
+            }
+        }
+
+        return $rows;
     }
 
-    private function getAIColumns(): array
+    private function getAIColumns(bool $includeTSColumn = false): array
     {
-        return [
+        $columns = [
             '_Weir%d I-D' => 'INT NOT NULL',
             'Weir%d Na-me' => 'NVARCHAR2(55) NOT NULL',
             'someInteger' => 'INT',
@@ -58,5 +67,11 @@ trait AutoIncrementTableTrait
             'type' => 'NVARCHAR2(55) NULL',
             'date' => 'DATE',
         ];
+
+        if ($includeTSColumn) {
+            $columns['timestamp'] = 'TIMESTAMP';
+        }
+
+        return $columns;
     }
 }
