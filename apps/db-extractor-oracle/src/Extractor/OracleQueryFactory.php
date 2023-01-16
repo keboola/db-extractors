@@ -50,15 +50,24 @@ class OracleQueryFactory extends DefaultQueryFactory
     {
         $where = [];
         if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
-            if ($this->incrementalFetchingColType === Oracle::INCREMENT_TYPE_NUMERIC) {
-                $lastFetchedRow = $this->state['lastFetchedRow'];
-            } else if ($this->incrementalFetchingColType === Oracle::INCREMENT_TYPE_DATE) {
-                $lastFetchedRow = sprintf(
-                    "DATE '%s'",
-                    formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
-                );
-            } else {
-                $lastFetchedRow = $connection->quote((string) $this->state['lastFetchedRow']);
+            switch ($this->incrementalFetchingColType) {
+                case Oracle::INCREMENT_TYPE_NUMERIC:
+                    $lastFetchedRow = $this->state['lastFetchedRow'];
+                    break;
+                case Oracle::INCREMENT_TYPE_DATE:
+                    $lastFetchedRow = sprintf(
+                        "DATE '%s'",
+                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
+                    );
+                    break;
+                case Oracle::INCREMENT_TYPE_TIMESTAMP:
+                    $lastFetchedRow = sprintf(
+                        "TO_TIMESTAMP('%s', 'YYYY-MM-DD HH24:MI:SS.FF')",
+                        $this->state['lastFetchedRow']
+                    );
+                    break;
+                default:
+                    $lastFetchedRow = $connection->quote((string) $this->state['lastFetchedRow']);
             }
 
             // intentionally ">=" last row should be included, it is handled by storage deduplication process
@@ -72,6 +81,8 @@ class OracleQueryFactory extends DefaultQueryFactory
         if ($exportConfig->hasIncrementalFetchingLimit()) {
             $where[] = sprintf('ROWNUM <= %d', $exportConfig->getIncrementalFetchingLimit());
         }
+
+        var_dump($where);
 
         if ($where) {
             yield sprintf('WHERE %s', implode(' AND ', $where));
