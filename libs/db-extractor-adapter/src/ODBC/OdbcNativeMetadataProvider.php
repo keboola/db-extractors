@@ -69,7 +69,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         // Process tables
         $tableRequiredProperties = ['type'];
-        $columnRequiredProperties= [];
+        $columnRequiredProperties = [];
         $builder = MetadataBuilder::create($tableRequiredProperties, $columnRequiredProperties);
         foreach ($this->queryTables($whitelist) as $data) {
             $tableId = $this->getTableId($data);
@@ -85,9 +85,10 @@ class OdbcNativeMetadataProvider implements MetadataProvider
 
         // Process columns
         if ($loadColumns) {
+            $primaryKeys = $this->queryPrimaryKeys($whitelist);
             foreach ($this->queryColumns($whitelist) as $data) {
                 $tableId = $this->getTableId($data);
-                $columnId = $tableId . '.' . $data['COLUMN_NAME'];
+                $columnId = $this->getColumnId($data);
 
                 // If the column has multiple constraints
                 // ... then is present multiple times in results
@@ -99,15 +100,20 @@ class OdbcNativeMetadataProvider implements MetadataProvider
                 }
 
                 $ordinalPosition[$tableId] = ($ordinalPosition[$tableId] ?? 0) + 1;
-                $this->processColumnData($columnBuilder, $data, $ordinalPosition[$tableId]);
+                $primaryKey = array_key_exists($columnId, $primaryKeys);
+                $this->processColumnData($columnBuilder, $data, $ordinalPosition[$tableId], $primaryKey);
             }
         }
 
         return $builder->build();
     }
 
-    protected function processColumnData(ColumnBuilder $builder, array $data, int $ordinalPosition): void
-    {
+    protected function processColumnData(
+        ColumnBuilder $builder,
+        array $data,
+        int $ordinalPosition,
+        bool $primaryKey
+    ): void {
         $type = $data['TYPE_NAME'];
         if (!in_array(strtolower($type), $this->typesWithoutLength)) {
             $length = $data['COLUMN_SIZE'] ?? null;
@@ -132,6 +138,10 @@ class OdbcNativeMetadataProvider implements MetadataProvider
             $builder->setDefault($data['COLUMN_DEF']);
         }
 
+        if ($primaryKey) {
+            $builder->setPrimaryKey(true);
+        }
+
         $builder->setName($data['COLUMN_NAME']);
         $builder->setType($type);
         $builder->setLength($length);
@@ -146,9 +156,44 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         $builder->setType(strpos($data['TABLE_TYPE'], 'VIEW') !== false ? 'view' : 'table');
     }
 
+
+    protected function getColumnId(array $data): string
+    {
+        return $this->getTableId($data) . '.' . $data['COLUMN_NAME'];
+    }
+
     protected function getTableId(array $data): string
     {
         return ($data['TABLE_CAT'] ?? '') . ($data['TABLE_SCHEM'] ?? '') . '.' . $data['TABLE_NAME'];
+    }
+
+    /**
+     * @param array|InputTable[] $whitelist
+     * @return array[string][]
+     */
+    protected function queryPrimaryKeys(array $whitelist): array
+    {
+        $whitelist = empty($whitelist) ? [null] : $whitelist;
+        $pks = [];
+
+        foreach ($whitelist as $whitelistedTable) {
+            $result = odbc_primarykeys(
+                $this->connection->getConnection(),
+                $this->onlyFromCatalog,
+                $this->onlyFromSchema,
+                // % means ALL, see odbc_columns docs
+                $whitelistedTable ? $whitelistedTable->getName() : '%',
+            );
+            while ($pk = odbc_fetch_array($result)) {
+                if ($this->isTableIgnored($pk)) {
+                    continue;
+                }
+                $pks[$this->getColumnId($pk)] = $pk;
+            }
+            odbc_free_result($result);
+        }
+
+        return $pks;
     }
 
     /**
