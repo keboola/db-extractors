@@ -47,6 +47,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('id', $table1Cols[0]->getName());
         Assert::assertSame('INT', $table1Cols[0]->getType());
         Assert::assertFalse($table1Cols[0]->hasLength());
+        Assert::assertSame(true, $table1Cols[0]->isPrimaryKey());
         Assert::assertSame(true, $table1Cols[0]->isNullable());
         Assert::assertSame(null, $table1Cols[0]->getDefault());
         // ----
@@ -54,6 +55,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('name', $table1Cols[1]->getName());
         Assert::assertSame('VARCHAR', $table1Cols[1]->getType());
         Assert::assertSame('255', $table1Cols[1]->getLength());
+        Assert::assertSame(false, $table1Cols[1]->isPrimaryKey());
         Assert::assertSame(false, $table1Cols[1]->isNullable());
         Assert::assertSame(null, $table1Cols[1]->getDefault());
         // ----
@@ -61,6 +63,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('price', $table1Cols[2]->getName());
         Assert::assertSame('DECIMAL', $table1Cols[2]->getType());
         Assert::assertSame('20,10', $table1Cols[2]->getLength());
+        Assert::assertSame(false, $table1Cols[2]->isPrimaryKey());
         Assert::assertSame(false, $table1Cols[2]->isNullable());
         Assert::assertSame(null, $table1Cols[2]->getDefault());
         // ----
@@ -68,6 +71,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('in_stock', $table1Cols[3]->getName());
         Assert::assertSame('SMALLINT', $table1Cols[3]->getType());
         Assert::assertFalse($table1Cols[3]->hasLength());
+        Assert::assertSame(false, $table1Cols[3]->isPrimaryKey());
         Assert::assertSame(false, $table1Cols[3]->isNullable());
         Assert::assertSame('1', $table1Cols[3]->getDefault());
 
@@ -80,6 +84,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('id', $table2Cols[0]->getName());
         Assert::assertSame('INT', $table2Cols[0]->getType());
         Assert::assertFalse($table2Cols[0]->hasLength());
+        Assert::assertSame(false, $table2Cols[0]->isPrimaryKey()); // primary keys is not reported for view
         Assert::assertSame(false, $table2Cols[0]->isNullable());
         Assert::assertSame('0', $table2Cols[0]->getDefault());
         // ----
@@ -87,6 +92,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('name', $table2Cols[1]->getName());
         Assert::assertSame('VARCHAR', $table2Cols[1]->getType());
         Assert::assertSame('255', $table2Cols[1]->getLength());
+        Assert::assertSame(false, $table2Cols[1]->isPrimaryKey());
         Assert::assertSame(false, $table2Cols[1]->isNullable());
         Assert::assertSame(null, $table2Cols[1]->getDefault());
         // ----
@@ -94,6 +100,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('price', $table2Cols[2]->getName());
         Assert::assertSame('DECIMAL', $table2Cols[2]->getType());
         Assert::assertSame('20,10', $table2Cols[2]->getLength());
+        Assert::assertSame(false, $table2Cols[2]->isPrimaryKey());
         Assert::assertSame(false, $table2Cols[2]->isNullable());
         Assert::assertSame(null, $table2Cols[2]->getDefault());
         // ----
@@ -101,6 +108,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('in_stock', $table2Cols[3]->getName());
         Assert::assertSame('SMALLINT', $table2Cols[3]->getType());
         Assert::assertFalse($table2Cols[3]->hasLength());
+        Assert::assertSame(false, $table2Cols[3]->isPrimaryKey());
         Assert::assertSame(false, $table2Cols[3]->isNullable());
         Assert::assertSame('1', $table2Cols[3]->getDefault());
 
@@ -113,6 +121,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('id', $table3Cols[0]->getName());
         Assert::assertSame('INT', $table3Cols[0]->getType());
         Assert::assertFalse($table3Cols[0]->hasLength());
+        Assert::assertSame(true, $table3Cols[0]->isPrimaryKey());
         Assert::assertSame(true, $table3Cols[0]->isNullable());
         Assert::assertSame(null, $table3Cols[0]->getDefault());
         // ----
@@ -120,6 +129,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('name', $table3Cols[1]->getName());
         Assert::assertSame('VARCHAR', $table3Cols[1]->getType());
         Assert::assertSame('255', $table3Cols[1]->getLength());
+        Assert::assertSame(false, $table3Cols[1]->isPrimaryKey());
         Assert::assertSame(false, $table3Cols[1]->isNullable());
         Assert::assertSame(null, $table3Cols[1]->getDefault());
         // ----
@@ -127,6 +137,7 @@ class OdbcNativeMetadataProviderTest extends BaseTest
         Assert::assertSame('population', $table3Cols[2]->getName());
         Assert::assertSame('INT', $table3Cols[2]->getType());
         Assert::assertFalse($table3Cols[2]->hasLength());
+        Assert::assertSame(false, $table3Cols[2]->isPrimaryKey());
         Assert::assertSame(false, $table3Cols[2]->isNullable());
         Assert::assertSame(null, $table3Cols[2]->getDefault());
     }
