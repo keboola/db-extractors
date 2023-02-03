@@ -117,8 +117,8 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         $type = $data['TYPE_NAME'];
         if (!in_array(strtolower($type), $this->typesWithoutLength)) {
             $length = $data['COLUMN_SIZE'] ?? null;
-            if ($length && isset($data['NUM_PREC_RADIX'])) {
-                $length .= ',' . $data['NUM_PREC_RADIX'];
+            if ($length && isset($data['DECIMAL_DIGITS'])) {
+                $length .= ',' . $data['DECIMAL_DIGITS'];
             }
         } else {
             $length = null;
