@@ -7,10 +7,23 @@ namespace Keboola\DbExtractorConfig\Configuration\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class SshNode extends ArrayNodeDefinition
 {
     public const NODE_NAME = 'ssh';
+
+    private const SSH_REQUIRED_PARAMS = [
+        'user',
+        'sshHost',
+        'sshPort',
+        'keys',
+    ];
+
+    private const SSH_REQUIRED_KEYS_PARAMS = [
+        'public',
+        '#private',
+    ];
 
     public function __construct(?NodeParentInterface $parent = null)
     {
@@ -30,6 +43,7 @@ class SshNode extends ArrayNodeDefinition
         $this->addUserNode($builder);
         $this->addCompressionNode($builder);
         $this->addMaxRetriesNode($builder);
+        $this->addValidation();
     }
 
     protected function addEnabledNode(NodeBuilder $builder): void
@@ -42,8 +56,8 @@ class SshNode extends ArrayNodeDefinition
         // @formatter:off
         $builder->arrayNode('keys')
             ->children()
-                ->scalarNode('#private')->end()
-                ->scalarNode('public')->end();
+            ->scalarNode('#private')->end()
+            ->scalarNode('public')->end();
         // @formatter:on
     }
 
@@ -85,5 +99,34 @@ class SshNode extends ArrayNodeDefinition
     protected function addMaxRetriesNode(NodeBuilder $builder): void
     {
         $builder->scalarNode('maxRetries');
+    }
+
+    protected function addValidation(): void
+    {
+        $this->validate()->always(function ($val) {
+            if (!isset($val['enabled']) || $val['enabled'] === false) {
+                return $val;
+            }
+
+            foreach (self::SSH_REQUIRED_PARAMS as $param) {
+                if (!array_key_exists($param, $val)) {
+                    throw new InvalidConfigurationException(sprintf(
+                        'The child config "%s" under "root.parameters.db.ssh" must be configured.',
+                        $param
+                    ));
+                }
+            }
+
+            foreach (self::SSH_REQUIRED_KEYS_PARAMS as $param) {
+                if (!array_key_exists($param, $val['keys'])) {
+                    throw new InvalidConfigurationException(sprintf(
+                        'The child config "%s" under "root.parameters.db.ssh.keys" must be configured.',
+                        $param
+                    ));
+                }
+            }
+
+            return $val;
+        });
     }
 }
