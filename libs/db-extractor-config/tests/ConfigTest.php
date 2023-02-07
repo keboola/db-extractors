@@ -223,6 +223,102 @@ class ConfigTest extends AbstractConfigTest
         $config = new Config($configurationArray, new ActionConfigRowDefinition());
         $this->assertEquals($configurationArray, $config->getData());
     }
+
+    public function testConfigWithSshTunnelDisabled(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'initQueries' => [],
+                    'ssh' => [
+                        'enabled' => false,
+                        'sshHost' => 'sshproxy',
+                        'sshPort' => '22',
+                        'localPort' => '33306',
+                        'keys' => ['public' => 'anyKey'],
+                        'maxRetries' => 10,
+                        'compression' => false,
+                    ],
+                ],
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testConfigWithSshTunnelEnabled(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'initQueries' => [],
+                    'ssh' => [
+                        'enabled' => true,
+                        'user' => 'root',
+                        'sshHost' => 'sshproxy',
+                        'sshPort' => '22',
+                        'localPort' => '33306',
+                        'keys' => ['public' => 'anyKey', '#private' => 'anyKey'],
+                        'maxRetries' => 10,
+                        'compression' => false,
+                    ],
+                ],
+            ],
+        ];
+
+        $config = new Config($configurationArray, new ActionConfigRowDefinition());
+        $this->assertEquals($configurationArray, $config->getData());
+    }
+
+    public function testConfigWithSshTunnelEnabledMissingPrivateKey(): void
+    {
+        $configurationArray = [
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => [
+                    'host' => 'mysql',
+                    'user' => 'root',
+                    '#password' => 'rootpassword',
+                    'database' => 'test',
+                    'port' => 3306,
+                    'initQueries' => [],
+                    'ssh' => [
+                        'enabled' => true,
+                        'user' => 'root',
+                        'sshHost' => 'sshproxy',
+                        'sshPort' => '22',
+                        'localPort' => '33306',
+                        'keys' => ['public' => 'anyKey'],
+                        'maxRetries' => 10,
+                        'compression' => false,
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The child config "#private" under "root.parameters.db.ssh.keys" ' .
+            'must be configured.');
+
+        new Config($configurationArray, new ActionConfigRowDefinition());
+    }
+
     public function testUnencryptedSslKey(): void
     {
         $configurationArray = [
