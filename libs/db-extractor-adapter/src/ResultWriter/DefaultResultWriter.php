@@ -25,16 +25,29 @@ class DefaultResultWriter implements ResultWriter
 
     protected ?string $toEncoding = null;
 
+    protected bool $ignoreInvalidUtf8 = false;
+
     protected int $rowsCount;
 
     protected ?array $lastRow;
 
-    public static function convertEncodingInArray(array $row, string $from, string $to): array
-    {
-        return array_map(
-            fn($value) => iconv($from, $to, (string) $value),
-            $row
-        );
+    public static function convertEncodingInArray(
+        array $row,
+        string $from,
+        string $to,
+        bool $ignoreInvalidUtf8 = false
+    ): array {
+        if ($ignoreInvalidUtf8) {
+            return array_map(
+                fn($value) => mb_convert_encoding((string) $value, $from, $to),
+                $row
+            );
+        } else {
+            return array_map(
+                fn($value) => iconv($from, $to, (string) $value),
+                $row
+            );
+        }
     }
 
     public function __construct(array $state)
@@ -44,7 +57,9 @@ class DefaultResultWriter implements ResultWriter
 
     public function setIgnoreInvalidUtf8(): self
     {
-        return $this->setConvertEncoding('UTF-8', 'UTF-8//IGNORE');
+        ini_set('mbstring.substitute_character', 'none');
+        $this->ignoreInvalidUtf8 = true;
+        return $this->setConvertEncoding('UTF-8', 'UTF-8');
     }
 
     public function setConvertEncoding(string $fromEncoding, string $toEncoding): self
@@ -125,7 +140,7 @@ class DefaultResultWriter implements ResultWriter
     protected function writeRow(array $row, CsvWriter $csvWriter): void
     {
         if ($this->fromEncoding && $this->toEncoding) {
-            $row = self::convertEncodingInArray($row, $this->fromEncoding, $this->toEncoding);
+            $row = self::convertEncodingInArray($row, $this->fromEncoding, $this->toEncoding, $this->ignoreInvalidUtf8);
         }
 
         $csvWriter->writeRow($row);
