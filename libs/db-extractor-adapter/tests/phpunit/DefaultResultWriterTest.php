@@ -256,6 +256,7 @@ END;
                 ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
                 ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
                 ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
+                ['id' => 4, 'name' => "世界\xE2\x82", 'population' => 103001256],
             ]
         );
 
@@ -268,6 +269,7 @@ END;
 "1","Ostrava","313088"
 "2","Plzen","164180"
 "3","Olomouc","101268"
+"4","世界","103001256"
 
 END;
         Assert::assertSame($expectedCsv, file_get_contents($result->getCsvPath()));
