@@ -16,7 +16,6 @@ class SshNode extends ArrayNodeDefinition
     private const SSH_REQUIRED_PARAMS = [
         'user',
         'sshHost',
-        'sshPort',
         'keys',
     ];
 
