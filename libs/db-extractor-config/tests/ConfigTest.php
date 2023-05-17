@@ -991,6 +991,76 @@ class ConfigTest extends AbstractConfigTest
         new Config($configurationArray, new GetTablesListFilterDefinition());
     }
 
+    public function testGetTablesListFilterEmptyTablesToListArray(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [
+                        [],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The child config "tableName" under ' .
+            '"root.parameters.tableListFilter.tablesToList.0" must be configured.');
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+    }
+
+    public function testGetTablesListFilterEmptyTableName(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [
+                        ['tableName' => ''],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The path "root.parameters.tableListFilter.tablesToList.0.tableName" cannot ' .
+            'contain an empty value, but got "".');
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+    }
+
+    public function testGetTablesListFilterMissingSchema(): void
+    {
+        $configurationArray = [
+            'action' => 'getTables',
+            'parameters' => [
+                'data_dir' => '/code/tests/Keboola/DbExtractor/../../data',
+                'extractor_class' => 'MySQL',
+                'db' => $this->getDbConfigurationArray(),
+                'tableListFilter' => [
+                    'listColumns' => true,
+                    'tablesToList' => [
+                        [
+                            'tableName' => 'table1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->expectException(ConfigUserException::class);
+        $this->expectExceptionMessage('The child config "schema" under ' .
+            '"root.parameters.tableListFilter.tablesToList.0" must be configured.');
+        new Config($configurationArray, new GetTablesListFilterDefinition());
+    }
 
     public function testIncrementalFetchingLimitNull(): void
     {
