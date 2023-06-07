@@ -143,8 +143,6 @@ class Oracle extends BaseExtractor
         $this->exportWrapper->export($query, $exportConfig->getMaxRetries(), $outputFile, false);
 
         $nullCount = json_decode((string) file_get_contents($outputFile));
-        var_dump($nullCount);
-
         unlink($outputFile);
 
         if ((int) $nullCount > 0) {
