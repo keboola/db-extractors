@@ -22,9 +22,12 @@ trait AutoIncrementTableTrait
         $this->createTable($name, $this->getAIColumns($includeTSColumn));
     }
 
-    public function generateAIRows(string $tableName = 'auto Increment Timestamp', bool $includeTSColumn = false): void
-    {
-        $data = $this->getAIRows($includeTSColumn);
+    public function generateAIRows(
+        string $tableName = 'auto Increment Timestamp',
+        bool $includeTSColumn = false,
+        bool $includeRowWithEmptyDate = false
+    ): void {
+        $data = $this->getAIRows($includeTSColumn, $includeRowWithEmptyDate);
         $this->insertRows($tableName, $data['columns'], $data['data']);
     }
 
@@ -33,7 +36,7 @@ trait AutoIncrementTableTrait
         $this->addConstraint($tableName, 'UNI_KEY_1', 'UNIQUE', '"Weir%d Na-me"');
     }
 
-    private function getAIRows(bool $includeTSColumn = false): array
+    private function getAIRows(bool $includeTSColumn = false, bool $includeRowWithEmptyDate = false): array
     {
         $rows = [
             'columns' => ['_Weir%d I-D', 'Weir%d Na-me', 'type', 'someInteger', 'someDecimal', 'date'],
@@ -46,6 +49,10 @@ trait AutoIncrementTableTrait
                 [6, 'yoshi', 'horse?', 6, 6.6, 'TO_DATE(\'2021-01-10\', \'yyyy-mm-dd\')'],
             ],
         ];
+
+        if ($includeRowWithEmptyDate) {
+            $rows['data'][] = [7, 'bowser', 'turtle', 7, 7.7, null];
+        }
 
         if ($includeTSColumn) {
             $rows['columns'][] = 'timestamp';
