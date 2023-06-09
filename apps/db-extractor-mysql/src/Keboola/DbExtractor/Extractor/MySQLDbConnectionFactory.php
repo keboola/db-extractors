@@ -91,6 +91,7 @@ class MySQLDbConnectionFactory
                 }
             },
             $connectMaxRetries,
+            $dbConfig->getInitQueries()
         );
     }
 

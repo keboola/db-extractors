@@ -1,0 +1,22 @@
+{
+  "parameters": {
+    "name": "testInitQueriesTable",
+    "outputTable": "in.c-main.testInitQueriesTable",
+    "table": {
+      "schema": "test",
+      "tableName": "testInitQueriesTable"
+    },
+    "db": {
+      "host": "%env(string:MYSQL_DB_HOST)%",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%",
+      "initQueries": [
+        "CREATE TABLE test.testInitQueriesTable (id INT, name VARCHAR(255))",
+        "INSERT INTO test.testInitQueriesTable VALUES (1, 'test')",
+        "INSERT INTO test.testInitQueriesTable VALUES (2, 'test2')"
+      ]
+    }
+  }
+}
