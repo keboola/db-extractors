@@ -40,8 +40,7 @@ class OracleMetadataProvider implements MetadataProvider
                 ->setSchema($table['owner'])
                 ->setCatalog($table['tablespaceName'] ?? null)
                 ->setTablespaceName($table['tablespaceName'] ?? null)
-                ->setOwner($table['owner'] ?? null)
-                ->setRowCount($table['rowCount'] ?? null);
+                ->setOwner($table['owner'] ?? null);
 
             if ($loadColumns) {
                 foreach ($table['columns'] as $column) {
