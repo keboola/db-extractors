@@ -75,6 +75,8 @@ class Oracle extends BaseExtractor
             ));
         }
 
+        $this->checkForNulls($exportConfig);
+
         try {
             $datatype = new GenericStorage($column->getType());
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
@@ -127,5 +129,27 @@ class Oracle extends BaseExtractor
         return
             !$exportConfig->hasQuery() &&
             $exportConfig->isIncrementalFetching();
+    }
+
+    protected function checkForNulls(ExportConfig $exportConfig): void
+    {
+        $outputFile = $this->getOutputFilename('nullValues');
+        $query = sprintf(
+            'SELECT COUNT(*) FROM "%s" WHERE "%s" IS NULL',
+            $exportConfig->getTable()->getName(),
+            $exportConfig->getIncrementalFetchingColumn()
+        );
+
+        $this->exportWrapper->export($query, $exportConfig->getMaxRetries(), $outputFile, false);
+
+        $nullCount = json_decode((string) file_get_contents($outputFile));
+        unlink($outputFile);
+
+        if ((int) $nullCount > 0) {
+            throw new UserException(sprintf(
+                'Cannot set incremental fetching on nullable column "%s".',
+                $exportConfig->getIncrementalFetchingColumn()
+            ));
+        }
     }
 }

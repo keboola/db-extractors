@@ -1,0 +1,16 @@
+{
+  "parameters": {
+    "name": "sales",
+    "outputTable": "in.c-main.sales",
+    "table": {
+      "schema": "TESTER",
+      "tableName": "sales"
+    },
+    "db": {
+      "tnsnames": "DWHTSP = (DESCRIPTION = (ADDRESS = (PROTOCOL = tcp)(HOST=10.254.0.12)(PORT = 15210))(CONNECT DATA = (SID=DWHTSP1)(SERVICE NAME = DWHTSP)))",
+      "user": "%env(string:ORACLE_DB_USER)%",
+      "#password": "%env(string:ORACLE_DB_PASSWORD)%",
+      "database": "%env(string:ORACLE_DB_DATABASE)%"
+    }
+  }
+}

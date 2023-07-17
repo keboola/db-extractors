@@ -6,7 +6,6 @@ namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\NodeDefinition\OracleDbNode;
 use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
-use Psr\Log\LoggerInterface;
 use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
