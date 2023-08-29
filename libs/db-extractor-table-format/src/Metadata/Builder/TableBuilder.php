@@ -42,6 +42,8 @@ class TableBuilder implements Builder
 
     private ?string $type = null;
 
+    private ?bool $cdcEnabled = null;
+
     private ?int $rowCount = null;
 
     private ?string $datatypeBackend = null;
@@ -87,7 +89,8 @@ class TableBuilder implements Builder
             $this->buildColumns ?
                 new ColumnCollection(array_map(fn(ColumnBuilder $col) => $col->build(), $this->columns)) :
                 null,
-            $this->datatypeBackend
+            $this->datatypeBackend,
+            $this->cdcEnabled
         );
     }
 
@@ -193,6 +196,12 @@ class TableBuilder implements Builder
     public function setDatatypeBackend(string $datatypeBackend): self
     {
         $this->datatypeBackend = $datatypeBackend;
+        return $this;
+    }
+
+    public function setCdcEnabled(bool $cdcEnabled): self
+    {
+        $this->cdcEnabled = $cdcEnabled;
         return $this;
     }
 }

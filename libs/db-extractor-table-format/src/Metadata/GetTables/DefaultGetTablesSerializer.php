@@ -23,6 +23,9 @@ class DefaultGetTablesSerializer implements GetTablesSerializer
         $out = [];
         $out['name'] = $table->getName();
         $out['schema'] = $table->getSchema();
+        if ($table->hasCdcEnabled()) {
+            $out['cdcEnabled'] = $table->getCdcEnabled();
+        }
 
         // Columns don't have to be defined if loading metadata in 2 steps:
         // first only tables and then columns in table (used in some extractors)
