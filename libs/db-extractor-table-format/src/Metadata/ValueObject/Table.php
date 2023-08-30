@@ -27,6 +27,8 @@ class Table implements ValueObject
 
     private ?string $type;
 
+    private ?bool $cdcEnabled;
+
     private ?int $rowCount;
 
     private ?string $datatypeBackend;
@@ -47,7 +49,8 @@ class Table implements ValueObject
         ?string $type,
         ?int $rowCount,
         ?ColumnCollection $columns,
-        ?string $datatypeBackend = null
+        ?string $datatypeBackend = null,
+        ?bool $cdcEnabled = null
     ) {
         if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');
@@ -93,6 +96,7 @@ class Table implements ValueObject
         $this->tablespaceName = $tablespaceName;
         $this->owner = $owner;
         $this->type = $type;
+        $this->cdcEnabled = $cdcEnabled;
         $this->rowCount = $rowCount;
         $this->datatypeBackend = $datatypeBackend;
         $this->columns = $columns;
@@ -184,6 +188,19 @@ class Table implements ValueObject
             throw new PropertyNotSetException('Type is not set.');
         }
         return $this->type;
+    }
+
+    public function hasCdcEnabled(): bool
+    {
+        return $this->cdcEnabled !== null;
+    }
+
+    public function getCdcEnabled(): bool
+    {
+        if ($this->cdcEnabled === null) {
+            throw new PropertyNotSetException('CDC enabled is not set.');
+        }
+        return $this->cdcEnabled;
     }
 
     public function hasRowCount(): bool

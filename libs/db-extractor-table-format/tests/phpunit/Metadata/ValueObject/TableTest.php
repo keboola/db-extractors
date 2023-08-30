@@ -23,6 +23,7 @@ class TableTest extends BaseValueObjectTest
         $type = $properties['type'];
         $rowCount = $properties['rowCount'];
         $column = $properties['columns'];
+        $cdcEnabled = $properties['cdcEnabled'];
         return new Table(
             $name,
             $sanitizedName,
@@ -34,6 +35,8 @@ class TableTest extends BaseValueObjectTest
             $type,
             $rowCount,
             $column,
+            null,
+            $cdcEnabled
         );
     }
 
@@ -50,6 +53,7 @@ class TableTest extends BaseValueObjectTest
             'type',
             'rowCount',
             'columns',
+            'cdcEnabled',
         ];
     }
 
@@ -67,6 +71,7 @@ class TableTest extends BaseValueObjectTest
             // ... null value in constructor means "not set"
             'type' => self::NULL_MEANS_NOT_SET,
             'columns' => self::NULL_MEANS_NOT_SET,
+            'cdcEnabled' => self::NULL_MEANS_NOT_SET,
         ];
     }
 
@@ -105,6 +110,9 @@ class TableTest extends BaseValueObjectTest
             'columns' => function (Table $column) {
                 return  $column->hasColumns();
             },
+            'cdcEnabled' => function (Table $column) {
+                return  $column->hasCdcEnabled();
+            },
         ];
     }
 
@@ -141,6 +149,9 @@ class TableTest extends BaseValueObjectTest
             'columns' => function (Table $column) {
                 return $column->getColumns();
             },
+            'cdcEnabled' => function (Table $column) {
+                return $column->getCdcEnabled();
+            },
         ];
     }
 
@@ -157,6 +168,7 @@ class TableTest extends BaseValueObjectTest
                 'owner' => 'My Owner',
                 'type' => 'table',
                 'rowCount' => 123,
+                'cdcEnabled' => true,
                 'columns' => new ColumnCollection([
                     ColumnBuilder::create()
                         ->setOrdinalPosition(0)->setName('Col 1')->setType('integer')->build(),
