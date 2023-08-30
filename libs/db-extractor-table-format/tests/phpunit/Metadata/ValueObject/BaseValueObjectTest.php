@@ -17,7 +17,7 @@ use TypeError;
  */
 abstract class BaseValueObjectTest extends TestCase
 {
-    public const    NULL_MEANS_NOT_SET = 'null_means_not_set_default_not_set';
+    public const NULL_MEANS_NOT_SET = 'null_means_not_set_default_not_set';
     public const NULL_IS_REGULAR_DEFAULT_NULL = 'null_is_regular_default_null';
     public const NULL_IS_REGULAR_DEFAULT_NOT_SET = 'null_is_regular_default_not_set';
 
