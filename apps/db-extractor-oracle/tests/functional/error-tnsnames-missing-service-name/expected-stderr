@@ -1,1 +1,1 @@
-[in.c-main.sales]: DB query failed: Missing "SERVICE_NAME" in the tnsnames. Tried 5 times.
+[in.c-main.sales]: DB query "SELECT * FROM "TESTER"."sales"" failed: Missing "SERVICE_NAME" in the tnsnames. Tried 5 times.
