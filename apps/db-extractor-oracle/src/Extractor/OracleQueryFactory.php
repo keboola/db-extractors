@@ -86,4 +86,14 @@ class OracleQueryFactory extends DefaultQueryFactory
             yield sprintf('WHERE %s', implode(' AND ', $where));
         }
     }
+
+    public function createCheckNullsQuery(ExportConfig $exportConfig, OracleDbConnection $connection): string
+    {
+        $from = iterator_to_array($this->createFrom($exportConfig, $connection));
+        return sprintf(
+            'SELECT COUNT(*) %s WHERE %s IS NULL',
+            reset($from),
+            $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
+        );
+    }
 }

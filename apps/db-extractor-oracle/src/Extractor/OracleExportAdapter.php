@@ -50,7 +50,7 @@ class OracleExportAdapter implements ExportAdapter
         } catch (Throwable $e) {
             $logPrefix = $exportConfig->hasConfigName() ?
                 $exportConfig->getConfigName() : $exportConfig->getOutputTable();
-            throw $this->handleDbError($e, $exportConfig->getMaxRetries(), $logPrefix);
+            throw $this->handleDbError($e, $exportConfig->getMaxRetries(), $query, $logPrefix);
         }
     }
 
@@ -64,10 +64,14 @@ class OracleExportAdapter implements ExportAdapter
         return 'Oracle';
     }
 
-    protected function handleDbError(Throwable $e, int $maxRetries, ?string $outputTable = null): UserExceptionInterface
-    {
+    protected function handleDbError(
+        Throwable $e,
+        int $maxRetries,
+        string $query,
+        ?string $outputTable = null
+    ): UserExceptionInterface {
         $message = $outputTable ? sprintf('[%s]: ', $outputTable) : '';
-        $message .= sprintf('DB query failed: %s', $e->getMessage());
+        $message .= sprintf('DB query "%s" failed: %s', $query, $e->getMessage());
 
         // Retry mechanism can be disabled
         if ($maxRetries > 1) {

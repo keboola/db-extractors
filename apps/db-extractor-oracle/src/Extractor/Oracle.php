@@ -134,12 +134,7 @@ class Oracle extends BaseExtractor
     protected function checkForNulls(ExportConfig $exportConfig): void
     {
         $outputFile = $this->getOutputFilename('nullValues');
-        $query = sprintf(
-            'SELECT COUNT(*) FROM "%s" WHERE "%s" IS NULL',
-            $exportConfig->getTable()->getName(),
-            $exportConfig->getIncrementalFetchingColumn()
-        );
-
+        $query = $this->queryFactory->createCheckNullsQuery($exportConfig, $this->connection);
         $this->exportWrapper->export($query, $exportConfig->getMaxRetries(), $outputFile, false);
 
         $nullCount = json_decode((string) file_get_contents($outputFile));
