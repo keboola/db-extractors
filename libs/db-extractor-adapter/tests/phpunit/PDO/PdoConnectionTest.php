@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Adapter\Tests\BaseTest;
 use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
@@ -70,7 +71,7 @@ class PdoConnectionTest extends BaseTest
         $connection = $this->createPdoConnection();
         $connection->testConnection();
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Creating PDO connection to "mysql:host=mariadb;port=3306;dbname=testdb;charset=utf8".'
+            'Creating PDO connection to "mysql:host=mariadb;port=3306;dbname=testdb;charset=utf8".',
         ));
     }
 
@@ -149,8 +150,9 @@ class PdoConnectionTest extends BaseTest
         $connection = $this->createPdoConnection();
         Assert::assertSame(
             [['X' => '123', 'Y' => '456']],
-            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll()
+            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll(),
         );
+        Assert::assertTrue($this->logger->hasDebug('Running query "SELECT 123 as X, 456 as Y".'));
     }
 
     public function testQueryFailed(): void
@@ -181,7 +183,7 @@ class PdoConnectionTest extends BaseTest
                 return array_map(function (array $row) {
                     return array_keys($row);
                 }, $result->fetchAll());
-            })
+            }),
         );
     }
 

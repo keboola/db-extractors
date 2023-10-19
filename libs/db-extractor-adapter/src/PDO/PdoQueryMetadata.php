@@ -43,7 +43,7 @@ class PdoQueryMetadata implements QueryMetadata
             if ($missingKeys) {
                 throw new InvalidStateException(sprintf(
                     'Missing key "%s" in PDO query column\'s metadata.',
-                    implode('", "', $missingKeys)
+                    implode('", "', $missingKeys),
                 ));
             }
 

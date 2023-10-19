@@ -70,7 +70,7 @@ abstract class BaseDbConnection implements DbConnection
             $maxRetries,
             function () use ($query) {
                 return $this->queryReconnectOnError($query);
-            }
+            },
         );
     }
 
@@ -90,12 +90,13 @@ abstract class BaseDbConnection implements DbConnection
                 // Success of isAlive means that ALL data has been extracted
                 $this->isAlive();
                 return $result;
-            }
+            },
         );
     }
 
     protected function queryReconnectOnError(string $query): QueryResult
     {
+        $this->logger->debug(sprintf('Running query "%s".', $query));
         try {
             return $this->doQuery($query);
         } catch (Throwable $e) {

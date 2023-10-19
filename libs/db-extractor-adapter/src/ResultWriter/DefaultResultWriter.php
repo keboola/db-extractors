@@ -40,12 +40,12 @@ class DefaultResultWriter implements ResultWriter
         if ($ignoreInvalidUtf8) {
             return array_map(
                 fn($value) => mb_convert_encoding((string) $value, $from, $to),
-                $row
+                $row,
             );
         } else {
             return array_map(
                 fn($value) => iconv($from, $to, (string) $value),
-                $row
+                $row,
             );
         }
     }
@@ -98,7 +98,7 @@ class DefaultResultWriter implements ResultWriter
             $this->rowsCount,
             $result->getMetadata(),
             $this->hasCsvHeader($exportConfig),
-            $incFetchingColMaxValue
+            $incFetchingColMaxValue,
         );
     }
 
@@ -164,8 +164,8 @@ class DefaultResultWriter implements ResultWriter
                 throw new UserException(
                     sprintf(
                         'The specified incremental fetching column %s not found in the table',
-                        $incrementalColumn
-                    )
+                        $incrementalColumn,
+                    ),
                 );
             }
             $incFetchingColMaxValue = (string) $this->lastRow[$incrementalColumn];

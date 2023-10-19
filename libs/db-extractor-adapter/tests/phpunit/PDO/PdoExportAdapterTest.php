@@ -29,7 +29,7 @@ class PdoExportAdapterTest extends AbstractExportAdapterTest
             $queryFactory,
             $this->createResultWriter($state),
             $this->temp->getTmpFolder(),
-            $state
+            $state,
         );
     }
 

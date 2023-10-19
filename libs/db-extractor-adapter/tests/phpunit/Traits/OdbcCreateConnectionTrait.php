@@ -28,7 +28,7 @@ trait OdbcCreateConnectionTrait
             (string) getenv('DB_USER'),
             (string) getenv('DB_PASSWORD'),
             null,
-            $connectRetries
+            $connectRetries,
         );
     }
 }

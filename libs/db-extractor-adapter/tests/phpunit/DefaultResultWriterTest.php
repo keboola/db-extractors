@@ -26,7 +26,7 @@ class DefaultResultWriterTest extends BaseTest
                 ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
                 ['id' => 2, 'name' => 'Brno', 'population' => 369559],
                 ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-            ]
+            ],
         );
 
         $result = $this
@@ -81,7 +81,7 @@ END;
                 ['id' => 1, 'name' => 'Praha', 'population' => 1165581],
                 ['id' => 2, 'name' => 'Brno', 'population' => 369559],
                 ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
-            ]
+            ],
         );
 
         $result = $this
@@ -138,7 +138,7 @@ END;
                 ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
                 ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
                 ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
-            ]
+            ],
         );
 
         $result = $this
@@ -171,7 +171,7 @@ END;
                 ['id' => 3, 'name' => 'Ostrava', 'population' => 313088],
                 ['id' => 4, 'name' => 'Plzen', 'population' => 164180],
                 ['id' => 5, 'name' => 'Olomouc', 'population' => 101268],
-            ]
+            ],
         );
 
         $result = $this
@@ -228,7 +228,7 @@ END;
                 ['id' => 1, 'name' => "Ost\xa0\xa1rava", 'population' => 313088],
                 ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
                 ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
-            ]
+            ],
         );
 
         $result = $this
@@ -257,7 +257,7 @@ END;
                 ['id' => 2, 'name' => "Plzen\xa0\xa1", 'population' => 164180],
                 ['id' => 3, 'name' => "\xa0\xa1Olomouc", 'population' => 101268],
                 ['id' => 4, 'name' => "世界\xE2\x82", 'population' => 103001256],
-            ]
+            ],
         );
 
         $result = $this
@@ -286,7 +286,7 @@ END;
             [
                 ['id' => 1, 'name' => 'ABCÁÈÕ', 'population' => 313088],
                 ['id' => 2, 'name' => 'CDEÁÈÕ', 'population' => 164180],
-            ]
+            ],
         );
 
         $result = $this

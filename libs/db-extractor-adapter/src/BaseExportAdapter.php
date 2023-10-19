@@ -58,7 +58,7 @@ abstract class BaseExportAdapter implements ExportAdapter
                 $exportConfig->getMaxRetries(),
                 function (QueryResult $result) use ($exportConfig, $csvFilePath) {
                     return $this->resultWriter->writeToCsv($result, $exportConfig, $csvFilePath);
-                }
+                },
             );
         } catch (CsvException $e) {
             throw new ApplicationException('Failed writing CSV File: ' . $e->getMessage(), $e->getCode(), $e);
