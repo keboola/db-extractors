@@ -71,7 +71,7 @@ class OdbcConnectionTest extends BaseTest
         $connection = $this->createOdbcConnection();
         $connection->testConnection();
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Creating ODBC connection to "Driver={MariaDB ODBC Driver};SERVER=mariadb;PORT=3306;DATABASE=testdb;".'
+            'Creating ODBC connection to "Driver={MariaDB ODBC Driver};SERVER=mariadb;PORT=3306;DATABASE=testdb;".',
         ));
     }
 
@@ -150,7 +150,7 @@ class OdbcConnectionTest extends BaseTest
         $connection = $this->createOdbcConnection();
         Assert::assertSame(
             [['X' => '123', 'Y' => '456']],
-            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll()
+            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll(),
         );
     }
 
@@ -182,7 +182,7 @@ class OdbcConnectionTest extends BaseTest
                 return array_map(function (array $row) {
                     return array_keys($row);
                 }, $result->fetchAll());
-            })
+            }),
         );
     }
 

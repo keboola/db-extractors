@@ -250,7 +250,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
                 $this->onlyFromCatalog,
                 $this->onlyFromSchema,
                 // % means ALL, see odbc_tables docs
-                $whitelistedTable ? $whitelistedTable->getName() : '%'
+                $whitelistedTable ? $whitelistedTable->getName() : '%',
             );
             while ($table = odbc_fetch_array($result)) {
                 if ($this->isTableIgnored($table)) {
@@ -291,7 +291,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
             GenericStorage::TIMESTAMP_TYPES,
             GenericStorage::INTEGER_TYPES,
             GenericStorage::FLOATING_POINT_TYPES,
-            GenericStorage::BOOLEAN_TYPES
+            GenericStorage::BOOLEAN_TYPES,
         );
     }
 }

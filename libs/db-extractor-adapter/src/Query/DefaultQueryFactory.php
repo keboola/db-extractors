@@ -24,7 +24,7 @@ class DefaultQueryFactory implements QueryFactory
             iterator_to_array($this->createFrom($exportConfig, $connection)),
             iterator_to_array($this->createWhere($exportConfig, $connection)),
             iterator_to_array($this->createOrderBy($exportConfig, $connection)),
-            iterator_to_array($this->createLimit($exportConfig, $connection))
+            iterator_to_array($this->createLimit($exportConfig, $connection)),
         );
         return implode(' ', $sql);
     }
@@ -34,7 +34,7 @@ class DefaultQueryFactory implements QueryFactory
         if ($exportConfig->hasColumns()) {
             yield sprintf('SELECT %s', implode(', ', array_map(
                 fn(string $c) => $connection->quoteIdentifier($c),
-                $exportConfig->getColumns()
+                $exportConfig->getColumns(),
             )));
         } else {
             yield 'SELECT *';
@@ -46,7 +46,7 @@ class DefaultQueryFactory implements QueryFactory
         yield sprintf(
             'FROM %s.%s',
             $connection->quoteIdentifier($exportConfig->getTable()->getSchema()),
-            $connection->quoteIdentifier($exportConfig->getTable()->getName())
+            $connection->quoteIdentifier($exportConfig->getTable()->getName()),
         );
     }
 
@@ -57,7 +57,7 @@ class DefaultQueryFactory implements QueryFactory
                 // intentionally ">=" last row should be included, it is handled by storage deduplication process
                 'WHERE %s >= %s',
                 $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
-                $connection->quote($this->state['lastFetchedRow'])
+                $connection->quote($this->state['lastFetchedRow']),
             );
         }
     }
@@ -77,7 +77,7 @@ class DefaultQueryFactory implements QueryFactory
         if ($exportConfig->hasIncrementalFetchingLimit()) {
             yield sprintf(
                 'LIMIT %d',
-                $exportConfig->getIncrementalFetchingLimit()
+                $exportConfig->getIncrementalFetchingLimit(),
             );
         }
     }

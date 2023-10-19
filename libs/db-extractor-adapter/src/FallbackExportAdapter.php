@@ -56,13 +56,13 @@ class FallbackExportAdapter implements ExportAdapter
                     $this->logger->info(sprintf(
                         'Adapter "%s" skipped: %s',
                         $adapter->getName(),
-                        $e->getMessage()
+                        $e->getMessage(),
                     ));
                 } else {
                     $this->logger->warning(sprintf(
                         'Export by "%s" adapter failed: %s',
                         $adapter->getName(),
-                        $e->getMessage()
+                        $e->getMessage(),
                     ));
                 }
 

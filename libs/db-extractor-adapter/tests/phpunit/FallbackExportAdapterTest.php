@@ -90,10 +90,10 @@ class FallbackExportAdapterTest extends BaseTest
 
         Assert::assertSame(1, $adapter1->getExportCallCount());
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter1" adapter.'
+            'Exporting by "Adapter1" adapter.',
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter1" adapter failed: Something went wrong.'
+            'Export by "Adapter1" adapter failed: Something went wrong.',
         ));
     }
 
@@ -119,22 +119,22 @@ class FallbackExportAdapterTest extends BaseTest
         Assert::assertSame(1, $adapter2->getExportCallCount());
         Assert::assertSame(1, $adapter3->getExportCallCount());
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter1" adapter.'
+            'Exporting by "Adapter1" adapter.',
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter1" adapter failed: Something went wrong.'
+            'Export by "Adapter1" adapter failed: Something went wrong.',
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter2" adapter.'
+            'Exporting by "Adapter2" adapter.',
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter2" adapter failed: Something went wrong.'
+            'Export by "Adapter2" adapter failed: Something went wrong.',
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter3" adapter.'
+            'Exporting by "Adapter3" adapter.',
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter3" adapter failed: Something went wrong.'
+            'Export by "Adapter3" adapter failed: Something went wrong.',
         ));
     }
 
@@ -156,13 +156,13 @@ class FallbackExportAdapterTest extends BaseTest
         Assert::assertSame(1, $adapter2->getExportCallCount());
         Assert::assertSame(0, $adapter3->getExportCallCount());
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter1" adapter.'
+            'Exporting by "Adapter1" adapter.',
         ));
         Assert::assertTrue($this->logger->hasWarningThatContains(
-            'Export by "Adapter1" adapter failed: Something went wrong.'
+            'Export by "Adapter1" adapter failed: Something went wrong.',
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter2" adapter.'
+            'Exporting by "Adapter2" adapter.',
         ));
     }
 
@@ -181,13 +181,13 @@ class FallbackExportAdapterTest extends BaseTest
         Assert::assertSame(1, $adapter1->getExportCallCount());
         Assert::assertSame(1, $adapter2->getExportCallCount());
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter1" adapter.'
+            'Exporting by "Adapter1" adapter.',
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Adapter "Adapter1" skipped: skipped message'
+            'Adapter "Adapter1" skipped: skipped message',
         ));
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Exporting by "Adapter2" adapter.'
+            'Exporting by "Adapter2" adapter.',
         ));
     }
 

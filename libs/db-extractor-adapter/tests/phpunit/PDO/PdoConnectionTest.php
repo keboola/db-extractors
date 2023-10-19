@@ -70,7 +70,7 @@ class PdoConnectionTest extends BaseTest
         $connection = $this->createPdoConnection();
         $connection->testConnection();
         Assert::assertTrue($this->logger->hasInfoThatContains(
-            'Creating PDO connection to "mysql:host=mariadb;port=3306;dbname=testdb;charset=utf8".'
+            'Creating PDO connection to "mysql:host=mariadb;port=3306;dbname=testdb;charset=utf8".',
         ));
     }
 
@@ -149,7 +149,7 @@ class PdoConnectionTest extends BaseTest
         $connection = $this->createPdoConnection();
         Assert::assertSame(
             [['X' => '123', 'Y' => '456']],
-            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll()
+            $connection->query('SELECT 123 as X, 456 as Y')->fetchAll(),
         );
     }
 
@@ -181,7 +181,7 @@ class PdoConnectionTest extends BaseTest
                 return array_map(function (array $row) {
                     return array_keys($row);
                 }, $result->fetchAll());
-            })
+            }),
         );
     }
 

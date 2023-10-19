@@ -29,7 +29,7 @@ trait PdoCreateConnectionTrait
             (string) getenv('DB_PASSWORD'),
             [],
             null,
-            $connectRetries
+            $connectRetries,
         );
     }
 }
