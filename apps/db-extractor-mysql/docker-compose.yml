@@ -5,6 +5,7 @@ services:
     image: keboola/db-extractor-mysql
     command: composer ci
     environment:
+      KBC_COMPONENT_RUN_MODE: run
       MYSQL_DB_HOST: mysql
       MYSQL_DB_SSL_HOST: mysql-ssl
       MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
