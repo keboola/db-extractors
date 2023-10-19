@@ -96,6 +96,7 @@ abstract class BaseDbConnection implements DbConnection
 
     protected function queryReconnectOnError(string $query): QueryResult
     {
+        $this->logger->debug(sprintf('Running query "%s".', $query));
         try {
             return $this->doQuery($query);
         } catch (Throwable $e) {

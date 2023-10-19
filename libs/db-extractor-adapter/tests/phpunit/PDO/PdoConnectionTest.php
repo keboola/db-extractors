@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\Adapter\Tests\PDO;
 
 use Keboola\CommonExceptions\UserExceptionInterface;
 use Keboola\DbExtractor\Adapter\Exception\DeadConnectionException;
+use Keboola\DbExtractor\Adapter\PDO\PdoConnection;
 use Keboola\DbExtractor\Adapter\Tests\BaseTest;
 use Keboola\DbExtractor\Adapter\Tests\Traits\PdoCreateConnectionTrait;
 use Keboola\DbExtractor\Adapter\ValueObject\QueryResult;
@@ -151,6 +152,7 @@ class PdoConnectionTest extends BaseTest
             [['X' => '123', 'Y' => '456']],
             $connection->query('SELECT 123 as X, 456 as Y')->fetchAll(),
         );
+        Assert::assertTrue($this->logger->hasDebug('Running query "SELECT 123 as X, 456 as Y".'));
     }
 
     public function testQueryFailed(): void

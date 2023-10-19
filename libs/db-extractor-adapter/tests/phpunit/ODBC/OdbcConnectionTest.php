@@ -152,6 +152,7 @@ class OdbcConnectionTest extends BaseTest
             [['X' => '123', 'Y' => '456']],
             $connection->query('SELECT 123 as X, 456 as Y')->fetchAll(),
         );
+        Assert::assertTrue($this->logger->hasDebug('Running query "SELECT 123 as X, 456 as Y".'));
     }
 
     public function testQueryFailed(): void
