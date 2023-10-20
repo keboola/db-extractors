@@ -11,6 +11,7 @@ services:
     tty: true
     stdin_open: true
     environment:
+      KBC_COMPONENT_RUN_MODE: run
       ORACLE_DB_HOST: oracle
       ORACLE_DB_PORT: 1521
       ORACLE_DB_USER: tester

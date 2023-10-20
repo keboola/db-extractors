@@ -83,6 +83,7 @@ class OracleJavaExportWrapper
         string $outputFile,
         bool $includeHeader
     ): ExportResult {
+        $this->logger->debug(sprintf('Running query "%s".', $query));
         $process = $this->runAction(
             'export',
             $this->writeExportConfig($query, $outputFile),

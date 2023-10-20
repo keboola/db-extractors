@@ -55,6 +55,7 @@ class DatadirTest extends DatadirTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        putenv('KBC_COMPONENT_RUN_MODE=run');
 
         // Clear KBC_REALUSER env
         $this->kbcRealuser = null;
@@ -105,7 +106,7 @@ class DatadirTest extends DatadirTestCase
         return $finder->files()->in($dir)->name(['~.*\.manifest~']);
     }
 
-    protected function runScript(string $datadirPath): Process
+    protected function runScript(string $datadirPath, ?string $runId = null): Process
     {
         $fs = new Filesystem();
 
@@ -122,10 +123,17 @@ class DatadirTest extends DatadirTestCase
             $script,
         ];
         $runProcess = new Process($runCommand);
-        $runProcess->setEnv([
+        $defaultRunId = random_int(1000, 100000) . '.' . random_int(1000, 100000) . '.' . random_int(1000, 100000);
+        $environments = [
             'KBC_DATADIR' => $datadirPath,
+            'KBC_RUNID' => $runId ?? $defaultRunId,
             'KBC_REALUSER' => (string) $this->kbcRealuser,
-        ]);
+        ];
+        if (getEnv('KBC_COMPONENT_RUN_MODE')) {
+            $environments['KBC_COMPONENT_RUN_MODE'] = (string) getEnv('KBC_COMPONENT_RUN_MODE');
+        }
+
+        $runProcess->setEnv($environments);
         $runProcess->setTimeout(0.0);
         $runProcess->run();
         return $runProcess;

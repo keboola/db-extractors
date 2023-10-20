@@ -13,7 +13,8 @@
         "php": "^7.4",
         "ext-filter": "*",
         "ext-json": "*",
-        "keboola/db-extractor-common": "^16.0",
+        "keboola/db-extractor-adapter": "^1.10",
+        "keboola/db-extractor-common": "^16.1",
         "keboola/db-extractor-config": "^1.13",
         "keboola/db-extractor-table-format": "^3.5",
         "keboola/php-component": "^9.2",
@@ -24,7 +25,7 @@
         "ext-mbstring": "*",
         "ext-oci8": "*",
         "keboola/coding-standard": ">=9.0.0",
-        "keboola/datadir-tests": "^5.2",
+        "keboola/datadir-tests": "^5.6",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.0"
     },
@@ -44,15 +45,12 @@
         "tests-phpunit": "phpunit --testsuite unit",
         "tests-datadir": "phpunit --testsuite functional",
         "tests": [
-            "@tests-phpunit",
             "@tests-datadir"
         ],
         "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon",
         "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "build": [
-            "@phpcs",
-            "@phpstan",
             "@tests"
         ],
         "ci": [
