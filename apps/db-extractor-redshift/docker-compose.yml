@@ -5,6 +5,7 @@ services:
       context: .
     image: keboola/ex-db-redshift
     environment:
+      - KBC_COMPONENT_RUN_MODE=run
       - REDSHIFT_DB_HOST
       - REDSHIFT_DB_PORT
       - REDSHIFT_DB_DATABASE
