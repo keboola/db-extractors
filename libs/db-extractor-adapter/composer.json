@@ -20,12 +20,12 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "ext-iconv": "*",
         "keboola/common-exceptions": "^1.0",
         "keboola/csv": "^3.2",
         "keboola/db-extractor-config": "^1.8",
-        "keboola/db-extractor-table-format": "^3.0",
+        "keboola/db-extractor-table-format": "dev-adamvyborny-update-php-and-datatypes",
         "keboola/retry": "^0.5",
         "psr/log": "^1.1"
     },
