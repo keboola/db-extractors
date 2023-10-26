@@ -20,11 +20,11 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "ext-mbstring": "*",
         "ext-json": "*",
         "keboola/common-exceptions": "^1.0",
-        "keboola/php-datatypes": "^6.0",
+        "keboola/php-datatypes": "^7.2",
         "keboola/php-utils": "^4.1"
     },
     "require-dev": {
