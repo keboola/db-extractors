@@ -50,7 +50,7 @@ class Table implements ValueObject
         ?int $rowCount,
         ?ColumnCollection $columns,
         ?string $datatypeBackend = null,
-        ?bool $cdcEnabled = null
+        ?bool $cdcEnabled = null,
     ) {
         if ($name === '') {
             throw new InvalidArgumentException('Table\'s name cannot be empty.');

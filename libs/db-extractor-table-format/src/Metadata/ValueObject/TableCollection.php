@@ -86,7 +86,7 @@ class TableCollection implements ValueObject, Countable, IteratorAggregate
         throw new TableNotFoundException(sprintf(
             'Table with name "%s" and schema "%s" not found.',
             $name,
-            $schema
+            $schema,
         ));
     }
 }

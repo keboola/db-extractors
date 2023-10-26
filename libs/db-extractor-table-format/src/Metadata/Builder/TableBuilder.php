@@ -68,7 +68,7 @@ class TableBuilder implements Builder
         $this->setRequiredProperties(
             $requiredProperties,
             self::ALWAYS_REQUIRED_PROPERTIES,
-            self::OPTIONAL_REQUIRED_PROPERTIES
+            self::OPTIONAL_REQUIRED_PROPERTIES,
         );
         $this->columnRequiredProperties = $columnRequiredProperties;
     }
@@ -90,7 +90,7 @@ class TableBuilder implements Builder
                 new ColumnCollection(array_map(fn(ColumnBuilder $col) => $col->build(), $this->columns)) :
                 null,
             $this->datatypeBackend,
-            $this->cdcEnabled
+            $this->cdcEnabled,
         );
     }
 

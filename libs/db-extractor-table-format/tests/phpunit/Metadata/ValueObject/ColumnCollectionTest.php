@@ -161,7 +161,7 @@ class ColumnCollectionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Set "ordinalPosition" to all columns, or none. ' .
-            'Column "C" has hasOrdinalPosition = "true", but the previous value is "false".'
+            'Column "C" has hasOrdinalPosition = "true", but the previous value is "false".',
         );
         $builder->build();
     }
@@ -191,7 +191,7 @@ class ColumnCollectionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Set "ordinalPosition" to all columns, or none. ' .
-            'Column "B" has hasOrdinalPosition = "false", but the previous value is "true".'
+            'Column "B" has hasOrdinalPosition = "false", but the previous value is "true".',
         );
         $builder->build();
     }

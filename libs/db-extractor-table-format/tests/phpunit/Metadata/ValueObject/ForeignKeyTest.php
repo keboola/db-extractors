@@ -19,7 +19,7 @@ class ForeignKeyTest extends BaseValueObjectTest
             $name,
             $refSchema,
             $refTable,
-            $refColumn
+            $refColumn,
         );
     }
 

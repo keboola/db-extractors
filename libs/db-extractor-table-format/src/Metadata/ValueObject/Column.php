@@ -61,7 +61,7 @@ class Column implements ValueObject
         bool $hasDefaultValue,
         ?string $default,
         ?ForeignKey $foreignKey,
-        array $constraints
+        array $constraints,
     ) {
         if ($name === '') {
             throw new InvalidArgumentException('Column\'s name cannot be empty.');
@@ -70,28 +70,28 @@ class Column implements ValueObject
         if ($sanitizedName === '') {
             throw new InvalidArgumentException(sprintf(
                 'Column\'s %s sanitized name cannot be empty.',
-                json_encode($name)
+                json_encode($name),
             ));
         }
 
         if ($description === '') {
             throw new InvalidArgumentException(sprintf(
                 'Column\'s %s description cannot be empty string, use null.',
-                json_encode($name)
+                json_encode($name),
             ));
         }
 
         if ($type === '') {
             throw new InvalidArgumentException(sprintf(
                 'Column\'s %s type cannot be empty.',
-                json_encode($name)
+                json_encode($name),
             ));
         }
 
         if ($length === '') {
             throw new InvalidArgumentException(sprintf(
                 'Column\'s %s length cannot be empty string, use null.',
-                json_encode($name)
+                json_encode($name),
             ));
         }
 

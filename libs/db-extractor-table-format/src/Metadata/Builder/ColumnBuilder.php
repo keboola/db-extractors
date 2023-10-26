@@ -66,7 +66,7 @@ class ColumnBuilder implements Builder
         $this->setRequiredProperties(
             $requiredProperties,
             self::ALWAYS_REQUIRED_PROPERTIES,
-            self::OPTIONAL_REQUIRED_PROPERTIES
+            self::OPTIONAL_REQUIRED_PROPERTIES,
         );
     }
 
@@ -88,7 +88,7 @@ class ColumnBuilder implements Builder
             $this->hasDefaultValue,
             $this->default,
             $this->foreignKeyBuilder ? $this->foreignKeyBuilder->build() : null,
-            $this->constraints
+            $this->constraints,
         );
     }
 

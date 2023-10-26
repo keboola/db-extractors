@@ -21,13 +21,13 @@ trait RequiredPropertiesTrait
             throw new InvalidArgumentException(sprintf(
                 'Properties "%s" cannot be set as required, ' .
                 'they are not present in OPTIONAL_REQUIRED_PROPERTIES constant',
-                implode('", "', $invalidReqProps)
+                implode('", "', $invalidReqProps),
             ));
         }
 
         // Merge always required properties and required properties set by constructor
         $this->requiredProperties = array_unique(
-            array_merge($alwaysRequired, $props)
+            array_merge($alwaysRequired, $props),
         );
     }
 
@@ -36,7 +36,7 @@ trait RequiredPropertiesTrait
         $key = array_search($property, $this->requiredProperties);
         if ($key === false) {
             throw new InvalidArgumentException(
-                sprintf('Property "%s" is not required.', $property)
+                sprintf('Property "%s" is not required.', $property),
             );
         }
 
@@ -49,13 +49,13 @@ trait RequiredPropertiesTrait
         foreach ($this->requiredProperties as $property) {
             if (!array_key_exists($property, $vars)) {
                 throw new PropertyNotFoundException(
-                    sprintf('Required property "%s" is not defined in %s.', $property, get_class($this))
+                    sprintf('Required property "%s" is not defined in %s.', $property, get_class($this)),
                 );
             }
 
             if ($vars[$property] === null) {
                 throw new PropertyNotSetException(
-                    sprintf('Required property "%s" is not set.', $property)
+                    sprintf('Required property "%s" is not set.', $property),
                 );
             }
         }

@@ -39,7 +39,7 @@ class ForeignKeyBuilder implements Builder
         $this->setRequiredProperties(
             $requiredProperties,
             self::ALWAYS_REQUIRED_PROPERTIES,
-            self::OPTIONAL_REQUIRED_PROPERTIES
+            self::OPTIONAL_REQUIRED_PROPERTIES,
         );
     }
 
@@ -50,7 +50,7 @@ class ForeignKeyBuilder implements Builder
             $this->name,
             $this->refSchema,
             $this->refTable,
-            $this->refColumn
+            $this->refColumn,
         );
     }
 

@@ -36,7 +36,7 @@ class TableTest extends BaseValueObjectTest
             $rowCount,
             $column,
             null,
-            $cdcEnabled
+            $cdcEnabled,
         );
     }
 

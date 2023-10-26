@@ -140,7 +140,7 @@ abstract class BaseBuilderTest extends TestCase
                         $expectedIsSet ? 'true' : 'false',
                         $property,
                         $isSet ? 'true' : 'false',
-                    )
+                    ),
                 );
             }
 
@@ -159,7 +159,7 @@ abstract class BaseBuilderTest extends TestCase
                         'Expected %s not thrown when calling get callback of "%s". Returned %s.',
                         'PropertyNotSetException',
                         $property,
-                        is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value)
+                        is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value),
                     ));
                 } catch (PropertyNotSetException $e) {
                     // ok, exception was thrown
@@ -229,7 +229,7 @@ abstract class BaseBuilderTest extends TestCase
                     'Expected %s not thrown when calling get callback of "%s". Returned %s.',
                     'PropertyNotSetException',
                     $property,
-                    is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value)
+                    is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value),
                 ));
             } catch (PropertyNotSetException $e) {
                 // ok, exception was thrown
@@ -272,7 +272,7 @@ abstract class BaseBuilderTest extends TestCase
             $requiredProperties = array_filter(
                 $allProperties,
                 fn(string $key) => in_array($key, $this->getAlwaysRequiredProperties(), true),
-                ARRAY_FILTER_USE_KEY
+                ARRAY_FILTER_USE_KEY,
             );
             yield "$index-only-required-properties" => [$requiredProperties];
 
@@ -322,7 +322,7 @@ abstract class BaseBuilderTest extends TestCase
             $requiredProperties = array_filter(
                 $allProperties,
                 fn(string $key) => in_array($key, $this->getAlwaysRequiredProperties(), true),
-                ARRAY_FILTER_USE_KEY
+                ARRAY_FILTER_USE_KEY,
             );
             foreach (array_keys($requiredProperties) as $missingProperty) {
                 $invalidProperties = $requiredProperties;
@@ -403,25 +403,19 @@ abstract class BaseBuilderTest extends TestCase
         return array_key_exists($property, $defaults);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDefaultValue(string $property)
+    public function getDefaultValue(string $property): mixed
     {
         $defaults = $this->getDefaultValues();
         return $defaults[$property];
     }
 
-    /**
-     * @param mixed $value
-     */
-    protected function callSet(Builder $builder, string $property, $value): void
+    protected function callSet(Builder $builder, string $property, mixed $value): void
     {
         $setCallbacks = $this->getSetCallbacks();
         if (!array_key_exists($property, $setCallbacks)) {
             throw new RuntimeException(sprintf(
                 'Set callback for property "%s" is not defined in test.',
-                $property
+                $property,
             ));
         }
 
@@ -431,21 +425,18 @@ abstract class BaseBuilderTest extends TestCase
             throw new RuntimeException(sprintf(
                 'Set callback for property "%s" must return Builder, given "%s".',
                 $property,
-                is_object($result) ? get_class($result) : gettype($result)
+                is_object($result) ? get_class($result) : gettype($result),
             ));
         }
     }
 
-    /**
-     * @return mixed
-     */
-    protected function callGet(ValueObject $valueObject, string $property)
+    protected function callGet(ValueObject $valueObject, string $property): mixed
     {
         $getCallbacks = $this->getGetCallbacks();
         if (!array_key_exists($property, $getCallbacks)) {
             throw new RuntimeException(sprintf(
                 'Get callback for property "%s" is not defined in test.',
-                $property
+                $property,
             ));
         }
 
@@ -466,7 +457,7 @@ abstract class BaseBuilderTest extends TestCase
             throw new RuntimeException(sprintf(
                 'Has callback for property "%s" must return bool, given "%s".',
                 $property,
-                is_object($result) ? get_class($result) : gettype($result)
+                is_object($result) ? get_class($result) : gettype($result),
             ));
         }
 
