@@ -33,5 +33,5 @@ interface DbConnection
      * @param callable $processor (QueryResult $dbResult): array
      * @return mixed - returned value from $processor
      */
-    public function queryAndProcess(string $query, int $maxRetries, callable $processor);
+    public function queryAndProcess(string $query, int $maxRetries, callable $processor): mixed;
 }

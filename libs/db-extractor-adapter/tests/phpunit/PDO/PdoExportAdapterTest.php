@@ -19,7 +19,7 @@ class PdoExportAdapterTest extends AbstractExportAdapterTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?QueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null,
     ): PdoExportAdapter {
         $connection = $this->createPdoConnection($host, $port);
         $queryFactory = $queryFactory ?? new DefaultQueryFactory($state);

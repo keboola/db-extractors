@@ -47,7 +47,7 @@ abstract class BaseDbConnection implements DbConnection
     public function __construct(
         LoggerInterface $logger,
         int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
-        array $userInitQueries = []
+        array $userInitQueries = [],
     ) {
         $this->logger = $logger;
         $this->connectMaxRetries = max($connectMaxRetries, 1);
@@ -79,7 +79,7 @@ abstract class BaseDbConnection implements DbConnection
      * @param callable $processor (QueryResult $dbResult): array
      * @return mixed - returned value from $processor
      */
-    public function queryAndProcess(string $query, int $maxRetries, callable $processor)
+    public function queryAndProcess(string $query, int $maxRetries, callable $processor): mixed
     {
         return $this->callWithRetry(
             $maxRetries,
@@ -122,10 +122,7 @@ abstract class BaseDbConnection implements DbConnection
         }
     }
 
-    /**
-     * @return mixed
-     */
-    protected function callWithRetry(int $maxRetries, callable $callback)
+    protected function callWithRetry(int $maxRetries, callable $callback): mixed
     {
         $proxy = $this->createRetryProxy($maxRetries);
         try {

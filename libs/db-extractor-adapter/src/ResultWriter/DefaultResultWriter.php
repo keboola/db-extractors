@@ -35,7 +35,7 @@ class DefaultResultWriter implements ResultWriter
         array $row,
         string $from,
         string $to,
-        bool $ignoreInvalidUtf8 = false
+        bool $ignoreInvalidUtf8 = false,
     ): array {
         if ($ignoreInvalidUtf8) {
             return array_map(
@@ -72,7 +72,7 @@ class DefaultResultWriter implements ResultWriter
     public function writeToCsv(
         QueryResult $result,
         ExportConfig $exportConfig,
-        string $csvFilePath
+        string $csvFilePath,
     ): ExportResult {
         $this->rowsCount = 0;
         $this->lastRow = null;
@@ -112,7 +112,7 @@ class DefaultResultWriter implements ResultWriter
         Iterator $iterator,
         QueryMetadata $queryMetadata,
         ExportConfig $exportConfig,
-        CsvWriter $csvWriter
+        CsvWriter $csvWriter,
     ): void {
         // Write header
         if ($this->hasCsvHeader($exportConfig)) {
@@ -151,10 +151,7 @@ class DefaultResultWriter implements ResultWriter
         return $result->getIterator();
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getIncrementalFetchingValueFromLastRow(ExportConfig $exportConfig)
+    protected function getIncrementalFetchingValueFromLastRow(ExportConfig $exportConfig): mixed
     {
         // Get/check maximum (last) value of incremental fetching column
         $incFetchingColMaxValue = null;

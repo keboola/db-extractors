@@ -14,7 +14,7 @@ trait OdbcCreateConnectionTrait
     protected function createOdbcConnection(
         ?string $host = null,
         ?int $port = null,
-        int $connectRetries = OdbcConnection::CONNECT_DEFAULT_MAX_RETRIES
+        int $connectRetries = OdbcConnection::CONNECT_DEFAULT_MAX_RETRIES,
     ): OdbcConnection {
         $dns = sprintf(
             'Driver={MariaDB ODBC Driver};SERVER=%s;PORT=%d;DATABASE=%s;',

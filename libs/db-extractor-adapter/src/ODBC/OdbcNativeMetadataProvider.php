@@ -36,7 +36,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         ?string $onlyFromSchema = null,
         array $ignoredCatalogs = [],
         array $ignoredSchemas = [],
-        array $typesWithoutLength = []
+        array $typesWithoutLength = [],
     ) {
         $this->connection = $connection;
         $this->onlyFromCatalog = $onlyFromCatalog;
@@ -112,7 +112,7 @@ class OdbcNativeMetadataProvider implements MetadataProvider
         ColumnBuilder $builder,
         array $data,
         int $ordinalPosition,
-        bool $primaryKey
+        bool $primaryKey,
     ): void {
         $type = $data['TYPE_NAME'];
         if (!in_array(strtolower($type), $this->typesWithoutLength)) {

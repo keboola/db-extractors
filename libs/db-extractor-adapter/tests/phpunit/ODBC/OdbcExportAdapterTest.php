@@ -19,7 +19,7 @@ class OdbcExportAdapterTest extends AbstractExportAdapterTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?QueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null,
     ): OdbcExportAdapter {
         $connection = $this->createOdbcConnection($host, $port);
         $queryFactory = $queryFactory ?? new DefaultQueryFactory($state);

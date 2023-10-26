@@ -21,7 +21,7 @@ abstract class AbstractExportAdapterTest extends BaseTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?QueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null,
     ): ExportAdapter;
 
     public function testExportSimpleQuery(): void

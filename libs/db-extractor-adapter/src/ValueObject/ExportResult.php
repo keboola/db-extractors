@@ -21,7 +21,7 @@ class ExportResult
         int $rowsCount,
         QueryMetadata $queryMetadata,
         bool $csvHeaderPresent,
-        ?string $incFetchingColMaxValue
+        ?string $incFetchingColMaxValue,
     ) {
         $this->csvPath = $csvPath;
         $this->rowsCount = $rowsCount;
