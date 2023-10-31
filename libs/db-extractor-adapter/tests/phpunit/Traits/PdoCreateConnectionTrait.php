@@ -14,7 +14,7 @@ trait PdoCreateConnectionTrait
     protected function createPdoConnection(
         ?string $host = null,
         ?int $port = null,
-        int $connectRetries = PdoConnection::CONNECT_DEFAULT_MAX_RETRIES
+        int $connectRetries = PdoConnection::CONNECT_DEFAULT_MAX_RETRIES,
     ): PdoConnection {
         $dns = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=utf8',

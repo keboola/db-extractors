@@ -17,7 +17,7 @@ class OdbcExportAdapter extends BaseExportAdapter
         QueryFactory $simpleQueryFactory,
         ResultWriter $resultWriter,
         string $dataDir,
-        array $state
+        array $state,
     ) {
         parent::__construct($logger, $connection, $simpleQueryFactory, $resultWriter, $dataDir, $state);
     }

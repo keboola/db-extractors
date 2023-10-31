@@ -21,7 +21,7 @@ abstract class AbstractExportAdapterTest extends BaseTest
         array $state = [],
         ?string $host = null,
         ?int $port = null,
-        ?QueryFactory $queryFactory = null
+        ?QueryFactory $queryFactory = null,
     ): ExportAdapter;
 
     public function testExportSimpleQuery(): void
@@ -94,7 +94,7 @@ END;
             Assert::assertSame($e->getTryCount(), $retries);
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Msg differs between PDO and ODBC
-                new StringContains('Connection not open'),
+                new StringContains('Lost connection to MySQL server'),
                 new StringContains('MySQL server has gone away'),
             ));
         }

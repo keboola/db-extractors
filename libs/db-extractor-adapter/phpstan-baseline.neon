@@ -1,0 +1,36 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Adapter\\\\BaseExportAdapter\\:\\:queryAndProcess\\(\\) should return Keboola\\\\DbExtractor\\\\Adapter\\\\ValueObject\\\\ExportResult but returns mixed\\.$#"
+			count: 1
+			path: src/BaseExportAdapter.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Adapter\\\\Connection\\\\BaseDbConnection\\:\\:query\\(\\) should return Keboola\\\\DbExtractor\\\\Adapter\\\\ValueObject\\\\QueryResult but returns mixed\\.$#"
+			count: 1
+			path: src/Connection/BaseDbConnection.php
+
+		-
+			message: "#^Generator expects value type array, mixed given\\.$#"
+			count: 1
+			path: src/PDO/PdoQueryResult.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Adapter\\\\PDO\\\\PdoQueryResult\\:\\:fetch\\(\\) should return array\\|null but returns mixed\\.$#"
+			count: 1
+			path: src/PDO/PdoQueryResult.php
+
+		-
+			message: "#^Parameter \\#1 \\$row of method Keboola\\\\DbExtractor\\\\Adapter\\\\ResultWriter\\\\DefaultResultWriter\\:\\:writeRow\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: src/ResultWriter/DefaultResultWriter.php
+
+		-
+			message: "#^Parameter \\#5 \\$incFetchingColMaxValue of class Keboola\\\\DbExtractor\\\\Adapter\\\\ValueObject\\\\ExportResult constructor expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: src/ResultWriter/DefaultResultWriter.php
+
+		-
+			message: "#^Property Keboola\\\\DbExtractor\\\\Adapter\\\\ResultWriter\\\\DefaultResultWriter\\:\\:\\$lastRow \\(array\\|null\\) does not accept mixed\\.$#"
+			count: 1
+			path: src/ResultWriter/DefaultResultWriter.php

@@ -36,7 +36,7 @@ class PdoConnection extends BaseDbConnection
         array $options,
         ?callable $init = null,
         int $connectMaxRetries = self::CONNECT_DEFAULT_MAX_RETRIES,
-        array $userInitQueries = []
+        array $userInitQueries = [],
     ) {
         // Convert errors to PDOExceptions
         $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;

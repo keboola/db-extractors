@@ -38,7 +38,7 @@ abstract class BaseExportAdapter implements ExportAdapter
         QueryFactory $simpleQueryFactory,
         ResultWriter $resultWriter,
         string $dataDir,
-        array $state
+        array $state,
     ) {
         $this->logger = $logger;
         $this->connection = $connection;

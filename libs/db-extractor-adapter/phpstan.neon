@@ -1,6 +1,8 @@
+includes:
+	- phpstan-baseline.neon
+
 parameters:
     checkMissingIterableValueType: false
     ignoreErrors:
-        - '#Parameter .* \$qualifier of function odbc_.* expects string, string\|null given\.#'
         # Bad phpdoc in library
         - '#\$toxicity of method Ihsw\\Toxiproxy\\Proxy::create\(\) expects string, float given\.#'

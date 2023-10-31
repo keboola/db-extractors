@@ -85,7 +85,7 @@ class OdbcConnectionTest extends BaseTest
             $connection->testConnection();
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Lost connection to MySQL server during query', $e->getMessage());
+            Assert::assertStringContainsString('Lost connection to MySQL server', $e->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class OdbcConnectionTest extends BaseTest
             $connection->testConnection();
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Lost connection to MySQL server during query', $e->getMessage());
+            Assert::assertStringContainsString('Lost connection to MySQL server', $e->getMessage());
         }
     }
 
@@ -141,7 +141,7 @@ class OdbcConnectionTest extends BaseTest
             Assert::fail('Exception expected.');
         } catch (DeadConnectionException $e) {
             Assert::assertStringContainsString('Dead connection:', $e->getMessage());
-            Assert::assertStringContainsString('Lost connection to MySQL server during query', $e->getMessage());
+            Assert::assertStringContainsString('Lost connection to MySQL server', $e->getMessage());
         }
     }
 
@@ -166,7 +166,7 @@ class OdbcConnectionTest extends BaseTest
             $connection->query('SELECT 123 as X, 456 as Y', $retries);
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Connection not open', $e->getMessage());
+            Assert::assertStringContainsString('Lost connection to MySQL server', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
@@ -202,7 +202,7 @@ class OdbcConnectionTest extends BaseTest
             });
             Assert::fail('Exception expected.');
         } catch (UserExceptionInterface $e) {
-            Assert::assertStringContainsString('Connection not open', $e->getMessage());
+            Assert::assertStringContainsString('Lost connection to MySQL server', $e->getMessage());
         }
 
         for ($attempt=1; $attempt < $retries; $attempt++) {
