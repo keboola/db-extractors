@@ -14,7 +14,7 @@ class DefaultGetTablesSerializer implements GetTablesSerializer
     {
         return array_map(
             fn(Table $table) => $this->serializeTable($table),
-            $tables->getAll()
+            $tables->getAll(),
         );
     }
 
@@ -32,7 +32,7 @@ class DefaultGetTablesSerializer implements GetTablesSerializer
         if ($table->hasColumns()) {
             $out['columns'] = array_map(
                 fn(Column $col) => $this->serializeColumn($col),
-                $table->getColumns()->getAll()
+                $table->getColumns()->getAll(),
             );
         }
 

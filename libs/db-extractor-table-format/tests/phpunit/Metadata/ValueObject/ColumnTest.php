@@ -60,7 +60,7 @@ class ColumnTest extends BaseValueObjectTest
             $hasDefault,
             $default,
             $foreignKey,
-            $constraints
+            $constraints,
         );
     }
 

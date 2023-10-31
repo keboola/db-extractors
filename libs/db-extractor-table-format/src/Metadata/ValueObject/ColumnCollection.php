@@ -32,7 +32,7 @@ class ColumnCollection implements ValueObject, Countable, IteratorAggregate
             if (!$column instanceof Column) {
                 throw new InvalidArgumentException(sprintf(
                     'All columns must by of type Column, given "%s".',
-                    is_object($column) ? get_class($column) : gettype($column)
+                    is_object($column) ? get_class($column) : gettype($column),
                 ));
             }
 

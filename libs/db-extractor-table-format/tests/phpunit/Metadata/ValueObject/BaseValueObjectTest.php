@@ -101,7 +101,7 @@ abstract class BaseValueObjectTest extends TestCase
                         $expectedIsSet ? 'true' : 'false',
                         $property,
                         $isSet ? 'true' : 'false',
-                    )
+                    ),
                 );
             }
 
@@ -120,7 +120,7 @@ abstract class BaseValueObjectTest extends TestCase
                         'Expected %s not thrown when calling get callback of "%s". Returned %s.',
                         'PropertyNotSetException',
                         $property,
-                        is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value)
+                        is_object($value) ? get_class($value) : getType($value) . ': ' . json_encode($value),
                     ));
                 } catch (PropertyNotSetException $e) {
                     // ok, exception was thrown
@@ -183,16 +183,13 @@ abstract class BaseValueObjectTest extends TestCase
         }
     }
 
-    /**
-     * @return mixed
-     */
-    protected function callGet(ValueObject $valueObject, string $property)
+    protected function callGet(ValueObject $valueObject, string $property): mixed
     {
         $getCallbacks = $this->getGetCallbacks();
         if (!array_key_exists($property, $getCallbacks)) {
             throw new RuntimeException(sprintf(
                 'Get callback for property "%s" is not defined in test.',
-                $property
+                $property,
             ));
         }
 
@@ -213,7 +210,7 @@ abstract class BaseValueObjectTest extends TestCase
             throw new RuntimeException(sprintf(
                 'Has callback for property "%s" must return bool, given "%s".',
                 $property,
-                is_object($result) ? get_class($result) : gettype($result)
+                is_object($result) ? get_class($result) : gettype($result),
             ));
         }
 

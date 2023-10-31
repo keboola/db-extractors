@@ -16,7 +16,7 @@ class BuilderHelper
         if ($sanitized === '') {
             // Name cannot start/end with special char, it is trim in ColumnNameSanitizer
             $sanitized = ColumnNameSanitizer::sanitize(
-                'empty' . preg_replace('~\s~', '_', $name) . 'name'
+                'empty' . preg_replace('~\s~', '_', $name) . 'name',
             );
         }
 
