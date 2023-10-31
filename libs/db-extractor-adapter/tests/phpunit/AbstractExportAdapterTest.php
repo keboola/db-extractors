@@ -94,7 +94,7 @@ END;
             Assert::assertSame($e->getTryCount(), $retries);
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Msg differs between PDO and ODBC
-                new StringContains('Lost connection to server'),
+                new StringContains('Lost connection to MySQL server'),
                 new StringContains('MySQL server has gone away'),
             ));
         }
