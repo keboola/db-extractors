@@ -14,8 +14,8 @@ trait TestDataTrait
     {
         $dns = sprintf(
             'mysql:host=%s;port=%s;dbname=%s;charset=utf8',
-            $host ?? getenv('DB_HOST'),
-            $port ?? getenv('DB_PORT'),
+            getenv('DB_HOST'),
+            getenv('DB_PORT'),
             $this->getDatabase(),
         );
         return new PDO($dns, (string) getenv('DB_USER'), (string) getenv('DB_PASSWORD'), [
