@@ -39,7 +39,7 @@ trait InsertRowsTrait
                             return $value;
                         }
                         return $this->quote((string) $value);
-                    }, $row)
+                    }, $row),
                 ) .
                 ')';
         }
@@ -50,7 +50,7 @@ trait InsertRowsTrait
                     'INSERT INTO %s (%s) VALUES %s',
                     $this->quoteIdentifier($tableName),
                     implode(', ', $columnsSql),
-                    $values
+                    $values,
                 );
 
                 $this->connection->exec($sql);

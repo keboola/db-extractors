@@ -44,7 +44,7 @@ class OracleDbConnection implements DbConnection
         throw new ApplicationException('not implemented');
     }
 
-    public function queryAndProcess(string $query, int $maxRetries, callable $processor): void
+    public function queryAndProcess(string $query, int $maxRetries, callable $processor): mixed
     {
         throw new ApplicationException('not implemented');
     }

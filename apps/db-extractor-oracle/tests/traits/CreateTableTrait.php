@@ -23,7 +23,7 @@ trait CreateTableTrait
         $sql = sprintf(
             'CREATE TABLE %s (%s) tablespace users',
             $this->quoteIdentifier($tableName),
-            implode(', ', $columnsSql)
+            implode(', ', $columnsSql),
         );
 
         // Create table

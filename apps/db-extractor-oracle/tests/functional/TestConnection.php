@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\FunctionalTests;
 
+use Exception;
 use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
-use \Exception;
-use \Throwable;
+use Throwable;
 
 class TestConnection
 {
@@ -43,14 +43,14 @@ class TestConnection
             '//%s:%s/%s',
             $databaseConfig->getHost(),
             $databaseConfig->getPort(),
-            $databaseConfig->getDatabase()
+            $databaseConfig->getDatabase(),
         );
 
         $adminConnection = @oci_connect(
             'system',
             'oracle',
             $dbString,
-            'AL32UTF8'
+            'AL32UTF8',
         );
 
         if (!$adminConnection) {
@@ -67,7 +67,7 @@ class TestConnection
             $databaseConfig->getUsername(),
             $databaseConfig->getPassword(),
             $dbString,
-            'AL32UTF8'
+            'AL32UTF8',
         );
         if (!$connection) {
             $error = (array) oci_error();
@@ -99,24 +99,24 @@ class TestConnection
                 sprintf(
                     'CREATE USER %s IDENTIFIED BY %s DEFAULT TABLESPACE users',
                     $dbConfig->getUsername(),
-                    $dbConfig->getPassword()
-                )
+                    $dbConfig->getPassword(),
+                ),
             );
 
             // provide roles
             $this->exec(
                 sprintf(
                     'GRANT CONNECT,RESOURCE,DBA TO %s',
-                    $dbConfig->getUsername()
-                )
+                    $dbConfig->getUsername(),
+                ),
             );
 
             // grant privileges
             $this->exec(
                 sprintf(
                     'GRANT CREATE SESSION GRANT ANY PRIVILEGE TO %s',
-                    $dbConfig->getUsername()
-                )
+                    $dbConfig->getUsername(),
+                ),
             );
         } catch (Throwable $e) {
             // make sure this is the case that TESTER already exists

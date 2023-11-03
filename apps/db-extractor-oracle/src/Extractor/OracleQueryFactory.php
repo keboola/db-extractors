@@ -25,7 +25,7 @@ class OracleQueryFactory extends DefaultQueryFactory
             iterator_to_array($this->createSelect($exportConfig, $connection)),
             iterator_to_array($this->createFrom($exportConfig, $connection)),
             iterator_to_array($this->createWhere($exportConfig, $connection)),
-            iterator_to_array($this->createOrderBy($exportConfig, $connection))
+            iterator_to_array($this->createOrderBy($exportConfig, $connection)),
         );
         return implode(' ', $sql);
     }
@@ -57,13 +57,13 @@ class OracleQueryFactory extends DefaultQueryFactory
                 case Oracle::INCREMENT_TYPE_DATE:
                     $lastFetchedRow = sprintf(
                         "DATE '%s'",
-                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d')
+                        formatDateTime($this->state['lastFetchedRow'], 'Y-m-d'),
                     );
                     break;
                 case Oracle::INCREMENT_TYPE_TIMESTAMP:
                     $lastFetchedRow = sprintf(
                         "TO_TIMESTAMP('%s', 'YYYY-MM-DD HH24:MI:SS.FF')",
-                        $this->state['lastFetchedRow']
+                        $this->state['lastFetchedRow'],
                     );
                     break;
                 default:
@@ -74,7 +74,7 @@ class OracleQueryFactory extends DefaultQueryFactory
             $where[] = sprintf(
                 '%s >= %s',
                 $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
-                $lastFetchedRow
+                $lastFetchedRow,
             );
         }
 
