@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d320045cd2de9c13bfe8315c66c80f92",
+    "content-hash": "34af6616ffdefeb38a93c069dfa72568",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -171,16 +171,16 @@
         },
         {
             "name": "keboola/db-extractor-adapter",
-            "version": "dev-adamvyborny-upgrade-php-and-datatypes",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-adapter.git",
-                "reference": "c99a8edce9a6a0551776b387dedd2865acdea484"
+                "reference": "1006813ce2621aa8afc87244861612975afb069c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/c99a8edce9a6a0551776b387dedd2865acdea484",
-                "reference": "c99a8edce9a6a0551776b387dedd2865acdea484",
+                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/1006813ce2621aa8afc87244861612975afb069c",
+                "reference": "1006813ce2621aa8afc87244861612975afb069c",
                 "shasum": ""
             },
             "require": {
@@ -223,22 +223,22 @@
             ],
             "description": "Set of connection adapters for DB extractors.",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-adapter/tree/adamvyborny-upgrade-php-and-datatypes"
+                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.12.0"
             },
-            "time": "2023-11-02T13:01:05+00:00"
+            "time": "2023-11-03T15:29:10+00:00"
         },
         {
             "name": "keboola/db-extractor-common",
-            "version": "dev-adamvyborny-upgrade-php-and-libs",
+            "version": "16.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "abe79132b48f9cbf51b5cd062f7484364af5e9db"
+                "reference": "01db78c9e5d4642b6b1a12cd12a3c825accbc13a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/abe79132b48f9cbf51b5cd062f7484364af5e9db",
-                "reference": "abe79132b48f9cbf51b5cd062f7484364af5e9db",
+                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/01db78c9e5d4642b6b1a12cd12a3c825accbc13a",
+                "reference": "01db78c9e5d4642b6b1a12cd12a3c825accbc13a",
                 "shasum": ""
             },
             "require": {
@@ -246,7 +246,7 @@
                 "ext-pdo": "*",
                 "keboola/common-exceptions": "^1.1",
                 "keboola/csv": "^4.0",
-                "keboola/db-extractor-adapter": "dev-adamvyborny-upgrade-php-and-datatypes",
+                "keboola/db-extractor-adapter": "^1.12",
                 "keboola/db-extractor-config": "^1.8",
                 "keboola/db-extractor-ssh-tunnel": "^1.1.5",
                 "keboola/db-extractor-table-format": "^3.7",
@@ -298,9 +298,9 @@
             ],
             "description": "Common library from Keboola Database Extractors",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-common/tree/adamvyborny-upgrade-php-and-libs"
+                "source": "https://github.com/keboola/db-extractor-common/tree/16.2.0"
             },
-            "time": "2023-11-02T14:05:06+00:00"
+            "time": "2023-11-07T14:04:35+00:00"
         },
         {
             "name": "keboola/db-extractor-config",
@@ -4025,10 +4025,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "keboola/db-extractor-adapter": 20,
-        "keboola/db-extractor-common": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
