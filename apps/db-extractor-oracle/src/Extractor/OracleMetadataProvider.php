@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\Datatype\Definition\Exception\InvalidTypeException;
+use Keboola\Datatype\Definition\Oracle as OracleDatatype;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\TableBuilder;
@@ -54,6 +56,12 @@ class OracleMetadataProvider implements MetadataProvider
         return $builder->build();
     }
 
+    /**
+     * @throws \Keboola\DbExtractor\TableResultFormat\Exception\InvalidStateException
+     * @throws \Keboola\DbExtractor\TableResultFormat\Exception\InvalidArgumentException
+     * @throws \Keboola\Datatype\Definition\Exception\InvalidOptionException
+     * @throws \Keboola\Datatype\Definition\Exception\InvalidLengthException
+     */
     private function processColumn(TableBuilder $tableBuilder, array $data): void
     {
         $columnType = $data['type'];
@@ -64,10 +72,16 @@ class OracleMetadataProvider implements MetadataProvider
             $length = $parsedType[2] ?? null;
         }
 
+        try {
+            $type = (new OracleDatatype($columnType))->getBasetype();
+        } catch (InvalidTypeException $e) {
+            $type = $columnType;
+        }
+
         $tableBuilder
             ->addColumn()
             ->setName($data['name'])
-            ->setType($columnType)
+            ->setType($type)
             ->setNullable($data['nullable'])
             ->setLength($length)
             ->setOrdinalPosition($data['ordinalPosition'])
