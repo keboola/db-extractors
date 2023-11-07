@@ -73,7 +73,7 @@
         "decimal": [
             {
                 "key": "KBC.datatype.type",
-                "value": "NUMBER"
+                "value": "NUMERIC"
             },
             {
                 "key": "KBC.datatype.nullable",
