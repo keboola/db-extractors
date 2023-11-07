@@ -25,6 +25,10 @@
         {
             "key": "KBC.owner",
             "value": "TESTER"
+        },
+        {
+            "key": "KBC.datatype.backend",
+            "value": "oracle"
         }
     ],
     "column_metadata": {
