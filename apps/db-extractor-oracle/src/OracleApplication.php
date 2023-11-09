@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor;
 
 use Keboola\DbExtractor\Configuration\NodeDefinition\OracleDbNode;
-use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
 use Keboola\DbExtractorConfig\Config;
 use Keboola\DbExtractorConfig\Configuration\ActionConfigRowDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigDefinition;
 use Keboola\DbExtractorConfig\Configuration\ConfigRowDefinition;
+use Keboola\DbExtractorConfig\Configuration\GetTablesListFilterDefinition;
 
 class OracleApplication extends Application
 {

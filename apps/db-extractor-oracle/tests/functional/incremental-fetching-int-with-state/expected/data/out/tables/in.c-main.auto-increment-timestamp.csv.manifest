@@ -28,13 +28,17 @@
         {
             "key": "KBC.owner",
             "value": "TESTER"
+        },
+        {
+            "key": "KBC.datatype.backend",
+            "value": "oracle"
         }
     ],
     "column_metadata": {
         "Weir_d_I_D": [
             {
                 "key": "KBC.datatype.type",
-                "value": "NUMBER"
+                "value": "NUMERIC"
             },
             {
                 "key": "KBC.datatype.nullable",
@@ -106,7 +110,7 @@
         "someInteger": [
             {
                 "key": "KBC.datatype.type",
-                "value": "NUMBER"
+                "value": "NUMERIC"
             },
             {
                 "key": "KBC.datatype.nullable",
@@ -140,7 +144,7 @@
         "someDecimal": [
             {
                 "key": "KBC.datatype.type",
-                "value": "NUMBER"
+                "value": "NUMERIC"
             },
             {
                 "key": "KBC.datatype.nullable",
@@ -216,7 +220,7 @@
         "date": [
             {
                 "key": "KBC.datatype.type",
-                "value": "DATE"
+                "value": "TIMESTAMP"
             },
             {
                 "key": "KBC.datatype.nullable",
@@ -224,7 +228,7 @@
             },
             {
                 "key": "KBC.datatype.basetype",
-                "value": "DATE"
+                "value": "TIMESTAMP"
             },
             {
                 "key": "KBC.sourceName",

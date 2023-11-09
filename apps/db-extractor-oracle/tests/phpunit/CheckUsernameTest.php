@@ -38,8 +38,8 @@ class CheckUsernameTest extends TestCase
         Assert::assertTrue(
             $logger->hasInfoThatContains(sprintf(
                 'Your username "%s" and database username are same. Running allowed.',
-                (string) getEnv('ORACLE_DB_USER')
-            ))
+                (string) getEnv('ORACLE_DB_USER'),
+            )),
         );
     }
 
@@ -58,7 +58,7 @@ class CheckUsernameTest extends TestCase
         $this->expectExceptionMessage(sprintf(
             'Your username "dbUsername" does not have permission ' .
             'to run configuration with the database username "%s"',
-            (string) getEnv('ORACLE_DB_USER')
+            (string) getEnv('ORACLE_DB_USER'),
         ));
         new OracleApplication($logger);
     }
@@ -79,7 +79,8 @@ class CheckUsernameTest extends TestCase
         new OracleApplication($logger);
 
         Assert::assertTrue(
-            $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
+            $logger->hasInfoThatContains('Database username "service__abc" is service account, ' .
+                'username check skipped.'),
         );
     }
 
@@ -99,7 +100,7 @@ class CheckUsernameTest extends TestCase
         $this->expectException(BadUsernameException::class);
         $this->expectExceptionMessage(
             'Your username "dbUsername" does not have permission ' .
-            'to run configuration with the database username "user123"'
+            'to run configuration with the database username "user123"',
         );
         new OracleApplication($logger);
     }
@@ -120,7 +121,7 @@ class CheckUsernameTest extends TestCase
         $this->expectException(BadUsernameException::class);
         $this->expectExceptionMessage(
             'Your username "dbUsername" does not have permission ' .
-            'to run configuration with the database username "user_abc"'
+            'to run configuration with the database username "user_abc"',
         );
         new OracleApplication($logger);
     }
@@ -141,7 +142,8 @@ class CheckUsernameTest extends TestCase
         new OracleApplication($logger);
 
         Assert::assertTrue(
-            $logger->hasInfoThatContains('Database username "service__abc" is service account, username check skipped.')
+            $logger->hasInfoThatContains('Database username "service__abc" is service account, ' .
+                'username check skipped.'),
         );
     }
 

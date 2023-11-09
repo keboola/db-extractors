@@ -25,7 +25,7 @@ class OracleExportAdapter implements ExportAdapter
     public function __construct(
         QueryFactory $simpleQueryFactory,
         OracleDbConnection $connection,
-        OracleJavaExportWrapper $exportWrapper
+        OracleJavaExportWrapper $exportWrapper,
     ) {
         $this->simpleQueryFactory = $simpleQueryFactory;
         $this->connection = $connection;
@@ -45,7 +45,7 @@ class OracleExportAdapter implements ExportAdapter
                 $query,
                 $exportConfig->getMaxRetries(),
                 $csvFilePath,
-                $exportConfig->hasQuery()
+                $exportConfig->hasQuery(),
             );
         } catch (Throwable $e) {
             $logPrefix = $exportConfig->hasConfigName() ?
@@ -68,7 +68,7 @@ class OracleExportAdapter implements ExportAdapter
         Throwable $e,
         int $maxRetries,
         string $query,
-        ?string $outputTable = null
+        ?string $outputTable = null,
     ): UserExceptionInterface {
         $message = $outputTable ? sprintf('[%s]: ', $outputTable) : '';
         $message .= sprintf('DB query "%s" failed: %s', $query, $e->getMessage());

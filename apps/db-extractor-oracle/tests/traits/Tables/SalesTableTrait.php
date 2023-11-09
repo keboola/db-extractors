@@ -32,7 +32,7 @@ trait SalesTableTrait
                 $tableName,
                 'PK_' . $tableName,
                 'PRIMARY KEY',
-                $this->quoteIdentifier(implode(', ', $primaryKey))
+                $this->quoteIdentifier(implode(', ', $primaryKey)),
             );
         }
     }

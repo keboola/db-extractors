@@ -25,7 +25,7 @@ trait AutoIncrementTableTrait
     public function generateAIRows(
         string $tableName = 'auto Increment Timestamp',
         bool $includeTSColumn = false,
-        bool $includeRowWithEmptyDate = false
+        bool $includeRowWithEmptyDate = false,
     ): void {
         $data = $this->getAIRows($includeTSColumn, $includeRowWithEmptyDate);
         $this->insertRows($tableName, $data['columns'], $data['data']);

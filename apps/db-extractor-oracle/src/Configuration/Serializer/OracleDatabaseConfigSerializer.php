@@ -24,12 +24,12 @@ class OracleDatabaseConfigSerializer
             if ($realUser) {
                 $logger->info(sprintf(
                     'Connect through is enabled, OracleConnection.PROXY_USER_NAME = "%s".',
-                    $realUser
+                    $realUser,
                 ));
                 $config['proxyUser'] = $realUser;
             } else {
                 throw new UserException(
-                    'Connect through is enabled, but "KBC_REALUSER" environment variable is not set.'
+                    'Connect through is enabled, but "KBC_REALUSER" environment variable is not set.',
                 );
             }
         }

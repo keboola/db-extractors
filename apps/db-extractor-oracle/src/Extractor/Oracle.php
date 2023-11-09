@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Extractor;
 
+use Keboola\Datatype\Definition\Exception\InvalidLengthException;
+use Keboola\Datatype\Definition\GenericStorage;
 use Keboola\DbExtractor\Adapter\ExportAdapter;
 use Keboola\DbExtractor\Adapter\Metadata\MetadataProvider;
 use Keboola\DbExtractor\Configuration\OracleDatabaseConfig;
+use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractor\Manifest\ManifestGenerator;
+use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Manifest\DefaultManifestSerializer;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
-use Keboola\DbExtractor\TableResultFormat\Exception\ColumnNotFoundException;
-use Keboola\DbExtractor\Exception\UserException;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\ExportConfig;
-use Keboola\Datatype\Definition\Exception\InvalidLengthException;
-use Keboola\Datatype\Definition\GenericStorage;
 
 class Oracle extends BaseExtractor
 {
@@ -45,7 +45,7 @@ class Oracle extends BaseExtractor
     {
         return new OracleManifestGenerator(
             $this->getMetadataProvider(),
-            new DefaultManifestSerializer()
+            new DefaultManifestSerializer(),
         );
     }
 
@@ -56,7 +56,7 @@ class Oracle extends BaseExtractor
         return new OracleExportAdapter(
             $this->queryFactory,
             $this->connection,
-            $this->exportWrapper
+            $this->exportWrapper,
         );
     }
 
@@ -71,7 +71,7 @@ class Oracle extends BaseExtractor
         } catch (ColumnNotFoundException $e) {
             throw new UserException(sprintf(
                 'Column "%s" specified for incremental fetching was not found in the table.',
-                $exportConfig->getIncrementalFetchingColumn()
+                $exportConfig->getIncrementalFetchingColumn(),
             ));
         }
 
@@ -81,9 +81,9 @@ class Oracle extends BaseExtractor
             $datatype = new GenericStorage($column->getType());
             if (in_array($datatype->getBasetype(), self::NUMERIC_BASE_TYPES)) {
                 $incrementalFetchingType = self::INCREMENT_TYPE_NUMERIC;
-            } else if ($datatype->getBasetype() === 'TIMESTAMP') {
+            } elseif ($datatype->getBasetype() === 'TIMESTAMP') {
                 $incrementalFetchingType = self::INCREMENT_TYPE_TIMESTAMP;
-            } else if ($datatype->getBasetype() === 'DATE') {
+            } elseif ($datatype->getBasetype() === 'DATE') {
                 $incrementalFetchingType = self::INCREMENT_TYPE_DATE;
             } else {
                 throw new UserException('invalid incremental fetching column type');
@@ -92,8 +92,8 @@ class Oracle extends BaseExtractor
             throw new UserException(
                 sprintf(
                     'Column "%s" specified for incremental fetching is not a numeric or timestamp type column.',
-                    $column->getName()
-                )
+                    $column->getName(),
+                ),
             );
         }
         $this->queryFactory->setIncrementalFetchingColType($incrementalFetchingType);
@@ -106,7 +106,7 @@ class Oracle extends BaseExtractor
             $this->queryFactory->createLastRowQuery($exportConfig, $this->connection),
             $exportConfig->getMaxRetries(),
             $outputFile,
-            false
+            false,
         );
 
         $value = json_decode((string) file_get_contents($outputFile));
@@ -143,7 +143,7 @@ class Oracle extends BaseExtractor
         if ((int) $nullCount > 0) {
             throw new UserException(sprintf(
                 'Cannot set incremental fetching on nullable column "%s".',
-                $exportConfig->getIncrementalFetchingColumn()
+                $exportConfig->getIncrementalFetchingColumn(),
             ));
         }
     }

@@ -49,7 +49,7 @@ JSON;
             getenv('ORACLE_DB_PASSWORD'),
             getenv('ORACLE_DB_DATABASE'),
             json_encode($this->getPrivateKey()),
-            json_encode($this->getPublicKey())
+            json_encode($this->getPublicKey()),
         );
 
         return json_decode($configJson, true);
@@ -93,7 +93,7 @@ JSON;
             getenv('ORACLE_DB_PASSWORD'),
             getenv('ORACLE_DB_DATABASE'),
             json_encode($this->getPrivateKey()),
-            json_encode($this->getPublicKey())
+            json_encode($this->getPublicKey()),
         );
 
         return json_decode($configJson, true);

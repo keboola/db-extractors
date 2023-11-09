@@ -11,7 +11,7 @@ RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-s
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/instantclient-sqlplus.zip
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-table-exporter/TableExporter-$TABLE_EXPORTER_VERSION-jar-with-dependencies.jar /tmp/table-exporter.jar
 
-FROM php:7.4-cli
+FROM php:8.1-cli
 
 ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -43,7 +43,7 @@ RUN ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
 
 RUN export LD_LIBRARY_PATH=/usr/local/instantclient
 RUN export PATH=/usr/local/instantclient:$PATH
-RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-2.2.0
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-3.2.0
 RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
 RUN echo /usr/local/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf
 RUN ldconfig

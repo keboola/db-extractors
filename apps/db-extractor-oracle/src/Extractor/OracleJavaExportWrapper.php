@@ -52,7 +52,7 @@ class OracleJavaExportWrapper
             $this->writeTestConnectionConfig(),
             [],
             self::MAX_TRIES_TEST_CONNECTION,
-            'Failed connecting to DB'
+            'Failed connecting to DB',
         );
     }
 
@@ -68,7 +68,7 @@ class OracleJavaExportWrapper
                 $this->writeTestGetTablesConfig($whitelist, $loadColumns, $outputFile),
                 [],
                 self::MAX_TRIES_GET_TABLES,
-                'Error fetching table listing'
+                'Error fetching table listing',
             );
 
             return JsonHelper::readFile($outputFile);
@@ -81,7 +81,7 @@ class OracleJavaExportWrapper
         string $query,
         int $maxRetries,
         string $outputFile,
-        bool $includeHeader
+        bool $includeHeader,
     ): ExportResult {
         $this->logger->debug(sprintf('Running query "%s".', $query));
         $process = $this->runAction(
@@ -89,7 +89,7 @@ class OracleJavaExportWrapper
             $this->writeExportConfig($query, $outputFile),
             [var_export($includeHeader, true)],
             $maxRetries,
-            'Export process failed'
+            'Export process failed',
         );
 
         $output = $process->getOutput();
@@ -107,13 +107,13 @@ class OracleJavaExportWrapper
         string $configFile,
         array $args,
         int $maxRetries,
-        string $errorMsgPrefix
+        string $errorMsgPrefix,
     ): Process {
         try {
             return $this->runCommand(
                 $this->getCmd($action, $configFile, $args),
                 $maxRetries,
-                $errorMsgPrefix
+                $errorMsgPrefix,
             );
         } finally {
             @unlink($configFile);
@@ -133,7 +133,7 @@ class OracleJavaExportWrapper
                 throw new OracleJavaExportException(sprintf(
                     '%s: %s',
                     $errorMsgPrefix,
-                    $process->getErrorOutput()
+                    $process->getErrorOutput(),
                 ));
             }
 
@@ -162,9 +162,6 @@ class OracleJavaExportWrapper
         ]);
     }
 
-    /***
-     * @param array|InputTable[] $whitelist
-     */
     private function writeTestGetTablesConfig(array $whitelist, bool $loadColumns, string $outputFile): string
     {
         return $this->writeConfig('get tables', [
@@ -198,7 +195,7 @@ class OracleJavaExportWrapper
         if ($this->databaseConfig->hasTnsnames()) {
             $this->writeTnsnames($this->databaseConfig->getTnsnames());
             $config['parameters']['db']['tnsnamesService'] = $this->getTnsnamesService(
-                $this->databaseConfig->getTnsnames()
+                $this->databaseConfig->getTnsnames(),
             );
         }
 
@@ -215,7 +212,7 @@ class OracleJavaExportWrapper
         } else {
             $this->logger->info(sprintf(
                 'Created "%s" configuration for "java-oracle-exporter" tool.',
-                $configDesc
+                $configDesc,
             ));
         }
 
@@ -226,7 +223,7 @@ class OracleJavaExportWrapper
     {
         file_put_contents(
             sprintf('%s/%s', $this->dataDir, 'tnsnames.ora'),
-            $tnsnameContent
+            $tnsnameContent,
         );
 
         $this->logger->info('Created "tnsname.ora" file for "java-oracle-exporter" tool.');
