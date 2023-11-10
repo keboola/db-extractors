@@ -111,7 +111,7 @@ class SshNode extends ArrayNodeDefinition
                 if (!array_key_exists($param, $val)) {
                     throw new InvalidConfigurationException(sprintf(
                         'The child config "%s" under "root.parameters.db.ssh" must be configured.',
-                        $param
+                        $param,
                     ));
                 }
             }
@@ -120,7 +120,7 @@ class SshNode extends ArrayNodeDefinition
                 if (!array_key_exists($param, $val['keys'])) {
                     throw new InvalidConfigurationException(sprintf(
                         'The child config "%s" under "root.parameters.db.ssh.keys" must be configured.',
-                        $param
+                        $param,
                     ));
                 }
             }

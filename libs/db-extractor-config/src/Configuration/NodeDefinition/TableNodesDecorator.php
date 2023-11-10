@@ -36,21 +36,21 @@ class TableNodesDecorator implements DecoratorInterface
         if (!empty($v['query'])  && !empty($v['incrementalFetchingColumn'])) {
             throw new InvalidConfigurationException(
                 'The "incrementalFetchingColumn" is configured, ' .
-                'but incremental fetching is not supported for custom query.'
+                'but incremental fetching is not supported for custom query.',
             );
         }
 
         if (!empty($v['query'])  && !empty($v['incrementalFetchingLimit'])) {
             throw new InvalidConfigurationException(
                 'The "incrementalFetchingLimit" is configured, ' .
-                'but incremental fetching is not supported for custom query.'
+                'but incremental fetching is not supported for custom query.',
             );
         }
 
         if (!empty($v['incrementalFetchingLimit']) && empty($v['incrementalFetchingColumn'])) {
             throw new InvalidConfigurationException(
                 'The "incrementalFetchingLimit" is configured, ' .
-                'but "incrementalFetchingColumn" is missing.'
+                'but "incrementalFetchingColumn" is missing.',
             );
         }
 

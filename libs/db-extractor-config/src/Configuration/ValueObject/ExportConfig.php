@@ -47,14 +47,14 @@ class ExportConfig implements ValueObject
         return new self(
             $data['id'] ?? null,
             $data['name'] ?? null,
-            $data['query'],
+            $data['query'] ?? null,
             empty($data['query']) ? InputTable::fromArray($data) : null,
             $data['incremental'] ?? false,
             empty($data['query']) ? IncrementalFetchingConfig::fromArray($data) : null,
             $data['columns'],
             $data['outputTable'],
             $data['primaryKey'],
-            $data['retries']
+            $data['retries'],
         );
     }
 
@@ -68,7 +68,7 @@ class ExportConfig implements ValueObject
         array $columns,
         string $outputTable,
         array $primaryKey,
-        int $maxRetries
+        int $maxRetries,
     ) {
         $this->configId = $configId;
         $this->configName = $configName;

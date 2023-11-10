@@ -20,7 +20,7 @@ class DbNode extends ArrayNodeDefinition
     public function __construct(
         ?SshNode $sshNode = null,
         ?SslNode $sslNode = null,
-        ?NodeParentInterface $parent = null
+        ?NodeParentInterface $parent = null,
     ) {
         parent::__construct(self::NODE_NAME, $parent);
         $this->sshNode = $sshNode ?? new SshNode();

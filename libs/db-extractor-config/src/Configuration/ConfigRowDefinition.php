@@ -23,7 +23,7 @@ class ConfigRowDefinition extends BaseConfigDefinition
         ?DbNode $dbNode = null,
         ?SshNode $sshNode = null,
         ?SslNode $sslNode = null,
-        ?TableNodesDecorator $tableNodesDecorator = null
+        ?TableNodesDecorator $tableNodesDecorator = null,
     ) {
         $this->dbNode = $dbNode ?? new DbNode($sshNode, $sslNode);
         $this->tableNodesDecorator = $tableNodesDecorator ?? new TableNodesDecorator();
