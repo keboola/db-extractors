@@ -32,9 +32,9 @@ class SSHTunnelTest extends TestCase
         $this->assertEquals(
             array_merge(
                 $dbConfig,
-                ['host' => '127.0.0.1', 'port' => '33306']
+                ['host' => '127.0.0.1', 'port' => '33306'],
             ),
-            $newDbConfig
+            $newDbConfig,
         );
     }
 
@@ -94,7 +94,7 @@ class SSHTunnelTest extends TestCase
         $tunnel = new SSHTunnel($logger);
 
         $this->expectException(UserException::class);
-        $this->expectExceptionMessage("Unable to create ssh tunnel. Output:  ErrorOutput: ssh: connect to host " .
+        $this->expectExceptionMessage('Unable to create ssh tunnel. Output:  ErrorOutput: ssh: connect to host ' .
         "sshproxy port 222: Connection refused\r\nRetries count: " . $maxRetries);
 
         $tunnel->createSshTunnel($dbConfig);

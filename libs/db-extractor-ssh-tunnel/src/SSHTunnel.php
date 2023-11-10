@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Retry\BackOff\ExponentialBackOffPolicy;
 use Retry\Policy\SimpleRetryPolicy;
 use Retry\RetryProxy;
+use Throwable;
 
 class SSHTunnel
 {
@@ -21,8 +22,7 @@ class SSHTunnel
 
     public const DEFAULT_MAX_TRIES = 5;
 
-    /** @var LoggerInterface */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -71,26 +71,27 @@ class SSHTunnel
             array_flip(
                 [
                     'user', 'sshHost', 'sshPort', 'localPort', 'remoteHost', 'remotePort', 'privateKey', 'compression',
-                ]
-            )
+                ],
+            ),
         );
         $this->logger->info(
             sprintf(
                 "Creating SSH tunnel to '%s' on local port '%s'",
                 $tunnelParams['sshHost'],
-                $tunnelParams['localPort'])
+                $tunnelParams['localPort'],
+            ),
         );
 
         $simplyRetryPolicy = new SimpleRetryPolicy(
             $sshConfig['maxRetries'] ?? self::DEFAULT_MAX_TRIES,
-            [SSHException::class,\Throwable::class]
+            [SSHException::class, Throwable::class],
         );
 
         $exponentialBackOffPolicy = new ExponentialBackOffPolicy();
         $proxy = new RetryProxy(
             $simplyRetryPolicy,
             $exponentialBackOffPolicy,
-            $this->logger
+            $this->logger,
         );
 
         try {
@@ -99,7 +100,7 @@ class SSHTunnel
                 $ssh->openTunnel($tunnelParams);
             });
         } catch (SSHException $e) {
-            throw new UserException($e->getMessage() . 'Retries count: ' . $proxy->getTryCount() , 0, $e);
+            throw new UserException($e->getMessage() . 'Retries count: ' . $proxy->getTryCount(), 0, $e);
         }
 
         $dbConfig['host'] = '127.0.0.1';

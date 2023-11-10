@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractorSSHTunnel\Exception;
 
+use Exception;
 use Throwable;
 
-class ApplicationException extends \Exception
+class ApplicationException extends Exception
 {
-    /** @var array */
-    protected $data;
+    protected array $data;
 
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null, array $data = [])
     {

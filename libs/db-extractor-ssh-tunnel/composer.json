@@ -4,15 +4,16 @@
     "type": "library",
     "license": "MIT",
     "require": {
+        "php": ">=8.2",
         "keboola/retry": "^0.5",
         "keboola/ssh-tunnel": "^2.0.3",
         "psr/log": "^1.1"
     },
     "require-dev": {
-        "keboola/coding-standard": ">=9.0.0",
-        "phpstan/phpstan": "^0.12.14",
-        "phpunit/phpunit": "^9.1",
-        "monolog/monolog": "^2.0"
+        "keboola/coding-standard": "^15.0",
+        "monolog/monolog": "^2.9",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.6"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +27,7 @@
     },
     "scripts": {
         "tests": "./vendor/bin/phpunit",
-        "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests",
+        "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests  -c phpstan.neon",
         "phpcs": "phpcs -n -s --ignore=vendor --extensions=php .",
         "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
         "build": [
@@ -41,6 +42,9 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }
