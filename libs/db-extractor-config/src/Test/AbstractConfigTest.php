@@ -27,7 +27,11 @@ abstract class AbstractConfigTest extends TestCase
 
     protected function getConfig(string $driver): array
     {
-        $config = json_decode((string) file_get_contents($this->dataDir . '/' .$driver . '/config.json'), true);
+        /** @var array<string, array> $config */
+        $config = (array) json_decode(
+            (string) file_get_contents($this->dataDir . '/' .$driver . '/config.json'),
+            true,
+        );
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);
         $config['parameters']['extractor_class'] = ucfirst($driver);
@@ -37,7 +41,11 @@ abstract class AbstractConfigTest extends TestCase
 
     protected function getConfigRow(string $driver): array
     {
-        $config = json_decode((string) file_get_contents($this->dataDir . '/' .$driver . '/configRow.json'), true);
+        /** @var array<string, array> $config */
+        $config = (array) json_decode(
+            (string) file_get_contents($this->dataDir . '/' .$driver . '/configRow.json'),
+            true,
+        );
 
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);
@@ -49,7 +57,8 @@ abstract class AbstractConfigTest extends TestCase
     protected function getConfigRowForCsvErr(string $driver): array
     {
         $filename = $this->dataDir . '/' .$driver . '/configRowCsvErr.json';
-        $config = json_decode((string) file_get_contents($filename), true);
+        /** @var array<string, array> $config */
+        $config = (array) json_decode((string) file_get_contents($filename), true);
 
         $config['parameters']['data_dir'] = $this->dataDir;
         $config['parameters']['db'] = $this->getConfigDbNode($driver);

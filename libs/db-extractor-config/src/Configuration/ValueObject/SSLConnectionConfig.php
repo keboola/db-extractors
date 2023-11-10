@@ -28,7 +28,7 @@ class SSLConnectionConfig implements ValueObject
             $data['ca'] ?? null,
             $data['cipher'] ?? null,
             $data['verifyServerCert'] ?? true,
-            $data['ignoreCertificateCn'] ?? false
+            $data['ignoreCertificateCn'] ?? false,
         );
     }
 
@@ -38,7 +38,7 @@ class SSLConnectionConfig implements ValueObject
         ?string $ca,
         ?string $cipher,
         bool $verifyServerCert,
-        bool $ignoreCertificateCn
+        bool $ignoreCertificateCn,
     ) {
         $this->key = $key ?: null;
         $this->cert = $cert  ?: null;

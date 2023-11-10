@@ -343,7 +343,9 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $config = new Config($configurationArray, new ActionConfigRowDefinition());
-        $this->assertEquals('testKey', $config->getData()['parameters']['db']['ssl']['#key']);
+        /** @var array $configData */
+        $configData = $config->getData();
+        $this->assertEquals('testKey', $configData['parameters']['db']['ssl']['#key']);
     }
 
     public function testSslOnlyCa(): void
@@ -788,7 +790,7 @@ class ConfigTest extends AbstractConfigTest
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage(
-            'The "incrementalFetchingLimit" is configured, but "incrementalFetchingColumn" is missing.'
+            'The "incrementalFetchingLimit" is configured, but "incrementalFetchingColumn" is missing.',
         );
         new Config($configurationArray, new ConfigRowDefinition());
     }
@@ -811,7 +813,7 @@ class ConfigTest extends AbstractConfigTest
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage(
-            'The path "root.parameters.columns.1" cannot contain an empty value, but got "".'
+            'The path "root.parameters.columns.1" cannot contain an empty value, but got "".',
         );
         new Config($configurationArray, new ConfigRowDefinition());
     }
@@ -834,7 +836,7 @@ class ConfigTest extends AbstractConfigTest
 
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage(
-            'The path "root.parameters.primaryKey.1" cannot contain an empty value, but got "".'
+            'The path "root.parameters.primaryKey.1" cannot contain an empty value, but got "".',
         );
         new Config($configurationArray, new ConfigRowDefinition());
     }
@@ -1083,7 +1085,9 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $config = new Config($configurationArray, new ConfigRowDefinition());
-        Assert::assertSame(null, $config->getData()['incrementalFetchingLimit']);
+        /** @var array $configData */
+        $configData = $config->getData();
+        Assert::assertSame(null, $configData['parameters']['incrementalFetchingLimit']);
     }
 
     public function testIncrementalFetchingColumnNull(): void
@@ -1107,7 +1111,9 @@ class ConfigTest extends AbstractConfigTest
         ];
 
         $config = new Config($configurationArray, new ConfigRowDefinition());
-        Assert::assertSame(null, $config->getData()['incrementalFetchingColumn']);
+        /** @var array $configData */
+        $configData = $config->getData();
+        Assert::assertSame(null, $configData['parameters']['incrementalFetchingColumn']);
     }
 
     public function testMissingDbNode(): void

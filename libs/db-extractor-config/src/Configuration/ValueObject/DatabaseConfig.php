@@ -31,13 +31,13 @@ class DatabaseConfig
 
         return new self(
             $data['host'],
-            $data['port'] ? (string) $data['port'] : null,
+            isset($data['port']) ? (string) $data['port'] : null,
             $data['user'],
             $data['#password'],
             $data['database'] ?? null,
             $data['schema'] ?? null,
             $sslEnabled ? SSLConnectionConfig::fromArray($data['ssl']) : null,
-            $data['initQueries'] ?? []
+            $data['initQueries'] ?? [],
         );
     }
 
@@ -49,7 +49,7 @@ class DatabaseConfig
         ?string $database,
         ?string $schema,
         ?SSLConnectionConfig $sslConnectionConfig,
-        array $initQueries
+        array $initQueries,
     ) {
         $this->host = $host;
         $this->port = $port;
