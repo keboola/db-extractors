@@ -6,6 +6,7 @@ namespace Keboola\DbExtractor\TableResultFormat\Metadata\Builder;
 
 use Generator;
 use Keboola\DbExtractor\TableResultFormat\Exception\NoColumnException;
+use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\TableCollection;
 
 class MetadataBuilder implements Builder
@@ -46,7 +47,9 @@ class MetadataBuilder implements Builder
 
     public function build(): TableCollection
     {
-        return new TableCollection(iterator_to_array($this->buildTables()));
+        /** @var Table[] $tables */
+        $tables = iterator_to_array($this->buildTables());
+        return new TableCollection($tables);
     }
 
     public function addTable(): TableBuilder

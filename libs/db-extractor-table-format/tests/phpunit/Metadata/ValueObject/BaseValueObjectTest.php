@@ -44,13 +44,13 @@ abstract class BaseValueObjectTest extends TestCase
 
     /**
      * Get "has" callbacks called on ValueObject
-     * @return callable<ValueObject>[]
+     * @return array<string, callable>
      */
     abstract public function getHasCallbacks(): array;
 
     /**
      * Get "get" callbacks called on ValueObject
-     * @return callable<ValueObject>[]
+     * @return array<string, callable>
      */
     abstract public function getGetCallbacks(): array;
 
