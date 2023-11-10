@@ -10,14 +10,14 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-filter": "*",
         "ext-json": "*",
-        "keboola/db-extractor-adapter": "^1.12",
+        "keboola/db-extractor-adapter": "^1.13",
         "keboola/db-extractor-common": "^16.2",
         "keboola/db-extractor-config": "^1.13",
-        "keboola/db-extractor-table-format": "^3.7",
-        "keboola/php-component": "^9.2",
+        "keboola/db-extractor-table-format": "^3.8",
+        "keboola/php-component": "^9.4",
         "symfony/config": "^5.0",
         "symfony/process": "^5.0"
     },
