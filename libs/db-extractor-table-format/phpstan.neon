@@ -1,4 +1,5 @@
 parameters:
+    treatPhpDocTypesAsCertain: false
     checkMissingIterableValueType: false
     ignoreErrors:
         # Required constructor argumens of ValueObjects are checked, see: RequiredPropertiesTrait

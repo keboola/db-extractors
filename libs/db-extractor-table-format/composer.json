@@ -29,7 +29,7 @@
     },
     "require-dev": {
         "keboola/coding-standard": ">=13.0",
-        "phpstan/phpstan": "^0.12.2",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.1"
     },
     "scripts": {

@@ -76,19 +76,19 @@ abstract class BaseBuilderTest extends TestCase
 
     /**
      * Get "set" callbacks called on Builder
-     * @return callable<Builder, mixed>[]
+     * @return array<string, callable>
      */
     abstract public function getSetCallbacks(): array;
 
     /**
      * Get "has" callbacks called on ValueObject
-     * @return callable<ValueObject>[]
+     * @return array<string, callable>
      */
     abstract public function getHasCallbacks(): array;
 
     /**
      * Get "get" callbacks called on ValueObject
-     * @return callable<ValueObject>[]
+     * @return array<string, callable>
      */
     abstract public function getGetCallbacks(): array;
 

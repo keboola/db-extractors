@@ -7,8 +7,8 @@ namespace Keboola\DbExtractor\TableResultFormat\Tests\Metadata\ValueObject;
 use Keboola\DbExtractor\TableResultFormat\Exception\NoColumnException;
 use Keboola\DbExtractor\TableResultFormat\Metadata\Builder\MetadataBuilder;
 use Keboola\DbExtractor\TableResultFormat\Metadata\ValueObject\Table;
-use PHPStan\Testing\TestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
 class MetadataTest extends TestCase
 {
