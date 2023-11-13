@@ -130,7 +130,9 @@ class MySQLMetadataProvider implements MetadataProvider
                 (
                 $data['NUMERIC_SCALE'] > 0 ?
                     $data['NUMERIC_PRECISION'] . ',' . $data['NUMERIC_SCALE'] :
-                    (string) $data['NUMERIC_PRECISION'] ?? ''
+                    (
+                        $data['NUMERIC_PRECISION'] ? (string) $data['NUMERIC_PRECISION'] : ''
+                    )
                 ),
         );
 
