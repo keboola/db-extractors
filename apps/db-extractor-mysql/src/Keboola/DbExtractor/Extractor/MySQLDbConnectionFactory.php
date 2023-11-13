@@ -20,8 +20,11 @@ class MySQLDbConnectionFactory
     // So we reset this value to OpenSSL default.
     public const SSL_DEFAULT_CIPHER_CONFIG = 'DEFAULT@SECLEVEL=1';
 
-    public static function create(MysqlDatabaseConfig $dbConfig, LoggerInterface $logger, int $connectMaxRetries): MySQLDbConnection
-    {
+    public static function create(
+        MysqlDatabaseConfig $dbConfig,
+        LoggerInterface $logger,
+        int $connectMaxRetries,
+    ): MySQLDbConnection {
         // Default options
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // convert errors to PDOExceptions
@@ -85,13 +88,14 @@ class MySQLDbConnectionFactory
 
                 // Set isolation level
                 if ($dbConfig->hasTransactionIsolationLevel()) {
-                    $pdo->query(
-                        sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s', $dbConfig->getTransactionIsolationLevel())
-                    );
+                    $pdo->query(sprintf(
+                        'SET SESSION TRANSACTION ISOLATION LEVEL %s',
+                        $dbConfig->getTransactionIsolationLevel(),
+                    ));
                 }
             },
             $connectMaxRetries,
-            $dbConfig->getInitQueries()
+            $dbConfig->getInitQueries(),
         );
     }
 

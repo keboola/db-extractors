@@ -126,12 +126,12 @@ class MySQLMetadataProvider implements MetadataProvider
 
         // Length
         $builder->setLength(
-            $data['CHARACTER_MAXIMUM_LENGTH'] ?:
+            (string) $data['CHARACTER_MAXIMUM_LENGTH'] ?:
                 (
                 $data['NUMERIC_SCALE'] > 0 ?
                     $data['NUMERIC_PRECISION'] . ',' . $data['NUMERIC_SCALE'] :
-                    $data['NUMERIC_PRECISION'] ?? ''
-                )
+                    (string) $data['NUMERIC_PRECISION'] ?? ''
+                ),
         );
 
         // Auto increment
@@ -222,7 +222,7 @@ class MySQLMetadataProvider implements MetadataProvider
         if ($this->database !== null) {
             $sql[] = sprintf(
                 'WHERE LOWER(c.TABLE_SCHEMA) = %s',
-                $this->connection->quote(mb_strtolower($this->database))
+                $this->connection->quote(mb_strtolower($this->database)),
             );
         } else {
             $sql[] = 'WHERE c.TABLE_SCHEMA NOT IN ("performance_schema", "mysql", "information_schema", "sys")';
@@ -258,12 +258,12 @@ class MySQLMetadataProvider implements MetadataProvider
                     throw new InvalidArgumentException(sprintf(
                         'Table "%s"."%s" is not from used database.',
                         $table->getSchema(),
-                        $table->getName()
+                        $table->getName(),
                     ));
                 }
 
                 return $this->connection->quote(mb_strtolower($table->getName()));
-            }, $whitelist)
+            }, $whitelist),
         );
     }
 }

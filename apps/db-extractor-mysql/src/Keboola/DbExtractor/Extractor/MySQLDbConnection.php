@@ -40,7 +40,8 @@ class MySQLDbConnection extends PdoConnection
             $checkCnMismatch($previous);
         }
 
-        // SQLSTATE[HY000] is a main general message and additional informations are in the previous exception, so throw previous
+        // SQLSTATE[HY000] is a main general message
+        // and additional informations are in the previous exception, so throw previous
         if (strpos($e->getMessage(), 'SQLSTATE[HY000]') === 0 && $e->getPrevious() !== null) {
             throw $e->getPrevious();
         }

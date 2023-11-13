@@ -81,12 +81,12 @@ class MySQLTest extends TestCase
             $this->quoteIdentifier('foreign_keyFK'),
             'FOREIGN KEY',
             $this->quoteIdentifier('foreign_key'),
-            '`auto Increment Timestamp` (`_Weir%d I-D`) ON DELETE CASCADE'
+            '`auto Increment Timestamp` (`_Weir%d I-D`) ON DELETE CASCADE',
         );
         $this->insertRows(
             'auto Increment Timestamp FK',
             ['random_name', 'foreign_key'],
-            [['sue', 1]]
+            [['sue', 1]],
         );
 
         $isConfigRow = !isset($config['parameters']['tables']);
@@ -338,9 +338,10 @@ class MySQLTest extends TestCase
                 ],
         ];
         foreach ($manifests as $manifest) {
+            /** @var array<array> $outputManifest */
             $outputManifest = json_decode(
                 (string) file_get_contents($manifest->getPathname()),
-                true
+                true,
             );
 
             $this->assertArrayHasKey('destination', $outputManifest);
@@ -400,6 +401,7 @@ class MySQLTest extends TestCase
         $app = new MySQLApplication($logger);
         ob_start();
         $app->execute();
+        /** @var array<array> $result */
         $result = json_decode((string) ob_get_contents(), true);
         ob_end_clean();
 
@@ -421,6 +423,7 @@ class MySQLTest extends TestCase
         Assert::assertTrue($logger->hasInfo('Exported "6" rows to "in.c-main.auto-increment-timestamp".'));
 
         $outputManifestFile = $this->dataDir . '/out/tables/in.c-main.auto-increment-timestamp.csv.manifest';
+        /** @var array<array> $manifest */
         $manifest = json_decode((string) file_get_contents($outputManifestFile), true);
         $expectedColumns = ['Weir_d_I_D', 'Weir_d_Na_me', 'someInteger', 'someDecimal', 'type', 'datetime'];
         $this->assertEquals($expectedColumns, $manifest['columns']);
@@ -499,7 +502,7 @@ class MySQLTest extends TestCase
 
         Assert::assertTrue($logger->hasInfo('Exporting to "in.c-main.escaping".'));
         Assert::assertTrue(
-            $logger->hasWarning('Query result set is empty. Exported "0" rows to "in.c-main.escaping".')
+            $logger->hasWarning('Query result set is empty. Exported "0" rows to "in.c-main.escaping".'),
         );
     }
 
@@ -519,7 +522,7 @@ class MySQLTest extends TestCase
             'pk_fk_target_table1',
             'FOREIGN KEY',
             'id',
-            'pk_fk_target_table1(id)'
+            'pk_fk_target_table1(id)',
         );
 
         $this->addConstraint(
@@ -527,7 +530,7 @@ class MySQLTest extends TestCase
             'pk_fk_target_table2',
             'FOREIGN KEY',
             'id',
-            'pk_fk_target_table2(id)'
+            'pk_fk_target_table2(id)',
         );
 
         $this->insertRows('pk_fk_target_table1', ['id', 'value'], [[123, 'test']]);
@@ -543,6 +546,7 @@ class MySQLTest extends TestCase
 
         ob_start();
         $app->execute();
+        /** @var array<array> $result */
         $result = json_decode((string) ob_get_contents(), true);
         ob_end_clean();
 
@@ -604,7 +608,7 @@ class MySQLTest extends TestCase
             // ignore, the user does not have to exist
         }
         $this->connection->query(
-            "CREATE USER 'user_no_perms' IDENTIFIED BY 'password'"
+            "CREATE USER 'user_no_perms' IDENTIFIED BY 'password'",
         );
 
         // With this privilege can user list table names but not names of the columns
@@ -626,6 +630,7 @@ class MySQLTest extends TestCase
 
         ob_start();
         $app->execute();
+        /** @var array<array> $result */
         $result = json_decode((string) ob_get_contents(), true);
         ob_end_clean();
 
@@ -660,9 +665,9 @@ class MySQLTest extends TestCase
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Message differs between MySQL versions
                 Assert::stringContains(
-                    "Base table or view not found: 1146 Table 'TesT.Auto_INCREMENT_TimestamP' doesn't exist"
+                    "Base table or view not found: 1146 Table 'TesT.Auto_INCREMENT_TimestamP' doesn't exist",
                 ),
-                Assert::stringContains("Unknown database 'TesT'")
+                Assert::stringContains("Unknown database 'TesT'"),
             ));
         }
     }
@@ -704,8 +709,10 @@ class MySQLTest extends TestCase
         $config = $this->getRowConfig();
         $config['parameters']['db']['transactionIsolationLevel'] = 'invalid transaction level';
 
+        // @phpcs disable
         $expctedMessage = 'The value "invalid transaction level" is not allowed for path "root.parameters.db.transactionIsolationLevel". ';
         $expctedMessage .= 'Permissible values: "REPEATABLE READ", "READ COMMITTED", "READ UNCOMMITTED", "SERIALIZABLE"';
+        // @phpcs enable
         $this->expectException(ConfigUserException::class);
         $this->expectExceptionMessage($expctedMessage);
 
