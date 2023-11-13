@@ -65,6 +65,7 @@ class PerformanceTest extends TestCase
         $app = new MySQLApplication(new TestLogger());
         ob_start();
         $app->execute();
+        /** @var array<array> $result */
         $result = json_decode((string) ob_get_contents(), true);
         ob_end_clean();
         $end = microtime(true);

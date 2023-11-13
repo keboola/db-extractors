@@ -44,7 +44,7 @@ class MySQL extends BaseExtractor
             $simpleQueryFactory,
             $resultWriter,
             $this->dataDir,
-            $this->state
+            $this->state,
         );
     }
 
@@ -110,7 +110,7 @@ class MySQL extends BaseExtractor
                 'Invalid Configuration [%s].  The table schema "%s" is different from the connection database "%s"',
                 $exportConfig->getTable()->getName(),
                 $exportConfig->getTable()->getSchema(),
-                $this->database
+                $this->database,
             ));
         }
 
@@ -129,8 +129,8 @@ class MySQL extends BaseExtractor
             throw new UserException(
                 sprintf(
                     'Column "%s" specified for incremental fetching was not found in the table',
-                    $exportConfig->getIncrementalFetchingColumn()
-                )
+                    $exportConfig->getIncrementalFetchingColumn(),
+                ),
             );
         }
 
@@ -141,8 +141,8 @@ class MySQL extends BaseExtractor
             throw new UserException(
                 sprintf(
                     'Column "%s" specified for incremental fetching must has numeric or timestamp type.',
-                    $exportConfig->getIncrementalFetchingColumn()
-                )
+                    $exportConfig->getIncrementalFetchingColumn(),
+                ),
             );
         }
 
@@ -163,11 +163,12 @@ class MySQL extends BaseExtractor
             $this->quote($exportConfig->getIncrementalFetchingColumn()),
             $this->quote($exportConfig->getIncrementalFetchingColumn()),
             $this->quote($exportConfig->getTable()->getSchema()),
-            $this->quote($exportConfig->getTable()->getName())
+            $this->quote($exportConfig->getTable()->getName()),
         );
 
         $result = $this->connection->query($sql)->fetchAll();
-        return $result ? $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;
+        /** @var array<array> $result */
+        return $result ? (string) $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;
     }
 
     public function simpleQuery(ExportConfig $exportConfig): string
@@ -177,7 +178,7 @@ class MySQL extends BaseExtractor
         if ($exportConfig->hasColumns()) {
             $sql[] = sprintf('SELECT %s', implode(', ', array_map(
                 fn(string $c) => $this->quote($c),
-                $exportConfig->getColumns()
+                $exportConfig->getColumns(),
             )));
         } else {
             $sql[] = 'SELECT *';
@@ -186,7 +187,7 @@ class MySQL extends BaseExtractor
         $sql[] = sprintf(
             'FROM %s.%s',
             $this->quote($exportConfig->getTable()->getSchema()),
-            $this->quote($exportConfig->getTable()->getName())
+            $this->quote($exportConfig->getTable()->getName()),
         );
 
         if ($exportConfig->isIncrementalFetching() && isset($this->state['lastFetchedRow'])) {
@@ -194,7 +195,7 @@ class MySQL extends BaseExtractor
             // intentionally ">=" last row should be included, it is handled by storage deduplication process
                 'WHERE %s >= %s',
                 $this->quote($exportConfig->getIncrementalFetchingColumn()),
-                $this->connection->quote((string) $this->state['lastFetchedRow'])
+                $this->connection->quote((string) $this->state['lastFetchedRow']),
             );
         }
 

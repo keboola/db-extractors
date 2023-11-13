@@ -21,7 +21,7 @@ class ConfigTest extends TestCase
             new MysqlDbNode(),
             null,
             null,
-            new MysqlTableNodesDecorator()
+            new MysqlTableNodesDecorator(),
         ));
         $this->expectNotToPerformAssertions();
     }
@@ -125,7 +125,7 @@ class ConfigTest extends TestCase
             new MysqlDbNode(),
             null,
             null,
-            new MysqlTableNodesDecorator()
+            new MysqlTableNodesDecorator(),
         ));
     }
 
