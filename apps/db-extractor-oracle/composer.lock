@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "34af6616ffdefeb38a93c069dfa72568",
+    "content-hash": "f287f765aa4dab6e73ce849c3360058c",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -171,16 +171,16 @@
         },
         {
             "name": "keboola/db-extractor-adapter",
-            "version": "1.12.0",
+            "version": "1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-adapter.git",
-                "reference": "1006813ce2621aa8afc87244861612975afb069c"
+                "reference": "b1e56f083985f36d463be7724242eaf6dfcee752"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/1006813ce2621aa8afc87244861612975afb069c",
-                "reference": "1006813ce2621aa8afc87244861612975afb069c",
+                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/b1e56f083985f36d463be7724242eaf6dfcee752",
+                "reference": "b1e56f083985f36d463be7724242eaf6dfcee752",
                 "shasum": ""
             },
             "require": {
@@ -190,7 +190,7 @@
                 "keboola/db-extractor-config": "^1.8",
                 "keboola/db-extractor-table-format": "^3.7",
                 "keboola/retry": "^0.5",
-                "php": ">=8.1",
+                "php": ">=8.2",
                 "psr/log": "^1.1"
             },
             "require-dev": {
@@ -223,9 +223,9 @@
             ],
             "description": "Set of connection adapters for DB extractors.",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.12.0"
+                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.13.0"
             },
-            "time": "2023-11-03T15:29:10+00:00"
+            "time": "2023-11-10T09:12:43+00:00"
         },
         {
             "name": "keboola/db-extractor-common",
@@ -388,16 +388,16 @@
         },
         {
             "name": "keboola/db-extractor-table-format",
-            "version": "3.7.0",
+            "version": "3.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/db-extractor-table-format.git",
-                "reference": "2e4b344150063b7368fd3e68ffd7210a6bd41df5"
+                "reference": "5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-table-format/zipball/2e4b344150063b7368fd3e68ffd7210a6bd41df5",
-                "reference": "2e4b344150063b7368fd3e68ffd7210a6bd41df5",
+                "url": "https://api.github.com/repos/keboola/db-extractor-table-format/zipball/5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa",
+                "reference": "5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa",
                 "shasum": ""
             },
             "require": {
@@ -406,11 +406,11 @@
                 "keboola/common-exceptions": "^1.0",
                 "keboola/php-datatypes": "^7.2",
                 "keboola/php-utils": "^4.1",
-                "php": ">=8.1"
+                "php": ">=8.2"
             },
             "require-dev": {
                 "keboola/coding-standard": ">=13.0",
-                "phpstan/phpstan": "^0.12.2",
+                "phpstan/phpstan": "^1.10",
                 "phpunit/phpunit": "^9.1"
             },
             "type": "library",
@@ -431,9 +431,9 @@
             ],
             "description": "PHP class for formating table result",
             "support": {
-                "source": "https://github.com/keboola/db-extractor-table-format/tree/3.7.0"
+                "source": "https://github.com/keboola/db-extractor-table-format/tree/3.8.0"
             },
-            "time": "2023-10-31T14:54:52+00:00"
+            "time": "2023-11-10T09:12:47+00:00"
         },
         {
             "name": "keboola/php-component",
@@ -4029,7 +4029,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-filter": "*",
         "ext-json": "*"
     },
