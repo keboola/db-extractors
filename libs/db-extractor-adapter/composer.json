@@ -23,7 +23,7 @@
         "php": ">=8.2",
         "ext-iconv": "*",
         "keboola/common-exceptions": "^1.0",
-        "keboola/csv": "^4.0",
+        "keboola/csv": "^3.2",
         "keboola/db-extractor-config": "^1.8",
         "keboola/db-extractor-table-format": "^3.7",
         "keboola/retry": "^0.5",
