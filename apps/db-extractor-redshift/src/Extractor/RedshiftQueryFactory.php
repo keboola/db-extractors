@@ -31,7 +31,7 @@ class RedshiftQueryFactory extends DefaultQueryFactory
             // intentionally ">=" last row should be included, it is handled by storage deduplication process
                 'WHERE %s >= %s',
                 $connection->quoteIdentifier($exportConfig->getIncrementalFetchingColumn()),
-                $lastFetchedRow
+                $lastFetchedRow,
             );
         }
     }

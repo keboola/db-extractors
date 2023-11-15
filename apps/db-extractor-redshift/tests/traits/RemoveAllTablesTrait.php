@@ -30,7 +30,7 @@ SQL;
                 'DROP %s IF EXISTS "%s"."%s";',
                 $drop,
                 $item['table_schema'],
-                $item['table_name']
+                $item['table_name'],
             ));
         }
     }

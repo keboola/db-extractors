@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Keboola\DbExtractor\TraitTests;
 
 use Keboola\DbExtractor\Exception\UserException;
-use Throwable;
 use PDO;
+use Throwable;
 
 trait InsertRowsTrait
 {
@@ -38,7 +38,7 @@ trait InsertRowsTrait
                             return $value;
                         }
                         return $this->quote((string) $value);
-                    }, $row)
+                    }, $row),
                 ) .
                 ')';
         }
@@ -50,7 +50,7 @@ trait InsertRowsTrait
                     $this->quoteIdentifier((string) getenv('REDSHIFT_DB_SCHEMA')),
                     $this->quoteIdentifier($tableName),
                     implode(', ', $columnsSql),
-                    $values
+                    $values,
                 ));
             } catch (Throwable $e) {
                 throw new UserException($e->getMessage(), $e->getCode(), $e);

@@ -25,7 +25,7 @@ trait CreateTableTrait
             'CREATE TABLE %s.%s (%s)',
             $this->quoteIdentifier((string) getenv('REDSHIFT_DB_SCHEMA')),
             $this->quoteIdentifier($tableName),
-            implode(', ', $columnsSql)
+            implode(', ', $columnsSql),
         ))->execute();
     }
 
@@ -38,7 +38,7 @@ trait CreateTableTrait
             $this->quoteIdentifier($tableName . '_view'),
             implode(', ', $columnsInView),
             $this->quoteIdentifier((string) getenv('REDSHIFT_DB_SCHEMA')),
-            $this->quoteIdentifier($tableName)
+            $this->quoteIdentifier($tableName),
         ))->execute();
     }
 }

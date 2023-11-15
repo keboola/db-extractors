@@ -136,7 +136,7 @@ SQL;
             }, $nameTables)),
             implode(', ', array_map(function (string $tableName) {
                 return $this->db->quote($tableName);
-            }, $nameTables))
+            }, $nameTables)),
         );
 
         return $this->queryAndFetchAll($sql);
@@ -165,13 +165,13 @@ SQL;
                 return sprintf(
                     '(table_schema = %s AND table_name = %s)',
                     $this->db->quote($v->getSchema()),
-                    $this->db->quote($v->getName())
+                    $this->db->quote($v->getName()),
                 );
             }, $whiteList);
 
             $sql[] = sprintf(
                 'AND %s',
-                implode(' OR ', $whiteListSql)
+                implode(' OR ', $whiteListSql),
             );
         }
 
