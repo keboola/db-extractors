@@ -10,7 +10,7 @@ use Keboola\DbExtractor\TraitTests\RemoveAllTablesTrait;
 use PDO;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
-use \Throwable;
+use Throwable;
 
 class DatadirTest extends DatadirTestCase
 {
@@ -57,8 +57,8 @@ class DatadirTest extends DatadirTestCase
                             sprintf('"%s"', getenv('REDSHIFT_DB_USER')),
                         ],
                         '"replaceEnv"',
-                        $json
-                    )
+                        $json,
+                    ),
                 );
             } catch (Throwable $e) {
                 // If a problem occurs, preserve the original contents

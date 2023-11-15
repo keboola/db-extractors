@@ -26,7 +26,7 @@ class RedshiftApplication extends Application
                     null,
                     null,
                     null,
-                    new RedshiftTableNodeDecorator()
+                    new RedshiftTableNodeDecorator(),
                 );
             } else {
                 $configDefinition = new ActionConfigRowDefinition();
@@ -36,7 +36,7 @@ class RedshiftApplication extends Application
                 null,
                 null,
                 null,
-                new RedshiftTableNodeDecorator()
+                new RedshiftTableNodeDecorator(),
             );
         }
         $this->config = new Config($config, $configDefinition);

@@ -59,7 +59,7 @@ class Redshift extends BaseExtractor
             $this->getQueryFactory(),
             $resultWriter,
             $this->dataDir,
-            $this->state
+            $this->state,
         );
     }
 
@@ -69,7 +69,7 @@ class Redshift extends BaseExtractor
             'pgsql:dbname=%s;port=%s;host=%s',
             $databaseConfig->getDatabase(),
             $databaseConfig->getPort(),
-            $databaseConfig->getHost()
+            $databaseConfig->getHost(),
         );
 
         $this->connection = new RedshiftPdoConnection(
@@ -80,7 +80,7 @@ class Redshift extends BaseExtractor
             [],
             function (PDO $pdo): void {
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            }
+            },
         );
     }
 
@@ -99,8 +99,8 @@ class Redshift extends BaseExtractor
             throw new UserException(
                 sprintf(
                     'Column [%s] specified for incremental fetching was not found in the table',
-                    $exportConfig->getIncrementalFetchingConfig()->getColumn()
-                )
+                    $exportConfig->getIncrementalFetchingConfig()->getColumn(),
+                ),
             );
         }
 
@@ -123,8 +123,8 @@ class Redshift extends BaseExtractor
             throw new UserException(
                 sprintf(
                     'Column [%s] specified for incremental fetching is not a numeric or timestamp type column',
-                    $exportConfig->getIncrementalFetchingConfig()->getColumn()
-                )
+                    $exportConfig->getIncrementalFetchingConfig()->getColumn(),
+                ),
             );
         }
     }
@@ -137,7 +137,7 @@ class Redshift extends BaseExtractor
             $this->connection->quoteIdentifier($exportConfig->getIncrementalFetchingConfig()->getColumn()),
             $this->connection->quoteIdentifier($exportConfig->getIncrementalFetchingConfig()->getColumn()),
             $this->connection->quoteIdentifier($exportConfig->getTable()->getSchema()),
-            $this->connection->quoteIdentifier($exportConfig->getTable()->getName())
+            $this->connection->quoteIdentifier($exportConfig->getTable()->getName()),
         );
         $result = $this->connection->query($fullsql)->fetchAll();
         return $result ? (string) $result[0][$exportConfig->getIncrementalFetchingColumn()] : null;

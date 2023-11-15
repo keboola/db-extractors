@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\FunctionalTests;
 
-use PDO;
 use Keboola\DbExtractorConfig\Configuration\ValueObject\DatabaseConfig;
+use PDO;
 
 class PdoTestConnection
 {
@@ -34,12 +34,12 @@ class PdoTestConnection
             'pgsql:dbname=%s;port=%s;host=%s',
             $databaseConfig->getDatabase(),
             $databaseConfig->getPort(),
-            $databaseConfig->getHost()
+            $databaseConfig->getHost(),
         );
         $pdo = new PDO(
             $dsn,
             $databaseConfig->getUsername(),
-            $databaseConfig->getPassword()
+            $databaseConfig->getPassword(),
         );
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;

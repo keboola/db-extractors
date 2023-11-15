@@ -51,9 +51,9 @@ trait ConfigTrait
   }
 }
 JSON;
-        return json_decode(
+        return (array) json_decode(
             sprintf($configTemplate, json_encode(PdoTestConnection::getDbConfigArray())),
-            true
+            true,
         );
     }
 
@@ -76,9 +76,9 @@ JSON;
   }
 }
 JSON;
-        return json_decode(
+        return (array) json_decode(
             sprintf($configTemplate, json_encode(PdoTestConnection::getDbConfigArray())),
-            true
+            true,
         );
     }
 }

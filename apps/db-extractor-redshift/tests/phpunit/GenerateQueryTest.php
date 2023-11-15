@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\DbExtractor\Tests;
 
-use Keboola\Component\Logger;
 use Keboola\DbExtractor\Extractor\Redshift;
 use Keboola\DbExtractor\Extractor\RedshiftPdoConnection;
 use Keboola\DbExtractor\Extractor\RedshiftQueryFactory;
@@ -57,7 +56,7 @@ class GenerateQueryTest extends TestCase
             'pgsql:dbname=%s;port=%s;host=%s',
             getenv('REDSHIFT_DB_DATABASE'),
             getenv('REDSHIFT_DB_PORT'),
-            getenv('REDSHIFT_DB_HOST')
+            getenv('REDSHIFT_DB_HOST'),
         );
 
         $query = $queryFactory->create(
@@ -67,8 +66,8 @@ class GenerateQueryTest extends TestCase
                 $dsn,
                 (string) getenv('REDSHIFT_DB_USER'),
                 (string) getenv('REDSHIFT_DB_PASSWORD'),
-                []
-            )
+                [],
+            ),
         );
         $this->assertEquals($expected, $query);
     }

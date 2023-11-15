@@ -8,7 +8,7 @@ use Keboola\DbExtractor\TraitTests\Tables\AutoIncrementTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\EscapingTableTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SalesLateBindViewTrait;
 use Keboola\DbExtractor\TraitTests\Tables\SalesTableTrait;
-use \PDO;
+use PDO;
 
 class DatabaseManager
 {
