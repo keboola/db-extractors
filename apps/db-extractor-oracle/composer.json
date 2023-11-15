@@ -18,7 +18,7 @@
         "keboola/db-extractor-config": "^1.13",
         "keboola/db-extractor-table-format": "^3.8",
         "keboola/php-component": "^9.4",
-        "symfony/config": "^5.0",
+        "symfony/config": "^6.3",
         "symfony/process": "^5.0"
     },
     "require-dev": {
