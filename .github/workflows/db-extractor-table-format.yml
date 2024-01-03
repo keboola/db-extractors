@@ -1,4 +1,4 @@
-name: Build and Test DB Extractor Config
+name: Build and Test DB Extractor Table Format
 on:
   workflow_call:
     inputs:
@@ -10,7 +10,7 @@ on:
         required: true
 
 env:
-  APP_IMAGE: keboola/db-extractor-config
+  APP_IMAGE: keboola/db-extractor-table-format
 
 jobs:
   build:
@@ -22,13 +22,13 @@ jobs:
         run: docker login --username "${{ inputs.dockerhub-user }}" --password "${{ inputs.dockerhub-token }}"
       - name: Build and export
         run: |
-          docker build --target lib-db-extractor-config -t ${APP_IMAGE} .
-          docker save ${APP_IMAGE} -o /tmp/db-extractor-config.tar
+          docker build --target lib-db-extractor-table-format -t ${APP_IMAGE} .
+          docker save ${APP_IMAGE} -o /tmp/db-extractor-table-format.tar
       - name: Upload image to artifact
         uses: actions/upload-artifact@v4
         with:
-          name: db-extractor-config
-          path: /tmp/db-extractor-config.tar
+          name: db-extractor-table-format
+          path: /tmp/db-extractor-table-format.tar
   
   test:
     runs-on: ubuntu-latest
@@ -47,9 +47,9 @@ jobs:
       - name: Download image from artifact
         uses: actions/download-artifact@v4
         with:
-          name: db-extractor-config
+          name: db-extractor-table-format
           path: /tmp
       - name: Load image
-        run: docker load -i /tmp/db-extractor-config.tar
+        run: docker load -i /tmp/db-extractor-table-format.tar
       - name: Test
         run: docker run $APP_IMAGE composer ci
