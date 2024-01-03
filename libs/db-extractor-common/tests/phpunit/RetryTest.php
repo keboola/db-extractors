@@ -25,7 +25,6 @@ class RetryTest extends TestCase
         parent::setUp();
         $this->temp = new Temp();
         $this->initDatabase();
-        $this->clearAllToxiproxies();
         $this->initToxiproxy();
     }
 
