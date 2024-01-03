@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11.1
+    environment:
+      MARIADB_DATABASE: testdb
+      MARIADB_ROOT_PASSWORD: somePassword
+
+  mysql:
+    image: mysql:5.6
+    command: mysqld --local-infile=1
+    volumes:
+      - ../certs/mysql/conf.d:/etc/mysql/conf.d
+      - ../certs/mysql/ssl:/ssl-cert
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: somePassword
+    ports:
+      - "3306:3306"

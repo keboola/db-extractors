@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 
 class ExtractorTest extends TestCase
 {
-    protected string $dataDir = '/code/tests/phpunit/data';
+    protected string $dataDir = '/code/libs/db-extractor-common/tests/phpunit/data';
 
     protected string $appName = 'ex-db-common';
 

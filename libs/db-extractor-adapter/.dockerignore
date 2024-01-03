@@ -1,0 +1,6 @@
+.env
+vendor/
+/data/
+.idea/
+composer.lock
+.phpunit.result.cache

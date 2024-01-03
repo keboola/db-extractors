@@ -1,5 +1,5 @@
 {
-    "name": "keboola/db-extractor-ssh-tunnel",
+    "name": "keboola/db-extractors-db-extractor-ssh-tunnel",
     "description": "Create SSH tunnel for DB Extractors",
     "type": "library",
     "license": "MIT",
@@ -38,7 +38,7 @@
         "ci": [
             "@composer install",
             "@composer validate --no-check-all --strict",
-            "@tests"
+            "@build"
         ]
     },
     "config": {

@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  app-db-extractor-adapter: &db-extractor-adapter
+    image: keboola/db-extractor-adapter
+    build:
+      context: ..
+      target: lib-db-extractor-adapter
+      args:
+        - PHP_VERSION=8.2
+    volumes:
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+    environment:
+      DB_USER: root
+      DB_PASSWORD: somePassword
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: testdb
+    depends_on:
+      - mariadb
+      - toxiproxy
+
+  dev-db-extractor-adapter:
+    <<: *db-extractor-adapter
+    volumes:
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ../:/code
+
+  app-db-extractor-common: &db-extractor-common
+    image: keboola/db-extractor-common
+    build:
+      context: ..
+      target: lib-db-extractor-adapter
+      args:
+        - PHP_VERSION=8.2
+    environment:
+      COMMON_DB_USER: root
+      COMMON_DB_PASSWORD: somePassword
+      COMMON_DB_HOST: mysql
+      COMMON_DB_PORT: 3306
+      COMMON_DB_DATABASE: testdb
+    depends_on:
+      - sshproxy
+      - mysql
+      - toxiproxy
+    volumes:
+      - ../libs/db-extractor-adapter/:/code/libs/db-extractor-adapter
+      - ../libs/db-extractor-ssh-tunnel/:/code/libs/db-extractor-ssh-tunnel
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ssh-keys:/root/.ssh:ro
+      - ../certs/mysql/ssl:/ssl-cert
+
+  dev-db-extractor-common:
+    <<: *db-extractor-common
+    volumes:
+      - ../libs/db-extractor-adapter/:/code/libs/db-extractor-adapter
+      - ../libs/db-extractor-ssh-tunnel/:/code/libs/db-extractor-ssh-tunnel
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ../:/code
+      - ssh-keys:/root/.ssh:ro
+      - ../certs/mysql/ssl:/ssl-cert
+
+
+  app-db-extractor-config: &db-extractor-config
+    image: keboola/db-extractor-config
+    build:
+      context: ..
+      target: lib-db-extractor-config
+      args:
+        - PHP_VERSION=8.2
+
+  dev-db-extractor-config:
+    <<: *db-extractor-config
+    volumes:
+      - ../:/code
+
+  app-db-extractor-ssh-tunnel: &db-extractor-ssh-tunnel
+    image: keboola/db-extractor-ssh-tunnel
+    build:
+      context: ..
+      target: lib-db-extractor-ssh-tunnel
+      args:
+        - PHP_VERSION=8.2
+    links:
+      - sshproxy
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+
+  dev-db-extractor-ssh-tunnel:
+    <<: *db-extractor-ssh-tunnel
+    volumes:
+      - ../:/code
+      - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-table-format: &db-extractor-table-format
+    image: keboola/db-extractor-table-format
+    build:
+      context: ..
+      target: lib-db-extractor-table-format
+      args:
+        - PHP_VERSION=8.2
+
+  dev-db-extractor-table-format:
+    <<: *db-extractor-table-format
+    volumes:
+      - ../:/code

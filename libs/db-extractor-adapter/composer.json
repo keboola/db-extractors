@@ -1,5 +1,5 @@
 {
-    "name": "keboola/db-extractor-adapter",
+    "name": "keboola/db-extractors-db-extractor-adapter",
     "description": "Set of connection adapters for DB extractors.",
     "type": "library",
     "license": "MIT",
@@ -19,13 +19,19 @@
             "Keboola\\DbExtractor\\Adapter\\Tests\\": "tests/phpunit"
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../libs/*"
+        }
+    ],
     "require": {
         "php": ">=8.2",
         "ext-iconv": "*",
         "keboola/common-exceptions": "^1.0",
         "keboola/csv": "^3.2",
-        "keboola/db-extractor-config": "^1.8",
-        "keboola/db-extractor-table-format": "^3.7",
+        "keboola/db-extractors-db-extractor-config": "*@dev",
+        "keboola/db-extractors-db-extractor-table-format": "*@dev",
         "keboola/retry": "^0.5",
         "psr/log": "^1.1"
     },
