@@ -28,6 +28,14 @@ jobs:
             dbExtractorSshTunnel:libs/db-extractor-ssh-tunnel \
             dbExtractorTableFormat:libs/db-extractor-table-format \
 
+  db-extractor-adapter:
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.changedProjects_dbExtractorAdapter == '1' }}
+    uses: ./.github/workflows/db-extractor-adapter.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
   db-extractor-config:
     needs: check-changes
     if: ${{ needs.check-changes.outputs.changedProjects_dbExtractorConfig == '1' }}
