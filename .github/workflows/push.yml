@@ -36,3 +36,19 @@ jobs:
       dockerhub-user: $DOCKERHUB_USER
       dockerhub-token: $DOCKERHUB_TOKEN
 
+  db-extractor-ssh-tunnel:
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.changedProjects_dbExtractorSshTunnel == '1' }}
+    uses: ./.github/workflows/db-extractor-ssh-tunnel.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-table-format:
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.changedProjects_dbExtractorTableFormat == '1' }}
+    uses: ./.github/workflows/db-extractor-table-format.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
