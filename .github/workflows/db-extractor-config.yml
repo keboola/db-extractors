@@ -1,0 +1,56 @@
+name: Build and Test DB Extractor Config
+on:
+  workflow_call:
+    inputs:
+      dockerhub-user:
+        type: string
+        required: true
+      dockerhub-token:
+        type: string
+        required: true
+
+env:
+  APP_IMAGE: keboola/db-extractor-config
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Docker login'
+        if: inputs.dockerhub-token
+        run: docker login --username "${{ inputs.dockerhub-user }}" --password "${{ inputs.dockerhub-token }}"
+      - name: Build and export
+        run: |
+          docker build --target lib-db-extractor-config -t ${APP_IMAGE} .
+          docker save ${APP_IMAGE} -o /tmp/db-extractor-config.tar
+      - name: Upload image to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-extractor-config
+          path: /tmp/db-extractor-config.tar
+  
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Compose
+        uses: ndeloof/install-compose-action@v0.0.1
+        with:
+          version: latest
+          legacy: true
+      - name: Docker version
+        run: docker -v
+      - name: Docker-compose version
+        run: docker-compose -v
+      - name: Download image from artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: db-extractor-config
+          path: /tmp
+      - name: Load image
+        run: docker load -i /tmp/db-extractor-config.tar
+      - name: Test
+        run: |
+          docker-compose run --rm app-db-extractor-config composer ci
