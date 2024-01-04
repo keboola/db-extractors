@@ -52,3 +52,21 @@ services:
     build:
       context: ..
       target: mssql-ssl-invalid-cn
+
+  pgsql: &pgsql
+    image: keboola/pgsql-test:${PGSQL_VERSION:-13}
+    build:
+      args:
+        PGSQL_VERSION: ${PGSQL_VERSION:-13}
+      context: ..
+      target: pgsql
+    volumes:
+      - ../certs/pgsql/init-sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=some password
+
+  pgsql-ssl:
+    <<: *pgsql
+    image: keboola/pgsql-ssl-test:${PGSQL_VERSION:-13}
+    command: -c hba_file=/etc/postgresql/pg_hba_ssl.conf -c ssl=on -c ssl_ca_file=/ssl-cert/ca-cert.pem -c ssl_cert_file=/ssl-cert/server-cert.pem -c ssl_key_file=/ssl-cert/server-key.pem
