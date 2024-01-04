@@ -18,6 +18,30 @@ services:
       - TARGETS=mysql:3306
       - TIMEOUT=120
 
+  wait-mssql:
+    image: waisbrot/wait
+    links:
+      - mssql
+    environment:
+      - TARGETS=mssql:1433
+      - TIMEOUT=120
+
+  wait-mssql-ssl:
+    image: waisbrot/wait
+    links:
+      - mssql-ssl
+    environment:
+      - TARGETS=mssql-ssl:1433
+      - TIMEOUT=120
+
+  wait-mssql-ssl-invalid-cn:
+    image: waisbrot/wait
+    links:
+      - mssql-ssl-invalid-cn
+    environment:
+      - TARGETS=mssql-ssl-invalid-cn:1433
+      - TIMEOUT=120
+
   wait-sshproxy:
     image: waisbrot/wait
     links:
