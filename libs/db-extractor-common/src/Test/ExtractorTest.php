@@ -22,25 +22,25 @@ class ExtractorTest extends TestCase
         putenv('KBC_DATADIR=' . $this->dataDir);
     }
 
-    protected function getConfigDbNode(string $driver): array
+    protected function getConfigDbNode(string $driver, bool $sslHost = false): array
     {
         return [
             'user' => $this->getEnv($driver, 'DB_USER', true),
             '#password' => $this->getEnv($driver, 'DB_PASSWORD', true),
-            'host' => $this->getEnv($driver, 'DB_HOST'),
+            'host' => $sslHost ? $this->getEnv($driver, 'DB_HOST_SSL') : $this->getEnv($driver, 'DB_HOST'),
             'port' => $this->getEnv($driver, 'DB_PORT'),
             'database' => $this->getEnv($driver, 'DB_DATABASE'),
         ];
     }
 
-    protected function getConfig(string $driver): array
+    protected function getConfig(string $driver, bool $sslHost = false): array
     {
         $config = json_decode(
             (string) file_get_contents($this->dataDir . '/' .$driver . '/config.json'),
             true,
         );
         $config['parameters']['data_dir'] = $this->dataDir;
-        $config['parameters']['db'] = $this->getConfigDbNode($driver);
+        $config['parameters']['db'] = $this->getConfigDbNode($driver, $sslHost);
         $config['parameters']['extractor_class'] = ucfirst($driver);
 
         return $config;

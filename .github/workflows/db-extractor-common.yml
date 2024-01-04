@@ -54,5 +54,6 @@ jobs:
       - name: Test
         run: |
           docker-compose run --rm wait-mysql
+          docker-compose run --rm wait-mysql-ssl
           docker-compose run --rm wait-sshproxy
           docker-compose run --rm app-db-extractor-common composer ci

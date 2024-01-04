@@ -18,6 +18,14 @@ services:
       - TARGETS=mysql:3306
       - TIMEOUT=120
 
+  wait-mysql-ssl:
+    image: waisbrot/wait
+    links:
+      - mysql-ssl
+    environment:
+      - TARGETS=mysql-ssl:3306
+      - TIMEOUT=120
+
   wait-mssql:
     image: waisbrot/wait
     links:

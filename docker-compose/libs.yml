@@ -39,11 +39,13 @@ services:
       COMMON_DB_USER: root
       COMMON_DB_PASSWORD: somePassword
       COMMON_DB_HOST: mysql
+      COMMON_DB_HOST_SSL: mysql-ssl
       COMMON_DB_PORT: 3306
       COMMON_DB_DATABASE: testdb
     depends_on:
       - sshproxy
       - mysql
+      - mysql-ssl
       - toxiproxy
     volumes:
       - ../libs/db-extractor-adapter/:/code/libs/db-extractor-adapter

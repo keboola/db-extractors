@@ -15,7 +15,7 @@
         },
         {
             "key": "KBC.schema",
-            "value": "test"
+            "value": "testdb"
         },
         {
             "key": "KBC.type",

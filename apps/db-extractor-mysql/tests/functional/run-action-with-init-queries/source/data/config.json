@@ -3,7 +3,7 @@
     "name": "testInitQueriesTable",
     "outputTable": "in.c-main.testInitQueriesTable",
     "table": {
-      "schema": "test",
+      "schema": "testdb",
       "tableName": "testInitQueriesTable"
     },
     "db": {
@@ -13,9 +13,9 @@
       "#password": "%env(string:MYSQL_DB_PASSWORD)%",
       "database": "%env(string:MYSQL_DB_DATABASE)%",
       "initQueries": [
-        "CREATE TABLE test.testInitQueriesTable (id INT, name VARCHAR(255))",
-        "INSERT INTO test.testInitQueriesTable VALUES (1, 'test')",
-        "INSERT INTO test.testInitQueriesTable VALUES (2, 'test2')"
+        "CREATE TABLE testdb.testInitQueriesTable (id INT, name VARCHAR(255))",
+        "INSERT INTO testdb.testInitQueriesTable VALUES (1, 'test')",
+        "INSERT INTO testdb.testInitQueriesTable VALUES (2, 'test2')"
       ]
     }
   }

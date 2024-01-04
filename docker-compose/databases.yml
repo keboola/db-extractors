@@ -9,15 +9,20 @@ services:
 
   mysql:
     image: mysql:${MYSQL_VERSION:-5.6}
-    command: mysqld --local-infile=1
+    command: mysqld --local-infile=1 --port=3306 --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: somePassword
+
+  mysql-ssl:
+    image: mysql:${MYSQL_VERSION:-5.6}
+    command: mysqld --local-infile=1 --port=3306 --default-authentication-plugin=mysql_native_password
     volumes:
-      - ../certs/mysql/conf.d:/etc/mysql/conf.d
+      - ../certs/mysql/conf.d/${MYSQL_VERSION:-5.6}:/etc/mysql/conf.d
       - ../certs/mysql/ssl:/ssl-cert
     environment:
       MYSQL_DATABASE: testdb
       MYSQL_ROOT_PASSWORD: somePassword
-    ports:
-      - "3306:3306"
 
   mssql: &mssql
     image: mssql-server-linux
