@@ -1,0 +1,62 @@
+version: "2"
+services:
+  app:
+    build:
+      context: .
+      args:
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    image: keboola/db-extractor-oracle
+    tty: true
+    stdin_open: true
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    links:
+      - oracle
+      - sshproxy
+
+  dev:
+    image: keboola/db-extractor-oracle
+    volumes:
+      - .:/code
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./data:/data
+    tty: true
+    stdin_open: true
+    environment:
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    links:
+      - oracle
+      - sshproxy
+
+  oracle:
+    build: https://github.com/keboola/docker-oracle-xe-11g.git
+    image: wnameless/oracle-xe-11g-r2
+    ports:
+      - "8080:8080"
+      - "1521:1521"
+
+  sshproxy:
+    image: keboola/db-component-ssh-proxy:latest
+    ports:
+      - "2222:22"
+    links:
+      - oracle
+
+  wait:
+    image: waisbrot/wait
+    depends_on:
+      - oracle
+    environment:
+      - TARGETS=oracle:8080
+      - TIMEOUT=200

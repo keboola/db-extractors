@@ -1,0 +1,31 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: src/Extractor/Oracle.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Extractor\\\\Oracle\\:\\:getMaxOfIncrementalFetchingColumn\\(\\) should return string\\|null but returns mixed\\.$#"
+			count: 1
+			path: src/Extractor/Oracle.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Extractor\\\\OracleJavaExportWrapper\\:\\:runCommand\\(\\) should return Symfony\\\\Component\\\\Process\\\\Process but returns mixed\\.$#"
+			count: 1
+			path: src/Extractor/OracleJavaExportWrapper.php
+
+		-
+			message: "#^Parameter \\#2 \\.\\.\\.\\$values of function sprintf expects bool\\|float\\|int\\|string\\|null, mixed given\\.$#"
+			count: 1
+			path: src/Extractor/OracleQueryFactory.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Tests\\\\OracleTest\\:\\:getConfig\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: tests/phpunit/OracleTest.php
+
+		-
+			message: "#^Method Keboola\\\\DbExtractor\\\\Tests\\\\OracleTest\\:\\:getConfigConnection\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: tests/phpunit/OracleTest.php

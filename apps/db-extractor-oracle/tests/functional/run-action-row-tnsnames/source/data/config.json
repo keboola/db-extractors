@@ -1,0 +1,15 @@
+{
+  "parameters": {
+    "name": "sales",
+    "outputTable": "in.c-main.sales",
+    "table": {
+      "schema": "TESTER",
+      "tableName": "sales"
+    },
+    "db": {
+      "tnsnames": "XE = (DESCRIPTION = (ADDRESS = (PROTOCOL = tcp)(HOST=oracle)(PORT = 1521))(CONNECT_DATA = (SID=xe)(SERVICE_NAME = XE)))",
+      "user": "%env(string:ORACLE_DB_USER)%",
+      "#password": "%env(string:ORACLE_DB_PASSWORD)%"
+    }
+  }
+}

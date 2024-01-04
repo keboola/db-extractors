@@ -1,0 +1,16 @@
+Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
+Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
+Connecting user "tester" to database "xe" at "oracle" on port "1521"
+Executing query "SELECT COUNT(*) FROM "TESTER"."auto Increment Timestamp" WHERE "_Weir%%d I-D" IS NULL"
+Fetched 2 rows in 0 seconds
+Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
+Connecting user "tester" to database "xe" at "oracle" on port "1521"
+Executing query "SELECT "_Weir%%d I-D" FROM (SELECT * FROM (SELECT * FROM "TESTER"."auto Increment Timestamp" ORDER BY "_Weir%%d I-D") ORDER BY "_Weir%%d I-D" DESC) WHERE ROWNUM = 1"
+Fetched 1 rows in 0 seconds
+Exporting "in.c-main.auto-increment-timestamp" to "in.c-main.auto-increment-timestamp".
+Created "export" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
+Connecting user "tester" to database "xe" at "oracle" on port "1521"
+Executing query "SELECT * FROM "TESTER"."auto Increment Timestamp" ORDER BY "_Weir%%d I-D""
+Fetched 1 rows in 0 seconds
+Created "get tables" configuration for "java-oracle-exporter" tool, host: "oracle", port: "1521".
+Exported "1" rows to "in.c-main.auto-increment-timestamp".

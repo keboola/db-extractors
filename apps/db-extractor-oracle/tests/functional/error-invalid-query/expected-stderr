@@ -1,0 +1,1 @@
+[in.c-main.escaping]: DB query "SELECT something, fake" failed: Export process failed: SQL Exception: ORA-00923: FROM keyword not found where expected   Tried 5 times.
