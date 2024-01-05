@@ -138,7 +138,6 @@ services:
       args:
         - PHP_VERSION=8.2
     image: keboola/db-extractor-redshift
-    env_file: ../apps/db-extractor-redshift/.env
     environment:
       - KBC_COMPONENT_RUN_MODE=run
       - REDSHIFT_DB_HOST
