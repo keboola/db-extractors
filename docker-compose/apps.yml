@@ -125,8 +125,6 @@ services:
 
   dev-db-extractor-oracle:
     <<: *db-extractor-oracle
-    env_file:
-      - ../apps/db-extractor-oracle/.env
     volumes:
       - ../apps/db-extractor-oracle:/code/apps/db-extractor-oracle
       - ../apps/db-extractor-oracle/data:/data
