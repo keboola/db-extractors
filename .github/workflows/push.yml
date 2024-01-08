@@ -90,5 +90,7 @@ jobs:
       dockerhub-token: $DOCKERHUB_TOKEN
       tag: ${{ needs.prepare.outputs.app_image_tag }}
       is_semantic_tag: ${{ needs.prepare.outputs.is_semantic_tag }}
-
+    secrets:
+      KBC_DEVELOPERPORTAL_PASSWORD_MYSQL: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD_MYSQL }}
+      KBC_STORAGE_TOKEN_MYSQL: ${{ secrets.KBC_STORAGE_TOKEN_MYSQL }}
 

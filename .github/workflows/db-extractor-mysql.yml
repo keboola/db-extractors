@@ -14,6 +14,11 @@ on:
       is_semantic_tag:
         type: string
         required: true
+    secrets:
+        KBC_DEVELOPERPORTAL_PASSWORD_MYSQL:
+            required: true
+        KBC_STORAGE_TOKEN_MYSQL:
+            required: true
 env:
   # Test image, must be same in the docker-compose.yml if used
   APP_IMAGE: keboola/db-extractor-mysql
