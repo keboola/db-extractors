@@ -12,7 +12,7 @@ on:
         type: string
         required: true
       is_semantic_tag:
-        type: boolean
+        type: string
         required: true
 env:
   # Test image, must be same in the docker-compose.yml if used
