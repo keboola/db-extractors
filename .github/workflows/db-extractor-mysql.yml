@@ -11,10 +11,12 @@ on:
       tag:
         type: string
         required: true
+      is_semantic_tag:
+        type: boolean
+        required: true
 env:
   # Test image, must be same in the docker-compose.yml if used
   APP_IMAGE: keboola/db-extractor-mysql
-
   # Developer portal login
   KBC_DEVELOPERPORTAL_VENDOR: "keboola"
   KBC_DEVELOPERPORTAL_APP: "keboola.ex-db-mysql"
@@ -42,14 +44,6 @@ jobs:
         run: docker login --username "${{ inputs.dockerhub-user }}" --password "${{ inputs.dockerhub-token }}"
       - name: Build image
         run: docker build -t $APP_IMAGE .
-      - name: Set image tag
-        id: tag
-        run: |
-          TAG=$(echo "${{ inputs.tag }}" | grep -o "v\?[0-9]\+\.[0-9]\+\.[0-9]\+$")
-          IS_SEMANTIC_TAG=$(echo "$TAG" | grep -q '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$' && echo true || echo false)
-          echo "Tag = '$TAG', is semantic tag = '$IS_SEMANTIC_TAG'"
-          echo "is_semantic_tag=$IS_SEMANTIC_TAG" >> $GITHUB_OUTPUT
-          echo "app_image_tag=$TAG" >> $GITHUB_OUTPUT
       - name: Push image to ECR
         uses: keboola/action-push-to-ecr@master
         with:
@@ -57,8 +51,8 @@ jobs:
           app_id: ${{ env.KBC_DEVELOPERPORTAL_APP }}
           username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
           password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
-          tag: ${{ steps.tag.outputs.app_image_tag }}
-          push_latest: ${{ steps.tag.outputs.is_semantic_tag }}
+          tag: ${{ inputs.tag }}
+          push_latest: ${{ inputs.is_semantic_tag }}
           source_image: ${{ env.APP_IMAGE}}
 
   tests:
@@ -83,7 +77,7 @@ jobs:
           app_id: ${{ env.KBC_DEVELOPERPORTAL_APP }}
           username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
           password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
-          tag: ${{ needs.build.outputs.app_image_tag }}
+          tag: ${{ inputs.tag }}
           target_image: ${{ env.APP_IMAGE}}
           tag_as_latest: true
       - name: Run tests
@@ -110,13 +104,7 @@ jobs:
       - tests
       - tests-in-kbc
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/dbExtractorMysql') && needs.build.outputs.is_semantic_tag == 'true'
+    if: startsWith(github.ref, 'refs/tags/dbExtractorMysql') && inputs.is_semantic_tag == 'true'
     steps:
       - name: Set tag in the Deloper Portal
-        uses: keboola/action-set-tag-developer-portal@master
-        with:
-          vendor: ${{ env.KBC_DEVELOPERPORTAL_VENDOR }}
-          app_id: ${{ env.KBC_DEVELOPERPORTAL_APP }}
-          username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
-          password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
-          tag: ${{ needs.build.outputs.app_image_tag }}
+        run: echo 1
