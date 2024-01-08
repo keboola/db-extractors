@@ -667,7 +667,7 @@ class MySQLTest extends TestCase
                 Assert::stringContains(
                     "Base table or view not found: 1146 Table 'TesTdb.Auto_INCREMENT_TimestamP' doesn't exist",
                 ),
-                Assert::stringContains("Unknown database 'TesT'"),
+                Assert::stringContains("Unknown database 'TesTdb'"),
             ));
         }
     }
