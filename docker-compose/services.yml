@@ -42,6 +42,14 @@ services:
       - TARGETS=mssql-ssl:1433
       - TIMEOUT=120
 
+  wait-mssql-ssl-invalid-cn:
+    image: waisbrot/wait
+    links:
+      - mssql-ssl-invalid-cn
+    environment:
+      - TARGETS=mssql-ssl-invalid-cn:1433
+      - TIMEOUT=120
+
   wait-pgsql:
     image: waisbrot/wait
     links:
@@ -56,14 +64,6 @@ services:
       - pgsql-ssl
     environment:
       - TARGETS=pgsql-ssl:5432
-      - TIMEOUT=120
-
-  wait-mssql-ssl-invalid-cn:
-    image: waisbrot/wait
-    links:
-      - mssql-ssl-invalid-cn
-    environment:
-      - TARGETS=mssql-ssl-invalid-cn:1433
       - TIMEOUT=120
 
   wait-oracle:
