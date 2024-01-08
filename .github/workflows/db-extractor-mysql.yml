@@ -48,7 +48,7 @@ jobs:
         if: inputs.dockerhub-token
         run: docker login --username "${{ inputs.dockerhub-user }}" --password "${{ inputs.dockerhub-token }}"
       - name: Build image
-        run: docker build -t $APP_IMAGE .
+        run: docker build --target app-db-extractor-mysql -t $APP_IMAGE .
       - name: Push image to ECR
         uses: keboola/action-push-to-ecr@master
         with:
@@ -88,8 +88,8 @@ jobs:
       - name: Run tests
         run: |
           export MYSQL_VERSION="${{ matrix.mysql }}"
-          docker-compose run wait-mysql
-          docker-compose run app-db-extractor-mysql composer ci
+          docker-compose run --rm wait-mysql
+          docker-compose run --rm app-db-extractor-mysql composer ci
 
   tests-in-kbc:
     needs: build
