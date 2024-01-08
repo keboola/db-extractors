@@ -77,5 +77,5 @@ jobs:
     with:
       dockerhub-user: $DOCKERHUB_USER
       dockerhub-token: $DOCKERHUB_TOKEN
-      tag: ${GITHUB_REF##*/}
+      tag: "${GITHUB_REF##*/}"
 
