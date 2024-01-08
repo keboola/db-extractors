@@ -31,7 +31,7 @@ env:
   # Test KBC project
   KBC_STORAGE_TOKEN: ${{ secrets.KBC_STORAGE_TOKEN }}
   KBC_TEST_PROJECT_URL: "https://connection.keboola.com/admin/projects/2703/dashboard"
-  KBC_TEST_PROJECT_CONFIGS: "285843250 287599200" # space separated list
+  KBC_TEST_PROJECT_CONFIGS: "287537333 287589303 288410371 313935368" # space separated list
 jobs:
   build:
     runs-on: ubuntu-latest
