@@ -53,7 +53,7 @@ services:
       - ../libs/db-extractor-config/:/code/libs/db-extractor-config
       - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
       - ssh-keys:/root/.ssh:ro
-      - ../certs/mysql/ssl:/ssl-cert
+      - ../docker/databases/mysql/ssl:/ssl-cert
 
   dev-db-extractor-common:
     <<: *db-extractor-common
@@ -64,7 +64,7 @@ services:
       - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
       - ../:/code
       - ssh-keys:/root/.ssh:ro
-      - ../certs/mysql/ssl:/ssl-cert
+      - ../docker/databases/mysql/ssl:/ssl-cert
 
 
   app-db-extractor-config: &db-extractor-config

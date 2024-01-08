@@ -693,8 +693,8 @@ FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql-ssl
 
 USER root
 
-COPY certs/mssql/mssql.crt /etc/ssl/certs/mssql.crt
-COPY certs/mssql/mssql.key /etc/ssl/private/mssql.key
+COPY docker/databases/mssql/ssl/mssql.crt /etc/ssl/certs/mssql.crt
+COPY docker/databases/mssql/ssl/mssql.key /etc/ssl/private/mssql.key
 
 RUN chmod 600 /etc/ssl/certs/mssql.crt /etc/ssl/private/mssql.key
 
@@ -707,8 +707,8 @@ FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql-ssl-invalid-cn
 
 USER root
 
-COPY certs/mssql/mssql-invalidCn.crt /etc/ssl/certs/mssql.crt
-COPY certs/mssql/mssql-invalidCn.key /etc/ssl/private/mssql.key
+COPY docker/databases/mssql/ssl/mssql-invalidCn.crt /etc/ssl/certs/mssql.crt
+COPY docker/databases/mssql/ssl/mssql-invalidCn.key /etc/ssl/private/mssql.key
 
 RUN chmod 600 /etc/ssl/certs/mssql.crt /etc/ssl/private/mssql.key
 
@@ -731,9 +731,9 @@ RUN \
     && sed -i 's/MinProtocol\s*=.*/MinProtocol = TLSv1/g' /etc/ssl/openssl.cnf
 
 # Copy certificates, SSL must by enabled by args: "-c ssl=on -c ssl_ca_file=/ssl-cert/ca-cert.pem -c ssl_cert_file=/ssl-cert/server-cert.pem -c ssl_key_file=/ssl-cert/server-key.pem"
-COPY certs/pgsql/ssl /ssl-cert
+COPY docker/databases/pgsql/ssl /ssl-cert
 RUN chmod 700 -R /ssl-cert/
 RUN chown postgres:postgres -R /ssl-cert/
 
 # Force SSL mode, if used arg "-c hba_file=/etc/postgresql/pg_hba_ssl.conf"
-COPY certs/pgsql/conf/pg_hba_ssl.conf /etc/postgresql/pg_hba_ssl.conf
+COPY docker/databases/pgsql/conf/pg_hba_ssl.conf /etc/postgresql/pg_hba_ssl.conf

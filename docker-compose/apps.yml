@@ -49,7 +49,7 @@ services:
       MYSQL_DB_DATABASE: testdb
       MYSQL_DB_PORT: 3306
     volumes:
-      - ../certs/mysql/ssl:/ssl-cert
+      - ../docker/databases/mysql/ssl:/ssl-cert
       - ssh-keys:/root/.ssh:ro
     links:
       - mysql
@@ -62,7 +62,7 @@ services:
     volumes:
       - ../apps/db-extractor-mysql:/code/apps/db-extractor-mysql
       - ../apps/db-extractor-mysql/data:/data
-      - ../certs/mysql/ssl:/ssl-cert
+      - ../docker/databases/mysql/ssl:/ssl-cert
       - ssh-keys:/root/.ssh:ro
 
   app-db-extractor-pgsql: &db-extractor-pgsql
@@ -84,7 +84,7 @@ services:
       - PGSQL_DB_RO_USER=readonly_user
       - PGSQL_DB_RO_PASSWORD=password
     volumes:
-      - ../certs/pgsql/ssl/:/ssl-cert:z
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
       - ssh-keys:/root/.ssh:ro
     links:
       - pgsql
@@ -97,7 +97,7 @@ services:
     volumes:
       - ../apps/db-extractor-pgsql:/code/apps/db-extractor-pgsql
       - ../apps/db-extractor-pgsql/data:/data
-      - ../certs/pgsql/ssl/:/ssl-cert:z
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
       - ssh-keys:/root/.ssh:ro
 
   app-db-extractor-oracle: &db-extractor-oracle
