@@ -25,7 +25,7 @@ env:
   # Developer portal login
   KBC_DEVELOPERPORTAL_VENDOR: "keboola"
   KBC_DEVELOPERPORTAL_APP: "keboola.ex-db-pgsql"
-  KBC_DEVELOPERPORTAL_USERNAME: "keboola+github_actions_db_extractor_pgsql"
+  KBC_DEVELOPERPORTAL_USERNAME: "keboola+github_actions_ex_db_pgsql"
   KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}
 
   # Test KBC project
