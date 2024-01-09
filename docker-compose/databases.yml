@@ -23,3 +23,32 @@ services:
     environment:
       MYSQL_DATABASE: testdb
       MYSQL_ROOT_PASSWORD: somePassword
+
+  mssql: &mssql
+    image: mssql-server-linux
+    build:
+      context: ..
+      target: mssql
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: "yourStrong(!)Password"
+
+  mssql-ssl:
+    <<: *mssql
+    image: mssql-server-linux-ssl
+    ports:
+      - "1434:1433"
+    build:
+      context: ..
+      target: mssql-ssl
+
+  mssql-ssl-invalid-cn:
+    <<: *mssql
+    image: mssql-server-linux-ssl-invalid-cn
+    ports:
+      - "1435:1433"
+    build:
+      context: ..
+      target: mssql-ssl-invalid-cn

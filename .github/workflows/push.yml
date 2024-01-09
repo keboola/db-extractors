@@ -18,6 +18,7 @@ jobs:
       changedProjects_dbExtractorSshTunnel: ${{ steps.check_changes.outputs.changedProjects_dbExtractorSshTunnel }}
       changedProjects_dbExtractorTableFormat: ${{ steps.check_changes.outputs.changedProjects_dbExtractorTableFormat }}
       changedProjects_dbExtractorMysql: ${{ steps.check_changes.outputs.changedProjects_dbExtractorMysql }}
+      changedProjects_dbExtractorMssql: ${{ steps.check_changes.outputs.changedProjects_dbExtractorMssql }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +31,8 @@ jobs:
             dbExtractorConfig:libs/db-extractor-config \
             dbExtractorSshTunnel:libs/db-extractor-ssh-tunnel \
             dbExtractorTableFormat:libs/db-extractor-table-format \
-            dbExtractorMysql:apps/db-extractor-mysql
+            dbExtractorMysql:apps/db-extractor-mysql \
+            dbExtractorMssql:apps/db-extractor-mssql
       - name: Set image tag
         id: set_tag
         run: |
@@ -93,3 +95,16 @@ jobs:
     secrets:
       KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD_MYSQL }}
       KBC_STORAGE_TOKEN: ${{ secrets.KBC_STORAGE_TOKEN_MYSQL }}
+
+  db-extractor-mssql:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorMssql == '1' }} || startsWith(github.ref, 'refs/tags/dbExtractorMssql')
+    uses: ./.github/workflows/db-extractor-mssql.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+      tag: ${{ needs.prepare.outputs.app_image_tag }}
+      is_semantic_tag: ${{ needs.prepare.outputs.is_semantic_tag }}
+    secrets:
+      KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD_MSSQL }}
+      KBC_STORAGE_TOKEN: ${{ secrets.KBC_STORAGE_TOKEN_MSSQL }}

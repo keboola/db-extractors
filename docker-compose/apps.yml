@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+  app-db-extractor-mssql: &db-extractor-mssql
+    image: keboola/db-extractor-mssql
+    build:
+      context: ..
+      target: app-db-extractor-mssql
+      args:
+        - PHP_VERSION=8.2
+    volumes:
+      - ssh-keys:/root/.ssh
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      MSSQL_DB_HOST: mssql
+      MSSQL_DB_SSL_HOST: mssql-ssl
+      MSSQL_DB_SSL_HOST_INVALID_CN: mssql-ssl-invalid-cn
+      MSSQL_DB_PORT: 1433
+      MSSQL_DB_USER: sa
+      MSSQL_DB_PASSWORD: "yourStrong(!)Password"
+      MSSQL_DB_DATABASE: test
+    links:
+      - sshproxy
+      - mssql
+      - mssql-ssl
+      - mssql-ssl-invalid-cn
+
+  dev-db-extractor-mssql:
+    <<: *db-extractor-mssql
+    volumes:
+      - ssh-keys:/root/.ssh
+      - ../apps/db-extractor-mssql:/code/apps/db-extractor-mssql
+      - ../apps/db-extractor-mssql/data:/data
+
   app-db-extractor-mysql: &db-extractor-mysql
     build:
       context: ..

@@ -246,6 +246,79 @@ RUN composer install $COMPOSER_FLAGS
 
 CMD ["composer", "ci"]
 
+FROM base-buster AS app-db-extractor-mssql
+ENV APP_NAME=db-extractor-mssql
+ENV APP_HOME=/code/apps/${APP_NAME}
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_PROCESS_TIMEOUT 3600
+
+WORKDIR ${APP_HOME}
+
+COPY apps/${APP_NAME}/docker/php-prod.ini /usr/local/etc/php/php.ini
+COPY docker/composer-install.sh /tmp/composer-install.sh
+
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    locales \
+    unzip \
+    ssh \
+    apt-transport-https \
+    wget \
+    libxml2-dev \
+    gnupg2 \
+    unixodbc-dev \
+    libgss3 \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+    msodbcsql17=17.7.1.1-1 \
+    mssql-tools=17.7.1.1-1 \
+    && rm -r /var/lib/apt/lists/* \
+    && sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
+    && locale-gen \
+    && chmod +x /tmp/composer-install.sh \
+    && /tmp/composer-install.sh
+
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
+
+ENV LANGUAGE=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# PDO mssql
+RUN pecl install pdo_sqlsrv-5.10.0 sqlsrv-5.10.0 \
+    && docker-php-ext-enable sqlsrv pdo_sqlsrv \
+    && docker-php-ext-install xml
+
+# Set path
+ENV PATH $PATH:/opt/mssql-tools/bin
+
+# Fix SSL configuration to be compatible with older servers
+RUN \
+    # https://wiki.debian.org/ContinuousIntegration/TriagingTips/openssl-1.1.1
+    sed -i 's/CipherString\s*=.*/CipherString = DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf \
+    # https://stackoverflow.com/questions/53058362/openssl-v1-1-1-ssl-choose-client-version-unsupported-protocol
+    && sed -i 's/MinProtocol\s*=.*/MinProtocol = TLSv1/g' /etc/ssl/openssl.cnf
+
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY apps/${APP_NAME}/composer.* ${APP_HOME}/
+COPY libs/ /code/libs/
+
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+
+# Copy rest of the app
+COPY apps/${APP_NAME}/ ${APP_HOME}/
+
+# Run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
+
+CMD ["php", "./src/run.php"]
+
 FROM base-buster AS app-db-extractor-mysql
 ENV APP_NAME=db-extractor-mysql
 ENV APP_HOME=/code/apps/${APP_NAME}
@@ -296,3 +369,37 @@ COPY apps/${APP_NAME}/. ${APP_HOME}/
 RUN composer install $COMPOSER_FLAGS
 
 CMD ["php", "/code/src/run.php"]
+
+FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql
+
+USER root
+
+RUN /opt/mssql/bin/mssql-conf set sqlagent.enabled true
+
+FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql-ssl
+
+USER root
+
+COPY docker/databases/mssql/ssl/mssql.crt /etc/ssl/certs/mssql.crt
+COPY docker/databases/mssql/ssl/mssql.key /etc/ssl/private/mssql.key
+
+RUN chmod 600 /etc/ssl/certs/mssql.crt /etc/ssl/private/mssql.key
+
+RUN /opt/mssql/bin/mssql-conf set network.tlscert /etc/ssl/certs/mssql.crt \
+      && /opt/mssql/bin/mssql-conf set network.tlskey /etc/ssl/private/mssql.key \
+      && /opt/mssql/bin/mssql-conf set network.tlsprotocols 1.2 \
+      && /opt/mssql/bin/mssql-conf set network.forceencryption 1
+
+FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql-ssl-invalid-cn
+
+USER root
+
+COPY docker/databases/mssql/ssl/mssql-invalidCn.crt /etc/ssl/certs/mssql.crt
+COPY docker/databases/mssql/ssl/mssql-invalidCn.key /etc/ssl/private/mssql.key
+
+RUN chmod 600 /etc/ssl/certs/mssql.crt /etc/ssl/private/mssql.key
+
+RUN /opt/mssql/bin/mssql-conf set network.tlscert /etc/ssl/certs/mssql.crt \
+      && /opt/mssql/bin/mssql-conf set network.tlskey /etc/ssl/private/mssql.key \
+      && /opt/mssql/bin/mssql-conf set network.tlsprotocols 1.2 \
+      && /opt/mssql/bin/mssql-conf set network.forceencryption 1
