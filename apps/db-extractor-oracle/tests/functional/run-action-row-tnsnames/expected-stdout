@@ -1,0 +1,9 @@
+Exporting "in.c-main.sales" to "in.c-main.sales".
+Created "tnsname.ora" file for "java-oracle-exporter" tool.
+Created "export" configuration for "java-oracle-exporter" tool.
+Connecting user "tester". Using service name "XE" from tnsnames.ora.
+Executing query "SELECT * FROM "TESTER"."sales""
+Fetched 11 rows in %d seconds
+Created "tnsname.ora" file for "java-oracle-exporter" tool.
+Created "get tables" configuration for "java-oracle-exporter" tool.
+Exported "11" rows to "in.c-main.sales".

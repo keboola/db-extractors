@@ -1,0 +1,11 @@
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+Exporting "sales" to "in.c-main.escaping".
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [1x]
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [2x]
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [3x]
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".
+SQLSTATE[3D000]: Invalid catalog name: 1046 No database selected. Retrying... [4x]
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8".

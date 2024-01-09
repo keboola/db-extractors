@@ -1,0 +1,9 @@
+vendor/
+.idea/
+/data*
+composer.phar
+tests/phpunit/data
+.DS_Store
+.env
+.phpunit.result.cache
+/phpunut/data/

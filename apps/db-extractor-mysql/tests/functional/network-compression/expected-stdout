@@ -1,0 +1,4 @@
+Creating PDO connection to "mysql:%a".
+Using network compression.
+Exporting "simple" to "in.c-main.simple".
+Exported "1" rows to "in.c-main.simple".

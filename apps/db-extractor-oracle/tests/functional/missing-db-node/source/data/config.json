@@ -1,0 +1,10 @@
+{
+  "parameters": {
+    "name": "escaping",
+    "table": {
+      "tableName": "escaping",
+      "schema": "TESTER"
+    },
+    "outputTable": "in.c-main.escaping"
+  }
+}

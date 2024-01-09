@@ -1,0 +1,194 @@
+{
+    "destination": "in.c-main.types",
+    "incremental": false,
+    "metadata": [
+        {
+            "key": "KBC.name",
+            "value": "types"
+        },
+        {
+            "key": "KBC.sanitizedName",
+            "value": "types"
+        },
+        {
+            "key": "KBC.schema",
+            "value": "TESTER"
+        },
+        {
+            "key": "KBC.catalog",
+            "value": "USERS"
+        },
+        {
+            "key": "KBC.tablespaceName",
+            "value": "USERS"
+        },
+        {
+            "key": "KBC.owner",
+            "value": "TESTER"
+        },
+        {
+            "key": "KBC.datatype.backend",
+            "value": "oracle"
+        }
+    ],
+    "column_metadata": {
+        "varchar": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "NVARCHAR2"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "STRING"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "400"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "varchar"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "varchar"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 1
+            }
+        ],
+        "decimal": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "NUMERIC"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "NUMERIC"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "4,2"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "decimal"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "decimal"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 2
+            }
+        ],
+        "timestamp": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "TIMESTAMP"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "TIMESTAMP"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "6"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "timestamp"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "timestamp"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 3
+            }
+        ],
+        "timestamp_length": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "TIMESTAMP"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "TIMESTAMP"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "6"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "timestamp_length"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "timestamp_length"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 4
+            }
+        ]
+    },
+    "columns": [
+        "varchar",
+        "decimal",
+        "timestamp",
+        "timestamp_length"
+    ]
+}

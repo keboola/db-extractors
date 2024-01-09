@@ -1,0 +1,6 @@
+[%s] DEBUG: Component initialization completed [] []
+Creating PDO connection to "pgsql:dbname=%s;port=5439;host=%s.redshift.amazonaws.com".
+Exporting "sales" to "in.c-main.escaping".
+[%s] DEBUG: Running query "SELECT * FROM escaping". [] []
+[%s] DEBUG: Running query "SELECT 1". [] []
+Exported "7" rows to "in.c-main.escaping".

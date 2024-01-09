@@ -1,0 +1,1 @@
+{"parameters":{"db":{"host":"pgsql","port":"5432","user":"postgres","#password":"some password","database":"postgres"},"data_dir":"PGSQL","tables":[]},"action":"getTables"}

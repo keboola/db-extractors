@@ -1,0 +1,10 @@
+vendor/
+/data/
+.idea/
+composer.phar
+runtests.sh
+test.php
+tests/phpunit/data/out
+tests/phpunit/data/config.yml
+.env
+.phpunit.result.cache

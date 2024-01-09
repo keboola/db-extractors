@@ -1,0 +1,9 @@
+Creating PDO connection to "mysql:%a".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [1x]
+Creating PDO connection to "mysql:%a".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [2x]
+Creating PDO connection to "mysql:%a".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [3x]
+Creating PDO connection to "mysql:%a".
+SQLSTATE[HY000] [1045] Access denied for user 'unexistsUser'@'%s' (using password: YES). Retrying... [4x]
+Creating PDO connection to "mysql:%a".

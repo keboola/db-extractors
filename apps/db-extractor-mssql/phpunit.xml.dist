@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         bootstrap="vendor/autoload.php">
+
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/phpunit</directory>
+            <exclude>tests/phpunit/PerformanceTest.php</exclude>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>tests/functional</directory>
+        </testsuite>
+        <testsuite name="perf">
+            <file>tests/phpunit/PerformanceTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
