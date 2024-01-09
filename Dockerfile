@@ -39,3 +39,41 @@ COPY libs/${APP_NAME}/. ${APP_HOME}/
 RUN composer install $COMPOSER_FLAGS
 
 CMD ["composer", "ci"]
+
+FROM base-buster AS lib-db-extractor-table-format
+ENV APP_NAME=db-extractor-table-format
+ENV APP_HOME=/code/libs/${APP_NAME}
+
+ARG COMPOSER_FLAGS="--prefer-dist --no-interaction"
+ARG DEBIAN_FRONTEND=noninteractive
+
+WORKDIR ${APP_HOME}
+
+COPY libs/${APP_NAME}/docker/php-prod.ini /usr/local/etc/php/php.ini
+COPY docker/composer-install.sh /tmp/composer-install.sh
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ssh \
+        git \
+        locales \
+        unzip \
+	&& rm -r /var/lib/apt/lists/* \
+	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
+	&& locale-gen \
+	&& chmod +x /tmp/composer-install.sh \
+	&& /tmp/composer-install.sh
+
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY libs/${APP_NAME}/composer.* ${APP_HOME}/
+
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+
+# Copy rest of the app
+COPY libs/${APP_NAME}/. ${APP_HOME}/
+
+# Run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
+
+CMD ["composer", "ci"]
