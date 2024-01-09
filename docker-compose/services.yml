@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  sshproxy:
+    image: keboola/db-component-ssh-proxy:latest
+    volumes:
+      - ssh-keys:/root/.ssh
+
