@@ -130,3 +130,34 @@ services:
       - ../apps/db-extractor-oracle/data:/data
       - ../apps/db-extractor-oracle/docker/php/php.ini:/usr/local/etc/php/php.ini
       - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-redshift: &db-extractor-redshift
+    build:
+      context: .
+      target: app-db-extractor-redshift
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-redshift
+    environment:
+      - KBC_COMPONENT_RUN_MODE=run
+      - REDSHIFT_DB_HOST
+      - REDSHIFT_DB_PORT
+      - REDSHIFT_DB_DATABASE
+      - REDSHIFT_DB_USER
+      - REDSHIFT_DB_PASSWORD
+      - REDSHIFT_DB_SCHEMA
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - AWS_REGION
+      - AWS_S3_BUCKET
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - sshproxy
+
+  dev-db-extractor-redshift:
+    <<: *db-extractor-redshift
+    volumes:
+      - ../apps/db-extractor-redshift:/code/apps/db-extractor-redshift
+      - ../apps/db-extractor-redshift/data:/data
+      - ssh-keys:/root/.ssh:ro
