@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7f532a664c8ede6f822323ec1a478745",
+    "content-hash": "fcba7a29e42fc23f0f3cd0a8545021bc",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -118,16 +118,16 @@
         },
         {
             "name": "keboola/csv",
-            "version": "3.2.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/keboola/php-csv.git",
-                "reference": "ea1e00e255de657ad51b5ad3cef79e3ef9f2df9d"
+                "reference": "4d7785e982b31f3768ac71d559aeebdc1722b03c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/keboola/php-csv/zipball/ea1e00e255de657ad51b5ad3cef79e3ef9f2df9d",
-                "reference": "ea1e00e255de657ad51b5ad3cef79e3ef9f2df9d",
+                "url": "https://api.github.com/repos/keboola/php-csv/zipball/4d7785e982b31f3768ac71d559aeebdc1722b03c",
+                "reference": "4d7785e982b31f3768ac71d559aeebdc1722b03c",
                 "shasum": ""
             },
             "require": {
@@ -139,7 +139,7 @@
                 "php-parallel-lint/php-parallel-lint": "^1.3",
                 "phpstan/phpdoc-parser": "1.5.*",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": ">=7.5"
+                "phpunit/phpunit": ">=7.5 <=9.6"
             },
             "type": "library",
             "autoload": {
@@ -165,30 +165,24 @@
             ],
             "support": {
                 "issues": "https://github.com/keboola/php-csv/issues",
-                "source": "https://github.com/keboola/php-csv/tree/3.2.0"
+                "source": "https://github.com/keboola/php-csv/tree/3.3.0"
             },
-            "time": "2022-11-02T15:02:35+00:00"
+            "time": "2023-12-08T09:16:32+00:00"
         },
         {
-            "name": "keboola/db-extractor-adapter",
-            "version": "1.13.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/keboola/db-extractor-adapter.git",
-                "reference": "8be4441ed5cfa10448fc4efbb9539a37f5743659"
-            },
+            "name": "keboola/db-extractors-db-extractor-adapter",
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-adapter/zipball/8be4441ed5cfa10448fc4efbb9539a37f5743659",
-                "reference": "8be4441ed5cfa10448fc4efbb9539a37f5743659",
-                "shasum": ""
+                "type": "path",
+                "url": "../../libs/db-extractor-adapter",
+                "reference": "f808bd851dbf3bc0b8eccc41bf5f9cceed88fbd9"
             },
             "require": {
                 "ext-iconv": "*",
                 "keboola/common-exceptions": "^1.0",
                 "keboola/csv": "^3.2",
-                "keboola/db-extractor-config": "^1.8",
-                "keboola/db-extractor-table-format": "^3.7",
+                "keboola/db-extractors-db-extractor-config": "*@dev",
+                "keboola/db-extractors-db-extractor-table-format": "*@dev",
                 "keboola/retry": "^0.5",
                 "php": ">=8.2",
                 "psr/log": "^1.1"
@@ -211,7 +205,35 @@
                     "Keboola\\DbExtractor\\Adapter\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Keboola\\DbExtractor\\Adapter\\Tests\\": "tests/phpunit"
+                }
+            },
+            "scripts": {
+                "tests": [
+                    "./vendor/bin/phpunit"
+                ],
+                "phpstan": [
+                    "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon"
+                ],
+                "phpcs": [
+                    "phpcs -n -s --ignore=vendor --extensions=php ."
+                ],
+                "phpcbf": [
+                    "phpcbf -n --ignore=vendor --extensions=php ."
+                ],
+                "build": [
+                    "@phpcs",
+                    "@phpstan",
+                    "@tests"
+                ],
+                "ci": [
+                    "@composer install",
+                    "@composer validate --no-check-all --strict",
+                    "@build"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -222,34 +244,27 @@
                 }
             ],
             "description": "Set of connection adapters for DB extractors.",
-            "support": {
-                "source": "https://github.com/keboola/db-extractor-adapter/tree/1.13.1"
-            },
-            "time": "2023-11-14T14:29:29+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
-            "name": "keboola/db-extractor-common",
-            "version": "16.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/keboola/db-extractor-common.git",
-                "reference": "fb5d6cec9d762085e7db62817b3fca6b16e3c32f"
-            },
+            "name": "keboola/db-extractors-db-extractor-common",
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-common/zipball/fb5d6cec9d762085e7db62817b3fca6b16e3c32f",
-                "reference": "fb5d6cec9d762085e7db62817b3fca6b16e3c32f",
-                "shasum": ""
+                "type": "path",
+                "url": "../../libs/db-extractor-common",
+                "reference": "38934b33c82803ba8521b790c475c1bc8d72dd11"
             },
             "require": {
                 "ext-json": "*",
                 "ext-pdo": "*",
                 "keboola/common-exceptions": "^1.1",
                 "keboola/csv": "^3.2",
-                "keboola/db-extractor-adapter": "^1.13",
-                "keboola/db-extractor-config": "^1.14",
-                "keboola/db-extractor-ssh-tunnel": "^1.2",
-                "keboola/db-extractor-table-format": "^3.8",
+                "keboola/db-extractors-db-extractor-adapter": "*@dev",
+                "keboola/db-extractors-db-extractor-config": "*@dev",
+                "keboola/db-extractors-db-extractor-ssh-tunnel": "*@dev",
+                "keboola/db-extractors-db-extractor-table-format": "*@dev",
                 "keboola/php-component": "^9.4",
                 "keboola/php-datatypes": "^7.2",
                 "keboola/php-utils": "^2.3||^3.0||^4.0",
@@ -275,9 +290,6 @@
             "type": "library",
             "extra": {
                 "patches": {
-                    "keboola/csv": [
-                        "patches/keboola-csv-src-csvreader-php.patch"
-                    ],
                     "ihsw/toxiproxy-php-client": [
                         "patches/ihsw-toxiproxy-php-client-Proxy.php.patch",
                         "patches/ihsw-toxiproxy-php-client-Toxic.php.patch"
@@ -290,7 +302,41 @@
                     "Keboola\\DbExtractor\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Keboola\\DbExtractor\\Tests\\": "tests/phpunit/"
+                }
+            },
+            "scripts": {
+                "tests-phpunit": [
+                    "phpunit"
+                ],
+                "tests": [
+                    "@tests-phpunit"
+                ],
+                "phpstan": [
+                    "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon"
+                ],
+                "phpcs": [
+                    "phpcs -n --ignore=vendor --extensions=php ."
+                ],
+                "phpcbf": [
+                    "phpcbf -n --ignore=vendor --extensions=php ."
+                ],
+                "phplint": [
+                    "parallel-lint -j 10 --exclude vendor ."
+                ],
+                "build": [
+                    "@phplint",
+                    "@phpcs",
+                    "@phpstan",
+                    "@tests"
+                ],
+                "ci": [
+                    "@composer validate --no-check-publish --no-check-all",
+                    "@build"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -301,24 +347,17 @@
                 }
             ],
             "description": "Common library from Keboola Database Extractors",
-            "support": {
-                "source": "https://github.com/keboola/db-extractor-common/tree/16.2.2"
-            },
-            "time": "2023-11-14T15:42:53+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
-            "name": "keboola/db-extractor-config",
-            "version": "1.14.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/keboola/db-extractor-config.git",
-                "reference": "1bb4289a2ab56b95a3965e4a353d6753ffffd98c"
-            },
+            "name": "keboola/db-extractors-db-extractor-config",
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-config/zipball/1bb4289a2ab56b95a3965e4a353d6753ffffd98c",
-                "reference": "1bb4289a2ab56b95a3965e4a353d6753ffffd98c",
-                "shasum": ""
+                "type": "path",
+                "url": "../../libs/db-extractor-config",
+                "reference": "5c0f25cf812664f5becfe6466f0e61f2d6006f81"
             },
             "require": {
                 "keboola/php-component": "^9.4",
@@ -338,29 +377,56 @@
                     "Keboola\\DbExtractorConfig\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Keboola\\DbExtractorConfig\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "tests-phpunit": [
+                    "phpunit"
+                ],
+                "tests": [
+                    "@tests-phpunit"
+                ],
+                "phpstan": [
+                    "phpstan analyse ./src ./tests --level=max --no-progress -c phpstan.neon"
+                ],
+                "phpcs": [
+                    "phpcs -n --ignore=vendor --extensions=php ."
+                ],
+                "phpcbf": [
+                    "phpcbf -n --ignore=vendor --extensions=php ."
+                ],
+                "phplint": [
+                    "parallel-lint -j 10 --exclude vendor ."
+                ],
+                "build": [
+                    "@phplint",
+                    "@phpcs",
+                    "@phpstan",
+                    "@tests"
+                ],
+                "ci": [
+                    "@composer validate --no-check-publish --no-check-all",
+                    "@build"
+                ]
+            },
             "license": [
                 "MIT"
             ],
             "description": "Config definition for database extractor",
-            "support": {
-                "source": "https://github.com/keboola/db-extractor-config/tree/1.14.0"
-            },
-            "time": "2023-11-10T09:12:40+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
-            "name": "keboola/db-extractor-ssh-tunnel",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/keboola/db-extractor-ssh-tunnel.git",
-                "reference": "174b655371a2127b81242c9fd2577c382e97fa8e"
-            },
+            "name": "keboola/db-extractors-db-extractor-ssh-tunnel",
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-ssh-tunnel/zipball/174b655371a2127b81242c9fd2577c382e97fa8e",
-                "reference": "174b655371a2127b81242c9fd2577c382e97fa8e",
-                "shasum": ""
+                "type": "path",
+                "url": "../../libs/db-extractor-ssh-tunnel",
+                "reference": "0aa1f4aef3440e36e695c8b367dcbd5daf6b754a"
             },
             "require": {
                 "keboola/retry": "^0.5",
@@ -380,30 +446,50 @@
                     "Keboola\\DbExtractorSSHTunnel\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Keboola\\DbExtractorSSHTunnel\\Test\\": "tests/"
+                }
+            },
+            "scripts": {
+                "tests": [
+                    "./vendor/bin/phpunit"
+                ],
+                "phpstan": [
+                    "phpstan analyse --no-progress --level=max ./src ./tests  -c phpstan.neon"
+                ],
+                "phpcs": [
+                    "phpcs -n -s --ignore=vendor --extensions=php ."
+                ],
+                "phpcbf": [
+                    "phpcbf -n --ignore=vendor --extensions=php ."
+                ],
+                "build": [
+                    "@phpcs",
+                    "@phpstan",
+                    "@tests"
+                ],
+                "ci": [
+                    "@composer install",
+                    "@composer validate --no-check-all --strict",
+                    "@build"
+                ]
+            },
             "license": [
                 "MIT"
             ],
             "description": "Create SSH tunnel for DB Extractors",
-            "support": {
-                "issues": "https://github.com/keboola/db-extractor-ssh-tunnel/issues",
-                "source": "https://github.com/keboola/db-extractor-ssh-tunnel/tree/1.2.0"
-            },
-            "time": "2023-11-10T09:27:13+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
-            "name": "keboola/db-extractor-table-format",
-            "version": "3.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/keboola/db-extractor-table-format.git",
-                "reference": "5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa"
-            },
+            "name": "keboola/db-extractors-db-extractor-table-format",
+            "version": "dev-main",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/keboola/db-extractor-table-format/zipball/5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa",
-                "reference": "5e7bf95a7c33e8c9fd36ecc2c6129a86c5c697aa",
-                "shasum": ""
+                "type": "path",
+                "url": "../../libs/db-extractor-table-format",
+                "reference": "ed1b7e335842dfda54f7187d8ceadbf29471cd2c"
             },
             "require": {
                 "ext-json": "*",
@@ -424,7 +510,35 @@
                     "Keboola\\DbExtractor\\TableResultFormat\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Keboola\\DbExtractor\\TableResultFormat\\Tests\\": "tests/phpunit"
+                }
+            },
+            "scripts": {
+                "tests": [
+                    "./vendor/bin/phpunit"
+                ],
+                "phpstan": [
+                    "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon"
+                ],
+                "phpcs": [
+                    "phpcs -n -s --ignore=vendor --extensions=php ."
+                ],
+                "phpcbf": [
+                    "phpcbf -n --ignore=vendor --extensions=php ."
+                ],
+                "build": [
+                    "@phpcs",
+                    "@phpstan",
+                    "@tests"
+                ],
+                "ci": [
+                    "@composer install",
+                    "@composer validate --no-check-all --strict",
+                    "@build"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -435,10 +549,9 @@
                 }
             ],
             "description": "PHP class for formating table result",
-            "support": {
-                "source": "https://github.com/keboola/db-extractor-table-format/tree/3.8.0"
-            },
-            "time": "2023-11-10T09:12:47+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "keboola/php-component",
@@ -2773,16 +2886,16 @@
         },
         {
             "name": "seld/jsonlint",
-            "version": "1.10.0",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/jsonlint.git",
-                "reference": "594fd6462aad8ecee0b45ca5045acea4776667f1"
+                "reference": "76d449a358ece77d6f1d6331c68453e657172202"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/594fd6462aad8ecee0b45ca5045acea4776667f1",
-                "reference": "594fd6462aad8ecee0b45ca5045acea4776667f1",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/76d449a358ece77d6f1d6331c68453e657172202",
+                "reference": "76d449a358ece77d6f1d6331c68453e657172202",
                 "shasum": ""
             },
             "require": {
@@ -2809,7 +2922,7 @@
                 {
                     "name": "Jordi Boggiano",
                     "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
+                    "homepage": "https://seld.be"
                 }
             ],
             "description": "JSON Linter",
@@ -2821,7 +2934,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/jsonlint/issues",
-                "source": "https://github.com/Seldaek/jsonlint/tree/1.10.0"
+                "source": "https://github.com/Seldaek/jsonlint/tree/1.10.1"
             },
             "funding": [
                 {
@@ -2833,7 +2946,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-05-11T13:16:46+00:00"
+            "time": "2023-12-18T13:03:25+00:00"
         },
         {
             "name": "symfony/config",
@@ -3561,54 +3674,6 @@
     ],
     "packages-dev": [
         {
-            "name": "cweagans/composer-patches",
-            "version": "1.7.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cweagans/composer-patches.git",
-                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
-                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0 || ^2.0",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "composer/composer": "~1.0 || ~2.0",
-                "phpunit/phpunit": "~4.6"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "cweagans\\Composer\\Patches"
-            },
-            "autoload": {
-                "psr-4": {
-                    "cweagans\\Composer\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Cameron Eagans",
-                    "email": "me@cweagans.net"
-                }
-            ],
-            "description": "Provides a way to patch Composer packages.",
-            "support": {
-                "issues": "https://github.com/cweagans/composer-patches/issues",
-                "source": "https://github.com/cweagans/composer-patches/tree/1.7.3"
-            },
-            "time": "2022-12-20T22:53:13+00:00"
-        },
-        {
             "name": "dealerdirect/phpcodesniffer-composer-installer",
             "version": "v1.0.0",
             "source": {
@@ -3991,54 +4056,17 @@
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
             "time": "2023-02-22T23:07:41+00:00"
-        },
-        {
-            "name": "symplify/vendor-patches",
-            "version": "11.2.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symplify/vendor-patches.git",
-                "reference": "793c5d0f995988af690e2a278d0133df41638528"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symplify/vendor-patches/zipball/793c5d0f995988af690e2a278d0133df41638528",
-                "reference": "793c5d0f995988af690e2a278d0133df41638528",
-                "shasum": ""
-            },
-            "require": {
-                "cweagans/composer-patches": "^1.7",
-                "php": ">=7.2"
-            },
-            "bin": [
-                "bin/vendor-patches"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Generate vendor patches for packages with single command",
-            "support": {
-                "issues": "https://github.com/symplify/vendor-patches/issues",
-                "source": "https://github.com/symplify/vendor-patches/tree/11.2.3"
-            },
-            "funding": [
-                {
-                    "url": "https://www.paypal.me/rectorphp",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/tomasvotruba",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-02-07T11:23:54+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "keboola/db-extractors-db-extractor-adapter": 20,
+        "keboola/db-extractors-db-extractor-common": 20,
+        "keboola/db-extractors-db-extractor-config": 20,
+        "keboola/db-extractors-db-extractor-ssh-tunnel": 20,
+        "keboola/db-extractors-db-extractor-table-format": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

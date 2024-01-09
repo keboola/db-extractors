@@ -64,3 +64,38 @@ services:
       - ../apps/db-extractor-mysql/data:/data
       - ../docker/databases/mysql/ssl:/ssl-cert
       - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-pgsql: &db-extractor-pgsql
+    build:
+      context: ..
+      target: app-db-extractor-pgsql
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-pgsql
+    environment:
+      - KBC_COMPONENT_RUN_MODE=run
+      - PGSQL_DB_HOST=pgsql
+      - PGSQL_DB_SSL_HOST=pgsql-ssl
+      - PGSQL_DB_SSL_HOST_BAD_CN=pgsql-ssl-bad-cn
+      - PGSQL_DB_PORT=5432
+      - PGSQL_DB_DATABASE=postgres
+      - PGSQL_DB_USER=postgres
+      - PGSQL_DB_PASSWORD=some password
+      - PGSQL_DB_RO_USER=readonly_user
+      - PGSQL_DB_RO_PASSWORD=password
+    volumes:
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - pgsql
+      - pgsql-ssl
+      - pgsql-ssl:pgsql-ssl-bad-cn
+      - sshproxy
+
+  dev-db-extractor-pgsql:
+    <<: *db-extractor-pgsql
+    volumes:
+      - ../apps/db-extractor-pgsql:/code/apps/db-extractor-pgsql
+      - ../apps/db-extractor-pgsql/data:/data
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
+      - ssh-keys:/root/.ssh:ro
