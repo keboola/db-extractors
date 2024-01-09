@@ -6,3 +6,20 @@ services:
     environment:
       MARIADB_DATABASE: testdb
       MARIADB_ROOT_PASSWORD: somePassword
+
+  mysql:
+    image: mysql:${MYSQL_VERSION:-5.6}
+    command: mysqld --local-infile=1 --port=3306 --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: somePassword
+
+  mysql-ssl:
+    image: mysql:${MYSQL_VERSION:-5.6}
+    command: mysqld --local-infile=1 --port=3306 --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ../docker/databases/mysql/conf.d/${MYSQL_VERSION:-5.6}:/etc/mysql/conf.d
+      - ../docker/databases/mysql/ssl:/ssl-cert
+    environment:
+      MYSQL_DATABASE: testdb
+      MYSQL_ROOT_PASSWORD: somePassword

@@ -15,7 +15,7 @@ class CommonExtractorSslTest extends ExtractorTest
 
     public function testDatabaseConfigSslConnection(): void
     {
-        $config = new Config($this->getConfig('common'), new ConfigDefinition());
+        $config = new Config($this->getConfig('common', true), new ConfigDefinition());
         $databaseConfig = DatabaseConfig::fromArray($config->getData()['parameters']['db']);
 
         Assert::assertTrue($databaseConfig->hasSSlConnection());
@@ -26,7 +26,7 @@ class CommonExtractorSslTest extends ExtractorTest
 
     public function testConnection(): void
     {
-        $config = $this->getConfig('common');
+        $config = $this->getConfig('common', true);
         $config['action'] = 'testConnection';
         $this->getApp(
             $config,
@@ -36,12 +36,12 @@ class CommonExtractorSslTest extends ExtractorTest
     }
 
 
-    protected function getConfig(string $driver): array
+    protected function getConfig(string $driver, bool $sslHost = false): array
     {
-        $config = parent::getConfig($driver);
+        $config = parent::getConfig($driver, $sslHost);
         $config['parameters']['db']['ssl'] = [
             'enabled' => true,
-            'ca' => file_get_contents('/ssl-cert/ca.pem'),
+            'ca' => file_get_contents('/ssl-cert/ca-cert.pem'),
             'cert' => file_get_contents('/ssl-cert/client-cert.pem'),
             'key' => file_get_contents('/ssl-cert/client-key.pem'),
         ];

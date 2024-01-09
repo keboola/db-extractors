@@ -13,6 +13,7 @@ jobs:
       app_image_tag: ${{ steps.set_tag.outputs.app_image_tag }}
       is_semantic_tag: ${{ steps.set_tag.outputs.is_semantic_tag }}
       changedProjects_dbExtractorAdapter: ${{ steps.check_changes.outputs.changedProjects_dbExtractorAdapter }}
+      changedProjects_dbExtractorCommon: ${{ steps.check_changes.outputs.changedProjects_dbExtractorCommon }}
       changedProjects_dbExtractorConfig: ${{ steps.check_changes.outputs.changedProjects_dbExtractorConfig }}
       changedProjects_dbExtractorSshTunnel: ${{ steps.check_changes.outputs.changedProjects_dbExtractorSshTunnel }}
       changedProjects_dbExtractorTableFormat: ${{ steps.check_changes.outputs.changedProjects_dbExtractorTableFormat }}
@@ -24,6 +25,7 @@ jobs:
         run: |
           bin/ci-find-changes.sh main \
             dbExtractorAdapter:libs/db-extractor-adapter \
+            dbExtractorCommon:libs/db-extractor-common \
             dbExtractorConfig:libs/db-extractor-config \
             dbExtractorSshTunnel:libs/db-extractor-ssh-tunnel \
             dbExtractorTableFormat:libs/db-extractor-table-format
@@ -41,6 +43,14 @@ jobs:
     needs: prepare
     if: ${{ needs.prepare.outputs.changedProjects_dbExtractorAdapter == '1' }}
     uses: ./.github/workflows/db-extractor-adapter.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-common:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorCommon == '1' }}
+    uses: ./.github/workflows/db-extractor-common.yml
     with:
       dockerhub-user: $DOCKERHUB_USER
       dockerhub-token: $DOCKERHUB_TOKEN
