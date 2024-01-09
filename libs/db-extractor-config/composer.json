@@ -1,5 +1,5 @@
 {
-    "name": "keboola/db-extractor-config",
+    "name": "keboola/db-extractors-db-extractor-config",
     "description": "Config definition for database extractor",
     "type": "library",
     "license": "MIT",

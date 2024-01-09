@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app-db-extractor-config: &db-extractor-config
+    image: keboola/db-extractor-config
+    build:
+      context: ..
+      target: lib-db-extractor-config
+      args:
+        - PHP_VERSION=8.2
+
+  dev-db-extractor-config:
+    <<: *db-extractor-config
+    volumes:
+      - ../:/code

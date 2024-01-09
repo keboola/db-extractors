@@ -1,0 +1,9 @@
+version: '3.8'
+
+include:
+  - path: docker-compose/libs.yml
+
+services: {}
+
+volumes:
+  ssh-keys:
