@@ -1,0 +1,287 @@
+{
+    "destination": "in.c-main.auto-increment-timestamp",
+    "incremental": true,
+    "primary_key": [
+        "weir_d_i_d"
+    ],
+    "metadata": [
+        {
+            "key": "KBC.name",
+            "value": "auto increment timestamp"
+        },
+        {
+            "key": "KBC.sanitizedName",
+            "value": "auto_increment_timestamp"
+        },
+        {
+            "key": "KBC.schema",
+            "value": "public"
+        },
+        {
+            "key": "KBC.catalog",
+            "value": "replaceEnv"
+        },
+        {
+            "key": "KBC.type",
+            "value": "BASE TABLE"
+        }
+    ],
+    "column_metadata": {
+        "weir_d_i_d": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "integer"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": false
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "INTEGER"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "32"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": ""
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "_weir%d i-d"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "weir_d_i_d"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 1
+            }
+        ],
+        "weir_d_na_me": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "character varying"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": false
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "STRING"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "30"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": "pam"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "weir%d na-me"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "weir_d_na_me"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": true
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 2
+            }
+        ],
+        "someinteger": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "integer"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "INTEGER"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "32"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": "1"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "someinteger"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "someinteger"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 3
+            }
+        ],
+        "somedecimal": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "numeric"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "NUMERIC"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "10,8"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": "10.2"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "somedecimal"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "somedecimal"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 4
+            }
+        ],
+        "type": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "character varying"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": true
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "STRING"
+            },
+            {
+                "key": "KBC.datatype.length",
+                "value": "55"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": ""
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "type"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "type"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 5
+            }
+        ],
+        "datetime": [
+            {
+                "key": "KBC.datatype.type",
+                "value": "timestamp without time zone"
+            },
+            {
+                "key": "KBC.datatype.nullable",
+                "value": false
+            },
+            {
+                "key": "KBC.datatype.basetype",
+                "value": "TIMESTAMP"
+            },
+            {
+                "key": "KBC.datatype.default",
+                "value": "(now"
+            },
+            {
+                "key": "KBC.sourceName",
+                "value": "datetime"
+            },
+            {
+                "key": "KBC.sanitizedName",
+                "value": "datetime"
+            },
+            {
+                "key": "KBC.primaryKey",
+                "value": false
+            },
+            {
+                "key": "KBC.uniqueKey",
+                "value": false
+            },
+            {
+                "key": "KBC.ordinalPosition",
+                "value": 6
+            }
+        ]
+    },
+    "columns": [
+        "weir_d_i_d",
+        "weir_d_na_me",
+        "someinteger",
+        "somedecimal",
+        "type",
+        "datetime"
+    ]
+}

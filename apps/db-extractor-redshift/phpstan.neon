@@ -1,0 +1,5 @@
+parameters:
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#Cannot call method fetchAll\(\) on PDOStatement\|false\.#'
+        - '#Cannot cast mixed to string\.#'
