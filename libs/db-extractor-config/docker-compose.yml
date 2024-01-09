@@ -1,0 +1,11 @@
+version: '2'
+services:
+  app: &base
+    build: .
+    image: keboola/db-extractor-config
+
+  dev:
+    <<: *base
+    image: keboola/db-extractor-config-dev
+    volumes:
+      - .:/code
