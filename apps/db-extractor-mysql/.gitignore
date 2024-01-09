@@ -1,0 +1,11 @@
+.env
+vendor/
+/data/
+/tests/data/in/
+/tests/data/out/
+/tests/data/config.yml
+/tests/data/config.json
+.idea/
+composer.phar
+tests.sh
+.phpunit.result.cache

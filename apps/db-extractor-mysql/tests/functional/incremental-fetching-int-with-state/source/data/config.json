@@ -1,0 +1,22 @@
+{
+  "parameters": {
+    "id": 3,
+    "enabled": true,
+    "name": "auto-increment-timestamp",
+    "outputTable": "in.c-main.auto-increment-timestamp",
+    "incremental": true,
+    "incrementalFetchingColumn": "_Weir%d I-D",
+    "primaryKey": ["_Weir%d I-D"],
+    "table": {
+      "schema": "test",
+      "tableName": "auto Increment Timestamp"
+    },
+    "db": {
+      "host": "%env(string:MYSQL_DB_HOST)%",
+      "port": "%env(string:MYSQL_DB_PORT)%",
+      "user": "%env(string:MYSQL_DB_USER)%",
+      "#password": "%env(string:MYSQL_DB_PASSWORD)%",
+      "database": "%env(string:MYSQL_DB_DATABASE)%"
+    }
+  }
+}
