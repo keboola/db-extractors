@@ -1,0 +1,80 @@
+name: GitHub Actions CI
+on: [ push ]
+concurrency: ci-${{ github.ref }} # to avoid tag collisions in the ECR
+
+env:
+  DOCKERHUB_USER: "keboolabot"
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      app_image_tag: ${{ steps.set_tag.outputs.app_image_tag }}
+      is_semantic_tag: ${{ steps.set_tag.outputs.is_semantic_tag }}
+      changedProjects_dbExtractorAdapter: ${{ steps.check_changes.outputs.changedProjects_dbExtractorAdapter }}
+      changedProjects_dbExtractorCommon: ${{ steps.check_changes.outputs.changedProjects_dbExtractorCommon }}
+      changedProjects_dbExtractorConfig: ${{ steps.check_changes.outputs.changedProjects_dbExtractorConfig }}
+      changedProjects_dbExtractorSshTunnel: ${{ steps.check_changes.outputs.changedProjects_dbExtractorSshTunnel }}
+      changedProjects_dbExtractorTableFormat: ${{ steps.check_changes.outputs.changedProjects_dbExtractorTableFormat }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for changes
+        id: check_changes
+        run: |
+          bin/ci-find-changes.sh main \
+            dbExtractorAdapter:libs/db-extractor-adapter \
+            dbExtractorCommon:libs/db-extractor-common \
+            dbExtractorConfig:libs/db-extractor-config \
+            dbExtractorSshTunnel:libs/db-extractor-ssh-tunnel \
+            dbExtractorTableFormat:libs/db-extractor-table-format
+      - name: Set image tag
+        id: set_tag
+        run: |
+          ORIGINAL_TAG="${GITHUB_REF##*/}"
+          TAG=$(echo "$ORIGINAL_TAG" | grep -o 'v\?[0-9]\+\.[0-9]\+\.[0-9]\+$' || echo "$ORIGINAL_TAG")
+          IS_SEMANTIC_TAG=$(echo "$TAG" | grep -q '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$' && echo true || echo false)
+          echo "Tag = '$TAG', is semantic tag = '$IS_SEMANTIC_TAG'"
+          echo "is_semantic_tag=$IS_SEMANTIC_TAG" >> $GITHUB_OUTPUT
+          echo "app_image_tag=$TAG" >> $GITHUB_OUTPUT
+
+  db-extractor-adapter:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorAdapter == '1' }}
+    uses: ./.github/workflows/db-extractor-adapter.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-common:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorCommon == '1' }}
+    uses: ./.github/workflows/db-extractor-common.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-config:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorConfig == '1' }}
+    uses: ./.github/workflows/db-extractor-config.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-ssh-tunnel:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorSshTunnel == '1' }}
+    uses: ./.github/workflows/db-extractor-ssh-tunnel.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
+
+  db-extractor-table-format:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorTableFormat == '1' }}
+    uses: ./.github/workflows/db-extractor-table-format.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN

@@ -1,5 +1,5 @@
 {
-    "name": "keboola/db-extractor-table-format",
+    "name": "keboola/db-extractors-db-extractor-table-format",
     "description": "PHP class for formating table result",
     "type": "library",
     "license": "MIT",

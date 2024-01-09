@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  wait-mariadb:
+    image: waisbrot/wait
+    links:
+      - mariadb
+    environment:
+      - TARGETS=mariadb:3306
+      - TIMEOUT=120
+
+  wait-mysql:
+    image: waisbrot/wait
+    links:
+      - mysql
+    environment:
+      - TARGETS=mysql:3306
+      - TIMEOUT=120
+
+  wait-mysql-ssl:
+    image: waisbrot/wait
+    links:
+      - mysql-ssl
+    environment:
+      - TARGETS=mysql-ssl:3306
+      - TIMEOUT=120
+
+  wait-sshproxy:
+    image: waisbrot/wait
+    links:
+      - sshproxy
+    environment:
+      - TARGETS=sshproxy:22
+      - TIMEOUT=120
+
+  sshproxy:
+    image: keboola/db-component-ssh-proxy:latest
+    volumes:
+      - ssh-keys:/root/.ssh
+
+  toxiproxy:
+    image: shopify/toxiproxy
