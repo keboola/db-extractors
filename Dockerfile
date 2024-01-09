@@ -463,6 +463,80 @@ RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-s
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-instantclient/instantclient-sqlplus-linux.x64-12.2.0.1.0.zip /tmp/instantclient-sqlplus.zip
 RUN /usr/bin/aws s3 cp s3://keboola-drivers/oracle-table-exporter/TableExporter-$TABLE_EXPORTER_VERSION-jar-with-dependencies.jar /tmp/table-exporter.jar
 
+FROM base-buster AS app-db-extractor-oracle
+ENV APP_NAME=db-extractor-oracle
+ENV APP_HOME=/code/apps/${APP_NAME}
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV TZ=UTC
+
+WORKDIR ${APP_HOME}
+
+RUN apt-get update -q \
+  && apt-get install -y unzip ssh libmcrypt-dev libaio1 wget gnupg git dirmngr libicu-dev --no-install-recommends
+
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
+
+# Table exporter
+COPY --from=aws-cli /tmp/table-exporter.jar /opt/table-exporter.jar
+
+# Oracle instantclient
+COPY --from=aws-cli /tmp/instantclient-basiclite.zip /tmp/instantclient-basiclite.zip
+COPY --from=aws-cli /tmp/instantclient-sdk.zip /tmp/instantclient-sdk.zip
+COPY --from=aws-cli /tmp/instantclient-sqlplus.zip /tmp/instantclient-sqlplus.zip
+
+RUN unzip /tmp/instantclient-basiclite.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sdk.zip -d /usr/local/
+RUN unzip /tmp/instantclient-sqlplus.zip -d /usr/local/
+
+RUN ln -s /usr/local/instantclient_12_2 /usr/local/instantclient
+RUN ln -s /usr/local/instantclient/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
+RUN ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
+
+RUN export LD_LIBRARY_PATH=/usr/local/instantclient
+RUN export PATH=/usr/local/instantclient:$PATH
+RUN echo 'instantclient,/usr/local/instantclient' | pecl install oci8-3.2.0
+RUN echo "extension=oci8.so" > /usr/local/etc/php/conf.d/php-oci8.ini
+RUN echo /usr/local/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf
+RUN ldconfig
+
+RUN mkdir -p /usr/share/man/man1
+
+COPY --from=aws-cli /tmp/oracle-jdk.tar.gz /tmp/oracle-jdk.tar.gz
+
+RUN mkdir /usr/lib/jvm/ && tar zxvf /tmp/oracle-jdk.tar.gz -C /usr/lib/jvm/ \
+ && update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk1.8.0_231/bin/java 4 \
+ &&  update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk1.8.0_231/bin/javac 4 \
+ && update-alternatives --config java \
+ && rm /tmp/oracle-jdk.tar.gz
+
+ENV JAVA_HOME /usr/lib/jvm/jdk1.8.0_231
+
+WORKDIR /root
+RUN curl -sS https://getcomposer.org/installer | php \
+  && mv composer.phar /usr/local/bin/composer
+
+COPY apps/${APP_NAME}/docker/php/php-prod.ini /usr/local/etc/php/php.ini
+
+WORKDIR ${APP_HOME}
+
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY apps/${APP_NAME}/composer.* ${APP_HOME}/
+COPY libs/ /code/libs/
+
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+
+# copy rest of the app
+COPY apps/${APP_NAME}/ ${APP_HOME}/
+
+# run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
+
+CMD ["php", "./src/run.php"]
+
 FROM mcr.microsoft.com/mssql/server:2019-latest AS mssql
 
 USER root

@@ -99,3 +99,34 @@ services:
       - ../apps/db-extractor-pgsql/data:/data
       - ../docker/databases/pgsql/ssl/:/ssl-cert:z
       - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-oracle: &db-extractor-oracle
+    build:
+      context: ..
+      target: app-db-extractor-oracle
+      args:
+        - PHP_VERSION=8.2
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+        - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+    image: keboola/db-extractor-oracle
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - oracle
+      - sshproxy
+
+  dev-db-extractor-oracle:
+    <<: *db-extractor-oracle
+    volumes:
+      - ../apps/db-extractor-oracle:/code/apps/db-extractor-oracle
+      - ../apps/db-extractor-oracle/data:/data
+      - ../apps/db-extractor-oracle/docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ssh-keys:/root/.ssh:ro

@@ -70,3 +70,7 @@ services:
     <<: *pgsql
     image: keboola/pgsql-ssl-test:${PGSQL_VERSION:-13}
     command: -c hba_file=/etc/postgresql/pg_hba_ssl.conf -c ssl=on -c ssl_ca_file=/ssl-cert/ca-cert.pem -c ssl_cert_file=/ssl-cert/server-cert.pem -c ssl_key_file=/ssl-cert/server-key.pem
+
+  oracle:
+    build: https://github.com/keboola/docker-oracle-xe-11g.git
+    image: wnameless/oracle-xe-11g-r2

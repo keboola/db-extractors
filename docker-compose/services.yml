@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   wait-mariadb:
     image: waisbrot/wait
     links:
@@ -64,6 +65,14 @@ services:
     environment:
       - TARGETS=pgsql-ssl:5432
       - TIMEOUT=120
+
+  wait-oracle:
+    image: waisbrot/wait
+    depends_on:
+      - oracle
+    environment:
+      - TARGETS=oracle:8080
+      - TIMEOUT=200
 
   wait-sshproxy:
     image: waisbrot/wait
