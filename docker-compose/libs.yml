@@ -1,6 +1,33 @@
 version: '3.8'
 
 services:
+  app-db-extractor-adapter: &db-extractor-adapter
+    image: keboola/db-extractor-adapter
+    build:
+      context: ..
+      target: lib-db-extractor-adapter
+      args:
+        - PHP_VERSION=8.2
+    volumes:
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+    environment:
+      DB_USER: root
+      DB_PASSWORD: somePassword
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: testdb
+    depends_on:
+      - mariadb
+      - toxiproxy
+
+  dev-db-extractor-adapter:
+    <<: *db-extractor-adapter
+    volumes:
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ../:/code
+
   app-db-extractor-config: &db-extractor-config
     image: keboola/db-extractor-config
     build:

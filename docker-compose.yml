@@ -3,6 +3,7 @@ version: '3.8'
 include:
   - path: docker-compose/libs.yml
   - path: docker-compose/services.yml
+  - path: docker-compose/databases.yml
 
 services: {}
 

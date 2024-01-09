@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:${MARIADB_VERSION:-11.1}
+    environment:
+      MARIADB_DATABASE: testdb
+      MARIADB_ROOT_PASSWORD: somePassword

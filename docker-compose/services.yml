@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  wait-mariadb:
+    image: waisbrot/wait
+    links:
+      - mariadb
+    environment:
+      - TARGETS=mariadb:3306
+      - TIMEOUT=120
+
   sshproxy:
     image: keboola/db-component-ssh-proxy:latest
     volumes:

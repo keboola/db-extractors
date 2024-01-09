@@ -12,6 +12,7 @@ jobs:
     outputs:
       app_image_tag: ${{ steps.set_tag.outputs.app_image_tag }}
       is_semantic_tag: ${{ steps.set_tag.outputs.is_semantic_tag }}
+      changedProjects_dbExtractorAdapter: ${{ steps.check_changes.outputs.changedProjects_dbExtractorAdapter }}
       changedProjects_dbExtractorConfig: ${{ steps.check_changes.outputs.changedProjects_dbExtractorConfig }}
       changedProjects_dbExtractorSshTunnel: ${{ steps.check_changes.outputs.changedProjects_dbExtractorSshTunnel }}
       changedProjects_dbExtractorTableFormat: ${{ steps.check_changes.outputs.changedProjects_dbExtractorTableFormat }}
@@ -22,6 +23,7 @@ jobs:
         id: check_changes
         run: |
           bin/ci-find-changes.sh main \
+            dbExtractorAdapter:libs/db-extractor-adapter \
             dbExtractorConfig:libs/db-extractor-config \
             dbExtractorSshTunnel:libs/db-extractor-ssh-tunnel \
             dbExtractorTableFormat:libs/db-extractor-table-format
@@ -34,6 +36,14 @@ jobs:
           echo "Tag = '$TAG', is semantic tag = '$IS_SEMANTIC_TAG'"
           echo "is_semantic_tag=$IS_SEMANTIC_TAG" >> $GITHUB_OUTPUT
           echo "app_image_tag=$TAG" >> $GITHUB_OUTPUT
+
+  db-extractor-adapter:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.changedProjects_dbExtractorAdapter == '1' }}
+    uses: ./.github/workflows/db-extractor-adapter.yml
+    with:
+      dockerhub-user: $DOCKERHUB_USER
+      dockerhub-token: $DOCKERHUB_TOKEN
 
   db-extractor-config:
     needs: prepare
