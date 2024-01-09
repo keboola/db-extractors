@@ -1,0 +1,20 @@
+version: '2'
+services:
+  app: &base
+    build: .
+    working_dir: /code
+    links:
+      - sshproxy
+  dev:
+    <<: *base
+    volumes:
+      - .:/code
+
+  sshproxy:
+    build: ./tests/env/sshproxy
+    image: db-ex-ssh-tunnel-sshproxy
+    volumes:
+      - ./tests/env/sshproxy:/code
+    working_dir: /code
+    ports:
+      - "2222:22"
