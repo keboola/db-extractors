@@ -1,0 +1,21 @@
+{
+  "parameters": {
+    "id": 3,
+    "enabled": true,
+    "name": "auto-increment-timestamp",
+    "outputTable": "in.c-main.auto-increment-timestamp",
+    "incremental": true,
+    "incrementalFetchingColumn": "date",
+    "incrementalFetchingLimit": 2,
+    "primaryKey": ["_Weir%d I-D"],
+    "table": {
+      "schema": "TESTER",
+      "tableName": "auto Increment Timestamp"
+    },
+    "db": {
+      "tnsnames": "XE = (DESCRIPTION = (ADDRESS = (PROTOCOL = tcp)(HOST=oracle)(PORT = 1521))(CONNECT_DATA = (SID=xe)(SERVICE_NAME = XE)))",
+      "user": "%env(string:ORACLE_DB_USER)%",
+      "#password": "%env(string:ORACLE_DB_PASSWORD)%"
+    }
+  }
+}
