@@ -46,7 +46,7 @@ trait ConfigTrait
         "incremental": false,
         "primaryKey": null,
         "table": {
-          "schema": "test",
+          "schema": "testdb",
           "tableName": "sales"
         },
         "columns": [
@@ -97,7 +97,7 @@ JSON;
     "db": %s,
     "table": {
         "tableName": "auto Increment Timestamp",
-        "schema": "test"    
+        "schema": "testdb"    
     },
     "name": "auto-increment-timestamp",
     "outputTable": "in.c-main.auto-increment-timestamp",

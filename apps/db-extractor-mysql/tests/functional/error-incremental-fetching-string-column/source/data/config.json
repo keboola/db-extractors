@@ -8,7 +8,7 @@
     "incrementalFetchingColumn": "Weir%d Na-me",
     "primaryKey": ["_Weir%d I-D"],
     "table": {
-      "schema": "test",
+      "schema": "testdb",
       "tableName": "auto Increment Timestamp"
     },
     "db": {

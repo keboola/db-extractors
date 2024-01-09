@@ -9,7 +9,7 @@
         "incremental": false,
         "primaryKey": null,
         "table": {
-          "schema": "test",
+          "schema": "testdb",
           "tableName": "unexistTable"
         }
       }

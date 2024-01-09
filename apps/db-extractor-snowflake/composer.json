@@ -15,16 +15,23 @@
             "email": "devel@keboola.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../libs/*"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "ext-json": "*",
         "ext-odbc": "*",
         "keboola/csv": "^3.2",
         "keboola/db-adapter-snowflake": "^1.4",
-        "keboola/db-extractor-adapter": "^1.13",
-        "keboola/db-extractor-common": "^16.2",
-        "keboola/db-extractor-config": "^1.14",
-        "keboola/db-extractor-table-format": "^3.8",
+        "keboola/db-extractors-db-extractor-adapter": "*@dev",
+        "keboola/db-extractors-db-extractor-common": "*@dev",
+        "keboola/db-extractors-db-extractor-config": "*@dev",
+        "keboola/db-extractors-db-extractor-ssh-tunnel": "*@dev",
+        "keboola/db-extractors-db-extractor-table-format": "*@dev",
         "keboola/php-component": "^9.4",
         "keboola/php-datatypes": "^7.2",
         "keboola/php-temp": "^2.0",
@@ -32,12 +39,10 @@
         "symfony/process": "^5.2"
     },
     "require-dev": {
-        "cweagans/composer-patches": "^1.7",
         "keboola/coding-standard": "^15.0",
         "keboola/datadir-tests": "^5.6",
         "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "^9.5",
-        "symplify/vendor-patches": "^11.2"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
@@ -75,15 +80,7 @@
         "process-timeout": 0,
         "sort-packages": true,
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "cweagans/composer-patches": true
-        }
-    },
-    "extra": {
-        "patches": {
-            "keboola/csv": [
-                "patches/keboola-csv-src-csvreader-php.patch"
-            ]
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }

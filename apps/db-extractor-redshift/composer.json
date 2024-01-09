@@ -9,13 +9,20 @@
             "email": "devel@keboola.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../libs/*"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "ext-PDO": "*",
-        "keboola/db-extractor-adapter": "^1.13",
-        "keboola/db-extractor-common": "^16.2",
-        "keboola/db-extractor-config": "^1.14",
-        "keboola/db-extractor-table-format": "^3.8"
+        "keboola/db-extractors-db-extractor-adapter": "*@dev",
+        "keboola/db-extractors-db-extractor-common": "*@dev",
+        "keboola/db-extractors-db-extractor-config": "*@dev",
+        "keboola/db-extractors-db-extractor-ssh-tunnel": "*@dev",
+        "keboola/db-extractors-db-extractor-table-format": "*@dev"
     },
     "require-dev": {
         "aws/aws-sdk-php": "^3.286",

@@ -1,0 +1,187 @@
+version: '3.8'
+
+services:
+  app-db-extractor-mssql: &db-extractor-mssql
+    image: keboola/db-extractor-mssql
+    build:
+      context: ..
+      target: app-db-extractor-mssql
+      args:
+        - PHP_VERSION=8.2
+    volumes:
+      - ssh-keys:/root/.ssh
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      MSSQL_DB_HOST: mssql
+      MSSQL_DB_SSL_HOST: mssql-ssl
+      MSSQL_DB_SSL_HOST_INVALID_CN: mssql-ssl-invalid-cn
+      MSSQL_DB_PORT: 1433
+      MSSQL_DB_USER: sa
+      MSSQL_DB_PASSWORD: "yourStrong(!)Password"
+      MSSQL_DB_DATABASE: test
+    links:
+      - sshproxy
+      - mssql
+      - mssql-ssl
+      - mssql-ssl-invalid-cn
+
+  dev-db-extractor-mssql:
+    <<: *db-extractor-mssql
+    volumes:
+      - ssh-keys:/root/.ssh
+      - ../apps/db-extractor-mssql:/code/apps/db-extractor-mssql
+      - ../apps/db-extractor-mssql/data:/data
+
+  app-db-extractor-mysql: &db-extractor-mysql
+    build:
+      context: ..
+      target: app-db-extractor-mysql
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-mysql
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      MYSQL_DB_HOST: mysql
+      MYSQL_DB_SSL_HOST: mysql-ssl
+      MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
+      MYSQL_DB_USER: root
+      MYSQL_DB_PASSWORD: somePassword
+      MYSQL_DB_DATABASE: testdb
+      MYSQL_DB_PORT: 3306
+    volumes:
+      - ../docker/databases/mysql/ssl:/ssl-cert
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - mysql
+      - mysql-ssl
+      - mysql-ssl:mysql-different-cn
+      - sshproxy
+
+  dev-db-extractor-mysql:
+    <<: *db-extractor-mysql
+    volumes:
+      - ../apps/db-extractor-mysql:/code/apps/db-extractor-mysql
+      - ../apps/db-extractor-mysql/data:/data
+      - ../docker/databases/mysql/ssl:/ssl-cert
+      - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-pgsql: &db-extractor-pgsql
+    build:
+      context: ..
+      target: app-db-extractor-pgsql
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-pgsql
+    environment:
+      - KBC_COMPONENT_RUN_MODE=run
+      - PGSQL_DB_HOST=pgsql
+      - PGSQL_DB_SSL_HOST=pgsql-ssl
+      - PGSQL_DB_SSL_HOST_BAD_CN=pgsql-ssl-bad-cn
+      - PGSQL_DB_PORT=5432
+      - PGSQL_DB_DATABASE=postgres
+      - PGSQL_DB_USER=postgres
+      - PGSQL_DB_PASSWORD=some password
+      - PGSQL_DB_RO_USER=readonly_user
+      - PGSQL_DB_RO_PASSWORD=password
+    volumes:
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - pgsql
+      - pgsql-ssl
+      - pgsql-ssl:pgsql-ssl-bad-cn
+      - sshproxy
+
+  dev-db-extractor-pgsql:
+    <<: *db-extractor-pgsql
+    volumes:
+      - ../apps/db-extractor-pgsql:/code/apps/db-extractor-pgsql
+      - ../apps/db-extractor-pgsql/data:/data
+      - ../docker/databases/pgsql/ssl/:/ssl-cert:z
+      - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-oracle: &db-extractor-oracle
+    build:
+      context: ..
+      target: app-db-extractor-oracle
+      args:
+        - PHP_VERSION=8.2
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+        - AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN:-}
+    image: keboola/db-extractor-oracle
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      ORACLE_DB_HOST: oracle
+      ORACLE_DB_PORT: 1521
+      ORACLE_DB_USER: tester
+      ORACLE_DB_PASSWORD: tester
+      ORACLE_DB_DATABASE: xe
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - oracle
+      - sshproxy
+
+  dev-db-extractor-oracle:
+    <<: *db-extractor-oracle
+    volumes:
+      - ../apps/db-extractor-oracle:/code/apps/db-extractor-oracle
+      - ../apps/db-extractor-oracle/data:/data
+      - ../apps/db-extractor-oracle/docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-redshift: &db-extractor-redshift
+    build:
+      context: .
+      target: app-db-extractor-redshift
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-redshift
+    environment:
+      - KBC_COMPONENT_RUN_MODE=run
+      - REDSHIFT_DB_HOST
+      - REDSHIFT_DB_PORT
+      - REDSHIFT_DB_DATABASE
+      - REDSHIFT_DB_USER
+      - REDSHIFT_DB_PASSWORD
+      - REDSHIFT_DB_SCHEMA
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - AWS_REGION
+      - AWS_S3_BUCKET
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - sshproxy
+
+  dev-db-extractor-redshift:
+    <<: *db-extractor-redshift
+    volumes:
+      - ../apps/db-extractor-redshift:/code/apps/db-extractor-redshift
+      - ../apps/db-extractor-redshift/data:/data
+      - ssh-keys:/root/.ssh:ro
+
+  app-db-extractor-snowflake: &db-extractor-snowflake
+    build:
+      context: .
+      target: app-db-extractor-snowflake
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-snowflake
+    environment:
+      - KBC_COMPONENT_RUN_MODE
+      - KBC_RUNID
+      - SNOWFLAKE_DB_HOST
+      - SNOWFLAKE_DB_PORT
+      - SNOWFLAKE_DB_USER
+      - SNOWFLAKE_DB_PASSWORD
+      - SNOWFLAKE_DB_DATABASE
+      - SNOWFLAKE_DB_SCHEMA
+      - SNOWFLAKE_DB_WAREHOUSE
+
+  dev-db-extractor-snowflake:
+    <<: *db-extractor-snowflake
+    volumes:
+      - ../apps/db-extractor-snowflake:/code/apps/db-extractor-snowflake
+      - ../apps/db-extractor-snowflake/data:/data

@@ -1,0 +1,1 @@
+{"parameters":{"db":{"host":"redshift","user":"root","#password":"rootpassword","database":"redshiftDatabase","port":3306},"query":"SELECT * FROM escaping","incrementalFetchingColumn":"id","outputTable":"in.c-main.escaping"}}

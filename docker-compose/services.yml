@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   wait-mariadb:
     image: waisbrot/wait
     links:
@@ -24,6 +25,54 @@ services:
     environment:
       - TARGETS=mysql-ssl:3306
       - TIMEOUT=120
+
+  wait-mssql:
+    image: waisbrot/wait
+    links:
+      - mssql
+    environment:
+      - TARGETS=mssql:1433
+      - TIMEOUT=120
+
+  wait-mssql-ssl:
+    image: waisbrot/wait
+    links:
+      - mssql-ssl
+    environment:
+      - TARGETS=mssql-ssl:1433
+      - TIMEOUT=120
+
+  wait-mssql-ssl-invalid-cn:
+    image: waisbrot/wait
+    links:
+      - mssql-ssl-invalid-cn
+    environment:
+      - TARGETS=mssql-ssl-invalid-cn:1433
+      - TIMEOUT=120
+
+  wait-pgsql:
+    image: waisbrot/wait
+    links:
+      - pgsql
+    environment:
+      - TARGETS=pgsql:5432
+      - TIMEOUT=120
+
+  wait-pgsql-ssl:
+    image: waisbrot/wait
+    links:
+      - pgsql-ssl
+    environment:
+      - TARGETS=pgsql-ssl:5432
+      - TIMEOUT=120
+
+  wait-oracle:
+    image: waisbrot/wait
+    depends_on:
+      - oracle
+    environment:
+      - TARGETS=oracle:8080
+      - TIMEOUT=200
 
   wait-sshproxy:
     image: waisbrot/wait

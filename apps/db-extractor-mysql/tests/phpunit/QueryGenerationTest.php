@@ -97,7 +97,7 @@ class QueryGenerationTest extends TestCase
                 [
                     'table' => [
                         'tableName' => 'auto Increment Timestamp',
-                        'schema' => 'test',
+                        'schema' => 'testdb',
                     ],
                     'columns' => [],
                     'incremental' => true,
@@ -105,14 +105,14 @@ class QueryGenerationTest extends TestCase
                     'incrementalFetchingColumn' => 'datetime',
                 ],
                 [],
-                'SELECT * FROM `test`.`auto Increment Timestamp` ORDER BY `datetime` LIMIT 10',
+                'SELECT * FROM `testdb`.`auto Increment Timestamp` ORDER BY `datetime` LIMIT 10',
             ],
             // test simplePDO query with limit and idp column and previos state
             [
                 [
                     'table' => [
                         'tableName' => 'auto Increment Timestamp',
-                        'schema' => 'test',
+                        'schema' => 'testdb',
                     ],
                     'columns' => [],
                     'incremental' => true,
@@ -122,14 +122,14 @@ class QueryGenerationTest extends TestCase
                 [
                     'lastFetchedRow' => 4,
                 ],
-                "SELECT * FROM `test`.`auto Increment Timestamp` WHERE `_Weir%d I-D` >= '4' ORDER BY `_Weir%d I-D` LIMIT 10",
+                "SELECT * FROM `testdb`.`auto Increment Timestamp` WHERE `_Weir%d I-D` >= '4' ORDER BY `_Weir%d I-D` LIMIT 10",
             ],
             // test simplePDO query timestamp column but no state and no limit
             [
                 [
                     'table' => [
                         'tableName' => 'auto Increment Timestamp',
-                        'schema' => 'test',
+                        'schema' => 'testdb',
                     ],
                     'columns' => [],
                     'incremental' => true,
@@ -137,14 +137,14 @@ class QueryGenerationTest extends TestCase
                     'incrementalFetchingColumn' => 'datetime',
                 ],
                 [],
-                'SELECT * FROM `test`.`auto Increment Timestamp` ORDER BY `datetime`',
+                'SELECT * FROM `testdb`.`auto Increment Timestamp` ORDER BY `datetime`',
             ],
             // test simplePDO query id column and previous state and no limit
             [
                 [
                     'table' => [
                         'tableName' => 'auto Increment Timestamp',
-                        'schema' => 'test',
+                        'schema' => 'testdb',
                     ],
                     'columns' => [],
                     'incremental' => true,
@@ -154,7 +154,7 @@ class QueryGenerationTest extends TestCase
                 [
                     'lastFetchedRow' => 4,
                 ],
-                "SELECT * FROM `test`.`auto Increment Timestamp` WHERE `_Weir%d I-D` >= '4' ORDER BY `_Weir%d I-D`",
+                "SELECT * FROM `testdb`.`auto Increment Timestamp` WHERE `_Weir%d I-D` >= '4' ORDER BY `_Weir%d I-D`",
             ],
         ];
     }
