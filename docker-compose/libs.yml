@@ -14,6 +14,24 @@ services:
     volumes:
       - ../:/code
 
+  app-db-extractor-ssh-tunnel: &db-extractor-ssh-tunnel
+    image: keboola/db-extractor-ssh-tunnel
+    build:
+      context: ..
+      target: lib-db-extractor-ssh-tunnel
+      args:
+        - PHP_VERSION=8.2
+    links:
+      - sshproxy
+    volumes:
+      - ssh-keys:/root/.ssh:ro
+
+  dev-db-extractor-ssh-tunnel:
+    <<: *db-extractor-ssh-tunnel
+    volumes:
+      - ../:/code
+      - ssh-keys:/root/.ssh:ro
+
   app-db-extractor-table-format: &db-extractor-table-format
     image: keboola/db-extractor-table-format
     build:
