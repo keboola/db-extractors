@@ -1,0 +1,6 @@
+parameters:
+    treatPhpDocTypesAsCertain: false
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        # Required constructor argumens of ValueObjects are checked, see: RequiredPropertiesTrait
+        - '#ValueObject\\.* constructor expects string, string\|null given.#'
