@@ -28,6 +28,45 @@ services:
       - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
       - ../:/code
 
+  app-db-extractor-common: &db-extractor-common
+    image: keboola/db-extractor-common
+    build:
+      context: ..
+      target: lib-db-extractor-adapter
+      args:
+        - PHP_VERSION=8.2
+    environment:
+      COMMON_DB_USER: root
+      COMMON_DB_PASSWORD: somePassword
+      COMMON_DB_HOST: mysql
+      COMMON_DB_HOST_SSL: mysql-ssl
+      COMMON_DB_PORT: 3306
+      COMMON_DB_DATABASE: testdb
+    depends_on:
+      - sshproxy
+      - mysql
+      - mysql-ssl
+      - toxiproxy
+    volumes:
+      - ../libs/db-extractor-adapter/:/code/libs/db-extractor-adapter
+      - ../libs/db-extractor-ssh-tunnel/:/code/libs/db-extractor-ssh-tunnel
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ssh-keys:/root/.ssh:ro
+      - ../docker/databases/mysql/ssl:/ssl-cert
+
+  dev-db-extractor-common:
+    <<: *db-extractor-common
+    volumes:
+      - ../libs/db-extractor-adapter/:/code/libs/db-extractor-adapter
+      - ../libs/db-extractor-ssh-tunnel/:/code/libs/db-extractor-ssh-tunnel
+      - ../libs/db-extractor-config/:/code/libs/db-extractor-config
+      - ../libs/db-extractor-table-format/:/code/libs/db-extractor-table-format
+      - ../:/code
+      - ssh-keys:/root/.ssh:ro
+      - ../docker/databases/mysql/ssl:/ssl-cert
+
+
   app-db-extractor-config: &db-extractor-config
     image: keboola/db-extractor-config
     build:
