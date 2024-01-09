@@ -1,13 +1,13 @@
 [%s] DEBUG: Component initialization completed [] []
-Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8;dbname=test".
+Creating PDO connection to "mysql:host=mysql;port=3306;charset=utf8;dbname=testdb".
 Exporting "sales" to "in.c-main.escaping".
 [%s] DEBUG: Running query "SELECT * FROM escaping". [] []
 [%s] DEBUG: Running query "SELECT 1". [] []
 Exported "7" rows to "in.c-main.escaping".
 Exporting "sales" to "in.c-main.sales".
-[%s] DEBUG: Running query "SELECT * FROM `test`.`sales`". [] []
+[%s] DEBUG: Running query "SELECT * FROM `testdb`.`sales`". [] []
 [%s] DEBUG: Running query "SELECT 1". [] []
-[%s] DEBUG: Running query "SELECT * FROM INFORMATION_SCHEMA.TABLES as c WHERE LOWER(c.TABLE_SCHEMA) = 'test' AND LOWER(c.TABLE_NAME) IN ('sales') ORDER BY TABLE_SCHEMA, TABLE_NAME". [] []
-[%s] DEBUG: Running query "SELECT * FROM INFORMATION_SCHEMA.COLUMNS as c WHERE LOWER(c.TABLE_SCHEMA) = 'test' AND LOWER(c.TABLE_NAME) IN ('sales') ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION". [] []
-[%s] DEBUG: Running query "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE as c WHERE LOWER(c.TABLE_SCHEMA) = 'test' AND LOWER(c.TABLE_NAME) IN ('sales')". [] []
+[%s] DEBUG: Running query "SELECT * FROM INFORMATION_SCHEMA.TABLES as c WHERE LOWER(c.TABLE_SCHEMA) = 'testdb' AND LOWER(c.TABLE_NAME) IN ('sales') ORDER BY TABLE_SCHEMA, TABLE_NAME". [] []
+[%s] DEBUG: Running query "SELECT * FROM INFORMATION_SCHEMA.COLUMNS as c WHERE LOWER(c.TABLE_SCHEMA) = 'testdb' AND LOWER(c.TABLE_NAME) IN ('sales') ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION". [] []
+[%s] DEBUG: Running query "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, REFERENCED_TABLE_SCHEMA FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE as c WHERE LOWER(c.TABLE_SCHEMA) = 'testdb' AND LOWER(c.TABLE_NAME) IN ('sales')". [] []
 Exported "100" rows to "in.c-main.sales".

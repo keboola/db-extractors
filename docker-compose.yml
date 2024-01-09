@@ -4,6 +4,7 @@ include:
   - path: docker-compose/libs.yml
   - path: docker-compose/services.yml
   - path: docker-compose/databases.yml
+  - path: docker-compose/apps.yml
 
 services: {}
 

@@ -97,7 +97,7 @@ class MySQLTest extends TestCase
         $tableParams['primaryKey'] = ['some_primary_key'];
         $tableParams['table'] = [
             'tableName' => 'auto Increment Timestamp FK',
-            'schema' => 'test',
+            'schema' => 'testdb',
         ];
         if ($isConfigRow) {
             $config['parameters'] = $tableParams;
@@ -118,7 +118,7 @@ class MySQLTest extends TestCase
         $expectedMetadata = [
             'KBC.name' => 'auto Increment Timestamp FK',
             'KBC.sanitizedName' => 'auto_Increment_Timestamp_FK',
-            'KBC.schema' => 'test',
+            'KBC.schema' => 'testdb',
             'KBC.type' => 'BASE TABLE',
             'KBC.rowCount' => 1,
         ];
@@ -320,7 +320,7 @@ class MySQLTest extends TestCase
                     ],
                     [
                         'key' => 'KBC.foreignKeyRefSchema',
-                        'value' => 'test',
+                        'value' => 'testdb',
                     ],
                     [
                         'key' => 'KBC.foreignKeyRefTable',
@@ -553,7 +553,7 @@ class MySQLTest extends TestCase
         $this->assertEquals([
             [
                 'name' => 'pk_fk_table',
-                'schema' => 'test',
+                'schema' => 'testdb',
                 'columns' =>
                     [
                         [
@@ -565,7 +565,7 @@ class MySQLTest extends TestCase
             ],
             [
                 'name' => 'pk_fk_target_table1',
-                'schema' => 'test',
+                'schema' => 'testdb',
                 'columns' =>
                     [
                         [
@@ -582,7 +582,7 @@ class MySQLTest extends TestCase
             ],
             [
                 'name' => 'pk_fk_target_table2',
-                'schema' => 'test',
+                'schema' => 'testdb',
                 'columns' =>
                     [
                         [
@@ -613,7 +613,7 @@ class MySQLTest extends TestCase
 
         // With this privilege can user list table names but not names of the columns
         // In MySQLMetadataProvider must be this situation properly handled
-        $this->connection->query("GRANT CREATE ON test.* TO 'user_no_perms'");
+        $this->connection->query("GRANT CREATE ON testdb.* TO 'user_no_perms'");
 
         $this->createAITable();
         $this->createEscapingTable();
@@ -646,7 +646,7 @@ class MySQLTest extends TestCase
         $config = $this->getRowConfig();
         unset($config['parameters']['query']);
         $config['parameters']['table'] = [
-            'schema' => 'TesT',
+            'schema' => 'TesTdb',
             'tableName' => 'Auto_INCREMENT_TimestamP',
         ];
 
@@ -665,9 +665,9 @@ class MySQLTest extends TestCase
             Assert::assertThat($e->getMessage(), Assert::logicalOr(
                 // Message differs between MySQL versions
                 Assert::stringContains(
-                    "Base table or view not found: 1146 Table 'TesT.Auto_INCREMENT_TimestamP' doesn't exist",
+                    "Base table or view not found: 1146 Table 'TesTdb.Auto_INCREMENT_TimestamP' doesn't exist",
                 ),
-                Assert::stringContains("Unknown database 'TesT'"),
+                Assert::stringContains("Unknown database 'TesTdb'"),
             ));
         }
     }

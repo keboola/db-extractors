@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app-db-extractor-mysql: &db-extractor-mysql
+    build:
+      context: ..
+      target: app-db-extractor-mysql
+      args:
+        - PHP_VERSION=8.2
+    image: keboola/db-extractor-mysql
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      MYSQL_DB_HOST: mysql
+      MYSQL_DB_SSL_HOST: mysql-ssl
+      MYSQL_DB_SSL_BAD_CN_HOST: mysql-different-cn
+      MYSQL_DB_USER: root
+      MYSQL_DB_PASSWORD: somePassword
+      MYSQL_DB_DATABASE: testdb
+      MYSQL_DB_PORT: 3306
+    volumes:
+      - ../docker/databases/mysql/ssl:/ssl-cert
+      - ssh-keys:/root/.ssh:ro
+    links:
+      - mysql
+      - mysql-ssl
+      - mysql-ssl:mysql-different-cn
+      - sshproxy
+
+  dev-db-extractor-mysql:
+    <<: *db-extractor-mysql
+    volumes:
+      - ../apps/db-extractor-mysql:/code/apps/db-extractor-mysql
+      - ../apps/db-extractor-mysql/data:/data
+      - ../docker/databases/mysql/ssl:/ssl-cert
+      - ssh-keys:/root/.ssh:ro

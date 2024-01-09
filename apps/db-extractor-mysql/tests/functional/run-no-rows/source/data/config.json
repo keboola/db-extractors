@@ -2,7 +2,7 @@
   "parameters": {
     "name": "simple",
     "table": {
-      "schema": "test",
+      "schema": "testdb",
       "tableName": "simple"
     },
     "outputTable": "in.c-main.simple",

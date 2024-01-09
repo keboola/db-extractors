@@ -245,3 +245,54 @@ COPY libs/${APP_NAME}/. ${APP_HOME}/
 RUN composer install $COMPOSER_FLAGS
 
 CMD ["composer", "ci"]
+
+FROM base-buster AS app-db-extractor-mysql
+ENV APP_NAME=db-extractor-mysql
+ENV APP_HOME=/code/apps/${APP_NAME}
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_PROCESS_TIMEOUT 3600
+
+WORKDIR ${APP_HOME}
+
+COPY apps/${APP_NAME}/docker/php-prod.ini /usr/local/etc/php/php.ini
+COPY docker/composer-install.sh /tmp/composer-install.sh
+
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    locales \
+    unzip \
+    ssh \
+    libicu-dev \
+    && rm -r /var/lib/apt/lists/* \
+    && sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
+    && locale-gen \
+    && chmod +x /tmp/composer-install.sh \
+    && /tmp/composer-install.sh
+
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
+
+ENV LANGUAGE=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# PDO mysql
+RUN docker-php-ext-install pdo_mysql
+
+## Composer - deps always cached unless changed
+# First copy only composer files
+COPY apps/${APP_NAME}/composer.* ${APP_HOME}/
+COPY libs/ /code/libs/
+
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install $COMPOSER_FLAGS --no-scripts --no-autoloader
+
+# Copy rest of the app
+COPY apps/${APP_NAME}/. ${APP_HOME}/
+
+# Run normal composer - all deps are cached already
+RUN composer install $COMPOSER_FLAGS
+
+CMD ["php", "/code/src/run.php"]
