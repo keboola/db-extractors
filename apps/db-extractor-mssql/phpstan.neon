@@ -1,0 +1,8 @@
+includes:
+    - ./phpstan-baseline.neon
+parameters:
+    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#Cannot call method fetch\(\) on PDOStatement\|false\.#'
+        - '#Cannot call method execute\(\) on PDOStatement\|false\.#'
+        - '#Unreachable statement - code above always terminates.#'

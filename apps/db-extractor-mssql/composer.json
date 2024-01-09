@@ -1,0 +1,83 @@
+{
+    "name": "keboola/db-extractor-mssql",
+    "license": "MIT",
+    "type": "project",
+    "description": "Keboola Microsoft SQL DB Writer",
+    "authors": [
+        {
+            "name": "keboola",
+            "email": "devel@keboola.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-PDO": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "keboola/csv": "^3.2",
+        "keboola/db-extractor-adapter": "^1.13",
+        "keboola/db-extractor-common": "^16.2",
+        "keboola/db-extractor-config": "^1.14",
+        "keboola/db-extractor-table-format": "^3.8",
+        "keboola/php-component": "^9.4",
+        "keboola/php-datatypes": "^7.2",
+        "symfony/config": "^6.3",
+        "symfony/process": "^5.4"
+    },
+    "require-dev": {
+        "cweagans/composer-patches": "^1.7",
+        "keboola/coding-standard": "^15.0",
+        "keboola/datadir-tests": "^5.6",
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^9.0",
+        "symplify/vendor-patches": "^11.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Keboola\\DbExtractor\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keboola\\DbExtractor\\Tests\\": "tests/phpunit/",
+            "Keboola\\DbExtractor\\TraitTests\\": "tests/traits/",
+            "Keboola\\DbExtractor\\FunctionalTests\\": "tests/functional/"
+        }
+    },
+    "scripts": {
+        "tests-phpunit": "phpunit --testsuite unit",
+        "tests-datadir": "phpunit --testsuite functional",
+        "tests-perf": "phpunit --testsuite perf",
+        "tests": [
+            "@tests-phpunit",
+            "@tests-datadir",
+            "@tests-perf"
+        ],
+        "phpstan": "phpstan analyse --no-progress --level=max ./src ./tests -c phpstan.neon",
+        "phpcs": "phpcs -n --ignore=vendor --extensions=php .",
+        "phpcbf": "phpcbf -n --ignore=vendor --extensions=php .",
+        "build": [
+            "@phpcs",
+            "@phpstan",
+            "@tests"
+        ],
+        "ci": [
+            "@composer validate --no-check-all --strict",
+            "@build"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "cweagans/composer-patches": true
+        }
+    },
+    "extra": {
+        "patches": {
+            "keboola/csv": [
+                "patches/keboola-csv-src-csvreader-php.patch"
+            ]
+        }
+    }
+}

@@ -1,0 +1,78 @@
+version: "3"
+services:
+  app: &app
+    build: .
+    image: keboola/ex-db-mssql
+    command: composer ci
+    volumes:
+      - ssh-keys:/root/.ssh
+    environment:
+      KBC_COMPONENT_RUN_MODE: run
+      MSSQL_DB_HOST: mssql
+      MSSQL_DB_SSL_HOST: mssql-ssl
+      MSSQL_DB_SSL_HOST_INVALID_CN: mssql-ssl-invalid-cn
+      MSSQL_DB_PORT: 1433
+      MSSQL_DB_USER: sa
+      MSSQL_DB_PASSWORD: "yourStrong(!)Password"
+      MSSQL_DB_DATABASE: test
+    links:
+      - sshproxy
+      - mssql
+      - mssql-ssl
+      - mssql-ssl-invalid-cn
+
+  dev:
+    <<: *app
+    volumes:
+      - ssh-keys:/root/.ssh
+      - ./data/:/data/
+      - .:/code
+
+  mssql: &mssql
+    image: mssql-server-linux
+    build:
+      context: .
+      dockerfile: docker/mssql/Dockerfile
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: "yourStrong(!)Password"
+
+  mssql-ssl:
+    <<: *mssql
+    image: mssql-server-linux-ssl
+    ports:
+      - "1434:1433"
+    build:
+      context: .
+      dockerfile: docker/mssql-ssl/Dockerfile
+
+  mssql-ssl-invalid-cn:
+    <<: *mssql
+    image: mssql-server-linux-ssl-invalid-cn
+    ports:
+      - "1435:1433"
+    build:
+      context: .
+      dockerfile: docker/mssql-ssl-invalid-cn/Dockerfile
+
+  sshproxy:
+    image: keboola/db-component-ssh-proxy:latest
+    volumes:
+      - ssh-keys:/root/.ssh
+    links:
+      - mssql
+
+  wait:
+    image: waisbrot/wait
+    depends_on:
+      - mssql-ssl-invalid-cn
+      - mssql-ssl
+      - mssql
+    environment:
+      - TARGETS=mssql-ssl:1433,mssql:1433,mssql-ssl-invalid-cn:1433
+      - TIMEOUT=200
+
+volumes:
+  ssh-keys:
